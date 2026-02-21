@@ -82,38 +82,37 @@ export default function Home() {
           <WranglerChat />
         </div>
 
-        {/* ── Service Pills ── */}
+        {/* ── Services ── */}
         <div
           className="hero-services"
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "10px",
+            gap: "6px 4px",
             justifyContent: "center",
             marginTop: "20px",
             padding: "0 24px",
+            alignItems: "center",
           }}
         >
-          {["Web Design", "Digital Marketing", "Branding", "Business Strategy"].map((service) => (
-            <span
-              key={service}
-              style={{
-                background: "rgba(255,255,255,0.55)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.75)",
-                borderRadius: "999px",
-                padding: "8px 18px",
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "#1a1514",
-                letterSpacing: "0.02em",
-                whiteSpace: "nowrap",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              }}
-            >
-              {service}
-            </span>
+          {["Web Design", "Digital Marketing", "Branding", "Business Strategy"].map((service, i, arr) => (
+            <>
+              <span
+                key={service}
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 500,
+                  color: "rgba(26,21,20,0.65)",
+                  letterSpacing: "0.02em",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {service}
+              </span>
+              {i < arr.length - 1 && (
+                <span key={`dot-${i}`} style={{ color: "rgba(26,21,20,0.3)", fontSize: "13px" }}>·</span>
+              )}
+            </>
           ))}
         </div>
 
