@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import FloatingNav from "@/components/FloatingNav";
 import WranglerChat from "@/components/WranglerChat";
 import { Features } from "@/components/ui/features-4";
@@ -14,7 +15,7 @@ export default function Home() {
         <div className="mesh-gradient absolute inset-0 w-full h-full" />
 
         {/* Logo (top-left, fixed) — offset below the 36px info bar */}
-        <div className="absolute left-6 z-50" style={{ top: "52px" }}>
+        <Link href="/" className="absolute left-6 z-50" style={{ top: "52px" }}>
           <Image
             src="/Main%20logo%202.png"
             alt="Creative Cowboys Media"
@@ -23,7 +24,7 @@ export default function Home() {
             priority
             className="w-[180px] h-auto"
           />
-        </div>
+        </Link>
 
         {/* ── Hero Headline — Pro Max: Agency Bold pattern ── */}
         <style>{`
