@@ -23,6 +23,7 @@ const navItems: NavItem[] = [
         icon: IoHomeOutline,
         gradientFrom: "#F15F2A",
         gradientTo: "#DBC792",
+        href: "/",
     },
     {
         name: "Services",
