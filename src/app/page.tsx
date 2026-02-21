@@ -3,6 +3,51 @@ import FloatingNav from "@/components/FloatingNav";
 import WranglerChat from "@/components/WranglerChat";
 import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
+import { TestimonialStack, Testimonial } from "@/components/ui/glass-testimonial-swiper";
+import { Users, Calendar, TrendingUp, Zap, Star, BarChart3, Globe, Megaphone } from "lucide-react";
+
+const testimonialsData: Testimonial[] = [
+  {
+    id: 1,
+    initials: 'JR',
+    name: 'Jake Rivera',
+    role: 'Owner, Lone Star HVAC',
+    quote: "Creative Cowboys completely transformed our online presence. Within 60 days of launching our new site, we were getting 3x more leads from Google. The team was hands-on the whole way through — felt like having an in-house marketing team.",
+    tags: [{ text: 'FEATURED', type: 'featured' }, { text: 'Web Design', type: 'default' }],
+    stats: [{ icon: TrendingUp, text: '3x more leads' }, { icon: Calendar, text: '60 day launch' }],
+    avatarGradient: 'linear-gradient(135deg, #F15F2A, #d97706)',
+  },
+  {
+    id: 2,
+    initials: 'AM',
+    name: 'Ashley Monroe',
+    role: 'Founder, Bloom Boutique',
+    quote: "The branding they built for us was exactly what I had in my head but couldn't articulate. Our store traffic doubled after the rebrand and we finally feel like a real brand, not just a small shop.",
+    tags: [{ text: 'Branding', type: 'default' }, { text: 'E-Commerce', type: 'default' }],
+    stats: [{ icon: Star, text: '5-star rated' }, { icon: Users, text: '2x store traffic' }],
+    avatarGradient: 'linear-gradient(135deg, #EA51FF, #8b5cf6)',
+  },
+  {
+    id: 3,
+    initials: 'CT',
+    name: 'Carlos Torres',
+    role: 'Co-Founder, Apex Roofing Co.',
+    quote: "We went from zero digital presence to ranking on the first page of Google in our area. The marketing strategy they put together was clear, affordable, and actually worked. Couldn't recommend them more.",
+    tags: [{ text: 'SEO', type: 'default' }, { text: 'Digital Marketing', type: 'featured' }],
+    stats: [{ icon: Globe, text: 'Page 1 Google' }, { icon: BarChart3, text: 'Organic growth' }],
+    avatarGradient: 'linear-gradient(135deg, #10b981, #059669)',
+  },
+  {
+    id: 4,
+    initials: 'SL',
+    name: 'Samantha Lee',
+    role: 'Director, Horizon Real Estate Group',
+    quote: "Our old website was embarrassing us at networking events. Creative Cowboys turned it around fast — clean, modern, and built to convert. Our inquiry form submissions went up immediately after launch.",
+    tags: [{ text: 'Web Design', type: 'default' }, { text: 'Quick Launch', type: 'default' }],
+    stats: [{ icon: Zap, text: 'Fast turnaround' }, { icon: Megaphone, text: 'More inquiries' }],
+    avatarGradient: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+  },
+];
 
 export default function Home() {
   return (
@@ -144,6 +189,19 @@ export default function Home() {
       <div id="services">
         <Features />
       </div>
+
+      {/* ===== Testimonials Section ===== */}
+      <section className="testimonials-section">
+        <span className="testimonials-eyebrow">Client Results</span>
+        <h2 className="testimonials-heading">
+          Real People.{" "}
+          <span style={{ background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            Real Results.
+          </span>
+        </h2>
+        <p className="testimonials-subheading">See what business owners are saying after working with us.</p>
+        <TestimonialStack testimonials={testimonialsData} visibleBehind={2} />
+      </section>
 
       {/* ===== Footer ===== */}
       <Footer7 />
