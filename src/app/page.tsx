@@ -1,6 +1,6 @@
 import Image from "next/image";
 import FloatingNav from "@/components/FloatingNav";
-import GHLChatWidget from "@/components/GHLChatWidget";
+import VoiceflowWidget from "@/components/VoiceflowWidget";
 import ChatBar from "@/components/ChatBar";
 import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
@@ -118,8 +118,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* ── GHL Chat Widget — script-loaded, auto-opens, centered via CSS ── */}
-        <GHLChatWidget />
+        {/* ── Voiceflow Chat Widget ── */}
+        <VoiceflowWidget />
 
         {/* Floating Navigation */}
         <FloatingNav />

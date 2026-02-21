@@ -6,27 +6,17 @@ import { useState } from "react";
 export default function ChatBar() {
     const [hovered, setHovered] = useState(false);
 
-    function openGHLChat() {
-        const launcher =
-            document.querySelector<HTMLElement>("#lc-chat-launcher") ||
-            document.querySelector<HTMLElement>(".lc-launcher") ||
-            document.querySelector<HTMLElement>(".chat-widget-launcher");
-        if (launcher) { launcher.click(); return; }
-
-        const widget = document.querySelector("chat-widget") as HTMLElement & {
-            shadowRoot: ShadowRoot | null;
-        };
-        if (widget) {
-            widget.style.setProperty("opacity", "1", "important");
-            widget.style.setProperty("pointer-events", "auto", "important");
-            widget.shadowRoot?.querySelector<HTMLElement>("button")?.click();
+    function openVoiceflowChat() {
+        const vf = (window as any).voiceflow?.chat;
+        if (vf) {
+            vf.open();
         }
     }
 
     return (
         <div
-            onClick={openGHLChat}
-            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && openGHLChat()}
+            onClick={openVoiceflowChat}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && openVoiceflowChat()}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             role="button"
