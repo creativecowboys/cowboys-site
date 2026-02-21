@@ -101,39 +101,7 @@ export default function Home() {
           <WranglerChat />
         </div>
 
-        {/* ── Services ── */}
-        <div
-          className="hero-services"
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "6px 4px",
-            justifyContent: "center",
-            marginTop: "20px",
-            padding: "0 24px",
-            alignItems: "center",
-          }}
-        >
-          {["Web Design", "Digital Marketing", "Branding", "Business Strategy"].map((service, i, arr) => (
-            <>
-              <span
-                key={service}
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  color: "rgba(26,21,20,0.65)",
-                  letterSpacing: "0.02em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {service}
-              </span>
-              {i < arr.length - 1 && (
-                <span key={`dot-${i}`} style={{ color: "rgba(26,21,20,0.3)", fontSize: "13px" }}>·</span>
-              )}
-            </>
-          ))}
-        </div>
+
 
 
 

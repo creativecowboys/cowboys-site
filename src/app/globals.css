@@ -202,9 +202,9 @@ chat-widget,
 
 /* ===== Testimonial Stack Section ===== */
 .testimonials-section {
-  padding: 80px 24px 100px;
+  padding: 80px 24px 160px;
   text-align: center;
-  background: transparent;
+  background: linear-gradient(180deg, #f0ddd4 0%, #fce8d5 60%, #f0ddd4 100%);
 }
 
 .testimonials-eyebrow {
@@ -237,9 +237,11 @@ chat-widget,
 .testimonials-stack {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  height: 320px;
+  height: 340px;
+  padding-bottom: 48px;
+  /* room for pagination dots */
 }
 
 .testimonial-card {
