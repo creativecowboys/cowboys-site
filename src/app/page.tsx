@@ -53,39 +53,7 @@ export default function Home() {
             maxWidth: "860px",
           }}
         >
-          {/* Option C — Animated badge */}
-          <div
-            className="hero-eyebrow"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "rgba(255,255,255,0.60)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-              border: "1px solid rgba(255,255,255,0.80)",
-              borderRadius: "999px",
-              padding: "6px 16px 6px 10px",
-              marginBottom: "20px",
-              fontSize: "12px",
-              fontWeight: 600,
-              color: "#1a1514",
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-            }}
-          >
-            <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
-              <span style={{
-                width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e",
-                display: "inline-block",
-              }} />
-              <span style={{
-                position: "absolute", width: "8px", height: "8px", borderRadius: "50%",
-                background: "#22c55e", animation: "ping 1.5s cubic-bezier(0,0,0.2,1) infinite",
-              }} />
-            </span>
-            Now Accepting Clients
-          </div>
+
 
           {/* H1 — bold two-tone headline */}
           <h1
