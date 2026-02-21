@@ -1,6 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
+import { TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone } from 'lucide-react';
+
+// --- Icon registry (resolved inside client component, never serialized) ---
+const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
+    TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone,
+};
 
 // --- Component Interfaces ---
 export interface Testimonial {
@@ -10,17 +16,64 @@ export interface Testimonial {
     role: string;
     quote: string;
     tags: { text: string; type: 'featured' | 'default' }[];
-    stats: { icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; text: string }[];
+    stats: { icon: string; text: string }[];
     avatarGradient: string;
 }
 
 export interface TestimonialStackProps {
-    testimonials: Testimonial[];
+    testimonials?: Testimonial[];
     visibleBehind?: number;
 }
 
+// --- Built-in testimonials data (kept client-side to avoid icon serialization) ---
+export const defaultTestimonials: Testimonial[] = [
+    {
+        id: 1,
+        initials: 'JR',
+        name: 'Jake Rivera',
+        role: 'Owner, Lone Star HVAC',
+        quote: "Creative Cowboys completely transformed our online presence. Within 60 days of launching our new site, we were getting 3x more leads from Google. The team was hands-on the whole way through — felt like having an in-house marketing team.",
+        tags: [{ text: 'FEATURED', type: 'featured' }, { text: 'Web Design', type: 'default' }],
+        stats: [{ icon: 'TrendingUp', text: '3x more leads' }, { icon: 'Calendar', text: '60 day launch' }],
+        avatarGradient: 'linear-gradient(135deg, #F15F2A, #d97706)',
+    },
+    {
+        id: 2,
+        initials: 'AM',
+        name: 'Ashley Monroe',
+        role: 'Founder, Bloom Boutique',
+        quote: "The branding they built for us was exactly what I had in my head but couldn't articulate. Our store traffic doubled after the rebrand and we finally feel like a real brand, not just a small shop.",
+        tags: [{ text: 'Branding', type: 'default' }, { text: 'E-Commerce', type: 'default' }],
+        stats: [{ icon: 'Star', text: '5-star rated' }, { icon: 'Users', text: '2x store traffic' }],
+        avatarGradient: 'linear-gradient(135deg, #EA51FF, #8b5cf6)',
+    },
+    {
+        id: 3,
+        initials: 'CT',
+        name: 'Carlos Torres',
+        role: 'Co-Founder, Apex Roofing Co.',
+        quote: "We went from zero digital presence to ranking on the first page of Google in our area. The marketing strategy they put together was clear, affordable, and actually worked. Couldn't recommend them more.",
+        tags: [{ text: 'SEO', type: 'default' }, { text: 'Digital Marketing', type: 'featured' }],
+        stats: [{ icon: 'Globe', text: 'Page 1 Google' }, { icon: 'BarChart3', text: 'Organic growth' }],
+        avatarGradient: 'linear-gradient(135deg, #10b981, #059669)',
+    },
+    {
+        id: 4,
+        initials: 'SL',
+        name: 'Samantha Lee',
+        role: 'Director, Horizon Real Estate Group',
+        quote: "Our old website was embarrassing us at networking events. Creative Cowboys turned it around fast — clean, modern, and built to convert. Our inquiry form submissions went up immediately after launch.",
+        tags: [{ text: 'Web Design', type: 'default' }, { text: 'Quick Launch', type: 'default' }],
+        stats: [{ icon: 'Zap', text: 'Fast turnaround' }, { icon: 'Megaphone', text: 'More inquiries' }],
+        avatarGradient: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+    },
+];
+
 // --- The Component ---
-export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: TestimonialStackProps) => {
+export const TestimonialStack = ({
+    testimonials = defaultTestimonials,
+    visibleBehind = 2,
+}: TestimonialStackProps) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
@@ -103,11 +156,6 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
                     style.zIndex = 0;
                 }
 
-                const tagClasses = (type: 'featured' | 'default') =>
-                    type === 'featured'
-                        ? 'tag-featured'
-                        : 'tag-default';
-
                 return (
                     <div
                         ref={(el) => { cardRefs.current[index] = el; }}
@@ -132,19 +180,14 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
                                         <p className="testimonial-role">{testimonial.role}</p>
                                     </div>
                                 </div>
-                                {/* Quote mark */}
+                                {/* Decorative quote mark */}
                                 <svg
                                     className="testimonial-quote-mark"
-                                    width="32"
-                                    height="32"
-                                    viewBox="0 0 32 32"
-                                    fill="none"
-                                    aria-hidden="true"
+                                    width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true"
                                 >
                                     <path
                                         d="M9.333 21.333C7.493 21.333 6 19.84 6 18V14.667C6 10.985 8.985 8 12.667 8v2.667C10.826 10.667 9.333 12.16 9.333 14v.667H12v6.666H9.333zm13.334 0C20.827 21.333 19.333 19.84 19.333 18V14.667C19.333 10.985 22.318 8 26 8v2.667c-1.84 0-3.333 1.493-3.333 3.333v.667H25.333v6.666H22.667z"
-                                        fill="currentColor"
-                                        opacity="0.25"
+                                        fill="currentColor" opacity="0.25"
                                     />
                                 </svg>
                             </div>
@@ -158,17 +201,20 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
                             <div className="testimonial-footer">
                                 <div className="flex flex-wrap gap-2">
                                     {testimonial.tags.map((tag, i) => (
-                                        <span key={i} className={`tag ${tagClasses(tag.type)}`}>
+                                        <span
+                                            key={i}
+                                            className={`tag ${tag.type === 'featured' ? 'tag-featured' : 'tag-default'}`}
+                                        >
                                             {tag.text}
                                         </span>
                                     ))}
                                 </div>
                                 <div className="flex items-center gap-4 testimonial-stats">
                                     {testimonial.stats.map((stat, i) => {
-                                        const IconComponent = stat.icon;
+                                        const IconComponent = iconMap[stat.icon];
                                         return (
                                             <span key={i} className="flex items-center gap-1">
-                                                <IconComponent className="w-3.5 h-3.5" />
+                                                {IconComponent && <IconComponent className="w-3.5 h-3.5" />}
                                                 {stat.text}
                                             </span>
                                         );
