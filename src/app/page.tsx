@@ -1,6 +1,6 @@
 import Image from "next/image";
 import FloatingNav from "@/components/FloatingNav";
-import VoiceflowWidget from "@/components/VoiceflowWidget";
+import WranglerChat from "@/components/WranglerChat";
 import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
 
@@ -77,7 +77,10 @@ export default function Home() {
 
         </div>
 
-
+        {/* ── Wrangler AI Chat ── */}
+        <div className="hero-chat" style={{ width: "100%", maxWidth: "600px", padding: "0 24px", marginBottom: "20px" }}>
+          <WranglerChat />
+        </div>
 
         {/* ── Service Pills ── */}
         <div
@@ -114,8 +117,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* ── Voiceflow Chat Widget ── */}
-        <VoiceflowWidget />
+
 
         {/* Floating Navigation */}
         <FloatingNav />
