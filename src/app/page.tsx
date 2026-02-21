@@ -1,7 +1,6 @@
 import Image from "next/image";
 import FloatingNav from "@/components/FloatingNav";
 import VoiceflowWidget from "@/components/VoiceflowWidget";
-import ChatBar from "@/components/ChatBar";
 import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
 
@@ -78,10 +77,7 @@ export default function Home() {
 
         </div>
 
-        {/* ── Chat Input Bar ── */}
-        <div className="hero-chat" style={{ marginBottom: "0" }}>
-          <ChatBar />
-        </div>
+
 
         {/* ── Service Pills ── */}
         <div
