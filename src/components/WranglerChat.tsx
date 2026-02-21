@@ -28,6 +28,13 @@ export default function WranglerChat() {
         }
     }, [messages, typing]);
 
+    // Re-focus input after each response so the user can keep typing
+    useEffect(() => {
+        if (!disabled) {
+            inputRef.current?.focus();
+        }
+    }, [disabled]);
+
     async function sendToVoiceflow(userMessage: string) {
         const headers = {
             Authorization: API_KEY,
