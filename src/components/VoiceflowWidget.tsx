@@ -4,6 +4,11 @@ import { useEffect } from "react";
 
 export default function VoiceflowWidget() {
     useEffect(() => {
+        // Inject CSS to hide the default Voiceflow launcher bubble
+        const style = document.createElement("style");
+        style.innerHTML = "#voiceflow-chat .vfrc-launcher { display: none !important; }";
+        document.head.appendChild(style);
+
         const d = document;
         const t = "script";
         const v = d.createElement(t) as HTMLScriptElement;
@@ -25,8 +30,8 @@ export default function VoiceflowWidget() {
         s.parentNode?.insertBefore(v, s);
 
         return () => {
-            // Cleanup script tag on unmount
             if (v.parentNode) v.parentNode.removeChild(v);
+            if (style.parentNode) style.parentNode.removeChild(style);
         };
     }, []);
 
