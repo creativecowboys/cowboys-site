@@ -35,8 +35,9 @@ export default function Home() {
           .hero-headline { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
           .hero-sub      { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.32s both; }
           .hero-chat     { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.46s both; }
+          .hero-services { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.60s both; }
           @media (prefers-reduced-motion: reduce) {
-            .hero-eyebrow, .hero-headline, .hero-sub, .hero-chat { animation: none; }
+            .hero-eyebrow, .hero-headline, .hero-sub, .hero-chat, .hero-services { animation: none; }
           }
         `}</style>
 
@@ -80,6 +81,41 @@ export default function Home() {
         {/* ── Chat Input Bar ── */}
         <div className="hero-chat" style={{ marginBottom: "0" }}>
           <ChatBar />
+        </div>
+
+        {/* ── Service Pills ── */}
+        <div
+          className="hero-services"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "10px",
+            justifyContent: "center",
+            marginTop: "20px",
+            padding: "0 24px",
+          }}
+        >
+          {["Web Design", "Digital Marketing", "Branding", "Business Strategy"].map((service) => (
+            <span
+              key={service}
+              style={{
+                background: "rgba(255,255,255,0.55)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(255,255,255,0.75)",
+                borderRadius: "999px",
+                padding: "8px 18px",
+                fontSize: "13px",
+                fontWeight: 600,
+                color: "#1a1514",
+                letterSpacing: "0.02em",
+                whiteSpace: "nowrap",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+              }}
+            >
+              {service}
+            </span>
+          ))}
         </div>
 
         {/* ── GHL Chat Widget — script-loaded, auto-opens, centered via CSS ── */}
