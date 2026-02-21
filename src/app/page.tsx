@@ -30,6 +30,9 @@ export default function Home() {
             from { opacity: 0; transform: translateY(18px); }
             to   { opacity: 1; transform: translateY(0); }
           }
+          @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+          }
           .hero-eyebrow  { animation: heroFadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
           .hero-headline { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
           .hero-sub      { animation: heroFadeUp 0.60s cubic-bezier(0.4,0,0.2,1) 0.32s both; }
@@ -46,10 +49,44 @@ export default function Home() {
             zIndex: 10,
             textAlign: "center",
             padding: "0 24px",
-            marginBottom: "36px",
+            marginBottom: "28px",
             maxWidth: "860px",
           }}
         >
+          {/* Option C — Animated badge */}
+          <div
+            className="hero-eyebrow"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "rgba(255,255,255,0.60)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.80)",
+              borderRadius: "999px",
+              padding: "6px 16px 6px 10px",
+              marginBottom: "20px",
+              fontSize: "12px",
+              fontWeight: 600,
+              color: "#1a1514",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
+              <span style={{
+                width: "8px", height: "8px", borderRadius: "50%", background: "#22c55e",
+                display: "inline-block",
+              }} />
+              <span style={{
+                position: "absolute", width: "8px", height: "8px", borderRadius: "50%",
+                background: "#22c55e", animation: "ping 1.5s cubic-bezier(0,0,0.2,1) infinite",
+              }} />
+            </span>
+            Now Accepting Clients
+          </div>
+
           {/* H1 — bold two-tone headline */}
           <h1
             className="hero-headline"
@@ -59,7 +96,7 @@ export default function Home() {
               lineHeight: 1.08,
               letterSpacing: "-0.03em",
               color: "#1a1514",
-              margin: "0 0 20px",
+              margin: "0 0 18px",
             }}
           >
             Let&rsquo;s Build Something{" "}
@@ -75,6 +112,19 @@ export default function Home() {
             </span>
           </h1>
 
+          {/* Option B — Supporting subline */}
+          <p
+            className="hero-sub"
+            style={{
+              fontSize: "clamp(15px, 2vw, 18px)",
+              fontWeight: 400,
+              color: "rgba(26,21,20,0.60)",
+              lineHeight: 1.5,
+              margin: 0,
+            }}
+          >
+            Web design, marketing &amp; branding that drives real results.
+          </p>
         </div>
 
         {/* ── Wrangler AI Chat ── */}
