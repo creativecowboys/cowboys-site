@@ -248,10 +248,6 @@ export default function WranglerChat() {
                 </div>
             </div>
 
-            {/* Footer */}
-            <div style={{ textAlign: "center", padding: "6px", fontSize: "11px", color: "#bbb", letterSpacing: "0.02em" }}>
-                Powered by Wrangler AI · Creative Cowboys
-            </div>
         </div>
     );
 }
