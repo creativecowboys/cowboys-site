@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 
 const PROJECT_ID = "6998c611c348c0cb0a667c8c";
+const API_KEY = "VF.DM.69992321096ed66355fd3477.aRPa9hhLlEq6U0kE";
 const RUNTIME_URL = "https://general-runtime.voiceflow.com";
 
 interface Message {
@@ -26,7 +27,7 @@ export default function WranglerChat() {
 
     async function sendToVoiceflow(userMessage: string) {
         const headers = {
-            Authorization: PROJECT_ID,
+            Authorization: API_KEY,
             "Content-Type": "application/json",
             versionID: "production",
         };
@@ -195,7 +196,7 @@ export default function WranglerChat() {
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSend(); } }}
                         placeholder="What are we working on today?"
                         disabled={disabled}
                         autoComplete="off"
