@@ -58,7 +58,7 @@ export default function Home() {
         <div className="mesh-gradient absolute inset-0 w-full h-full" />
 
         {/* Logo (top-left, fixed) — offset below the 36px info bar */}
-        <div className="fixed left-6 z-50" style={{ top: "52px" }}>
+        <div className="absolute left-6 z-50" style={{ top: "52px" }}>
           <Image
             src="/Main%20logo%202.png"
             alt="Creative Cowboys Media"
