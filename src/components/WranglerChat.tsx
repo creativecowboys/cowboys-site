@@ -17,12 +17,15 @@ export default function WranglerChat() {
     const [typing, setTyping] = useState(false);
     const [disabled, setDisabled] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const sessionID = useRef("cc_" + Math.random().toString(36).substr(2, 9));
     const conversationStarted = useRef(false);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [messages, typing]);
 
     async function sendToVoiceflow(userMessage: string) {
@@ -110,6 +113,7 @@ export default function WranglerChat() {
             >
                 {/* Messages area */}
                 <div
+                    ref={messagesContainerRef}
                     style={{
                         flex: 1,
                         padding: "20px 20px 0 20px",
