@@ -528,24 +528,102 @@ export default function WebDesignPage() {
                 </section>
 
                 {/* ── SECTION 4: Who It's For ───────────────────────────── */}
-                <section style={{ padding: "96px 24px", textAlign: "center" }}>
-                    <div style={{ maxWidth: "860px", margin: "0 auto" }}>
-                        <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 18px" }}>
-                            Built for Businesses That Want to Grow
-                        </h2>
-                        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
-                            We partner with ambitious companies that understand the value of a premium digital presence.
-                        </p>
-                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px" }}>
-                            {["Local Businesses", "Contractors & Trades", "Professional Firms", "E-Commerce Brands", "Scaling Startups", "B2B Services"].map((label) => (
-                                <div key={label} className="wd-pill" style={{ padding: "10px 22px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "999px", color: "#fff", fontWeight: 500, fontSize: "14px", display: "inline-flex", alignItems: "center", gap: "8px", cursor: "default" }}>
-                                    <CheckCircle2 size={15} color={ORANGE} />
-                                    {label}
-                                </div>
-                            ))}
-                        </div>
+                <section style={{ background: "linear-gradient(180deg, #fce8d5 0%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px" }}>
+                    <style>{`
+                        .af-grid-cell {
+                            transition: background 200ms ease, transform 220ms cubic-bezier(0.34,1.56,0.64,1);
+                            cursor: default;
+                        }
+                        .af-grid-cell:hover {
+                            background: rgba(241,95,42,0.05) !important;
+                            transform: translateY(-2px);
+                        }
+                        .af-grid-cell:hover .af-icon {
+                            color: #F15F2A !important;
+                            transform: scale(1.1);
+                        }
+                        .af-icon {
+                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
+                        }
+                    `}</style>
+                    <div style={{ maxWidth: "1060px", margin: "0 auto" }}>
+
+                        {/* Header */}
+                        <AnimatedContainer delay={0.05}>
+                            <div style={{ marginBottom: "56px" }}>
+                                <span style={{
+                                    fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em",
+                                    textTransform: "uppercase", color: "#F15F2A", display: "block", marginBottom: "16px",
+                                    fontFamily: "var(--font-geist-sans, sans-serif)",
+                                }}>
+                                    Who We Work With
+                                </span>
+                                <h2 style={{
+                                    fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800,
+                                    letterSpacing: "-0.03em", color: "#1a1514", margin: "0 0 16px",
+                                    lineHeight: 1.08, fontFamily: "var(--font-geist-sans, sans-serif)",
+                                }}>
+                                    Built for Businesses<br />That Want to Grow
+                                </h2>
+                                <p style={{
+                                    fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.7,
+                                    maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)",
+                                }}>
+                                    We partner with ambitious companies that understand the value of a premium digital presence.
+                                </p>
+                            </div>
+                        </AnimatedContainer>
+
+                        {/* April Ford-style bordered grid */}
+                        <AnimatedContainer delay={0.2}>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid rgba(26,21,20,0.10)" }}>
+                                {[
+                                    { Icon: MonitorSmartphone, title: "Local Businesses", desc: "Service businesses and brick-and-mortar shops ready to dominate their local market online." },
+                                    { Icon: Zap, title: "Contractors & Trades", desc: "Builders, HVAC, electricians — companies that need leads flowing consistently." },
+                                    { Icon: TrendingUp, title: "Professional Firms", desc: "Law firms, accountants, consultants who need a site that commands authority." },
+                                    { Icon: ShieldCheck, title: "E-Commerce Brands", desc: "Stores that need a high-converting storefront, not just another Shopify theme." },
+                                    { Icon: Target, title: "Scaling Startups", desc: "Early-stage companies that need to establish credibility fast and attract investment." },
+                                    { Icon: BarChart3, title: "B2B Services", desc: "Companies selling to other businesses where trust and clarity drive every deal." },
+                                ].map(({ Icon, title, desc }, i) => (
+                                    <motion.div
+                                        key={title}
+                                        className="af-grid-cell"
+                                        initial={{ opacity: 0, y: 16 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.1 + i * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                                        style={{
+                                            padding: "32px 28px",
+                                            borderRight: "1px solid rgba(26,21,20,0.10)",
+                                            borderBottom: "1px solid rgba(26,21,20,0.10)",
+                                            background: "transparent",
+                                        }}
+                                    >
+                                        <Icon
+                                            size={22}
+                                            className="af-icon"
+                                            style={{ color: "rgba(26,21,20,0.30)", marginBottom: "16px", display: "block" }}
+                                            strokeWidth={1.5}
+                                        />
+                                        <h3 style={{
+                                            fontSize: "15px", fontWeight: 700, color: "#1a1514",
+                                            margin: "0 0 8px", fontFamily: "var(--font-geist-sans, sans-serif)",
+                                        }}>
+                                            {title}
+                                        </h3>
+                                        <p style={{
+                                            fontSize: "13px", lineHeight: 1.7, color: "rgba(26,21,20,0.55)",
+                                            margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)",
+                                        }}>
+                                            {desc}
+                                        </p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </AnimatedContainer>
                     </div>
                 </section>
+
 
                 {/* ── SECTION 5: Why Creative Cowboys ──────────────────── */}
                 <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px" }}>
