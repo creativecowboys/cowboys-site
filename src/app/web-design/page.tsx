@@ -307,7 +307,7 @@ export default function WebDesignPage() {
             <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
 
                 {/* ── Logo ───────────────────────────────────────────────── */}
-                <div style={{ position: "fixed", top: "52px", left: "24px", zIndex: 50 }}>
+                <div style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
                     <Image
                         src="/Main%20logo%202.png"
                         alt="Creative Cowboys Media"
@@ -369,115 +369,128 @@ export default function WebDesignPage() {
                 {/* ── SECTION 1: The Problem ─────────────────────────────── */}
                 <section style={{ background: "linear-gradient(180deg, #fce8d5 0%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
 
-                    {/* Decorative glow */}
-                    <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "320px", height: "320px", background: "rgba(241,95,42,0.10)", filter: "blur(90px)", borderRadius: "50%", pointerEvents: "none" }} />
+                    {/* Decorative glow blobs */}
+                    <div style={{ position: "absolute", bottom: "-80px", left: "-80px", width: "380px", height: "380px", background: "rgba(241,95,42,0.08)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", top: "-60px", right: "-40px", width: "260px", height: "260px", background: "rgba(234,81,255,0.05)", filter: "blur(80px)", borderRadius: "50%", pointerEvents: "none" }} />
 
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "64px", alignItems: "center", position: "relative", zIndex: 1 }}>
+                    <div style={{ maxWidth: "1060px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "72px", alignItems: "center", position: "relative", zIndex: 1 }}>
 
-                        {/* Left copy */}
+                        {/* ── Left copy ── */}
                         <motion.div
-                            initial={{ opacity: 0, x: -20 }}
+                            initial={{ opacity: 0, x: -24 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
                         >
-                            <span style={{
-                                display: "inline-block",
-                                fontSize: "11px",
-                                fontWeight: 700,
-                                letterSpacing: "0.16em",
-                                textTransform: "uppercase",
-                                color: "#F15F2A",
-                                marginBottom: "18px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
-                                The Problem
-                            </span>
+                            {/* Eyebrow with dash */}
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                                <div style={{ width: "24px", height: "2px", background: "#F15F2A", borderRadius: "1px", flexShrink: 0 }} />
+                                <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#F15F2A", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    The Problem
+                                </span>
+                            </div>
 
-                            <h2 style={{
-                                fontSize: "clamp(28px, 4vw, 46px)",
-                                fontWeight: 800,
-                                letterSpacing: "-0.03em",
-                                color: "#1a1514",
-                                margin: "0 0 24px",
-                                lineHeight: 1.08,
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
+                            {/* Headline */}
+                            <h2 style={{ fontSize: "clamp(32px, 4.2vw, 52px)", fontWeight: 800, letterSpacing: "-0.035em", color: "#1a1514", margin: "0 0 28px", lineHeight: 1.04, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 Most Websites<br />Don&rsquo;t Work.
                             </h2>
 
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(26,21,20,0.60)", marginBottom: "18px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                            {/* Body copy */}
+                            <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(26,21,20,0.58)", marginBottom: "20px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 They&rsquo;re slow. They&rsquo;re confusing. They look like every other template on the internet. And worst of all—they don&rsquo;t convert.
                             </p>
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(26,21,20,0.60)", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                A pretty website without a strategy is just an expensive digital brochure. At Creative Cowboys, we don&rsquo;t just design; we engineer user journeys. Every pixel, every button, and every headline is strategically placed to turn visitors into paying customers.
+                            <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(26,21,20,0.58)", marginBottom: "36px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                A pretty website without a strategy is just an expensive digital brochure. At Creative Cowboys, we don&rsquo;t just design; we engineer user journeys.
                             </p>
+
+                            {/* Pull-quote blockquote */}
+                            <blockquote style={{ margin: "0 0 36px", borderLeft: "3px solid #F15F2A", paddingLeft: "18px" }}>
+                                <p style={{ fontSize: "15px", fontStyle: "italic", lineHeight: 1.7, color: "rgba(26,21,20,0.65)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    &ldquo;Every pixel, button, and headline — strategically placed to turn visitors into paying customers.&rdquo;
+                                </p>
+                            </blockquote>
+
+                            {/* Stat trust anchors */}
+                            <div style={{ display: "flex", gap: "36px" }}>
+                                {[
+                                    { stat: "53%", label: "of visits abandoned if load > 3s" },
+                                    { stat: "7s", label: "to make a first impression" },
+                                ].map(({ stat, label }) => (
+                                    <div key={stat}>
+                                        <p style={{ fontSize: "30px", fontWeight: 800, color: "#F15F2A", margin: "0 0 4px", letterSpacing: "-0.04em", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{stat}</p>
+                                        <p style={{ fontSize: "12px", color: "rgba(26,21,20,0.48)", margin: 0, lineHeight: 1.5, maxWidth: "110px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{label}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </motion.div>
 
-                        {/* Pain-point card */}
+                        {/* ── Pain-point glassmorphism card ── */}
                         <motion.div
-                            initial={{ opacity: 0, x: 20 }}
+                            initial={{ opacity: 0, x: 24 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.65, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                            transition={{ duration: 0.7, delay: 0.18, ease: [0.4, 0, 0.2, 1] }}
                             style={{
-                                background: "rgba(255,255,255,0.90)",
-                                padding: "36px",
-                                borderRadius: "24px",
-                                border: "1px solid rgba(26,21,20,0.08)",
-                                boxShadow: "0 16px 48px rgba(26,21,20,0.08), inset 0 1px 0 rgba(255,255,255,1)",
+                                background: "rgba(255,255,255,0.72)",
+                                backdropFilter: "blur(20px)",
+                                WebkitBackdropFilter: "blur(20px)",
+                                padding: "40px",
+                                borderRadius: "28px",
+                                border: "1px solid rgba(255,255,255,0.9)",
+                                boxShadow: "0 24px 64px rgba(26,21,20,0.09), 0 4px 16px rgba(26,21,20,0.04), inset 0 1px 0 rgba(255,255,255,1)",
                                 position: "relative",
                                 overflow: "hidden",
                             }}
                         >
-                            {/* Top-right glow accent */}
-                            <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "130px", height: "130px", background: "rgba(241,95,42,0.12)", filter: "blur(52px)", borderRadius: "50%", pointerEvents: "none" }} />
+                            {/* Card glow */}
+                            <div style={{ position: "absolute", top: "-30px", right: "-30px", width: "160px", height: "160px", background: "rgba(241,95,42,0.10)", filter: "blur(60px)", borderRadius: "50%", pointerEvents: "none" }} />
 
-                            <p style={{
-                                fontSize: "11px",
-                                fontWeight: 700,
-                                letterSpacing: "0.14em",
-                                textTransform: "uppercase",
-                                color: "rgba(26,21,20,0.35)",
-                                margin: "0 0 24px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
+                            {/* Card label */}
+                            <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(26,21,20,0.30)", margin: "0 0 28px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 Common Pain Points
                             </p>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative", zIndex: 1 }}>
+                            <div style={{ display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
                                 {[
-                                    { Icon: Zap, label: "Slow Load Times", text: "Losing 50% of visitors before they even see your offer." },
-                                    { Icon: Target, label: "Unclear Messaging", text: "Users leave if they don't understand what you do in 3 seconds." },
-                                    { Icon: BarChart3, label: "Zero Conversion Strategy", text: "Traffic means nothing if there's no clear path to purchase." },
-                                ].map(({ Icon, label, text }, i) => (
+                                    { Icon: Zap, label: "Slow Load Times", text: "Losing 50% of visitors before they even see your offer.", stat: "−50%" },
+                                    { Icon: Target, label: "Unclear Messaging", text: "Users leave if they don't understand what you do in 3 seconds.", stat: "3 sec" },
+                                    { Icon: BarChart3, label: "Zero Conversion Strategy", text: "Traffic means nothing if there's no clear path to purchase.", stat: "$0 ROI" },
+                                ].map(({ Icon, label, text, stat }, i) => (
                                     <motion.div
                                         key={label}
-                                        initial={{ opacity: 0, y: 12 }}
+                                        initial={{ opacity: 0, y: 14 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
-                                        transition={{ delay: 0.30 + i * 0.10, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                                        style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}
+                                        transition={{ delay: 0.32 + i * 0.12, duration: 0.48, ease: [0.4, 0, 0.2, 1] }}
                                     >
-                                        <div style={{
-                                            width: "42px",
-                                            height: "42px",
-                                            borderRadius: "12px",
-                                            background: "rgba(239,68,68,0.07)",
-                                            border: "1px solid rgba(239,68,68,0.14)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            flexShrink: 0,
-                                        }}>
-                                            <Icon size={18} color="#ef4444" />
-                                        </div>
-                                        <div>
-                                            <p style={{ fontWeight: 700, color: "#1a1514", margin: "0 0 4px", fontSize: "15px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{label}</p>
-                                            <p style={{ fontSize: "13px", color: "rgba(26,21,20,0.50)", margin: 0, lineHeight: 1.65, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{text}</p>
+                                        {i > 0 && <div style={{ height: "1px", background: "rgba(26,21,20,0.07)", margin: "20px 0" }} />}
+                                        <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
+                                            <div style={{
+                                                width: "44px", height: "44px", borderRadius: "14px", flexShrink: 0,
+                                                background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.13)",
+                                                display: "flex", alignItems: "center", justifyContent: "center",
+                                                transition: "box-shadow 250ms ease, transform 250ms ease",
+                                            }}>
+                                                <Icon size={18} color="#ef4444" />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "4px" }}>
+                                                    <p style={{ fontWeight: 700, color: "#1a1514", margin: 0, fontSize: "15px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{label}</p>
+                                                    <span style={{ fontSize: "11px", fontWeight: 700, color: "#ef4444", letterSpacing: "0.04em", fontFamily: "var(--font-geist-sans, sans-serif)", whiteSpace: "nowrap", marginLeft: "12px" }}>{stat}</span>
+                                                </div>
+                                                <p style={{ fontSize: "13px", color: "rgba(26,21,20,0.48)", margin: 0, lineHeight: 1.65, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{text}</p>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 ))}
+                            </div>
+
+                            {/* Card footer micro-CTA */}
+                            <div style={{ marginTop: "28px", paddingTop: "20px", borderTop: "1px solid rgba(26,21,20,0.07)", display: "flex", alignItems: "center", gap: "8px" }}>
+                                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#F15F2A", flexShrink: 0 }} />
+                                <p style={{ fontSize: "12px", color: "rgba(26,21,20,0.45)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    Sound familiar? <a href="/contact" style={{ color: "#F15F2A", fontWeight: 600, textDecoration: "none" }}>Let&rsquo;s fix that →</a>
+                                </p>
                             </div>
                         </motion.div>
                     </div>
@@ -528,101 +541,90 @@ export default function WebDesignPage() {
                 </section>
 
                 {/* ── SECTION 4: Who It's For ───────────────────────────── */}
-                <section style={{ background: "linear-gradient(180deg, #fce8d5 0%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px" }}>
+                <section style={{ background: "#0D0D0F", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
+                    {/* Decorative glow */}
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "600px", height: "300px", background: "rgba(241,95,42,0.06)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
                     <style>{`
-                        .af-grid-cell {
-                            transition: background 200ms ease, transform 220ms cubic-bezier(0.34,1.56,0.64,1);
+                        .af-dark-card {
+                            transition: transform 230ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 230ms ease, border-color 230ms ease;
                             cursor: default;
                         }
-                        .af-grid-cell:hover {
-                            background: rgba(241,95,42,0.05) !important;
-                            transform: translateY(-2px);
+                        .af-dark-card:hover {
+                            transform: translateY(-4px);
+                            box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(241,95,42,0.18);
+                            border-color: rgba(241,95,42,0.22) !important;
                         }
-                        .af-grid-cell:hover .af-icon {
+                        .af-dark-card:hover .afd-icon {
                             color: #F15F2A !important;
-                            transform: scale(1.1);
+                            transform: scale(1.12);
                         }
-                        .af-icon {
-                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
+                        .afd-icon {
+                            transition: transform 230ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
                         }
                     `}</style>
-                    <div style={{ maxWidth: "1060px", margin: "0 auto" }}>
+                    <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
                         {/* Header */}
                         <AnimatedContainer delay={0.05}>
                             <div style={{ marginBottom: "56px" }}>
-                                <span style={{
-                                    fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em",
-                                    textTransform: "uppercase", color: "#F15F2A", display: "block", marginBottom: "16px",
-                                    fontFamily: "var(--font-geist-sans, sans-serif)",
-                                }}>
-                                    Who We Work With
-                                </span>
-                                <h2 style={{
-                                    fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800,
-                                    letterSpacing: "-0.03em", color: "#1a1514", margin: "0 0 16px",
-                                    lineHeight: 1.08, fontFamily: "var(--font-geist-sans, sans-serif)",
-                                }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                                    <div style={{ width: "24px", height: "2px", background: "#F15F2A", borderRadius: "1px", flexShrink: 0 }} />
+                                    <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#F15F2A", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                        Who We Work With
+                                    </span>
+                                </div>
+                                <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.08, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                     Built for Businesses<br />That Want to Grow
                                 </h2>
-                                <p style={{
-                                    fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.7,
-                                    maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)",
-                                }}>
+                                <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.42)", lineHeight: 1.7, maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                     We partner with ambitious companies that understand the value of a premium digital presence.
                                 </p>
                             </div>
                         </AnimatedContainer>
 
-                        {/* April Ford-style bordered grid */}
-                        <AnimatedContainer delay={0.2}>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: "1px solid rgba(26,21,20,0.10)" }}>
-                                {[
-                                    { Icon: MonitorSmartphone, title: "Local Businesses", desc: "Service businesses and brick-and-mortar shops ready to dominate their local market online." },
-                                    { Icon: Zap, title: "Contractors & Trades", desc: "Builders, HVAC, electricians — companies that need leads flowing consistently." },
-                                    { Icon: TrendingUp, title: "Professional Firms", desc: "Law firms, accountants, consultants who need a site that commands authority." },
-                                    { Icon: ShieldCheck, title: "E-Commerce Brands", desc: "Stores that need a high-converting storefront, not just another Shopify theme." },
-                                    { Icon: Target, title: "Scaling Startups", desc: "Early-stage companies that need to establish credibility fast and attract investment." },
-                                    { Icon: BarChart3, title: "B2B Services", desc: "Companies selling to other businesses where trust and clarity drive every deal." },
-                                ].map(({ Icon, title, desc }, i) => (
-                                    <motion.div
-                                        key={title}
-                                        className="af-grid-cell"
-                                        initial={{ opacity: 0, y: 16 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: 0.1 + i * 0.07, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                                        style={{
-                                            padding: "32px 28px",
-                                            borderRight: "1px solid rgba(26,21,20,0.10)",
-                                            borderBottom: "1px solid rgba(26,21,20,0.10)",
-                                            background: "transparent",
-                                        }}
-                                    >
-                                        <Icon
-                                            size={22}
-                                            className="af-icon"
-                                            style={{ color: "rgba(26,21,20,0.30)", marginBottom: "16px", display: "block" }}
-                                            strokeWidth={1.5}
-                                        />
-                                        <h3 style={{
-                                            fontSize: "15px", fontWeight: 700, color: "#1a1514",
-                                            margin: "0 0 8px", fontFamily: "var(--font-geist-sans, sans-serif)",
-                                        }}>
-                                            {title}
-                                        </h3>
-                                        <p style={{
-                                            fontSize: "13px", lineHeight: 1.7, color: "rgba(26,21,20,0.55)",
-                                            margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)",
-                                        }}>
-                                            {desc}
-                                        </p>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </AnimatedContainer>
+                        {/* April Ford dark individual cards — 3-column grid */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+                            {[
+                                { Icon: MonitorSmartphone, title: "Local Businesses", desc: "Service businesses and brick-and-mortar shops ready to dominate their local market online." },
+                                { Icon: Zap, title: "Contractors & Trades", desc: "Builders, HVAC, electricians — companies that need leads flowing consistently." },
+                                { Icon: TrendingUp, title: "Professional Firms", desc: "Law firms, accountants, consultants who need a site that commands authority." },
+                                { Icon: ShieldCheck, title: "E-Commerce Brands", desc: "Stores that need a high-converting storefront, not just another Shopify theme." },
+                                { Icon: Target, title: "Scaling Startups", desc: "Early-stage companies that need to establish credibility fast and attract investment." },
+                                { Icon: BarChart3, title: "B2B Services", desc: "Companies selling to other businesses where trust and clarity drive every deal." },
+                            ].map(({ Icon, title, desc }, i) => (
+                                <motion.div
+                                    key={title}
+                                    className="af-dark-card"
+                                    initial={{ opacity: 0, y: 18 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.08 + i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                                    style={{
+                                        background: "#15181e",
+                                        border: "1px solid rgba(255,255,255,0.06)",
+                                        borderRadius: "18px",
+                                        padding: "28px",
+                                    }}
+                                >
+                                    <Icon
+                                        size={20}
+                                        className="afd-icon"
+                                        style={{ color: "rgba(255,255,255,0.25)", marginBottom: "20px", display: "block" }}
+                                        strokeWidth={1.5}
+                                    />
+                                    <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", margin: "0 0 8px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                        {title}
+                                    </p>
+                                    <p style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.42)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                        {desc}
+                                    </p>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
                 </section>
+
+
 
 
                 {/* ── SECTION 5: Why Creative Cowboys ──────────────────── */}

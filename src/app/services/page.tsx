@@ -161,7 +161,7 @@ export default function ServicesPage() {
             <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
 
                 {/* ── Logo ── */}
-                <div style={{ position: "fixed", top: "52px", left: "24px", zIndex: 50 }}>
+                <div style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
                     <Link href="/">
                         <Image
                             src="/Main%20logo%202.png"
