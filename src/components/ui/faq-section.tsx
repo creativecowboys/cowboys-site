@@ -6,34 +6,40 @@ const FAQ_STYLE_ID = 'cowboys-faq-animations';
 
 const faqs = [
     {
-        question: "How long does it take to build a website?",
+        question: "How does pricing work?",
         answer:
-            "Most client websites are live within 2\u20134 weeks from kickoff. We move fast without cutting corners \u2014 you'll have a dedicated point of contact, regular check-ins, and a clear timeline from day one.",
+            "Every project is different, so we don't do one-size-fits-all pricing. We'll talk through what you need and put together a custom proposal that fits your goals and budget.",
+        meta: 'Pricing',
+    },
+    {
+        question: "How long does a website take?",
+        answer:
+            "Most websites are ready in 2\u20134 weeks. Larger projects with custom features can take a bit longer, but we keep you in the loop every step of the way.",
         meta: 'Timeline',
     },
     {
-        question: "What's included in your web design packages?",
+        question: "Do you work with small businesses?",
         answer:
-            "Every project includes custom design, mobile-responsive development, SEO foundations, contact forms, and a 30-day post-launch support window. We can also layer in copywriting, branding, and digital marketing depending on your goals.",
-        meta: 'Services',
-    },
-    {
-        question: "Do you work with small businesses or only larger companies?",
-        answer:
-            "We love working with small and mid-sized businesses \u2014 that's our sweet spot. Whether you're a solo contractor or a growing team of 50, we build solutions scaled to your budget and goals, not a one-size-fits-all template.",
+            "Absolutely \u2014 small and local businesses are our bread and butter. Whether you're just starting out or ready to scale, we build strategies that fit where you are right now.",
         meta: 'Fit',
     },
     {
-        question: "Can you help with marketing after the site is built?",
+        question: "Where are you located, and do you work with businesses outside of Villa Rica?",
         answer:
-            "Absolutely. We offer ongoing digital marketing services including Google Ads, social media strategy, SEO, and email campaigns. A great website is only the start \u2014 we help you drive real traffic and convert it into paying customers.",
-        meta: 'Growth',
+            "We're based in Villa Rica, GA, but we work with clients all over the country. Most of what we do is remote-friendly, so location is never a barrier.",
+        meta: 'Location',
     },
     {
-        question: "What makes Creative Cowboys different from other agencies?",
+        question: "What results can I expect?",
         answer:
-            "We're a small, focused team \u2014 you talk directly with the people doing the work. No account managers playing telephone. We're based in Georgia, fast-moving, and obsessed with results you can actually measure.",
-        meta: 'Why Us',
+            "That depends on the service, but we always tie our work to real metrics \u2014 more traffic, more leads, more revenue. We'll set clear goals upfront so you know exactly what we're working toward.",
+        meta: 'Results',
+    },
+    {
+        question: "How do I get started?",
+        answer:
+            "Just type in the box above! Wrangler will ask you a few quick questions and get you connected with our team.",
+        meta: 'Next Steps',
     },
 ];
 
@@ -98,14 +104,14 @@ export function FAQSection() {
                         margin: '0 0 14px',
                         lineHeight: 1.1,
                     }}>
-                        Frequently Asked{' '}
+                        Everything you need{' '}
                         <span style={{
                             background: 'linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             backgroundClip: 'text',
                         }}>
-                            Questions
+                            to know
                         </span>
                     </h2>
                     <p style={{
