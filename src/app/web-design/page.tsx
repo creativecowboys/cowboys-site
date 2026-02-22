@@ -50,49 +50,213 @@ function AnimatedContainer({
 function ProcessSection() {
     return (
         <div style={{ width: "100%" }}>
-            <AnimatedContainer className="mx-auto max-w-3xl text-center" delay={0.1}>
-                <h2 style={{
-                    fontSize: "clamp(28px, 4.5vw, 50px)",
-                    fontWeight: 800,
-                    letterSpacing: "-0.03em",
-                    color: "#1a1514",
-                    margin: "0 0 18px",
-                    fontFamily: "var(--font-geist-sans, sans-serif)",
-                }}>
-                    Strategy First. Design Second.
-                </h2>
-                <p style={{
-                    fontSize: "17px",
-                    color: "rgba(26,21,20,0.50)",
-                    maxWidth: "560px",
-                    marginInline: "auto",
-                    lineHeight: 1.7,
-                    marginBottom: "56px",
-                    fontFamily: "var(--font-geist-sans, sans-serif)",
-                }}>
-                    We don&rsquo;t just start pushing pixels. We follow a battle-tested process to ensure your website actually achieves your business goals.
-                </p>
+            <style>{`
+                .process-card {
+                    transition: transform 240ms cubic-bezier(0.34,1.56,0.64,1),
+                                box-shadow 240ms ease,
+                                background 240ms ease;
+                }
+                .process-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 20px 48px rgba(241,95,42,0.13), 0 6px 16px rgba(26,21,20,0.08);
+                    background: rgba(255,255,255,0.85) !important;
+                }
+                .process-icon-badge {
+                    transition: background 240ms ease, box-shadow 240ms ease, transform 240ms cubic-bezier(0.34,1.56,0.64,1);
+                }
+                .process-card:hover .process-icon-badge {
+                    background: rgba(241,95,42,0.14) !important;
+                    box-shadow: 0 0 0 6px rgba(241,95,42,0.08);
+                    transform: scale(1.08);
+                }
+                .process-cta-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #F15F2A;
+                    text-decoration: none;
+                    border-bottom: 1.5px solid rgba(241,95,42,0.35);
+                    padding-bottom: 2px;
+                    transition: border-color 180ms ease;
+                }
+                .process-cta-link:hover {
+                    border-color: #F15F2A;
+                }
+            `}</style>
+
+            {/* ── Header ── */}
+            <AnimatedContainer delay={0.05}>
+                <div style={{ textAlign: "center", marginBottom: "64px" }}>
+                    <span style={{
+                        display: "inline-block",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: "#F15F2A",
+                        marginBottom: "18px",
+                        fontFamily: "var(--font-geist-sans, sans-serif)",
+                    }}>
+                        Our Process
+                    </span>
+                    <h2 style={{
+                        fontSize: "clamp(30px, 4.5vw, 52px)",
+                        fontWeight: 800,
+                        letterSpacing: "-0.03em",
+                        color: "#1a1514",
+                        margin: "0 0 18px",
+                        lineHeight: 1.08,
+                        fontFamily: "var(--font-geist-sans, sans-serif)",
+                    }}>
+                        Strategy First.{" "}
+                        <span style={{
+                            background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                        }}>
+                            Design Second.
+                        </span>
+                    </h2>
+                    <p style={{
+                        fontSize: "17px",
+                        color: "rgba(26,21,20,0.50)",
+                        maxWidth: "520px",
+                        marginInline: "auto",
+                        lineHeight: 1.7,
+                        fontFamily: "var(--font-geist-sans, sans-serif)",
+                    }}>
+                        We don&rsquo;t just start pushing pixels. We follow a battle-tested process to ensure your website actually achieves your business goals.
+                    </p>
+                </div>
             </AnimatedContainer>
 
-            <AnimatedContainer delay={0.4}>
-                <div
-                    style={{
-                        border: "1px dashed rgba(26,21,20,0.18)",
-                        display: "grid",
-                        gridTemplateColumns: "repeat(2, 1fr)",
-                    }}
-                    className="sm:grid-cols-2 md:grid-cols-4"
-                >
-                    {processSteps.map((step) => (
-                        <FeatureCard
+            {/* ── Card Grid ── */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px", position: "relative" }}>
+                {/* Connector line between step icons */}
+                <div style={{
+                    position: "absolute",
+                    top: "51px",
+                    left: "calc(12.5% + 8px)",
+                    right: "calc(12.5% + 8px)",
+                    height: "1px",
+                    background: "linear-gradient(90deg, transparent, rgba(241,95,42,0.30), rgba(234,81,255,0.22), transparent)",
+                    pointerEvents: "none",
+                    zIndex: 0,
+                }} />
+
+                {processSteps.map((step, i) => {
+                    const Icon = step.icon;
+                    return (
+                        <motion.div
                             key={step.step}
-                            feature={step}
+                            className="process-card"
+                            initial={{ opacity: 0, y: 28 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.15 + i * 0.12, duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
                             style={{
-                                borderRight: "1px dashed rgba(26,21,20,0.18)",
-                                borderBottom: "1px dashed rgba(26,21,20,0.18)",
+                                background: "rgba(255,255,255,0.60)",
+                                border: "1px solid rgba(26,21,20,0.09)",
+                                borderRadius: "20px",
+                                padding: "28px 24px",
+                                position: "relative",
+                                overflow: "hidden",
+                                zIndex: 1,
+                                cursor: "default",
                             }}
-                        />
-                    ))}
+                        >
+                            {/* Watermark step number */}
+                            <span style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "14px",
+                                fontSize: "64px",
+                                fontWeight: 900,
+                                color: "rgba(26,21,20,0.05)",
+                                lineHeight: 1,
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                                pointerEvents: "none",
+                                userSelect: "none",
+                                letterSpacing: "-0.04em",
+                            }}>
+                                {step.step}
+                            </span>
+
+                            {/* Icon badge */}
+                            <div
+                                className="process-icon-badge"
+                                style={{
+                                    width: "44px",
+                                    height: "44px",
+                                    borderRadius: "12px",
+                                    background: "rgba(241,95,42,0.08)",
+                                    border: "1px solid rgba(241,95,42,0.15)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    marginBottom: "20px",
+                                    position: "relative",
+                                    zIndex: 2,
+                                }}
+                            >
+                                <Icon size={20} color="#F15F2A" strokeWidth={1.5} />
+                            </div>
+
+                            {/* Step micro-label */}
+                            <p style={{
+                                fontSize: "10px",
+                                fontWeight: 700,
+                                letterSpacing: "0.12em",
+                                textTransform: "uppercase",
+                                color: "rgba(241,95,42,0.65)",
+                                margin: "0 0 7px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                Step {step.step}
+                            </p>
+
+                            <h3 style={{
+                                fontSize: "15px",
+                                fontWeight: 700,
+                                color: "#1a1514",
+                                margin: "0 0 10px",
+                                lineHeight: 1.3,
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                {step.title}
+                            </h3>
+
+                            <p style={{
+                                fontSize: "13px",
+                                lineHeight: 1.75,
+                                color: "rgba(26,21,20,0.50)",
+                                margin: 0,
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                {step.description}
+                            </p>
+                        </motion.div>
+                    );
+                })}
+            </div>
+
+            {/* ── Bottom micro-CTA ── */}
+            <AnimatedContainer delay={0.65}>
+                <div style={{ textAlign: "center", marginTop: "48px" }}>
+                    <p style={{
+                        fontSize: "14px",
+                        color: "rgba(26,21,20,0.38)",
+                        fontFamily: "var(--font-geist-sans, sans-serif)",
+                        margin: "0 0 14px",
+                    }}>
+                        Ready to start your project?
+                    </p>
+                    <a href="/contact" className="process-cta-link">
+                        Book a free strategy call <ArrowRight size={14} />
+                    </a>
                 </div>
             </AnimatedContainer>
         </div>
