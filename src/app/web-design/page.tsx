@@ -367,43 +367,122 @@ export default function WebDesignPage() {
                 </section>
 
                 {/* ── SECTION 1: The Problem ─────────────────────────────── */}
-                <section style={{ background: "#ffffff", borderTop: "1px solid #e8e8e8", borderBottom: "1px solid #e8e8e8", padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "64px", alignItems: "center" }}>
-                        <div>
-                            <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#0f0f0f", margin: "0 0 20px" }}>
-                                Most Websites Don&rsquo;t Work.
+                <section style={{ background: "linear-gradient(180deg, #fce8d5 0%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
+
+                    {/* Decorative glow */}
+                    <div style={{ position: "absolute", bottom: "-60px", left: "-60px", width: "320px", height: "320px", background: "rgba(241,95,42,0.10)", filter: "blur(90px)", borderRadius: "50%", pointerEvents: "none" }} />
+
+                    <div style={{ maxWidth: "1060px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "64px", alignItems: "center", position: "relative", zIndex: 1 }}>
+
+                        {/* Left copy */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                        >
+                            <span style={{
+                                display: "inline-block",
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                letterSpacing: "0.16em",
+                                textTransform: "uppercase",
+                                color: "#F15F2A",
+                                marginBottom: "18px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                The Problem
+                            </span>
+
+                            <h2 style={{
+                                fontSize: "clamp(28px, 4vw, 46px)",
+                                fontWeight: 800,
+                                letterSpacing: "-0.03em",
+                                color: "#1a1514",
+                                margin: "0 0 24px",
+                                lineHeight: 1.08,
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                Most Websites<br />Don&rsquo;t Work.
                             </h2>
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "#555", marginBottom: "18px" }}>
+
+                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(26,21,20,0.60)", marginBottom: "18px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 They&rsquo;re slow. They&rsquo;re confusing. They look like every other template on the internet. And worst of all—they don&rsquo;t convert.
                             </p>
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "#555" }}>
+                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(26,21,20,0.60)", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 A pretty website without a strategy is just an expensive digital brochure. At Creative Cowboys, we don&rsquo;t just design; we engineer user journeys. Every pixel, every button, and every headline is strategically placed to turn visitors into paying customers.
                             </p>
-                        </div>
+                        </motion.div>
 
                         {/* Pain-point card */}
-                        <div style={{ background: "#f7f7f8", padding: "36px", borderRadius: "20px", border: "1px solid #e4e4e7", boxShadow: "0 12px 40px rgba(0,0,0,0.07)", position: "relative", overflow: "hidden" }}>
-                            <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", background: "rgba(241,95,42,0.12)", filter: "blur(48px)", borderRadius: "50%", pointerEvents: "none" }} />
-                            <div style={{ display: "flex", flexDirection: "column", gap: "28px", position: "relative", zIndex: 1 }}>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.65, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                background: "rgba(255,255,255,0.90)",
+                                padding: "36px",
+                                borderRadius: "24px",
+                                border: "1px solid rgba(26,21,20,0.08)",
+                                boxShadow: "0 16px 48px rgba(26,21,20,0.08), inset 0 1px 0 rgba(255,255,255,1)",
+                                position: "relative",
+                                overflow: "hidden",
+                            }}
+                        >
+                            {/* Top-right glow accent */}
+                            <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "130px", height: "130px", background: "rgba(241,95,42,0.12)", filter: "blur(52px)", borderRadius: "50%", pointerEvents: "none" }} />
+
+                            <p style={{
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                letterSpacing: "0.14em",
+                                textTransform: "uppercase",
+                                color: "rgba(26,21,20,0.35)",
+                                margin: "0 0 24px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}>
+                                Common Pain Points
+                            </p>
+
+                            <div style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative", zIndex: 1 }}>
                                 {[
                                     { Icon: Zap, label: "Slow Load Times", text: "Losing 50% of visitors before they even see your offer." },
                                     { Icon: Target, label: "Unclear Messaging", text: "Users leave if they don't understand what you do in 3 seconds." },
                                     { Icon: BarChart3, label: "Zero Conversion Strategy", text: "Traffic means nothing if there's no clear path to purchase." },
-                                ].map(({ Icon, label, text }) => (
-                                    <div key={label} style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-                                        <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                ].map(({ Icon, label, text }, i) => (
+                                    <motion.div
+                                        key={label}
+                                        initial={{ opacity: 0, y: 12 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.30 + i * 0.10, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                                        style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}
+                                    >
+                                        <div style={{
+                                            width: "42px",
+                                            height: "42px",
+                                            borderRadius: "12px",
+                                            background: "rgba(239,68,68,0.07)",
+                                            border: "1px solid rgba(239,68,68,0.14)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            flexShrink: 0,
+                                        }}>
                                             <Icon size={18} color="#ef4444" />
                                         </div>
                                         <div>
-                                            <p style={{ fontWeight: 700, color: "#111", margin: "0 0 4px", fontSize: "15px" }}>{label}</p>
-                                            <p style={{ fontSize: "13px", color: "#888", margin: 0, lineHeight: 1.6 }}>{text}</p>
+                                            <p style={{ fontWeight: 700, color: "#1a1514", margin: "0 0 4px", fontSize: "15px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{label}</p>
+                                            <p style={{ fontSize: "13px", color: "rgba(26,21,20,0.50)", margin: 0, lineHeight: 1.65, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{text}</p>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </section>
+
 
                 {/* ── SECTION 2: What We Build ──────────────────────────── */}
                 <section style={{ padding: "96px 24px" }}>
