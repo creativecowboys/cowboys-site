@@ -77,7 +77,7 @@ export function FAQSection() {
         <section
             className={`cowboys-faq-fade${hasEntered ? ' cowboys-faq-fade--in' : ''}`}
             style={{
-                background: 'linear-gradient(180deg, #fce8d5 0%, #f5ddd0 50%, #fce8d5 100%)',
+                background: 'linear-gradient(180deg, #0f0e0d 0%, #1a1210 50%, #0f0e0d 100%)',
                 padding: '80px 24px 96px',
             }}
         >
@@ -100,7 +100,7 @@ export function FAQSection() {
                         fontSize: 'clamp(28px, 4vw, 44px)',
                         fontWeight: 800,
                         letterSpacing: '-0.03em',
-                        color: '#1a1514',
+                        color: '#ffffff',
                         margin: '0 0 14px',
                         lineHeight: 1.1,
                     }}>
@@ -116,7 +116,7 @@ export function FAQSection() {
                     </h2>
                     <p style={{
                         fontSize: 'clamp(14px, 1.6vw, 17px)',
-                        color: 'rgba(26, 21, 20, 0.55)',
+                        color: 'rgba(255,255,255,0.45)',
                         margin: 0,
                         fontWeight: 400,
                     }}>
@@ -128,17 +128,17 @@ export function FAQSection() {
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {faqs.map((item, index) => {
                         const open = activeIndex === index;
+                        const borderColor = open ? 'rgba(241,95,42,0.40)' : 'rgba(255,255,255,0.08)';
+                        const metaBorderColor = open ? 'rgba(241,95,42,0.40)' : 'rgba(255,255,255,0.12)';
                         return (
                             <li key={item.question}>
                                 <div style={{
                                     borderRadius: '20px',
-                                    background: open ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.70)',
-                                    border: open
-                                        ? '1px solid rgba(241, 95, 42, 0.25)'
-                                        : '1px solid rgba(255,255,255,0.80)',
+                                    background: open ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
+                                    border: `1px solid ${borderColor}`,
                                     boxShadow: open
-                                        ? '0 8px 32px rgba(241, 95, 42, 0.10), 0 2px 8px rgba(0,0,0,0.06)'
-                                        : '0 2px 8px rgba(0,0,0,0.04)',
+                                        ? '0 8px 32px rgba(241,95,42,0.15), 0 2px 8px rgba(0,0,0,0.40)'
+                                        : '0 2px 8px rgba(0,0,0,0.30)',
                                     backdropFilter: 'blur(16px)',
                                     WebkitBackdropFilter: 'blur(16px)',
                                     transition: 'all 300ms ease',
@@ -168,8 +168,8 @@ export function FAQSection() {
                                             borderRadius: '50%',
                                             background: open
                                                 ? 'linear-gradient(135deg, #F15F2A, #EA51FF)'
-                                                : 'rgba(26, 21, 20, 0.06)',
-                                            border: open ? 'none' : '1px solid rgba(26, 21, 20, 0.10)',
+                                                : 'rgba(255,255,255,0.08)',
+                                            border: open ? 'none' : '1px solid rgba(255,255,255,0.12)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -181,7 +181,7 @@ export function FAQSection() {
                                                 style={{
                                                     transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
                                                     transition: 'transform 300ms ease',
-                                                    color: open ? '#fff' : '#1a1514',
+                                                    color: open ? '#fff' : 'rgba(255,255,255,0.80)',
                                                 }}
                                             >
                                                 <path d="M12 5v14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -195,7 +195,7 @@ export function FAQSection() {
                                                 <span style={{
                                                     fontSize: 'clamp(15px, 1.6vw, 17px)',
                                                     fontWeight: 700,
-                                                    color: '#1a1514',
+                                                    color: '#ffffff',
                                                     lineHeight: 1.35,
                                                 }}>
                                                     {item.question}
@@ -205,8 +205,8 @@ export function FAQSection() {
                                                     fontWeight: 600,
                                                     letterSpacing: '0.08em',
                                                     textTransform: 'uppercase',
-                                                    color: open ? '#F15F2A' : 'rgba(26,21,20,0.40)',
-                                                    border: `1px solid ${open ? 'rgba(241,95,42,0.30)' : 'rgba(26,21,20,0.12)'}`,
+                                                    color: open ? '#F15F2A' : 'rgba(255,255,255,0.30)',
+                                                    border: `1px solid ${metaBorderColor}`,
                                                     borderRadius: '999px',
                                                     padding: '2px 10px',
                                                     transition: 'all 300ms ease',
@@ -228,7 +228,7 @@ export function FAQSection() {
                                             margin: 0,
                                             padding: '0 24px 22px 80px',
                                             fontSize: 'clamp(14px, 1.4vw, 15px)',
-                                            color: 'rgba(26, 21, 20, 0.65)',
+                                            color: 'rgba(255,255,255,0.55)',
                                             lineHeight: 1.7,
                                             fontWeight: 400,
                                         }}>
@@ -246,7 +246,7 @@ export function FAQSection() {
                     textAlign: 'center',
                     marginTop: '44px',
                     fontSize: '15px',
-                    color: 'rgba(26,21,20,0.50)',
+                    color: 'rgba(255,255,255,0.35)',
                 }}>
                     Still have questions?{' '}
                     <a
