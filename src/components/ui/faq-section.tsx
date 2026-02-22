@@ -219,7 +219,7 @@ export function FAQSection() {
                 }}>
                     Still have questions?{' '}
                     <a
-                        href="mailto:hello@creativecowboys.com"
+                        href="mailto:howdy@creativecowboys.co"
                         style={{
                             color: '#F15F2A',
                             fontWeight: 600,
