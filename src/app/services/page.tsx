@@ -8,22 +8,16 @@ import { Footer7 } from "@/components/ui/footer-7";
 
 const ORANGE = "#F15F2A";
 const PINK = "#EA51FF";
-
-// Light mode palette — matches homepage warm peach sections
-const BG = "#fce8d5";          // warm peach base
-const BG_ALT = "#f0ddd4";          // slightly deeper peach for alternating sections
-const CARD_BG = "rgba(255,255,255,0.80)";
-const TEXT = "#1a1514";
-const TEXT_MUTED = "rgba(26,21,20,0.55)";
-const BORDER = "rgba(26,21,20,0.08)";
+const DARK = "#0D0D0F";
+const CARD = "#15181e";
 
 const services = [
     {
         icon: Globe,
         label: "Web Design",
         color: ORANGE,
-        glow: "rgba(241,95,42,0.10)",
-        border: "rgba(241,95,42,0.20)",
+        glow: "rgba(241,95,42,0.15)",
+        border: "rgba(241,95,42,0.25)",
         href: "/web-design",
         tagline: "Sites that sell",
         description:
@@ -34,8 +28,8 @@ const services = [
         icon: Megaphone,
         label: "Digital Marketing",
         color: PINK,
-        glow: "rgba(234,81,255,0.08)",
-        border: "rgba(234,81,255,0.20)",
+        glow: "rgba(234,81,255,0.12)",
+        border: "rgba(234,81,255,0.25)",
         href: "/contact",
         tagline: "More leads, more revenue",
         description:
@@ -45,9 +39,9 @@ const services = [
     {
         icon: Search,
         label: "SEO",
-        color: "#1a8fc1",
-        glow: "rgba(26,143,193,0.08)",
-        border: "rgba(26,143,193,0.20)",
+        color: "#56CCF2",
+        glow: "rgba(86,204,242,0.12)",
+        border: "rgba(86,204,242,0.25)",
         href: "/contact",
         tagline: "Own your market",
         description:
@@ -57,9 +51,9 @@ const services = [
     {
         icon: Palette,
         label: "Branding",
-        color: "#b07d10",
-        glow: "rgba(176,125,16,0.08)",
-        border: "rgba(176,125,16,0.20)",
+        color: "#F7B731",
+        glow: "rgba(247,183,49,0.12)",
+        border: "rgba(247,183,49,0.25)",
         href: "/contact",
         tagline: "Look the part",
         description:
@@ -69,9 +63,9 @@ const services = [
     {
         icon: Mail,
         label: "Email Marketing",
-        color: "#1a8c52",
-        glow: "rgba(26,140,82,0.08)",
-        border: "rgba(26,140,82,0.20)",
+        color: "#2ED573",
+        glow: "rgba(46,213,115,0.12)",
+        border: "rgba(46,213,115,0.25)",
         href: "/contact",
         tagline: "Stay top of mind",
         description:
@@ -81,9 +75,9 @@ const services = [
     {
         icon: BarChart3,
         label: "Analytics & Strategy",
-        color: "#c0392b",
-        glow: "rgba(192,57,43,0.08)",
-        border: "rgba(192,57,43,0.20)",
+        color: "#FF6B6B",
+        glow: "rgba(255,107,107,0.12)",
+        border: "rgba(255,107,107,0.25)",
         href: "/contact",
         tagline: "Know your numbers",
         description:
@@ -115,11 +109,12 @@ export default function ServicesPage() {
         }
 
         .svc-card {
-          transition: transform 240ms ease, box-shadow 240ms ease;
+          transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+          cursor: default;
         }
         .svc-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 16px 48px rgba(26,21,20,0.12);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.40);
         }
         .svc-link {
           display: inline-flex;
@@ -131,7 +126,7 @@ export default function ServicesPage() {
           transition: gap 200ms ease, opacity 200ms ease;
           margin-top: 20px;
         }
-        .svc-link:hover { gap: 10px; opacity: 0.75; }
+        .svc-link:hover { gap: 10px; opacity: 0.85; }
 
         .cta-primary {
           background: ${ORANGE};
@@ -141,7 +136,7 @@ export default function ServicesPage() {
         .cta-ghost {
           transition: background 180ms ease;
         }
-        .cta-ghost:hover { background: rgba(26,21,20,0.06); }
+        .cta-ghost:hover { background: rgba(255,255,255,0.09); }
 
         .services-grid {
           display: grid;
@@ -163,18 +158,18 @@ export default function ServicesPage() {
         }
       `}</style>
 
-            <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+            <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
 
                 {/* ── Logo ── */}
                 <div style={{ position: "fixed", top: "52px", left: "24px", zIndex: 50 }}>
                     <Link href="/">
                         <Image
-                            src="/cactus_for_login_page_-_black.png"
+                            src="/Main%20logo%202.png"
                             alt="Creative Cowboys Media"
                             width={160}
                             height={42}
                             priority
-                            style={{ width: "48px", height: "auto" }}
+                            style={{ width: "160px", height: "auto" }}
                         />
                     </Link>
                 </div>
@@ -187,6 +182,14 @@ export default function ServicesPage() {
                     textAlign: "center",
                     position: "relative",
                 }}>
+                    {/* Glow orb */}
+                    <div aria-hidden style={{
+                        position: "absolute", top: "60px", left: "50%", transform: "translateX(-50%)",
+                        width: "600px", height: "300px",
+                        background: "radial-gradient(ellipse, rgba(241,95,42,0.12) 0%, transparent 70%)",
+                        pointerEvents: "none",
+                    }} />
+
                     <p className="fu-1" style={{
                         fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em",
                         textTransform: "uppercase", color: ORANGE, marginBottom: "20px",
@@ -197,7 +200,7 @@ export default function ServicesPage() {
                     <h1 className="fu-2" style={{
                         fontSize: "clamp(38px, 6vw, 72px)", fontWeight: 800,
                         lineHeight: 1.06, letterSpacing: "-0.03em",
-                        color: TEXT, margin: "0 0 24px",
+                        color: "#ffffff", margin: "0 0 24px",
                     }}>
                         Everything your business needs{" "}
                         <span style={{
@@ -210,7 +213,7 @@ export default function ServicesPage() {
 
                     <p className="fu-3" style={{
                         fontSize: "clamp(16px, 2vw, 19px)", lineHeight: 1.7,
-                        color: TEXT_MUTED, marginBottom: "44px", maxWidth: "640px", marginInline: "auto",
+                        color: "rgba(255,255,255,0.48)", marginBottom: "44px", maxWidth: "640px", marginInline: "auto",
                     }}>
                         We&rsquo;re a full-service digital agency based in Villa Rica, GA. From your first website to a fully automated marketing engine — we build what your business needs to compete and win.
                     </p>
@@ -220,7 +223,7 @@ export default function ServicesPage() {
                             className="cta-primary"
                             style={{
                                 padding: "14px 32px", color: "#fff", fontWeight: 700,
-                                fontSize: "15px", borderRadius: "10px",
+                                fontSize: "15px", borderRadius: "10px", border: "none",
                                 textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px",
                             }}
                         >
@@ -229,10 +232,10 @@ export default function ServicesPage() {
                         <Link href="/contact"
                             className="cta-ghost"
                             style={{
-                                padding: "14px 32px", color: TEXT, fontWeight: 600,
+                                padding: "14px 32px", color: "#fff", fontWeight: 600,
                                 fontSize: "15px", borderRadius: "10px",
-                                border: `1px solid ${BORDER}`,
-                                background: "rgba(255,255,255,0.60)",
+                                border: "1px solid rgba(255,255,255,0.12)",
+                                background: "rgba(255,255,255,0.04)",
                                 textDecoration: "none",
                             }}
                         >
@@ -242,20 +245,15 @@ export default function ServicesPage() {
                 </section>
 
                 {/* ── Stats strip ── */}
-                <section style={{
-                    borderTop: `1px solid ${BORDER}`,
-                    borderBottom: `1px solid ${BORDER}`,
-                    padding: "48px 24px",
-                    background: BG_ALT,
-                }}>
+                <section style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "48px 24px", background: CARD }}>
                     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
                         <div className="stats-grid">
                             {stats.map(({ value, label }) => (
                                 <div key={label} style={{ textAlign: "center", padding: "12px" }}>
-                                    <p style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: TEXT, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+                                    <p style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
                                         {value}
                                     </p>
-                                    <p style={{ fontSize: "13px", color: TEXT_MUTED, margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                                    <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.38)", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                                         {label}
                                     </p>
                                 </div>
@@ -265,16 +263,16 @@ export default function ServicesPage() {
                 </section>
 
                 {/* ── Services Grid ── */}
-                <section style={{ padding: "96px 24px", background: BG }}>
+                <section style={{ padding: "96px 24px" }}>
                     <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
                         <div style={{ textAlign: "center", marginBottom: "64px" }}>
                             <h2 style={{
                                 fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
-                                letterSpacing: "-0.03em", color: TEXT, margin: "0 0 16px",
+                                letterSpacing: "-0.03em", color: "#fff", margin: "0 0 16px",
                             }}>
                                 Our Services
                             </h2>
-                            <p style={{ fontSize: "17px", color: TEXT_MUTED, maxWidth: "520px", marginInline: "auto", lineHeight: 1.7 }}>
+                            <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.42)", maxWidth: "520px", marginInline: "auto", lineHeight: 1.7 }}>
                                 Pick one or build out a full strategy — we can handle it all.
                             </p>
                         </div>
@@ -285,55 +283,55 @@ export default function ServicesPage() {
                                     key={label}
                                     className="svc-card"
                                     style={{
-                                        background: CARD_BG,
+                                        background: CARD,
                                         border: `1px solid ${border}`,
                                         borderRadius: "20px",
                                         padding: "32px",
                                         position: "relative",
                                         overflow: "hidden",
-                                        backdropFilter: "blur(12px)",
-                                        WebkitBackdropFilter: "blur(12px)",
-                                        boxShadow: "0 2px 12px rgba(26,21,20,0.06)",
                                     }}
                                 >
-                                    {/* Subtle glow */}
+                                    {/* Glow */}
                                     <div aria-hidden style={{
                                         position: "absolute", top: "-30px", right: "-30px",
-                                        width: "140px", height: "140px",
-                                        background: glow, filter: "blur(32px)",
+                                        width: "160px", height: "160px",
+                                        background: glow, filter: "blur(40px)",
                                         borderRadius: "50%", pointerEvents: "none",
                                     }} />
 
                                     <div style={{ position: "relative", zIndex: 1 }}>
+                                        {/* Icon */}
                                         <div style={{
                                             width: "52px", height: "52px", borderRadius: "14px",
-                                            background: glow,
-                                            border: `1px solid ${border}`,
+                                            background: `${glow}`, border: `1px solid ${border}`,
                                             display: "flex", alignItems: "center", justifyContent: "center",
                                             marginBottom: "20px",
                                         }}>
                                             <Icon size={24} color={color} />
                                         </div>
 
+                                        {/* Label + tagline */}
                                         <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color, margin: "0 0 6px" }}>
                                             {label}
                                         </p>
-                                        <h3 style={{ fontSize: "22px", fontWeight: 800, color: TEXT, margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+                                        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#ffffff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
                                             {tagline}
                                         </h3>
-                                        <p style={{ fontSize: "14px", lineHeight: 1.75, color: TEXT_MUTED, margin: "0 0 24px" }}>
+                                        <p style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>
                                             {description}
                                         </p>
 
+                                        {/* Bullets */}
                                         <ul style={{ listStyle: "none", padding: 0, margin: "0 0 4px", display: "flex", flexDirection: "column", gap: "10px" }}>
                                             {bullets.map(b => (
-                                                <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13px", color: TEXT_MUTED }}>
+                                                <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
                                                     <CheckCircle2 size={14} color={color} style={{ flexShrink: 0, marginTop: "2px" }} />
                                                     {b}
                                                 </li>
                                             ))}
                                         </ul>
 
+                                        {/* CTA link */}
                                         <Link href={href} className="svc-link" style={{ color }}>
                                             Learn more <ArrowRight size={14} />
                                         </Link>
@@ -346,22 +344,22 @@ export default function ServicesPage() {
 
                 {/* ── Why Cowboys ── */}
                 <section style={{
-                    background: BG_ALT,
-                    borderTop: `1px solid ${BORDER}`,
-                    borderBottom: `1px solid ${BORDER}`,
+                    background: "#f0ddd4",
+                    borderTop: "1px solid rgba(26,21,20,0.08)",
+                    borderBottom: "1px solid rgba(26,21,20,0.08)",
                     padding: "96px 24px",
                 }}>
                     <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
                         <h2 style={{
                             fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800,
-                            letterSpacing: "-0.03em", color: TEXT, margin: "0 0 20px",
+                            letterSpacing: "-0.03em", color: "#1a1514", margin: "0 0 20px",
                         }}>
                             You talk directly with the people doing the work.
                         </h2>
-                        <p style={{ fontSize: "17px", color: TEXT_MUTED, lineHeight: 1.75, marginBottom: "20px", maxWidth: "640px", marginInline: "auto" }}>
+                        <p style={{ fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.75, marginBottom: "20px", maxWidth: "640px", marginInline: "auto" }}>
                             No account managers playing telephone. No offshore teams you&rsquo;ll never meet. We&rsquo;re a small, focused crew based in Villa Rica, GA — fast-moving and obsessed with results you can actually measure.
                         </p>
-                        <p style={{ fontSize: "17px", color: TEXT_MUTED, lineHeight: 1.75, marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
+                        <p style={{ fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.75, marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
                             When you work with Creative Cowboys, you get a team that treats your business like their own — because your growth is how we grow.
                         </p>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
@@ -369,8 +367,8 @@ export default function ServicesPage() {
                                 <span key={t} style={{
                                     padding: "8px 18px",
                                     background: "rgba(255,255,255,0.70)",
-                                    border: `1px solid ${BORDER}`,
-                                    borderRadius: "999px", color: TEXT_MUTED,
+                                    border: "1px solid rgba(26,21,20,0.10)",
+                                    borderRadius: "999px", color: "rgba(26,21,20,0.65)",
                                     fontSize: "13px", fontWeight: 500,
                                 }}>
                                     {t}
@@ -380,12 +378,22 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
+
                 {/* ── Final CTA ── */}
-                <section style={{ padding: "120px 24px", textAlign: "center", background: BG }}>
-                    <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+                <section style={{
+                    padding: "120px 24px", textAlign: "center",
+                    position: "relative", overflow: "hidden",
+                }}>
+                    <div aria-hidden style={{
+                        position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)",
+                        width: "600px", height: "280px",
+                        background: "rgba(241,95,42,0.15)", filter: "blur(90px)",
+                        borderRadius: "50%", pointerEvents: "none",
+                    }} />
+                    <div style={{ maxWidth: "760px", margin: "0 auto", position: "relative", zIndex: 1 }}>
                         <h2 style={{
                             fontSize: "clamp(32px, 6vw, 64px)", fontWeight: 900,
-                            letterSpacing: "-0.035em", color: TEXT, lineHeight: 1.06, margin: "0 0 24px",
+                            letterSpacing: "-0.035em", color: "#fff", lineHeight: 1.06, margin: "0 0 24px",
                         }}>
                             Ready to get started?{" "}
                             <span style={{
@@ -395,7 +403,7 @@ export default function ServicesPage() {
                                 Let&rsquo;s talk.
                             </span>
                         </h2>
-                        <p style={{ fontSize: "18px", color: TEXT_MUTED, marginBottom: "48px", lineHeight: 1.7 }}>
+                        <p style={{ fontSize: "18px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
                             Tell us about your business and we&rsquo;ll put together a custom plan that fits your goals and your budget.
                         </p>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
@@ -412,10 +420,10 @@ export default function ServicesPage() {
                             <Link href="/contact"
                                 className="cta-ghost"
                                 style={{
-                                    padding: "16px 36px", color: TEXT, fontWeight: 600,
+                                    padding: "16px 36px", color: "#fff", fontWeight: 600,
                                     fontSize: "16px", borderRadius: "10px",
-                                    border: `1px solid ${BORDER}`,
-                                    background: "rgba(255,255,255,0.60)",
+                                    border: "1px solid rgba(255,255,255,0.12)",
+                                    background: "rgba(255,255,255,0.04)",
                                     textDecoration: "none",
                                 }}
                             >
