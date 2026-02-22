@@ -43,6 +43,7 @@ const navItems: NavItem[] = [
         icon: IoMailOutline,
         gradientFrom: "#2A9CF1",
         gradientTo: "#56CCF2",
+        href: "/contact",
     },
     {
         name: "Let's Talk",
