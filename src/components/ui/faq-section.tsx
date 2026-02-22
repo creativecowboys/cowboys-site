@@ -108,14 +108,7 @@ export function FAQSection() {
                             to know
                         </span>
                     </h2>
-                    <p style={{
-                        fontSize: 'clamp(14px, 1.6vw, 17px)',
-                        color: 'rgba(255,255,255,0.45)',
-                        margin: 0,
-                        fontWeight: 400,
-                    }}>
-                        Everything you need to know before we start building together.
-                    </p>
+
                 </div>
 
                 {/* Accordion */}
