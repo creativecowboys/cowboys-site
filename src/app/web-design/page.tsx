@@ -1,15 +1,103 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, BarChart3, Target, Zap, MonitorSmartphone, Search, TrendingUp, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, BarChart3, Target, Zap, MonitorSmartphone, Search, TrendingUp, ShieldCheck, Telescope, LayoutTemplate, Paintbrush, Rocket } from "lucide-react";
 import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 import Image from "next/image";
+import { motion, useReducedMotion } from "motion/react";
+import { FeatureCard } from "@/components/ui/grid-feature-cards";
 
 /* ── Brand tokens (mirror features-4 / globals) ─────────────── */
 const ORANGE = "#F15F2A";
 const PINK = "#EA51FF";
 const DARK = "#0D0D0F";
 const CARD = "#15181e";
+
+/* ── Process steps data ──────────────────────────────────────── */
+const processSteps = [
+    { step: "01", title: "Discovery & Strategy", icon: Telescope, description: "We dive deep into your business, audience, and competitors to find your unique edge." },
+    { step: "02", title: "Structure & Messaging", icon: LayoutTemplate, description: "We map out the user journey and craft compelling copy that sells your value." },
+    { step: "03", title: "Design & Development", icon: Paintbrush, description: "We bring the strategy to life with stunning, high-performance custom design." },
+    { step: "04", title: "Launch & Optimization", icon: Rocket, description: "We deploy, test, and integrate analytics to ensure maximum ROI from day one." },
+];
+
+/* ── AnimatedContainer ───────────────────────────────────────── */
+function AnimatedContainer({
+    className,
+    delay = 0.1,
+    children,
+}: {
+    delay?: number;
+    className?: string;
+    children: React.ReactNode;
+}) {
+    const shouldReduceMotion = useReducedMotion();
+    if (shouldReduceMotion) return <>{children}</>;
+    return (
+        <motion.div
+            initial={{ filter: "blur(4px)", translateY: -8, opacity: 0 }}
+            whileInView={{ filter: "blur(0px)", translateY: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay, duration: 0.8 }}
+            className={className}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+/* ── ProcessSection ──────────────────────────────────────────── */
+function ProcessSection() {
+    return (
+        <div style={{ width: "100%" }}>
+            <AnimatedContainer className="mx-auto max-w-3xl text-center" delay={0.1}>
+                <h2 style={{
+                    fontSize: "clamp(28px, 4.5vw, 50px)",
+                    fontWeight: 800,
+                    letterSpacing: "-0.03em",
+                    color: "#1a1514",
+                    margin: "0 0 18px",
+                    fontFamily: "var(--font-geist-sans, sans-serif)",
+                }}>
+                    Strategy First. Design Second.
+                </h2>
+                <p style={{
+                    fontSize: "17px",
+                    color: "rgba(26,21,20,0.50)",
+                    maxWidth: "560px",
+                    marginInline: "auto",
+                    lineHeight: 1.7,
+                    marginBottom: "56px",
+                    fontFamily: "var(--font-geist-sans, sans-serif)",
+                }}>
+                    We don&rsquo;t just start pushing pixels. We follow a battle-tested process to ensure your website actually achieves your business goals.
+                </p>
+            </AnimatedContainer>
+
+            <AnimatedContainer delay={0.4}>
+                <div
+                    style={{
+                        border: "1px dashed rgba(26,21,20,0.18)",
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
+                    }}
+                    className="sm:grid-cols-2 md:grid-cols-4"
+                >
+                    {processSteps.map((step) => (
+                        <FeatureCard
+                            key={step.step}
+                            feature={step}
+                            style={{
+                                borderRight: "1px dashed rgba(26,21,20,0.18)",
+                                borderBottom: "1px dashed rgba(26,21,20,0.18)",
+                            }}
+                        />
+                    ))}
+                </div>
+            </AnimatedContainer>
+        </div>
+    );
+}
 
 export default function WebDesignPage() {
     return (
@@ -201,29 +289,9 @@ export default function WebDesignPage() {
                 <section style={{ background: "#f0ddd4", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "350px", background: "rgba(241,95,42,0.10)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
                     <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-                        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-                            <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#1a1514", margin: "0 0 18px" }}>
-                                Strategy First. Design Second.
-                            </h2>
-                            <p style={{ fontSize: "17px", color: "rgba(26,21,20,0.50)", maxWidth: "560px", marginInline: "auto", lineHeight: 1.7 }}>
-                                We don&rsquo;t just start pushing pixels. We follow a battle-tested process to ensure your website actually achieves your business goals.
-                            </p>
-                        </div>
 
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "32px" }}>
-                            {[
-                                { step: "01", title: "Discovery & Strategy", desc: "We dive deep into your business, audience, and competitors to find your unique edge." },
-                                { step: "02", title: "Structure & Messaging", desc: "We map out the user journey and craft compelling copy that sells your value." },
-                                { step: "03", title: "Design & Development", desc: "We bring the strategy to life with stunning, high-performance custom design." },
-                                { step: "04", title: "Launch & Optimization", desc: "We deploy, test, and integrate analytics to ensure maximum ROI from day one." },
-                            ].map(({ step, title, desc }) => (
-                                <div key={step} style={{ position: "relative" }}>
-                                    <p style={{ fontSize: "60px", fontWeight: 900, color: "rgba(26,21,20,0.07)", lineHeight: 1, margin: "0 0 12px" }}>{step}</p>
-                                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1a1514", margin: "0 0 10px" }}>{title}</h3>
-                                    <p style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(26,21,20,0.50)", margin: 0 }}>{desc}</p>
-                                </div>
-                            ))}
-                        </div>
+                        <ProcessSection />
+
                     </div>
                 </section>
 
