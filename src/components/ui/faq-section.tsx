@@ -9,37 +9,31 @@ const faqs = [
         question: "How does pricing work?",
         answer:
             "Every project is different, so we don't do one-size-fits-all pricing. We'll talk through what you need and put together a custom proposal that fits your goals and budget.",
-        meta: 'Pricing',
     },
     {
         question: "How long does a website take?",
         answer:
             "Most websites are ready in 2\u20134 weeks. Larger projects with custom features can take a bit longer, but we keep you in the loop every step of the way.",
-        meta: 'Timeline',
     },
     {
         question: "Do you work with small businesses?",
         answer:
             "Absolutely \u2014 small and local businesses are our bread and butter. Whether you're just starting out or ready to scale, we build strategies that fit where you are right now.",
-        meta: 'Fit',
     },
     {
         question: "Where are you located, and do you work with businesses outside of Villa Rica?",
         answer:
             "We're based in Villa Rica, GA, but we work with clients all over the country. Most of what we do is remote-friendly, so location is never a barrier.",
-        meta: 'Location',
     },
     {
         question: "What results can I expect?",
         answer:
             "That depends on the service, but we always tie our work to real metrics \u2014 more traffic, more leads, more revenue. We'll set clear goals upfront so you know exactly what we're working toward.",
-        meta: 'Results',
     },
     {
         question: "How do I get started?",
         answer:
             "Just type in the box above! Wrangler will ask you a few quick questions and get you connected with our team.",
-        meta: 'Next Steps',
     },
 ];
 
@@ -128,14 +122,12 @@ export function FAQSection() {
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {faqs.map((item, index) => {
                         const open = activeIndex === index;
-                        const borderColor = open ? 'rgba(241,95,42,0.40)' : 'rgba(255,255,255,0.08)';
-                        const metaBorderColor = open ? 'rgba(241,95,42,0.40)' : 'rgba(255,255,255,0.12)';
                         return (
                             <li key={item.question}>
                                 <div style={{
                                     borderRadius: '20px',
                                     background: open ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
-                                    border: `1px solid ${borderColor}`,
+                                    border: `1px solid ${open ? 'rgba(241,95,42,0.40)' : 'rgba(255,255,255,0.08)'}`,
                                     boxShadow: open
                                         ? '0 8px 32px rgba(241,95,42,0.15), 0 2px 8px rgba(0,0,0,0.40)'
                                         : '0 2px 8px rgba(0,0,0,0.30)',
@@ -189,33 +181,17 @@ export function FAQSection() {
                                             </svg>
                                         </span>
 
-                                        {/* Question + meta */}
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                                                <span style={{
-                                                    fontSize: 'clamp(15px, 1.6vw, 17px)',
-                                                    fontWeight: 700,
-                                                    color: '#ffffff',
-                                                    lineHeight: 1.35,
-                                                }}>
-                                                    {item.question}
-                                                </span>
-                                                <span style={{
-                                                    fontSize: '10px',
-                                                    fontWeight: 600,
-                                                    letterSpacing: '0.08em',
-                                                    textTransform: 'uppercase',
-                                                    color: open ? '#F15F2A' : 'rgba(255,255,255,0.30)',
-                                                    border: `1px solid ${metaBorderColor}`,
-                                                    borderRadius: '999px',
-                                                    padding: '2px 10px',
-                                                    transition: 'all 300ms ease',
-                                                    whiteSpace: 'nowrap',
-                                                }}>
-                                                    {item.meta}
-                                                </span>
-                                            </div>
-                                        </div>
+                                        {/* Question */}
+                                        <span style={{
+                                            flex: 1,
+                                            fontSize: 'clamp(15px, 1.6vw, 17px)',
+                                            fontWeight: 700,
+                                            color: '#ffffff',
+                                            lineHeight: 1.35,
+                                            paddingTop: '10px',
+                                        }}>
+                                            {item.question}
+                                        </span>
                                     </button>
 
                                     {/* Answer panel */}
