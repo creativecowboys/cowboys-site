@@ -5,6 +5,7 @@ import WranglerChat from "@/components/WranglerChat";
 import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
 import { TestimonialStack } from "@/components/ui/glass-testimonial-swiper";
+import { FAQSection } from "@/components/ui/faq-section";
 
 export default function Home() {
   return (
@@ -127,6 +128,9 @@ export default function Home() {
         <p className="testimonials-subheading">See what business owners are saying after working with us.</p>
         <TestimonialStack />
       </section>
+
+      {/* ===== FAQ Section ===== */}
+      <FAQSection />
 
       {/* ===== Footer ===== */}
       <Footer7 />
