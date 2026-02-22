@@ -439,7 +439,7 @@ export default function WebDesignPage() {
                 </section>
 
                 {/* ── SECTION 3: Our Approach / Process ─────────────────── */}
-                <section style={{ background: "#f5c4b5", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
+                <section style={{ background: "linear-gradient(180deg, #f0ddd4 0%, #fce8d5 60%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "350px", background: "rgba(241,95,42,0.10)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
                     <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
