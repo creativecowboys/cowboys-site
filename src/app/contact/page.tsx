@@ -75,7 +75,7 @@ export default function ContactPage() {
                     }}
                 >
                     {/* Logo */}
-                    <Link href="/" style={{ display: "inline-block", marginBottom: "64px" }}>
+                    <Link href="/" className="site-logo" style={{ display: "inline-block", marginBottom: "64px" }}>
                         <Image
                             src="/Main%20logo%202.png"
                             alt="Creative Cowboys Media"

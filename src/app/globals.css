@@ -30,6 +30,36 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* ===== Site Logo — hover lift ===== */
+.site-logo {
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+  transform: translateY(0px);
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 180ms ease;
+}
+
+.site-logo:hover {
+  transform: translateY(-4px);
+  opacity: 0.88;
+}
+
+.site-logo:active {
+  transform: translateY(-1px);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .site-logo,
+  .site-logo:hover,
+  .site-logo:active {
+    transform: none !important;
+    transition: opacity 150ms ease !important;
+  }
+}
+
+
 /* ===== Mesh Gradient Animation ===== */
 @keyframes mesh {
 

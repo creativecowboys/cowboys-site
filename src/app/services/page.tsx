@@ -161,18 +161,16 @@ export default function ServicesPage() {
             <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
 
                 {/* ── Logo ── */}
-                <div style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
-                    <Link href="/">
-                        <Image
-                            src="/Main%20logo%202.png"
-                            alt="Creative Cowboys Media"
-                            width={160}
-                            height={42}
-                            priority
-                            style={{ width: "160px", height: "auto" }}
-                        />
-                    </Link>
-                </div>
+                <Link href="/" className="site-logo" style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
+                    <Image
+                        src="/Main%20logo%202.png"
+                        alt="Creative Cowboys Media"
+                        width={160}
+                        height={42}
+                        priority
+                        style={{ width: "160px", height: "auto" }}
+                    />
+                </Link>
 
                 {/* ── Hero ── */}
                 <section style={{
@@ -434,7 +432,7 @@ export default function ServicesPage() {
                 </section>
 
                 <Footer7 />
-            </div>
+            </div >
 
             <FloatingNav />
         </>

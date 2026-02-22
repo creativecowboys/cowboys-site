@@ -16,14 +16,14 @@ export default function Home() {
         <div className="mesh-gradient absolute inset-0 w-full h-full" />
 
         {/* Logo (top-left, fixed) — offset below the 36px info bar */}
-        <Link href="/" className="absolute left-6 z-50" style={{ top: "52px" }}>
+        <Link href="/" className="site-logo absolute left-6 z-50" style={{ top: "52px" }}>
           <Image
             src="/Main%20logo%202.png"
-            alt="Creative Cowboys Media"
+            alt="Creative Cowboys Media — Home"
             width={180}
             height={48}
             priority
-            className="w-[180px] h-auto"
+            className="w-[180px] h-auto block"
           />
         </Link>
 

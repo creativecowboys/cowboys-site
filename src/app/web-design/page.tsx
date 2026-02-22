@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, BarChart3, Target, Zap, MonitorSmartphone, Se
 import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { FeatureCard } from "@/components/ui/grid-feature-cards";
 
@@ -307,16 +308,16 @@ export default function WebDesignPage() {
             <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
 
                 {/* ── Logo ───────────────────────────────────────────────── */}
-                <div style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
+                <Link href="/" className="site-logo" style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
                     <Image
                         src="/Main%20logo%202.png"
-                        alt="Creative Cowboys Media"
+                        alt="Creative Cowboys Media — Home"
                         width={180}
                         height={48}
                         priority
-                        style={{ width: "180px", height: "auto" }}
+                        style={{ width: "180px", height: "auto", display: "block" }}
                     />
-                </div>
+                </Link>
 
                 {/* ── HERO ───────────────────────────────────────────────── */}
                 <section style={{ maxWidth: "860px", margin: "0 auto", padding: "160px 24px 120px", textAlign: "center" }}>
