@@ -135,17 +135,6 @@ function ProcessSection() {
 
             {/* ── Card Grid ── */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px", position: "relative" }}>
-                {/* Connector line between step icons */}
-                <div style={{
-                    position: "absolute",
-                    top: "51px",
-                    left: "calc(12.5% + 8px)",
-                    right: "calc(12.5% + 8px)",
-                    height: "1px",
-                    background: "linear-gradient(90deg, transparent, rgba(241,95,42,0.30), rgba(234,81,255,0.22), transparent)",
-                    pointerEvents: "none",
-                    zIndex: 0,
-                }} />
 
                 {processSteps.map((step, i) => {
                     const Icon = step.icon;
