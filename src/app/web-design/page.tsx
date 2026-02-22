@@ -58,8 +58,8 @@ function ProcessSection() {
                 }
                 .process-card:hover {
                     transform: translateY(-5px);
-                    box-shadow: 0 20px 48px rgba(241,95,42,0.13), 0 6px 16px rgba(26,21,20,0.08);
-                    background: rgba(255,255,255,0.85) !important;
+                    box-shadow: 0 20px 48px rgba(241,95,42,0.16), 0 6px 16px rgba(26,21,20,0.10);
+                    background: #ffffff !important;
                 }
                 .process-icon-badge {
                     transition: background 240ms ease, box-shadow 240ms ease, transform 240ms cubic-bezier(0.34,1.56,0.64,1);
@@ -158,7 +158,7 @@ function ProcessSection() {
                             viewport={{ once: true }}
                             transition={{ delay: 0.15 + i * 0.12, duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
                             style={{
-                                background: "rgba(255,255,255,0.60)",
+                                background: "rgba(255,255,255,0.92)",
                                 border: "1px solid rgba(26,21,20,0.09)",
                                 borderRadius: "20px",
                                 padding: "28px 24px",
@@ -450,7 +450,7 @@ export default function WebDesignPage() {
                 </section>
 
                 {/* ── SECTION 3: Our Approach / Process ─────────────────── */}
-                <section style={{ background: "#f0ddd4", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
+                <section style={{ background: "#f5c4b5", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "350px", background: "rgba(241,95,42,0.10)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
                     <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
 
