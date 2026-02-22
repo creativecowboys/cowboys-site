@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
         icon: IoBriefcaseOutline,
         gradientFrom: "#2A9CF1",
         gradientTo: "#92A6DB",
-        href: "/#services",
+        href: "/services",
     },
     {
         name: "About",
