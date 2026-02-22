@@ -49,8 +49,8 @@ const defaultSections: Footer7Props["sections"] = [
     {
         title: "Contact",
         links: [
-            { name: "Get In Touch", href: "#" },
-            { name: "Free Consultation", href: "#" },
+            { name: "Get In Touch", href: "/contact" },
+            { name: "Free Consultation", href: "/contact" },
             { name: "Support", href: "#" },
             { name: "FAQs", href: "#" },
         ],

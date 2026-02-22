@@ -50,6 +50,7 @@ const navItems: NavItem[] = [
         icon: IoChatbubbleOutline,
         gradientFrom: "#F15F2A",
         gradientTo: "#FF5E62",
+        href: "/contact",
     },
 ];
 
