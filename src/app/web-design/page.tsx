@@ -573,10 +573,11 @@ export default function WebDesignPage() {
                                         Who We Work With
                                     </span>
                                 </div>
-                                <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.08, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                    Built for Businesses<br />That Want to Grow
+                                <h2 style={{ fontSize: "clamp(36px, 5.5vw, 64px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: "0 0 20px", lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    Built for Businesses<br />That Want to{" "}
+                                    <span style={{ background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Grow</span>
                                 </h2>
-                                <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.42)", lineHeight: 1.7, maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.58)", lineHeight: 1.75, maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                     We partner with ambitious companies that understand the value of a premium digital presence.
                                 </p>
                             </div>
@@ -612,10 +613,10 @@ export default function WebDesignPage() {
                                         style={{ color: "rgba(255,255,255,0.25)", marginBottom: "20px", display: "block" }}
                                         strokeWidth={1.5}
                                     />
-                                    <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", margin: "0 0 8px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: "0 0 10px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                         {title}
                                     </p>
-                                    <p style={{ fontSize: "13px", lineHeight: 1.7, color: "rgba(255,255,255,0.42)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                    <p style={{ fontSize: "14px", lineHeight: 1.72, color: "rgba(255,255,255,0.60)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                         {desc}
                                     </p>
                                 </motion.div>
