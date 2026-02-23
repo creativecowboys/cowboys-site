@@ -277,16 +277,19 @@ export default function ServicesPage() {
 
                         <div className="services-grid">
                             {services.map(({ icon: Icon, label, color, glow, border, href, tagline, description, bullets }) => (
-                                <div
+                                <Link
                                     key={label}
+                                    href={href}
                                     className="svc-card"
                                     style={{
+                                        display: "block",
                                         background: CARD,
                                         border: `1px solid ${border}`,
                                         borderRadius: "20px",
                                         padding: "32px",
                                         position: "relative",
                                         overflow: "hidden",
+                                        textDecoration: "none"
                                     }}
                                 >
                                     {/* Glow */}
@@ -320,7 +323,7 @@ export default function ServicesPage() {
                                         </p>
 
                                         {/* Bullets */}
-                                        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 4px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                                        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", display: "flex", flexDirection: "column", gap: "10px" }}>
                                             {bullets.map(b => (
                                                 <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
                                                     <CheckCircle2 size={14} color={color} style={{ flexShrink: 0, marginTop: "2px" }} />
@@ -329,12 +332,12 @@ export default function ServicesPage() {
                                             ))}
                                         </ul>
 
-                                        {/* CTA link */}
-                                        <Link href={href} className="svc-link" style={{ color }}>
+                                        {/* CTA link (now just a visual span) */}
+                                        <div className="svc-link" style={{ color, display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 700, fontSize: "13px" }}>
                                             Learn more <ArrowRight size={14} />
-                                        </Link>
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>
