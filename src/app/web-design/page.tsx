@@ -811,35 +811,7 @@ export default function WebDesignPage() {
 
 
 
-                {/* ── FINAL CTA ─────────────────────────────────────────── */}
-                <section style={{ background: `linear-gradient(180deg, ${CARD} 0%, ${DARK} 100%)`, borderTop: "1px solid rgba(255,255,255,0.05)", padding: "120px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-                    <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "600px", height: "280px", background: "rgba(241,95,42,0.18)", filter: "blur(90px)", borderRadius: "50%", pointerEvents: "none" }} />
-                    <div style={{ maxWidth: "760px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-                        <h2 style={{ fontSize: "clamp(32px, 6vw, 64px)", fontWeight: 900, letterSpacing: "-0.035em", color: "#fff", lineHeight: 1.06, margin: "0 0 24px" }}>
-                            Let&rsquo;s Build Something That{" "}
-                            <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                                Actually Converts.
-                            </span>
-                        </h2>
-                        <p style={{ fontSize: "18px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
-                            Stop settling for a website that just sits there. It&rsquo;s time to build a digital asset that drives real revenue for your business.
-                        </p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
-                            <button
-                                className="wd-cta-btn-primary"
-                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 600, fontSize: "16px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
-                            >
-                                Start My Website Project <ArrowRight size={18} />
-                            </button>
-                            <button
-                                className="wd-cta-btn-ghost"
-                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 600, fontSize: "16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", cursor: "pointer" }}
-                            >
-                                Schedule a Strategy Call
-                            </button>
-                        </div>
-                    </div>
-                </section>
+
 
                 {/* ── Footer ────────────────────────────────────────────── */}
                 <Footer7 />
