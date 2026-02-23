@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { FeatureCard } from "@/components/ui/grid-feature-cards";
+import { ThreeDPhotoCarousel } from "@/components/ui/3d-carousel";
 
 /* ── Brand tokens (mirror features-4 / globals) ─────────────── */
 const ORANGE = "#F15F2A";
@@ -531,7 +532,37 @@ export default function WebDesignPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 3: Our Approach / Process ─────────────────── */}
+                {/* ── CAROUSEL: Work Showcase ───────────────────────────── */}
+                <section style={{ background: "#0a0a0c", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "96px 0 80px", position: "relative", overflow: "hidden" }}>
+                    {/* bg glow */}
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.06) 0%, transparent 70%)`, pointerEvents: "none" }} />
+
+                    <div style={{ maxWidth: "1060px", margin: "0 auto", padding: "0 24px 48px", position: "relative", zIndex: 1 }}>
+                        {/* Eyebrow */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px", flexShrink: 0 }} />
+                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                Our Work
+                            </span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+                            <h2 style={{ fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: 0, lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                Sites That{" "}
+                                <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                                    Actually Convert.
+                                </span>
+                            </h2>
+                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)", display: "flex", alignItems: "center", gap: "6px" }}>
+                                <span style={{ fontSize: "16px" }}>←</span> drag to explore <span style={{ fontSize: "16px" }}>→</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* 3D Carousel */}
+                    <ThreeDPhotoCarousel />
+                </section>
+
+
                 <section style={{ background: "linear-gradient(180deg, #f0ddd4 0%, #fce8d5 60%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "350px", background: "rgba(241,95,42,0.10)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
                     <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
