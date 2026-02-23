@@ -537,25 +537,25 @@ export default function WebDesignPage() {
                     {/* bg glow */}
                     <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.06) 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", padding: "0 24px 48px", position: "relative", zIndex: 1 }}>
+                    <div style={{ maxWidth: "1060px", margin: "0 auto", padding: "0 24px 48px", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
                         {/* Eyebrow */}
                         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
                             <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px", flexShrink: 0 }} />
                             <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 Our Work
                             </span>
+                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px", flexShrink: 0 }} />
                         </div>
-                        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-                            <h2 style={{ fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: 0, lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                Sites That{" "}
-                                <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                                    Actually Convert.
-                                </span>
-                            </h2>
-                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)", display: "flex", alignItems: "center", gap: "6px" }}>
-                                <span style={{ fontSize: "16px" }}>←</span> drag to explore <span style={{ fontSize: "16px" }}>→</span>
-                            </p>
-                        </div>
+
+                        <h2 style={{ fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                            Sites That{" "}
+                            <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                                Actually Convert.
+                            </span>
+                        </h2>
+                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "16px" }}>←</span> drag to explore <span style={{ fontSize: "16px" }}>→</span>
+                        </p>
                     </div>
 
                     {/* 3D Carousel */}
