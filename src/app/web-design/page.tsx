@@ -629,52 +629,154 @@ export default function WebDesignPage() {
 
 
 
-                {/* ── SECTION 5: Why Creative Cowboys ──────────────────── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "64px", alignItems: "center" }}>
-                        {/* Bento grid */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                {/* ── SECTION 5: Why Creative Cowboys — Editorial Manifesto ── */}
+                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "120px 24px", position: "relative", overflow: "hidden" }}>
+
+                    {/* bg glow */}
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "900px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.07) 0%, transparent 70%)`, pointerEvents: "none" }} />
+
+                    <style>{`
+                        @keyframes marqueeTicker {
+                            from { transform: translateX(0); }
+                            to   { transform: translateX(-50%); }
+                        }
+                        .why-ticker-track {
+                            display: flex;
+                            white-space: nowrap;
+                            animation: marqueeTicker 22s linear infinite;
+                            gap: 0;
+                        }
+                        .why-proof-bar {
+                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), border-color 200ms ease;
+                        }
+                        .why-proof-bar:hover {
+                            transform: translateX(6px);
+                            border-color: rgba(241,95,42,0.40) !important;
+                        }
+                    `}</style>
+
+                    <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+                        {/* ── Eyebrow ── */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                            style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}
+                        >
+                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px" }} />
+                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                Why Creative Cowboys
+                            </span>
+                        </motion.div>
+
+                        {/* ── GIANT display headline ── */}
+                        <motion.h2
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                fontSize: "clamp(52px, 9vw, 120px)",
+                                fontWeight: 900,
+                                letterSpacing: "-0.04em",
+                                lineHeight: 0.96,
+                                color: "#ffffff",
+                                margin: "0 0 40px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}
+                        >
+                            We Don&rsquo;t<br />
+                            Build{" "}
+                            <span style={{
+                                background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}>
+                                Websites.
+                            </span><br />
+                            We Build<br />
+                            <span style={{ color: "rgba(255,255,255,0.22)", fontStyle: "italic" }}>Revenue Machines.</span>
+                        </motion.h2>
+
+                        {/* ── Bold italic pull quote ── */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                fontSize: "clamp(18px, 2.2vw, 24px)",
+                                fontStyle: "italic",
+                                lineHeight: 1.6,
+                                color: "rgba(255,255,255,0.50)",
+                                maxWidth: "680px",
+                                marginBottom: "72px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                                borderLeft: `3px solid ${ORANGE}`,
+                                paddingLeft: "24px",
+                            }}
+                        >
+                            Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers.
+                        </motion.p>
+
+                        {/* ── Proof point bars ── */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "72px" }}>
                             {[
-                                { Icon: BarChart3, color: ORANGE, title: "Marketers First", desc: "We design with conversion psychology at the forefront.", offset: false },
-                                { Icon: Search, color: PINK, title: "SEO Native", desc: "Built from the ground up to rank on Google.", offset: true },
-                                { Icon: Target, color: PINK, title: "Ad Ready", desc: "Perfectly structured landing pages for your paid traffic.", offset: false },
-                                { Icon: TrendingUp, color: ORANGE, title: "Revenue Focus", desc: "We measure success by your bottom line, not just traffic.", offset: true },
-                            ].map(({ Icon, color, title, desc, offset }) => (
-                                <div key={title} style={{ background: DARK, padding: "24px", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.06)", transform: offset ? "translateY(28px)" : "none" }}>
-                                    <Icon size={28} color={color} style={{ marginBottom: "14px", display: "block" }} />
-                                    <p style={{ fontWeight: 700, color: "#fff", fontSize: "14px", margin: "0 0 6px" }}>{title}</p>
-                                    <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", margin: 0, lineHeight: 1.6 }}>{desc}</p>
-                                </div>
+                                { num: "01", title: "Conversion-Focused Design", desc: "Psychological triggers, clear CTAs, and strategic layout that guide visitors to a decision." },
+                                { num: "02", title: "Technical SEO Built-In", desc: "Your site launches ranking-ready. Clean code, proper structure, fast load times — from day one." },
+                                { num: "03", title: "Ad Campaign Integration", desc: "Landing pages engineered for your paid traffic so every dollar you spend works harder." },
+                                { num: "04", title: "Analytics & Revenue Tracking", desc: "Know exactly what's working. We set up advanced tracking tied directly to your revenue." },
+                            ].map(({ num, title, desc }, i) => (
+                                <motion.div
+                                    key={num}
+                                    className="why-proof-bar"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "56px 1fr",
+                                        gap: "28px",
+                                        alignItems: "start",
+                                        padding: "24px 0",
+                                        borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                        cursor: "default",
+                                    }}
+                                >
+                                    <span style={{ fontSize: "12px", fontWeight: 700, color: ORANGE, letterSpacing: "0.06em", paddingTop: "3px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{num}</span>
+                                    <div>
+                                        <p style={{ fontSize: "17px", fontWeight: 700, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.01em", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{title}</p>
+                                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{desc}</p>
+                                    </div>
+                                </motion.div>
                             ))}
                         </div>
 
-                        {/* Copy */}
-                        <div>
-                            <h2 style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 20px" }}>
-                                Why Creative Cowboys?
-                            </h2>
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(255,255,255,0.48)", marginBottom: "18px" }}>
-                                Most web designers are artists. We are marketers. We don&rsquo;t just want your website to look good—we want it to make you money.
+                        {/* ── Inline CTA ── */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                            style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}
+                        >
+                            <button
+                                className="wd-cta-btn-primary"
+                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                            >
+                                Start a Project <ArrowRight size={17} />
+                            </button>
+                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                No long-term contracts. No BS. Just results.
                             </p>
-                            <p style={{ fontSize: "17px", lineHeight: 1.75, color: "rgba(255,255,255,0.48)", marginBottom: "32px" }}>
-                                We combine deep conversion psychology, technical SEO expertise, and seamless ad integration to build a digital machine that works for your business 24/7.
-                            </p>
-                            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "14px" }}>
-                                {[
-                                    "Conversion-focused design psychology",
-                                    "Technical SEO architecture built-in",
-                                    "Seamless integration with your ad campaigns",
-                                    "Advanced tracking and analytics setup",
-                                ].map((item) => (
-                                    <li key={item} style={{ display: "flex", alignItems: "center", gap: "12px", color: "#fff", fontWeight: 500, fontSize: "15px" }}>
-                                        <CheckCircle2 size={18} color={ORANGE} style={{ flexShrink: 0 }} />
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        </motion.div>
                     </div>
                 </section>
+
 
                 {/* ── SECTION 6: Investment Framing ─────────────────────── */}
                 <section style={{ padding: "96px 24px" }}>
