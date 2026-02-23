@@ -778,41 +778,7 @@ export default function WebDesignPage() {
                 </section>
 
 
-                {/* ── SECTION 6: Investment Framing ─────────────────────── */}
-                <section style={{ padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "860px", margin: "0 auto", textAlign: "center" }}>
-                        <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 48px" }}>
-                            A Website Is an Investment —{" "}
-                            <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                                Not an Expense.
-                            </span>
-                        </h2>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px", textAlign: "left" }}>
-                            {/* Bad side */}
-                            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: "18px", padding: "32px" }}>
-                                <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>The Cost of a Bad Website</h3>
-                                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "14px" }}>
-                                    {["High bounce rates wasting ad spend", "Lost trust from potential clients", "Invisible to search engines", "Competitors stealing your market share"].map((t) => (
-                                        <li key={t} style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: "rgba(255,255,255,0.45)" }}>
-                                            <span style={{ color: "#ef4444", fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✕</span>{t}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            {/* Good side */}
-                            <div style={{ background: `linear-gradient(135deg, rgba(241,95,42,0.08) 0%, rgba(234,81,255,0.08) 100%)`, border: "1px solid rgba(241,95,42,0.22)", borderRadius: "18px", padding: "32px" }}>
-                                <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#fff", margin: "0 0 20px" }}>The ROI of a Great Website</h3>
-                                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "14px" }}>
-                                    {["Higher conversion rates on all traffic", "Lower customer acquisition costs", "Organic leads through better SEO", "Instant authority and brand trust"].map((t) => (
-                                        <li key={t} style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: "rgba(255,255,255,0.65)" }}>
-                                            <span style={{ color: "#22c55e", fontWeight: 700, flexShrink: 0, marginTop: "1px" }}>✓</span>{t}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+
 
                 {/* ── FINAL CTA ─────────────────────────────────────────── */}
                 <section style={{ background: `linear-gradient(180deg, ${CARD} 0%, ${DARK} 100%)`, borderTop: "1px solid rgba(255,255,255,0.05)", padding: "120px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
