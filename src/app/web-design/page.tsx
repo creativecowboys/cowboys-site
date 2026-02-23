@@ -320,51 +320,151 @@ export default function WebDesignPage() {
                     />
                 </Link>
 
-                {/* ── HERO ───────────────────────────────────────────────── */}
-                <section style={{ maxWidth: "860px", margin: "0 auto", padding: "160px 24px 120px", textAlign: "center" }}>
-                    <p className="fu-1" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "24px" }}>
-                        Web Design Services
-                    </p>
+                {/* ── SECTION 5: Why Creative Cowboys — Editorial Manifesto ── */}
+                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "160px 24px 120px", position: "relative", overflow: "hidden" }}>
 
-                    <h1 className="fu-2" style={{
-                        fontSize: "clamp(38px, 6vw, 72px)",
-                        fontWeight: 800,
-                        lineHeight: 1.06,
-                        letterSpacing: "-0.03em",
-                        color: "#ffffff",
-                        margin: "0 0 24px",
-                    }}>
-                        Web Design That{" "}
-                        <span style={{
-                            background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                        }}>
-                            Actually Converts.
-                        </span>
-                    </h1>
+                    {/* bg glow */}
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "900px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.07) 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-                    <p className="fu-3" style={{ fontSize: "clamp(16px, 2vw, 20px)", lineHeight: 1.65, color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
-                        Your website shouldn&rsquo;t just look pretty. It should generate leads, close sales, and move your business forward.
-                    </p>
-                    <p className="fu-3" style={{ fontSize: "clamp(15px, 1.6vw, 17px)", lineHeight: 1.7, color: "rgba(255,255,255,0.38)", marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
-                        We build high-performance, revenue-generating websites for brands that are serious about growth. Stop losing customers to a confusing digital experience.
-                    </p>
+                    <style>{`
+                        @keyframes marqueeTicker {
+                            from { transform: translateX(0); }
+                            to   { transform: translateX(-50%); }
+                        }
+                        .why-ticker-track {
+                            display: flex;
+                            white-space: nowrap;
+                            animation: marqueeTicker 22s linear infinite;
+                            gap: 0;
+                        }
+                        .why-proof-bar {
+                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), border-color 200ms ease;
+                        }
+                        .why-proof-bar:hover {
+                            transform: translateX(6px);
+                            border-color: rgba(241,95,42,0.40) !important;
+                        }
+                    `}</style>
 
-                    <div className="fu-4" style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
-                        <button
-                            className="wd-cta-btn-primary"
-                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                    <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+
+                        {/* ── Eyebrow ── */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                            style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}
                         >
-                            Start Your Project <ArrowRight size={18} />
-                        </button>
-                        <button
-                            className="wd-cta-btn-ghost"
-                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", cursor: "pointer" }}
+                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px" }} />
+                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                Why Creative Cowboys
+                            </span>
+                        </motion.div>
+
+                        {/* ── GIANT display headline ── */}
+                        <motion.h2
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                fontSize: "clamp(52px, 9vw, 120px)",
+                                fontWeight: 900,
+                                letterSpacing: "-0.04em",
+                                lineHeight: 0.96,
+                                color: "#ffffff",
+                                margin: "0 0 40px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                            }}
                         >
-                            Get a Free Strategy Call
-                        </button>
+                            We Don&rsquo;t<br />
+                            Build{" "}
+                            <span style={{
+                                background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}>
+                                Websites.
+                            </span><br />
+                            We Build<br />
+                            <span style={{ color: "rgba(255,255,255,0.22)", fontStyle: "italic" }}>Revenue Machines.</span>
+                        </motion.h2>
+
+                        {/* ── Bold italic pull quote ── */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 16 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                fontSize: "clamp(18px, 2.2vw, 24px)",
+                                fontStyle: "italic",
+                                lineHeight: 1.6,
+                                color: "rgba(255,255,255,0.50)",
+                                maxWidth: "680px",
+                                marginBottom: "72px",
+                                fontFamily: "var(--font-geist-sans, sans-serif)",
+                                borderLeft: `3px solid ${ORANGE}`,
+                                paddingLeft: "24px",
+                            }}
+                        >
+                            Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers.
+                        </motion.p>
+
+                        {/* ── Proof point bars ── */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "72px" }}>
+                            {[
+                                { num: "01", title: "Conversion-Focused Design", desc: "Psychological triggers, clear CTAs, and strategic layout that guide visitors to a decision." },
+                                { num: "02", title: "Technical SEO Built-In", desc: "Your site launches ranking-ready. Clean code, proper structure, fast load times — from day one." },
+                                { num: "03", title: "Ad Campaign Integration", desc: "Landing pages engineered for your paid traffic so every dollar you spend works harder." },
+                                { num: "04", title: "Analytics & Revenue Tracking", desc: "Know exactly what's working. We set up advanced tracking tied directly to your revenue." },
+                            ].map(({ num, title, desc }, i) => (
+                                <motion.div
+                                    key={num}
+                                    className="why-proof-bar"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "56px 1fr",
+                                        gap: "28px",
+                                        alignItems: "start",
+                                        padding: "24px 0",
+                                        borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                        cursor: "default",
+                                    }}
+                                >
+                                    <span style={{ fontSize: "12px", fontWeight: 700, color: ORANGE, letterSpacing: "0.06em", paddingTop: "3px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{num}</span>
+                                    <div>
+                                        <p style={{ fontSize: "17px", fontWeight: 700, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.01em", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{title}</p>
+                                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{desc}</p>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* ── Inline CTA ── */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                            style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}
+                        >
+                            <button
+                                className="wd-cta-btn-primary"
+                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                            >
+                                Start a Project <ArrowRight size={17} />
+                            </button>
+                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+                                No long-term contracts. No BS. Just results.
+                            </p>
+                        </motion.div>
                     </div>
                 </section>
 
@@ -660,151 +760,51 @@ export default function WebDesignPage() {
 
 
 
-                {/* ── SECTION 5: Why Creative Cowboys — Editorial Manifesto ── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "120px 24px", position: "relative", overflow: "hidden" }}>
+                {/* ── HERO ───────────────────────────────────────────────── */}
+                <section style={{ maxWidth: "860px", margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
+                    <p className="fu-1" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "24px" }}>
+                        Web Design Services
+                    </p>
 
-                    {/* bg glow */}
-                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "900px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.07) 0%, transparent 70%)`, pointerEvents: "none" }} />
+                    <h1 className="fu-2" style={{
+                        fontSize: "clamp(38px, 6vw, 72px)",
+                        fontWeight: 800,
+                        lineHeight: 1.06,
+                        letterSpacing: "-0.03em",
+                        color: "#ffffff",
+                        margin: "0 0 24px",
+                    }}>
+                        Web Design That{" "}
+                        <span style={{
+                            background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                        }}>
+                            Actually Converts.
+                        </span>
+                    </h1>
 
-                    <style>{`
-                        @keyframes marqueeTicker {
-                            from { transform: translateX(0); }
-                            to   { transform: translateX(-50%); }
-                        }
-                        .why-ticker-track {
-                            display: flex;
-                            white-space: nowrap;
-                            animation: marqueeTicker 22s linear infinite;
-                            gap: 0;
-                        }
-                        .why-proof-bar {
-                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), border-color 200ms ease;
-                        }
-                        .why-proof-bar:hover {
-                            transform: translateX(6px);
-                            border-color: rgba(241,95,42,0.40) !important;
-                        }
-                    `}</style>
+                    <p className="fu-3" style={{ fontSize: "clamp(16px, 2vw, 20px)", lineHeight: 1.65, color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
+                        Your website shouldn&rsquo;t just look pretty. It should generate leads, close sales, and move your business forward.
+                    </p>
+                    <p className="fu-3" style={{ fontSize: "clamp(15px, 1.6vw, 17px)", lineHeight: 1.7, color: "rgba(255,255,255,0.38)", marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
+                        We build high-performance, revenue-generating websites for brands that are serious about growth. Stop losing customers to a confusing digital experience.
+                    </p>
 
-                    <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-
-                        {/* ── Eyebrow ── */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                            style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}
+                    <div className="fu-4" style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
+                        <button
+                            className="wd-cta-btn-primary"
+                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
                         >
-                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px" }} />
-                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                Why Creative Cowboys
-                            </span>
-                        </motion.div>
-
-                        {/* ── GIANT display headline ── */}
-                        <motion.h2
-                            initial={{ opacity: 0, y: 24 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
-                            style={{
-                                fontSize: "clamp(52px, 9vw, 120px)",
-                                fontWeight: 900,
-                                letterSpacing: "-0.04em",
-                                lineHeight: 0.96,
-                                color: "#ffffff",
-                                margin: "0 0 40px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}
+                            Start Your Project <ArrowRight size={18} />
+                        </button>
+                        <button
+                            className="wd-cta-btn-ghost"
+                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", cursor: "pointer" }}
                         >
-                            We Don&rsquo;t<br />
-                            Build{" "}
-                            <span style={{
-                                background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                backgroundClip: "text",
-                            }}>
-                                Websites.
-                            </span><br />
-                            We Build<br />
-                            <span style={{ color: "rgba(255,255,255,0.22)", fontStyle: "italic" }}>Revenue Machines.</span>
-                        </motion.h2>
-
-                        {/* ── Bold italic pull quote ── */}
-                        <motion.p
-                            initial={{ opacity: 0, y: 16 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                            style={{
-                                fontSize: "clamp(18px, 2.2vw, 24px)",
-                                fontStyle: "italic",
-                                lineHeight: 1.6,
-                                color: "rgba(255,255,255,0.50)",
-                                maxWidth: "680px",
-                                marginBottom: "72px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                                borderLeft: `3px solid ${ORANGE}`,
-                                paddingLeft: "24px",
-                            }}
-                        >
-                            Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers.
-                        </motion.p>
-
-                        {/* ── Proof point bars ── */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "72px" }}>
-                            {[
-                                { num: "01", title: "Conversion-Focused Design", desc: "Psychological triggers, clear CTAs, and strategic layout that guide visitors to a decision." },
-                                { num: "02", title: "Technical SEO Built-In", desc: "Your site launches ranking-ready. Clean code, proper structure, fast load times — from day one." },
-                                { num: "03", title: "Ad Campaign Integration", desc: "Landing pages engineered for your paid traffic so every dollar you spend works harder." },
-                                { num: "04", title: "Analytics & Revenue Tracking", desc: "Know exactly what's working. We set up advanced tracking tied directly to your revenue." },
-                            ].map(({ num, title, desc }, i) => (
-                                <motion.div
-                                    key={num}
-                                    className="why-proof-bar"
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                                    style={{
-                                        display: "grid",
-                                        gridTemplateColumns: "56px 1fr",
-                                        gap: "28px",
-                                        alignItems: "start",
-                                        padding: "24px 0",
-                                        borderBottom: "1px solid rgba(255,255,255,0.06)",
-                                        cursor: "default",
-                                    }}
-                                >
-                                    <span style={{ fontSize: "12px", fontWeight: 700, color: ORANGE, letterSpacing: "0.06em", paddingTop: "3px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{num}</span>
-                                    <div>
-                                        <p style={{ fontSize: "17px", fontWeight: 700, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.01em", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{title}</p>
-                                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{desc}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* ── Inline CTA ── */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                            style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}
-                        >
-                            <button
-                                className="wd-cta-btn-primary"
-                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
-                            >
-                                Start a Project <ArrowRight size={17} />
-                            </button>
-                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                No long-term contracts. No BS. Just results.
-                            </p>
-                        </motion.div>
+                            Get a Free Strategy Call
+                        </button>
                     </div>
                 </section>
 
