@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Creative Cowboys Media | Creative Web Agency",
+  title: "Creative Cowboys Media",
   description:
     "Creative Cowboys Media is a creative web agency specializing in stunning digital experiences, branding, and web development.",
 };
