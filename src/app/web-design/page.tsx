@@ -455,12 +455,13 @@ export default function WebDesignPage() {
                             transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
                             style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}
                         >
-                            <button
+                            <Link
+                                href="/contact"
                                 className="wd-cta-btn-primary"
-                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
                             >
                                 Start a Project <ArrowRight size={17} />
-                            </button>
+                            </Link>
                             <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
                                 No long-term contracts. No BS. Just results.
                             </p>
@@ -664,12 +665,13 @@ export default function WebDesignPage() {
                     </p>
 
                     <div className="fu-4" style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
-                        <button
+                        <Link
+                            href="/contact"
                             className="wd-cta-btn-primary"
-                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
                         >
                             Start Your Project <ArrowRight size={18} />
-                        </button>
+                        </Link>
                         <button
                             className="wd-cta-btn-ghost"
                             style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", cursor: "pointer" }}
