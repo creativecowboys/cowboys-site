@@ -356,7 +356,7 @@ function Hero() {
                     {[
                         { val: "3 Yrs", lbl: "Building Loyal Customers" },
                         { val: "Artisanal", lbl: "Food Products" },
-                        { val: "Marietta", lbl: "GA Based" },
+                        { val: "West GA", lbl: "Based" },
                     ].map(s => (
                         <div key={s.val} style={{
                             background: "rgba(255,255,255,0.75)", backdropFilter: "blur(12px)",
