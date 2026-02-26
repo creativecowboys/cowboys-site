@@ -39,12 +39,12 @@ export const defaultTestimonials: Testimonial[] = [
     },
     {
         id: 2,
-        initials: 'AM',
-        name: 'Ashley Monroe',
-        role: 'Founder, Bloom Boutique',
-        quote: "The branding they built for us was exactly what I had in my head but couldn't articulate. Our store traffic doubled after the rebrand and we finally feel like a real brand, not just a small shop.",
-        tags: [{ text: 'Branding', type: 'default' }, { text: 'E-Commerce', type: 'default' }],
-        stats: [{ icon: 'Star', text: '5-star rated' }, { icon: 'Users', text: '2x store traffic' }],
+        initials: 'RG',
+        name: 'Rob Goldin',
+        role: 'Owner, Bremen Commercial Insurance Agency',
+        quote: "Top notch service! We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question/issue. Highly recommend.",
+        tags: [{ text: 'Digital Marketing', type: 'featured' }, { text: '2 Years', type: 'default' }],
+        stats: [{ icon: 'TrendingUp', text: 'Great ROI' }, { icon: 'Star', text: '5-star rated' }],
         avatarGradient: 'linear-gradient(135deg, #EA51FF, #8b5cf6)',
     },
     {
