@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <>
       {/* ===== Hero Section — full viewport height with gradient ===== */}
-      <section className="relative w-full h-screen flex flex-col items-center justify-center overflow-hidden">
+      <section className="relative w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden">
         {/* Animated Mesh Gradient Background */}
         <div className="mesh-gradient absolute inset-0 w-full h-full" />
 

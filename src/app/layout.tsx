@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
@@ -20,15 +20,20 @@ export const metadata: Metadata = {
     "Creative Cowboys Media is a creative web agency specializing in stunning digital experiences, branding, and web development.",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#c8dff0",
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ background: "#c8dff0" }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#c8dff0]`}
       >
         <ScrollToTop />
         <TopBar />

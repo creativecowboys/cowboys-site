@@ -23,10 +23,15 @@
   --animate-mesh: mesh 18s ease-in-out infinite;
 }
 
+html {
+  background: #c8dff0;
+}
+
 body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  background: #c8dff0;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
