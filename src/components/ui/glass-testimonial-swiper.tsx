@@ -29,12 +29,12 @@ export interface TestimonialStackProps {
 export const defaultTestimonials: Testimonial[] = [
     {
         id: 1,
-        initials: 'JR',
-        name: 'Jake Rivera',
-        role: 'Owner, Lone Star HVAC',
-        quote: "Creative Cowboys completely transformed our online presence. Within 60 days of launching our new site, we were getting 3x more leads from Google. The team was hands-on the whole way through — felt like having an in-house marketing team.",
-        tags: [{ text: 'FEATURED', type: 'featured' }, { text: 'Web Design', type: 'default' }],
-        stats: [{ icon: 'TrendingUp', text: '3x more leads' }, { icon: 'Calendar', text: '60 day launch' }],
+        initials: 'RC',
+        name: 'Ryan Coffey',
+        role: 'Owner, Harmonic Productions',
+        quote: "Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime. Would recommend them to anyone looking for SEO and market engagement.",
+        tags: [{ text: 'FEATURED', type: 'featured' }, { text: 'SEO', type: 'default' }],
+        stats: [{ icon: 'TrendingUp', text: '300% more engagement' }, { icon: 'Users', text: '200% retention' }],
         avatarGradient: 'linear-gradient(135deg, #F15F2A, #d97706)',
     },
     {
