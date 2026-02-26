@@ -24,14 +24,17 @@
 }
 
 html {
-  background: #c8dff0;
+  /* Dark neutral — fills iOS safe-area for dark pages (web-design, services).
+     The homepage mesh gradient covers full viewport so this is invisible there. */
+  background: #0D0D0F;
+  background-attachment: fixed;
 }
 
 body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  background: #c8dff0;
+  background: #0D0D0F;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 

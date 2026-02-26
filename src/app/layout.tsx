@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#c8dff0",
+  themeColor: "#0D0D0F",
   viewportFit: "cover",
 };
 
@@ -31,9 +31,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ background: "#c8dff0" }}>
+    <html lang="en" style={{ background: "#0D0D0F" }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#c8dff0]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0D0D0F]`}
       >
         <ScrollToTop />
         <TopBar />
