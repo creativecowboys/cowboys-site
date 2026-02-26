@@ -86,7 +86,6 @@ const SERVICES: Service[] = [
       "Content creation included",
       "Competitor gap analysis",
     ],
-    badge: "Recommended for PLG",
   },
   {
     id: "seo-regional",
@@ -147,7 +146,6 @@ const SERVICES: Service[] = [
       "Attorney approval before posting",
       "Instagram, Facebook & TikTok",
     ],
-    badge: "Recommended for PLG",
   },
   {
     id: "social-pro",
@@ -410,7 +408,7 @@ function ServiceCard({ svc, selected, onToggle }: ServiceCardProps) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{
             fontSize: "15px", fontWeight: 700, color: DARK, margin: "0 0 3px",
-            letterSpacing: "-0.01em", paddingRight: svc.badge ? "80px" : "0",
+            letterSpacing: "-0.01em", paddingRight: svc.badge ? "148px" : "0",
           }}>
             {svc.name}
           </h3>
@@ -610,8 +608,7 @@ export default function PilgrimLawProposal() {
       from_name: contactName,
       email: contactEmail,
       replyto: contactEmail,
-      message: `New proposal selection submitted by ${contactName} (${contactEmail}).\n\nSELECTED SERVICES:\n${servicesList}\n\nMonthly Total: $${monthlyTotal.toLocaleString()}/mo\nOne-Time Total: $${oneTimeTotal.toLocaleString()}`,
-      html: emailBody,
+      message: `New proposal selection submitted by ${contactName} (${contactEmail}).\n\nSELECTED SERVICES:\n${servicesList}\n\nMonthly Total: $${monthlyTotal.toLocaleString()}/mo${oneTimeTotal > 0 ? `\nOne-Time Total: $${oneTimeTotal.toLocaleString()}` : ""}`,
     };
 
     try {
@@ -816,7 +813,7 @@ export default function PilgrimLawProposal() {
           {/* Section header */}
           <div style={{ marginBottom: "48px" }}>
             <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, display: "block", marginBottom: "12px" }}>
-              Build Your Plan
+              Or Build A Custom Plan
             </span>
             <h2 style={{
               fontSize: "clamp(28px,4vw,46px)", fontWeight: 800, letterSpacing: "-0.03em",
