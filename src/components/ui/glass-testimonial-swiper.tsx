@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
-import { TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone } from 'lucide-react';
+import { TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone, ShieldCheck } from 'lucide-react';
 
 // --- Icon registry (resolved inside client component, never serialized) ---
 const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
-    TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone,
+    TrendingUp, Calendar, Star, Users, Globe, BarChart3, Zap, Megaphone, ShieldCheck,
 };
 
 // --- Component Interfaces ---
@@ -49,12 +49,12 @@ export const defaultTestimonials: Testimonial[] = [
     },
     {
         id: 3,
-        initials: 'CT',
-        name: 'Carlos Torres',
-        role: 'Co-Founder, Apex Roofing Co.',
-        quote: "We went from zero digital presence to ranking on the first page of Google in our area. The marketing strategy they put together was clear, affordable, and actually worked. Couldn't recommend them more.",
-        tags: [{ text: 'SEO', type: 'default' }, { text: 'Digital Marketing', type: 'featured' }],
-        stats: [{ icon: 'Globe', text: 'Page 1 Google' }, { icon: 'BarChart3', text: 'Organic growth' }],
+        initials: 'LD',
+        name: 'Lance Day',
+        role: 'Owner, Day Accounting (CPA)',
+        quote: "If you need some help with your web work, these guys can get it all together for you. No worries, just solutions.",
+        tags: [{ text: 'Web Design', type: 'featured' }, { text: 'Professional Services', type: 'default' }],
+        stats: [{ icon: 'Zap', text: 'Fast delivery' }, { icon: 'ShieldCheck', text: 'Zero hassle' }],
         avatarGradient: 'linear-gradient(135deg, #10b981, #059669)',
     },
     {
