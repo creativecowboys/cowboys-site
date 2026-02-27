@@ -16,6 +16,7 @@ import {
 } from "react-icons/io5";
 import { Footer7 } from "@/components/ui/footer-7";
 import FloatingNav from "@/components/FloatingNav";
+import ProposalTracker from "@/components/ProposalTracker";
 
 // ─── Brand tokens ──────────────────────────────────────────────────────────
 const ORANGE = "#F15F2A";
@@ -651,6 +652,7 @@ export default function SquirrelMadeProposal() {
     if (submitState === "success") {
         return (
             <>
+                <ProposalTracker proposalName="Squirrel Made Products" />
                 <Hero />
                 <section style={{ background: "#fff", padding: "120px 24px", textAlign: "center" }}>
                     <div style={{ maxWidth: "560px", margin: "0 auto" }}>
@@ -692,6 +694,7 @@ export default function SquirrelMadeProposal() {
 
     return (
         <>
+            <ProposalTracker proposalName="Squirrel Made Products" />
             <Hero />
 
             {/* ── Recommended Package Section ── */}

@@ -15,6 +15,7 @@ import {
 } from "react-icons/io5";
 import { Footer7 } from "@/components/ui/footer-7";
 import FloatingNav from "@/components/FloatingNav";
+import ProposalTracker from "@/components/ProposalTracker";
 
 // ─── Brand tokens ──────────────────────────────────────────────────────────
 const ORANGE = "#F15F2A";
@@ -635,6 +636,7 @@ export default function PilgrimLawProposal() {
   if (submitState === "success") {
     return (
       <>
+        <ProposalTracker proposalName="Pilgrim Law Group" />
         <Hero />
         <section style={{ background: "#fff", padding: "120px 24px", textAlign: "center" }}>
           <div style={{ maxWidth: "560px", margin: "0 auto" }}>
@@ -676,6 +678,7 @@ export default function PilgrimLawProposal() {
 
   return (
     <>
+      <ProposalTracker proposalName="Pilgrim Law Group" />
       <Hero />
 
       {/* ── Custom Package Section ── */}
