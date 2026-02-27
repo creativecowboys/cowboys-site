@@ -31,42 +31,44 @@ const defaultSections: Footer7Props["sections"] = [
         title: "Services",
         links: [
             { name: "Web Design", href: "/web-design" },
-            { name: "SEO", href: "#" },
-            { name: "PPC Advertising", href: "#" },
-            { name: "Social Media Ads", href: "#" },
-            { name: "Media Creation", href: "#" },
+            { name: "SEO", href: "/seo" },
+            { name: "PPC Advertising", href: "/ppc" },
+            { name: "Social Media Ads", href: "/social-media-ads" },
+            { name: "Media Creation", href: "/media-creation" },
+            { name: "Brand Strategy", href: "/brand-strategy" },
         ],
     },
     {
         title: "Company",
         links: [
-            { name: "About Us", href: "#" },
-            { name: "Our Work", href: "#" },
-            { name: "Blog", href: "#" },
-            { name: "Careers", href: "#" },
+            { name: "Services", href: "/services" },
+            { name: "Pricing", href: "/pricing" },
+            { name: "Results", href: "/results" },
+            { name: "Blog", href: "/blog" },
+            { name: "Contact", href: "/contact" },
         ],
     },
     {
-        title: "Contact",
+        title: "Locations Served",
         links: [
-            { name: "Get In Touch", href: "/contact" },
-            { name: "Free Consultation", href: "/contact" },
-            { name: "Support", href: "#" },
-            { name: "FAQs", href: "#" },
+            { name: "Villa Rica, GA", href: "/digital-marketing-villa-rica-ga" },
+            { name: "Carrollton, GA", href: "/digital-marketing-carrollton-ga" },
+            { name: "Douglasville, GA", href: "/digital-marketing-douglasville-ga" },
+            { name: "Newnan, GA", href: "/digital-marketing-newnan-ga" },
         ],
     },
 ];
 
 const defaultSocialLinks: Footer7Props["socialLinks"] = [
-    { icon: <FaInstagram size={18} />, href: "#", label: "Instagram" },
-    { icon: <FaFacebook size={18} />, href: "#", label: "Facebook" },
-    { icon: <FaTwitter size={18} />, href: "#", label: "Twitter" },
-    { icon: <FaLinkedin size={18} />, href: "#", label: "LinkedIn" },
+    { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/creativecowboys", label: "Instagram" },
+    { icon: <FaFacebook size={18} />, href: "https://www.facebook.com/creativecowboys", label: "Facebook" },
+    { icon: <FaTwitter size={18} />, href: "https://twitter.com/creativecowboys", label: "Twitter" },
+    { icon: <FaLinkedin size={18} />, href: "https://www.linkedin.com/company/creativecowboys", label: "LinkedIn" },
 ];
 
 const defaultLegalLinks: Footer7Props["legalLinks"] = [
-    { name: "Terms and Conditions", href: "#" },
-    { name: "Privacy Policy", href: "#" },
+    { name: "Privacy Policy", href: "/contact" },
+    { name: "Free Consultation", href: "/contact" },
 ];
 
 const ORANGE = "#F15F2A";

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import FloatingNav from "@/components/FloatingNav";
@@ -6,6 +7,18 @@ import { Features } from "@/components/ui/features-4";
 import { Footer7 } from "@/components/ui/footer-7";
 import { TestimonialStack } from "@/components/ui/glass-testimonial-swiper";
 import { FAQSection } from "@/components/ui/faq-section";
+
+export const metadata: Metadata = {
+  title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+  description:
+    "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+    description:
+      "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA.",
+  },
+};
 
 export default function Home() {
   return (

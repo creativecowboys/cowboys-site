@@ -30,7 +30,7 @@ const services = [
         color: PINK,
         glow: "rgba(234,81,255,0.12)",
         border: "rgba(234,81,255,0.25)",
-        href: "/contact",
+        href: "/ppc",
         tagline: "More leads, more revenue",
         description:
             "Google Ads, social media campaigns, and paid traffic strategies designed to bring qualified buyers to your business — not just clicks.",
@@ -42,7 +42,7 @@ const services = [
         color: "#56CCF2",
         glow: "rgba(86,204,242,0.12)",
         border: "rgba(86,204,242,0.25)",
-        href: "/contact",
+        href: "/seo",
         tagline: "Own your market",
         description:
             "Rank higher on Google and drive consistent organic traffic. We handle technical SEO, content strategy, and local search optimization.",
@@ -54,7 +54,7 @@ const services = [
         color: "#F7B731",
         glow: "rgba(247,183,49,0.12)",
         border: "rgba(247,183,49,0.25)",
-        href: "/contact",
+        href: "/brand-strategy",
         tagline: "Look the part",
         description:
             "Logo design, brand identity, and visual systems that make your business look professional and memorable from the first click.",
@@ -62,15 +62,15 @@ const services = [
     },
     {
         icon: Mail,
-        label: "Email Marketing",
+        label: "Social Media",
         color: "#2ED573",
         glow: "rgba(46,213,115,0.12)",
         border: "rgba(46,213,115,0.25)",
-        href: "/contact",
+        href: "/social-media-ads",
         tagline: "Stay top of mind",
         description:
-            "Automated email campaigns and nurture sequences that keep your brand in front of prospects and turn one-time buyers into loyal customers.",
-        bullets: ["Email automation & sequences", "List building strategy", "Open-rate optimized copy"],
+            "Targeted social media advertising and organic content strategies that keep your brand in front of prospects and turn followers into customers.",
+        bullets: ["Facebook & Instagram Ads", "Content strategy & scheduling", "Audience growth & engagement"],
     },
     {
         icon: BarChart3,
@@ -78,13 +78,14 @@ const services = [
         color: "#FF6B6B",
         glow: "rgba(255,107,107,0.12)",
         border: "rgba(255,107,107,0.25)",
-        href: "/contact",
+        href: "/results",
         tagline: "Know your numbers",
         description:
             "Clear reporting dashboards and strategy sessions that translate data into decisions — so you always know what's working and what to do next.",
         bullets: ["Google Analytics setup & audit", "Monthly strategy reports", "Clear KPIs tied to revenue"],
     },
 ];
+
 
 const stats = [
     { value: "2–4 wks", label: "Average launch time" },

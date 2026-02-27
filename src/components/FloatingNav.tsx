@@ -33,10 +33,11 @@ const navItems: NavItem[] = [
         href: "/services",
     },
     {
-        name: "About",
+        name: "Results",
         icon: IoPeopleOutline,
         gradientFrom: "#F15F2A",
         gradientTo: "#EA51FF",
+        href: "/results",
     },
     {
         name: "Contact",

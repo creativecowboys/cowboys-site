@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block private/admin paths
+Disallow: /cia/
+Disallow: /proposals/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://creativecowboys.co/sitemap.xml

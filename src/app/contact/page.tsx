@@ -6,9 +6,15 @@ import FloatingNav from "@/components/FloatingNav";
 import ContactForm from "@/components/ui/contact-form";
 
 export const metadata: Metadata = {
-    title: "Contact | Creative Cowboys Media",
+    title: "Free Digital Marketing Consultation in West Georgia | Creative Cowboys",
     description:
-        "Get in touch with Creative Cowboys Media. We're based in Villa Rica, GA and work with businesses across the country.",
+        "Ready to grow? Get a free consultation with Creative Cowboys — West Georgia's no-fluff digital marketing agency. Based in Villa Rica, GA. No contracts. No fluff. Just results.",
+    alternates: { canonical: "/contact" },
+    openGraph: {
+        title: "Free Digital Marketing Consultation in West Georgia | Creative Cowboys",
+        description:
+            "Get a free consultation with Creative Cowboys — West Georgia's digital marketing agency. SEO, PPC, web design & branding for small businesses.",
+    },
 };
 
 export default function ContactPage() {

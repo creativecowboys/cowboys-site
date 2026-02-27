@@ -42,6 +42,7 @@ const services = [
         Icon: Search,
         label: "SEO",
         color: BRAND.blue,
+        href: "/seo",
         description:
             "Get found by the people searching for what you offer. Data-driven strategies that build real organic traffic.",
     },
@@ -49,6 +50,7 @@ const services = [
         Icon: Target,
         label: "PPC Advertising",
         color: BRAND.orange,
+        href: "/ppc",
         description:
             "Google Ads that actually make money. Every dollar tracked, every click optimized for maximum ROI.",
     },
@@ -56,6 +58,7 @@ const services = [
         Icon: Megaphone,
         label: "Social Media Ads",
         color: BRAND.blue,
+        href: "/social-media-ads",
         description:
             "Scroll-stopping ads on Facebook, Instagram, and TikTok that drive real engagement and sales.",
     },
@@ -63,6 +66,7 @@ const services = [
         Icon: Video,
         label: "Media Creation",
         color: BRAND.orange,
+        href: "/media-creation",
         description:
             "Video, photography, and graphics that tell your story and make people care about your brand.",
     },
@@ -70,6 +74,7 @@ const services = [
         Icon: Sparkles,
         label: "Brand Strategy",
         color: BRAND.gold,
+        href: "/brand-strategy",
         description:
             "From logo to launch, we build cohesive brand identities that stand out and connect with your audience.",
     },
