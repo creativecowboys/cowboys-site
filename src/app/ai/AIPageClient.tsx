@@ -127,12 +127,37 @@ export default function AIPageClient() {
           0%, 100% { opacity: 0.55; }
           50%       { opacity: 0.90; }
         }
+        @keyframes hero-orb-drift {
+          0%   { transform: translateX(-50%) translateY(0px) scale(1); }
+          33%  { transform: translateX(-50%) translateY(-18px) scale(1.04); }
+          66%  { transform: translateX(-50%) translateY(8px) scale(0.97); }
+          100% { transform: translateX(-50%) translateY(0px) scale(1); }
+        }
+        @keyframes orb2-drift {
+          0%   { transform: translate(0, 0) scale(1); }
+          50%  { transform: translate(-30px, 20px) scale(1.08); }
+          100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes orb3-drift {
+          0%   { transform: translate(0, 0); }
+          50%  { transform: translate(20px, -25px); }
+          100% { transform: translate(0, 0); }
+        }
+        @keyframes grid-shift {
+          0%   { background-position: 0 0; }
+          100% { background-position: 48px 48px; }
+        }
+        @keyframes float-dot {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+          50%       { transform: translateY(-14px) scale(1.3); opacity: 1; }
+        }
         .fu-1 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
         .fu-2 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
         .fu-3 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.30s both; }
         .fu-4 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.42s both; }
         @media (prefers-reduced-motion: reduce) {
           .fu-1,.fu-2,.fu-3,.fu-4 { animation: none; }
+          .hero-bg-layer { animation: none !important; }
         }
         .cta-primary {
           background: ${ORANGE};
@@ -217,20 +242,101 @@ export default function AIPageClient() {
                         position: "relative",
                     }}
                 >
+                    {/* Animated grid texture */}
                     <div
                         aria-hidden
+                        className="hero-bg-layer"
+                        style={{
+                            position: "absolute",
+                            inset: "-60px -120px",
+                            backgroundImage: `linear-gradient(rgba(86,204,242,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(86,204,242,0.04) 1px, transparent 1px)`,
+                            backgroundSize: "48px 48px",
+                            animation: "grid-shift 12s linear infinite",
+                            pointerEvents: "none",
+                        }}
+                    />
+
+                    {/* Orb 1 — main center glow (existing, upgraded) */}
+                    <div
+                        aria-hidden
+                        className="hero-bg-layer"
                         style={{
                             position: "absolute",
                             top: "50px",
                             left: "50%",
-                            transform: "translateX(-50%)",
                             width: "720px",
                             height: "340px",
-                            background: `radial-gradient(ellipse, rgba(86,204,242,0.13) 0%, rgba(241,95,42,0.07) 50%, transparent 70%)`,
+                            background: `radial-gradient(ellipse, rgba(86,204,242,0.15) 0%, rgba(241,95,42,0.08) 50%, transparent 70%)`,
                             pointerEvents: "none",
-                            animation: "pulse-glow 4s ease-in-out infinite",
+                            animation: "hero-orb-drift 9s ease-in-out infinite, pulse-glow 4s ease-in-out infinite",
                         }}
                     />
+
+                    {/* Orb 2 — teal left accent */}
+                    <div
+                        aria-hidden
+                        className="hero-bg-layer"
+                        style={{
+                            position: "absolute",
+                            top: "30%",
+                            left: "-10%",
+                            width: "380px",
+                            height: "380px",
+                            borderRadius: "50%",
+                            background: `radial-gradient(circle, rgba(86,204,242,0.09) 0%, transparent 65%)`,
+                            pointerEvents: "none",
+                            animation: "orb2-drift 13s ease-in-out infinite",
+                        }}
+                    />
+
+                    {/* Orb 3 — orange right accent */}
+                    <div
+                        aria-hidden
+                        className="hero-bg-layer"
+                        style={{
+                            position: "absolute",
+                            bottom: "10%",
+                            right: "-8%",
+                            width: "320px",
+                            height: "320px",
+                            borderRadius: "50%",
+                            background: `radial-gradient(circle, rgba(241,95,42,0.09) 0%, transparent 65%)`,
+                            pointerEvents: "none",
+                            animation: "orb3-drift 11s ease-in-out infinite",
+                        }}
+                    />
+
+                    {/* Floating particles */}
+                    {[
+                        { top: "12%", left: "8%", color: TEAL, size: 4, dur: "6s", delay: "0s" },
+                        { top: "28%", left: "15%", color: ORANGE, size: 3, dur: "8s", delay: "1.2s" },
+                        { top: "65%", left: "5%", color: TEAL, size: 3, dur: "7s", delay: "0.5s" },
+                        { top: "80%", left: "22%", color: ORANGE, size: 2, dur: "9s", delay: "2.1s" },
+                        { top: "10%", right: "10%", color: ORANGE, size: 4, dur: "7.5s", delay: "0.8s" },
+                        { top: "45%", right: "6%", color: TEAL, size: 3, dur: "6.5s", delay: "1.8s" },
+                        { top: "72%", right: "18%", color: TEAL, size: 2, dur: "8.5s", delay: "0.3s" },
+                        { top: "55%", left: "48%", color: ORANGE, size: 2, dur: "10s", delay: "3s" },
+                    ].map((p, i) => (
+                        <div
+                            key={i}
+                            aria-hidden
+                            className="hero-bg-layer"
+                            style={{
+                                position: "absolute",
+                                top: p.top,
+                                left: "left" in p ? p.left : undefined,
+                                right: "right" in p ? (p as { right: string }).right : undefined,
+                                width: `${p.size}px`,
+                                height: `${p.size}px`,
+                                borderRadius: "50%",
+                                background: p.color,
+                                boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+                                pointerEvents: "none",
+                                animation: `float-dot ${p.dur} ease-in-out ${p.delay} infinite`,
+                            }}
+                        />
+                    ))}
+
                     <p
                         className="fu-1"
                         style={{
@@ -356,8 +462,79 @@ export default function AIPageClient() {
                     </div>
                 </section>
 
+                {/* ── ANIMATED CHAT DEMO ── */}
+                <section
+                    style={{
+                        background: DARK,
+                        borderTop: "1px solid rgba(255,255,255,0.05)",
+                        padding: "100px 24px",
+                        overflow: "hidden",
+                    }}
+                >
+                    <div
+                        style={{
+                            maxWidth: "1100px",
+                            margin: "0 auto",
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: "80px",
+                            alignItems: "center",
+                        }}
+                        className="chat-demo-grid"
+                    >
+                        {/* Left: copy */}
+                        <div>
+                            <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TEAL, marginBottom: "16px" }}>
+                                See It In Action
+                            </p>
+                            <h2
+                                style={{
+                                    fontSize: "clamp(28px, 4vw, 48px)",
+                                    fontWeight: 800,
+                                    letterSpacing: "-0.03em",
+                                    color: "#fff",
+                                    margin: "0 0 20px",
+                                    lineHeight: 1.1,
+                                }}
+                            >
+                                This is what your customers experience &mdash; at 2am on a Sunday.
+                            </h2>
+                            <p style={{ fontSize: "16px", lineHeight: 1.8, color: "rgba(255,255,255,0.48)", marginBottom: "16px" }}>
+                                Watch a real AI chat play out between a homeowner and Peak Plumbing&rsquo;s AI assistant. It answers the question, qualifies the lead, and books the appointment &mdash; without a single human involved.
+                            </p>
+                            <p style={{ fontSize: "16px", lineHeight: 1.8, color: "rgba(255,255,255,0.48)", marginBottom: "32px" }}>
+                                Your business gets one just like this &mdash; trained on your services, written in your voice, live in under a week.
+                            </p>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                {[
+                                    { e: "⚡", t: "Responds in seconds — day or night" },
+                                    { e: "📅", t: "Books appointments directly into your calendar" },
+                                    { e: "🎯", t: "Qualifies leads before they ever reach you" },
+                                    { e: "🤝", t: "Sounds like your business, not a generic bot" },
+                                ].map(({ e, t }) => (
+                                    <div key={t} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                                        <span style={{ fontSize: "20px", flexShrink: 0 }}>{e}</span>
+                                        <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{t}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right: animated chat */}
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                            <AnimatedChatDemo />
+                        </div>
+                    </div>
+                    <style>{`
+                        @media (max-width: 860px) {
+                            .chat-demo-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
+                        }
+                    `}</style>
+                </section>
+
+
                 {/* ── PROBLEM ── */}
-                <section style={{ padding: "100px 24px", background: DARK }}>
+                <section style={{ padding: "100px 24px", background: CARD }}>
                     <div style={{ maxWidth: "840px", margin: "0 auto" }}>
                         <h2
                             style={{
@@ -383,7 +560,7 @@ export default function AIPageClient() {
                         </p>
                         <div
                             style={{
-                                background: CARD,
+                                background: DARK,
                                 borderRadius: "20px",
                                 border: "1px solid rgba(255,255,255,0.07)",
                                 padding: "32px 36px",
@@ -418,7 +595,7 @@ export default function AIPageClient() {
                 {/* ── SOLUTION / FEATURES ── */}
                 <section
                     style={{
-                        background: CARD,
+                        background: DARK,
                         borderTop: "1px solid rgba(255,255,255,0.05)",
                         padding: "100px 24px",
                     }}
@@ -468,7 +645,7 @@ export default function AIPageClient() {
                                     key={title}
                                     className="feature-card"
                                     style={{
-                                        background: DARK,
+                                        background: CARD,
                                         border: "1px solid rgba(255,255,255,0.07)",
                                         borderRadius: "20px",
                                         padding: "36px",
@@ -518,7 +695,7 @@ export default function AIPageClient() {
                 </section>
 
                 {/* ── HOW IT WORKS ── */}
-                <section style={{ padding: "100px 24px", background: DARK }}>
+                <section style={{ padding: "100px 24px", background: CARD }}>
                     <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
                         <div style={{ textAlign: "center", marginBottom: "72px" }}>
                             <h2
@@ -574,7 +751,7 @@ export default function AIPageClient() {
                                 <div
                                     key={num}
                                     style={{
-                                        background: CARD,
+                                        background: DARK,
                                         borderRadius: "20px",
                                         border: "1px solid rgba(255,255,255,0.07)",
                                         padding: "36px 32px",
@@ -611,80 +788,10 @@ export default function AIPageClient() {
                     </div>
                 </section>
 
-                {/* ── ANIMATED CHAT DEMO ── */}
-                <section
-                    style={{
-                        background: DARK,
-                        borderTop: "1px solid rgba(255,255,255,0.05)",
-                        padding: "100px 24px",
-                        overflow: "hidden",
-                    }}
-                >
-                    <div
-                        style={{
-                            maxWidth: "1100px",
-                            margin: "0 auto",
-                            display: "grid",
-                            gridTemplateColumns: "1fr 1fr",
-                            gap: "80px",
-                            alignItems: "center",
-                        }}
-                        className="chat-demo-grid"
-                    >
-                        {/* Left: copy */}
-                        <div>
-                            <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TEAL, marginBottom: "16px" }}>
-                                See It In Action
-                            </p>
-                            <h2
-                                style={{
-                                    fontSize: "clamp(28px, 4vw, 48px)",
-                                    fontWeight: 800,
-                                    letterSpacing: "-0.03em",
-                                    color: "#fff",
-                                    margin: "0 0 20px",
-                                    lineHeight: 1.1,
-                                }}
-                            >
-                                This is what your customers experience — at 2am on a Sunday.
-                            </h2>
-                            <p style={{ fontSize: "16px", lineHeight: 1.8, color: "rgba(255,255,255,0.48)", marginBottom: "16px" }}>
-                                Watch a real AI chat play out between a homeowner and Peak Plumbing&rsquo;s AI assistant. It answers the question, qualifies the lead, and books the appointment — without a single human involved.
-                            </p>
-                            <p style={{ fontSize: "16px", lineHeight: 1.8, color: "rgba(255,255,255,0.48)", marginBottom: "32px" }}>
-                                Your business gets one just like this — trained on your services, written in your voice, live in under a week.
-                            </p>
-                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                                {[
-                                    { e: "⚡", t: "Responds in seconds — day or night" },
-                                    { e: "📅", t: "Books appointments directly into your calendar" },
-                                    { e: "🎯", t: "Qualifies leads before they ever reach you" },
-                                    { e: "🤝", t: "Sounds like your business, not a generic bot" },
-                                ].map(({ e, t }) => (
-                                    <div key={t} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                                        <span style={{ fontSize: "20px", flexShrink: 0 }}>{e}</span>
-                                        <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.55)", lineHeight: 1.5 }}>{t}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Right: animated chat */}
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <AnimatedChatDemo />
-                        </div>
-                    </div>
-                    <style>{`
-                        @media (max-width: 860px) {
-                            .chat-demo-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
-                        }
-                    `}</style>
-                </section>
-
                 {/* ── WHO IT'S FOR ── */}
                 <section
                     style={{
-                        background: CARD,
+                        background: DARK,
                         borderTop: "1px solid rgba(255,255,255,0.05)",
                         padding: "100px 24px",
                     }}
@@ -720,7 +827,7 @@ export default function AIPageClient() {
                                 <div
                                     key={name}
                                     style={{
-                                        background: DARK,
+                                        background: CARD,
                                         border: "1px solid rgba(255,255,255,0.07)",
                                         borderRadius: "16px",
                                         padding: "24px",
@@ -741,7 +848,7 @@ export default function AIPageClient() {
                 </section>
 
                 {/* ── TESTIMONIALS ── */}
-                <section style={{ padding: "100px 24px", background: DARK }}>
+                <section style={{ padding: "100px 24px", background: CARD }}>
                     <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
                         <div style={{ textAlign: "center", marginBottom: "56px" }}>
                             <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "14px" }}>
@@ -786,7 +893,7 @@ export default function AIPageClient() {
                                 <div
                                     key={name}
                                     style={{
-                                        background: CARD,
+                                        background: DARK,
                                         border: "1px solid rgba(255,255,255,0.07)",
                                         borderRadius: "20px",
                                         padding: "32px",
