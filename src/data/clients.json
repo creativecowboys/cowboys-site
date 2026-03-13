@@ -1,0 +1,49 @@
+[
+  {
+    "slug": "demo-client",
+    "name": "Demo Client",
+    "businessName": "Demo Business",
+    "services": [
+      "seo",
+      "ads"
+    ],
+    "passwordHash": "$2b$10$K1FgeflqepfKXjsrMaVMH.VEQBlwQtkkJeTZddgnvXti8pkFnRD7u",
+    "reports": {
+      "seo": "",
+      "ads": ""
+    },
+    "brightLocalCampaignId": null,
+    "brightLocalLrtId": null
+  },
+  {
+    "slug": "jane-roofing",
+    "name": "Jane",
+    "businessName": "Jane Roofing Co",
+    "services": [
+      "seo"
+    ],
+    "passwordHash": "$2b$10$q2RO2GkLX1Tz8qa7FDFdPeG9ktjGnywceD09ElNgCM710NqlgrVv.",
+    "reports": {
+      "seo": "",
+      "ads": ""
+    },
+    "brightLocalCampaignId": 11111,
+    "brightLocalLrtId": null
+  },
+  {
+    "slug": "leuco",
+    "name": "Abi",
+    "businessName": "Leuco Tools",
+    "services": [
+      "seo",
+      "ads"
+    ],
+    "passwordHash": "$2b$10$qewAQCOIx7KXhyS84IxCOeGnhFZvsM48spxKfN0h8WRs.VUlgmqRG",
+    "reports": {
+      "seo": "",
+      "ads": ""
+    },
+    "brightLocalCampaignId": 739274,
+    "brightLocalLrtId": 1705240
+  }
+]
