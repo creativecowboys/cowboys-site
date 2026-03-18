@@ -53,7 +53,7 @@ export default function ReportEmbed({ url, title }: ReportEmbedProps) {
     }
 
     return (
-        <div style={{ position: "relative", borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ position: "relative", height: "100%", overflow: "hidden", border: "none" }}>
             {/* Loading state */}
             {!loaded && (
                 <div
@@ -65,7 +65,7 @@ export default function ReportEmbed({ url, title }: ReportEmbedProps) {
                         justifyContent: "center",
                         background: "rgba(13,13,15,0.8)",
                         zIndex: 2,
-                        borderRadius: "16px",
+                        borderRadius: "12px",
                     }}
                 >
                     <div style={{ textAlign: "center" }}>
@@ -92,7 +92,7 @@ export default function ReportEmbed({ url, title }: ReportEmbedProps) {
                 onLoad={() => setLoaded(true)}
                 style={{
                     width: "100%",
-                    height: "calc(100dvh - 120px)",
+                    height: "100%",
                     minHeight: "600px",
                     border: "none",
                     display: "block",

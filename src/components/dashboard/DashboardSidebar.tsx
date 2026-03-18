@@ -5,9 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
-    IoGridOutline,
     IoSearchOutline,
-    IoMegaphoneOutline,
     IoLogOutOutline,
 } from "react-icons/io5";
 
@@ -19,9 +17,7 @@ interface NavLink {
 
 function getNavLinks(slug: string): NavLink[] {
     return [
-        { label: "Overview", href: `/clients/${slug}`, icon: IoGridOutline },
-        { label: "SEO", href: `/clients/${slug}/seo`, icon: IoSearchOutline },
-        { label: "Social Ads", href: `/clients/${slug}/ads`, icon: IoMegaphoneOutline },
+        { label: "SEO Report", href: `/clients/${slug}/seo`, icon: IoSearchOutline },
     ];
 }
 
