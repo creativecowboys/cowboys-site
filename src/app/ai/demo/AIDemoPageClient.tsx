@@ -58,9 +58,17 @@ export default function AIDemoPageClient() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('loading');
-        // TODO: replace with real endpoint (GoHighLevel, Calendly webhook, etc.)
-        await new Promise((r) => setTimeout(r, 1200));
-        setStatus('success');
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...form, source: 'AI Demo Page' }),
+            });
+            if (!res.ok) throw new Error('Send failed');
+            setStatus('success');
+        } catch {
+            setStatus('error');
+        }
     };
 
     return (
