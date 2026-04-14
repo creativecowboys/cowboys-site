@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
@@ -353,9 +353,69 @@ function LeadForm({
   );
 }
 
-/* ── Chat Mockup ─────────────────────────────────────────── */
+/* ── Chat Mockup (Animated Live Demo) ───────────────────── */
 
 function ChatMockup({ content }: { content: IndustryContent }) {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [showTyping, setShowTyping] = useState(false);
+  const [loopKey, setLoopKey] = useState(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const total = content.chatMessages.length;
+
+  useEffect(() => {
+    setVisibleCount(0);
+    setShowTyping(false);
+    let cancelled = false;
+
+    const showNext = (idx: number) => {
+      if (cancelled || idx >= total) {
+        // Pause 4s at the end then restart
+        if (!cancelled && idx >= total) {
+          setTimeout(() => {
+            if (!cancelled) {
+              setVisibleCount(0);
+              setShowTyping(false);
+              setLoopKey((k) => k + 1);
+            }
+          }, 4000);
+        }
+        return;
+      }
+
+      const msg = content.chatMessages[idx];
+      const isAI = msg.role === "ai";
+
+      if (isAI) {
+        // Show typing indicator before AI message
+        setShowTyping(true);
+        setTimeout(() => {
+          if (cancelled) return;
+          setShowTyping(false);
+          setVisibleCount(idx + 1);
+          // Next message after a read pause
+          setTimeout(() => showNext(idx + 1), 1200);
+        }, 1500);
+      } else {
+        // Customer message appears after a shorter pause
+        setVisibleCount(idx + 1);
+        setTimeout(() => showNext(idx + 1), 1400);
+      }
+    };
+
+    // Start first message after 800ms
+    const startTimer = setTimeout(() => showNext(0), 800);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(startTimer);
+    };
+  }, [loopKey, total, content.chatMessages]);
+
+  // Auto-scroll to bottom as messages appear
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [visibleCount, showTyping]);
+
   return (
     <div
       style={{
@@ -363,26 +423,26 @@ function ChatMockup({ content }: { content: IndustryContent }) {
         borderRadius: "24px",
         border: "1px solid rgba(255,255,255,0.07)",
         overflow: "hidden",
-        maxWidth: "400px",
+        maxWidth: "500px",
         width: "100%",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+        boxShadow: "0 24px 80px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.04)",
       }}
     >
       {/* Header */}
       <div
         style={{
-          padding: "16px 20px",
+          padding: "20px 24px",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
           display: "flex",
           alignItems: "center",
-          gap: "12px",
+          gap: "14px",
         }}
       >
-        <span style={{ fontSize: "24px" }}>{content.chatHeader.icon}</span>
+        <span style={{ fontSize: "28px" }}>{content.chatHeader.icon}</span>
         <div style={{ flex: 1 }}>
           <p
             style={{
-              fontSize: "14px",
+              fontSize: "16px",
               fontWeight: 700,
               color: "#fff",
               margin: 0,
@@ -392,9 +452,9 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           </p>
           <p
             style={{
-              fontSize: "11px",
+              fontSize: "12px",
               color: "rgba(255,255,255,0.40)",
-              margin: "2px 0 0",
+              margin: "3px 0 0",
               display: "flex",
               alignItems: "center",
               gap: "6px",
@@ -402,11 +462,12 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           >
             <span
               style={{
-                width: "7px",
-                height: "7px",
+                width: "8px",
+                height: "8px",
                 borderRadius: "50%",
                 background: "#22c55e",
                 display: "inline-block",
+                boxShadow: "0 0 6px rgba(34,197,94,0.5)",
               }}
             />
             {content.chatHeader.status}
@@ -415,10 +476,21 @@ function ChatMockup({ content }: { content: IndustryContent }) {
       </div>
 
       {/* Messages */}
-      <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
-        {content.chatMessages.map((msg, i) => (
+      <div
+        style={{
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          minHeight: "280px",
+          maxHeight: "400px",
+          overflowY: "auto",
+        }}
+      >
+        {content.chatMessages.slice(0, visibleCount).map((msg, i) => (
           <div
-            key={i}
+            key={`${loopKey}-${i}`}
+            className="chat-msg-in"
             style={{
               display: "flex",
               justifyContent: msg.role === "customer" ? "flex-start" : "flex-end",
@@ -426,12 +498,12 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           >
             <div
               style={{
-                maxWidth: "85%",
-                padding: "12px 16px",
+                maxWidth: "82%",
+                padding: "14px 18px",
                 borderRadius:
                   msg.role === "customer"
-                    ? "4px 18px 18px 18px"
-                    : "18px 4px 18px 18px",
+                    ? "4px 20px 20px 20px"
+                    : "20px 4px 20px 20px",
                 background:
                   msg.role === "customer"
                     ? "rgba(255,255,255,0.06)"
@@ -440,11 +512,11 @@ function ChatMockup({ content }: { content: IndustryContent }) {
                   msg.role === "customer"
                     ? "1px solid rgba(255,255,255,0.08)"
                     : `1px solid ${content.accent}35`,
-                fontSize: "13px",
-                lineHeight: 1.6,
+                fontSize: "15px",
+                lineHeight: 1.65,
                 color:
                   msg.role === "customer"
-                    ? "rgba(255,255,255,0.75)"
+                    ? "rgba(255,255,255,0.80)"
                     : content.accent,
               }}
             >
@@ -452,19 +524,48 @@ function ChatMockup({ content }: { content: IndustryContent }) {
             </div>
           </div>
         ))}
+
+        {/* Typing indicator */}
+        {showTyping && (
+          <div
+            className="chat-msg-in"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+            }}
+          >
+            <div
+              style={{
+                padding: "14px 22px",
+                borderRadius: "20px 4px 20px 20px",
+                background: `${content.accent}22`,
+                border: `1px solid ${content.accent}35`,
+                display: "flex",
+                gap: "5px",
+                alignItems: "center",
+              }}
+            >
+              <span className="typing-dot typing-dot-1" style={{ width: "7px", height: "7px", borderRadius: "50%", background: content.accent, opacity: 0.5 }} />
+              <span className="typing-dot typing-dot-2" style={{ width: "7px", height: "7px", borderRadius: "50%", background: content.accent, opacity: 0.5 }} />
+              <span className="typing-dot typing-dot-3" style={{ width: "7px", height: "7px", borderRadius: "50%", background: content.accent, opacity: 0.5 }} />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Footer */}
       <div
         style={{
-          padding: "12px 20px",
+          padding: "14px 24px",
           borderTop: "1px solid rgba(255,255,255,0.06)",
           textAlign: "center",
         }}
       >
         <p
           style={{
-            fontSize: "11px",
+            fontSize: "12px",
             color: "rgba(255,255,255,0.30)",
             margin: 0,
           }}
@@ -529,6 +630,28 @@ export default function AILandingPageClient({
         }
         @media (max-width: 600px) {
           .pain-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── Chat animation ── */
+        @keyframes chatMsgIn {
+          from { opacity: 0; transform: translateY(14px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .chat-msg-in {
+          animation: chatMsgIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes typingBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+          30% { transform: translateY(-5px); opacity: 1; }
+        }
+        .typing-dot-1 { animation: typingBounce 1.2s ease-in-out infinite 0s; }
+        .typing-dot-2 { animation: typingBounce 1.2s ease-in-out infinite 0.15s; }
+        .typing-dot-3 { animation: typingBounce 1.2s ease-in-out infinite 0.3s; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .chat-msg-in { animation: none; }
+          .typing-dot-1,.typing-dot-2,.typing-dot-3 { animation: none; }
         }
       `}</style>
 
