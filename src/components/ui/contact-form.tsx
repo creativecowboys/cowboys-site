@@ -15,9 +15,17 @@ export default function ContactForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('loading');
-        // Simulate submit — replace with real endpoint or form service
-        await new Promise(r => setTimeout(r, 1200));
-        setStatus('success');
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...form, source: 'Contact Page' }),
+            });
+            if (!res.ok) throw new Error('Send failed');
+            setStatus('success');
+        } catch {
+            setStatus('error');
+        }
     };
 
     const inputStyle: React.CSSProperties = {
@@ -73,6 +81,40 @@ export default function ContactForm() {
                 <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: '15px', margin: 0, lineHeight: 1.6 }}>
                     We&rsquo;ll be in touch within one business day. Talk soon, partner.
                 </p>
+            </div>
+        );
+    }
+
+    if (status === 'error') {
+        return (
+            <div style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,60,60,0.30)',
+                borderRadius: '24px',
+                padding: '64px 40px',
+                textAlign: 'center',
+            }}>
+                <h3 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 800, margin: '0 0 12px' }}>
+                    Something went wrong
+                </h3>
+                <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: '15px', margin: '0 0 24px', lineHeight: 1.6 }}>
+                    Your message couldn&rsquo;t be sent. Please try again or email us directly at howdy@creativecowboys.co
+                </p>
+                <button
+                    onClick={() => setStatus('idle')}
+                    style={{
+                        padding: '12px 28px',
+                        background: '#F15F2A',
+                        border: 'none',
+                        borderRadius: '10px',
+                        color: '#fff',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                    }}
+                >
+                    Try Again
+                </button>
             </div>
         );
     }
