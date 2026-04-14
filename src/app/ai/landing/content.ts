@@ -42,6 +42,9 @@ export interface IndustryContent {
   accent: string;
   accentHover: string;
 
+  /* Hero Image */
+  heroImage: string;
+
   /* Hero */
   eyebrow: string;
   headlineParts: { text: string; accent?: boolean }[];
@@ -109,6 +112,7 @@ export interface IndustryContent {
 export const roofingContent: IndustryContent = {
   accent: "#F15F2A",
   accentHover: "#C4520A",
+  heroImage: "/landing-roofing-hero.png",
 
   eyebrow: "FOR ROOFING CONTRACTORS",
   headlineParts: [
@@ -319,6 +323,7 @@ export const roofingContent: IndustryContent = {
 export const plumbingContent: IndustryContent = {
   accent: "#F15F2A",
   accentHover: "#C4520A",
+  heroImage: "/landing-plumbing-hero.png",
 
   eyebrow: "FOR PLUMBING CONTRACTORS",
   headlineParts: [
@@ -532,6 +537,7 @@ export const plumbingContent: IndustryContent = {
 export const lawContent: IndustryContent = {
   accent: "#C9A84C",
   accentHover: "#B09340",
+  heroImage: "/landing-law-hero.png",
 
   eyebrow: "FOR LAW FIRMS & ATTORNEYS",
   headlineParts: [

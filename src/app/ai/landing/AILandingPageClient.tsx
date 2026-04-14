@@ -614,7 +614,34 @@ export default function AILandingPageClient({
             overflow: "hidden",
           }}
         >
-          {/* Background glow */}
+          {/* Background hero image */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 0,
+            }}
+          >
+            <Image
+              src={content.heroImage}
+              alt=""
+              fill
+              style={{ objectFit: "cover", objectPosition: "center" }}
+              priority
+              quality={80}
+            />
+            {/* Dark overlay for readability */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `linear-gradient(135deg, ${DARK}f0 0%, ${DARK}e8 40%, ${DARK}d0 100%)`,
+              }}
+            />
+          </div>
+
+          {/* Accent glow on top of image */}
           <div
             aria-hidden
             style={{
@@ -624,12 +651,13 @@ export default function AILandingPageClient({
               transform: "translateX(-50%)",
               width: "800px",
               height: "400px",
-              background: `radial-gradient(ellipse, ${accent}18 0%, transparent 70%)`,
+              background: `radial-gradient(ellipse, ${accent}20 0%, transparent 70%)`,
               pointerEvents: "none",
+              zIndex: 1,
             }}
           />
 
-          <div className="hero-split" style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <div className="hero-split" style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
             {/* Left: Headline + Form */}
             <div>
               <p
@@ -792,8 +820,35 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 4. PAIN POINTS ═══════ */}
-        <section style={{ padding: "100px 24px", background: CARD }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <section style={{ padding: "100px 24px", background: CARD, position: "relative", overflow: "hidden" }}>
+          {/* Subtle background image */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              width: "50%",
+              height: "100%",
+              zIndex: 0,
+            }}
+          >
+            <Image
+              src={content.heroImage}
+              alt=""
+              fill
+              style={{ objectFit: "cover", objectPosition: "center" }}
+              quality={60}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: `linear-gradient(90deg, ${CARD} 0%, ${CARD}f5 30%, ${CARD}c0 70%, ${CARD}e0 100%)`,
+              }}
+            />
+          </div>
+          <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
             <div style={{ textAlign: "center", marginBottom: "64px" }}>
               <p
                 style={{
