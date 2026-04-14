@@ -485,8 +485,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           display: "flex",
           flexDirection: "column",
           gap: "16px",
-          minHeight: "280px",
-          maxHeight: "400px",
+          height: "340px",
           overflowY: "auto",
         }}
       >
