@@ -4,7 +4,8 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Where all form leads get emailed
-const TO_EMAIL = "howdy@creativecowboys.co";
+// NOTE: Change to "howdy@creativecowboys.co" after verifying domain at resend.com/domains
+const TO_EMAIL = "josh@creativecowboys.co";
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,8 +56,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+      console.error("Resend error:", JSON.stringify(error));
+      return NextResponse.json({ error: "Failed to send email", details: error }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
