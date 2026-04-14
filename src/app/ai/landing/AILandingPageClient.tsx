@@ -356,13 +356,13 @@ function LeadForm({
 /* ── Chat Mockup (Animated Live Demo) ───────────────────── */
 
 function ChatMockup({ content }: { content: IndustryContent }) {
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(1);
   const [showTyping, setShowTyping] = useState(false);
   const [loopKey, setLoopKey] = useState(0);
   const total = content.chatMessages.length;
 
   useEffect(() => {
-    setVisibleCount(0);
+    setVisibleCount(1);
     setShowTyping(false);
     let cancelled = false;
 
@@ -372,7 +372,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
         if (!cancelled && idx >= total) {
           setTimeout(() => {
             if (!cancelled) {
-              setVisibleCount(0);
+              setVisibleCount(1);
               setShowTyping(false);
               setLoopKey((k) => k + 1);
             }
@@ -401,8 +401,8 @@ function ChatMockup({ content }: { content: IndustryContent }) {
       }
     };
 
-    // Start first message after 800ms
-    const startTimer = setTimeout(() => showNext(0), 800);
+    // Start from message index 1 (first message is already visible)
+    const startTimer = setTimeout(() => showNext(1), 800);
 
     return () => {
       cancelled = true;
@@ -427,6 +427,9 @@ function ChatMockup({ content }: { content: IndustryContent }) {
         overflow: "hidden",
         maxWidth: "500px",
         width: "100%",
+        height: "480px",
+        display: "flex",
+        flexDirection: "column",
         boxShadow: "0 24px 80px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.04)",
       }}
     >
@@ -438,6 +441,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           display: "flex",
           alignItems: "center",
           gap: "14px",
+          flexShrink: 0,
         }}
       >
         <span style={{ fontSize: "28px" }}>{content.chatHeader.icon}</span>
@@ -484,8 +488,9 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           padding: "24px",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "flex-end",
           gap: "16px",
-          height: "340px",
+          flex: 1,
           overflowY: "auto",
         }}
       >
@@ -563,6 +568,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           padding: "14px 24px",
           borderTop: "1px solid rgba(255,255,255,0.06)",
           textAlign: "center",
+          flexShrink: 0,
         }}
       >
         <p
