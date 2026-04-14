@@ -427,7 +427,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
         overflow: "hidden",
         maxWidth: "500px",
         width: "100%",
-        height: "480px",
+        height: "580px",
         display: "flex",
         flexDirection: "column",
         boxShadow: "0 24px 80px rgba(0,0,0,0.50), 0 0 0 1px rgba(255,255,255,0.04)",
