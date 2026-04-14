@@ -359,7 +359,6 @@ function ChatMockup({ content }: { content: IndustryContent }) {
   const [visibleCount, setVisibleCount] = useState(0);
   const [showTyping, setShowTyping] = useState(false);
   const [loopKey, setLoopKey] = useState(0);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const total = content.chatMessages.length;
 
   useEffect(() => {
@@ -411,9 +410,12 @@ function ChatMockup({ content }: { content: IndustryContent }) {
     };
   }, [loopKey, total, content.chatMessages]);
 
-  // Auto-scroll to bottom as messages appear
+  // Auto-scroll chat container to bottom as messages appear (without moving the page)
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [visibleCount, showTyping]);
 
   return (
@@ -477,6 +479,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
 
       {/* Messages */}
       <div
+        ref={chatContainerRef}
         style={{
           padding: "24px",
           display: "flex",
@@ -552,7 +555,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+
       </div>
 
       {/* Footer */}
