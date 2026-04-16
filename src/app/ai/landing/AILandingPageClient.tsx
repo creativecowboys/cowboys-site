@@ -39,6 +39,7 @@ function FaqItem({
         }}
       >
         <span
+          className="lp-faq-question"
           style={{
             fontSize: "17px",
             fontWeight: 700,
@@ -66,6 +67,7 @@ function FaqItem({
         }}
       >
         <p
+          className="lp-faq-answer"
           style={{
             fontSize: "15px",
             lineHeight: 1.8,
@@ -151,6 +153,7 @@ function LeadForm({
   if (status === "success") {
     return (
       <div
+        className="lp-status-card"
         style={{
           background: "rgba(255,255,255,0.04)",
           border: `1px solid ${content.accent}40`,
@@ -189,6 +192,7 @@ function LeadForm({
   if (status === "error") {
     return (
       <div
+        className="lp-status-card"
         style={{
           background: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,60,60,0.30)",
@@ -240,6 +244,7 @@ function LeadForm({
     <form
       id={id}
       onSubmit={handleSubmit}
+      className="lp-lead-form"
       style={{
         background: "rgba(255,255,255,0.04)",
         border: "1px solid rgba(255,255,255,0.08)",
@@ -420,6 +425,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
 
   return (
     <div
+      className="lp-chat-mockup"
       style={{
         background: CARD,
         borderRadius: "24px",
@@ -435,6 +441,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
     >
       {/* Header */}
       <div
+        className="lp-chat-header"
         style={{
           padding: "20px 24px",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -444,9 +451,10 @@ function ChatMockup({ content }: { content: IndustryContent }) {
           flexShrink: 0,
         }}
       >
-        <span style={{ fontSize: "28px" }}>{content.chatHeader.icon}</span>
+        <span className="lp-chat-header-icon" style={{ fontSize: "28px" }}>{content.chatHeader.icon}</span>
         <div style={{ flex: 1 }}>
           <p
+            className="lp-chat-header-name"
             style={{
               fontSize: "16px",
               fontWeight: 700,
@@ -484,6 +492,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
       {/* Messages */}
       <div
         ref={chatContainerRef}
+        className="lp-chat-messages"
         style={{
           padding: "24px",
           display: "flex",
@@ -504,6 +513,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
             }}
           >
             <div
+              className="lp-chat-bubble"
               style={{
                 maxWidth: "82%",
                 padding: "14px 18px",
@@ -564,6 +574,7 @@ function ChatMockup({ content }: { content: IndustryContent }) {
 
       {/* Footer */}
       <div
+        className="lp-chat-footer"
         style={{
           padding: "14px 24px",
           borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -636,8 +647,136 @@ export default function AILandingPageClient({
           .testimonial-3col { grid-template-columns: 1fr !important; }
           .cta-split { grid-template-columns: 1fr !important; gap: 48px !important; }
         }
+
+        /* ═══════ MOBILE OPTIMIZATIONS (≤ 600px) ═══════ */
         @media (max-width: 600px) {
           .pain-grid { grid-template-columns: 1fr !important; }
+
+          /* ── Header ── */
+          .lp-header-nav { padding: 0 16px !important; }
+          .lp-header-inner { height: 56px !important; }
+          .lp-header-link { display: none !important; }
+          .lp-header-cta {
+            padding: 8px 16px !important;
+            font-size: 12px !important;
+            border-radius: 8px !important;
+          }
+          .lp-header-logo { width: 115px !important; }
+
+          /* ── Hero Section ── */
+          .lp-hero-section { padding: 48px 16px 56px !important; }
+          .hero-split { gap: 32px !important; }
+          .lp-hero-eyebrow { font-size: 10px !important; margin-bottom: 14px !important; }
+          .lp-hero-headline { font-size: clamp(28px, 8vw, 40px) !important; margin-bottom: 16px !important; letter-spacing: -0.025em !important; }
+          .lp-hero-subhead { font-size: 15px !important; margin-bottom: 24px !important; line-height: 1.65 !important; }
+          .lp-hero-stats { gap: 20px !important; margin-bottom: 28px !important; }
+          .lp-stat-number { font-size: 24px !important; }
+          .lp-stat-label { font-size: 10px !important; letter-spacing: 0.06em !important; }
+
+          /* ── Lead Form ── */
+          .lp-lead-form { padding: 24px 20px !important; border-radius: 18px !important; gap: 12px !important; }
+          .lp-lead-form h3 { font-size: 16px !important; }
+          .lp-lead-form p { font-size: 12px !important; }
+          .landing-input { padding: 12px 14px !important; font-size: 14px !important; border-radius: 10px !important; }
+          .landing-submit { padding: 14px 20px !important; font-size: 14px !important; border-radius: 10px !important; }
+
+          /* ── Chat Mockup ── */
+          .lp-chat-mockup {
+            height: 420px !important;
+            border-radius: 18px !important;
+            max-width: 100% !important;
+          }
+          .lp-chat-header { padding: 14px 16px !important; }
+          .lp-chat-header-icon { font-size: 22px !important; }
+          .lp-chat-header-name { font-size: 14px !important; }
+          .lp-chat-messages { padding: 16px !important; gap: 12px !important; }
+          .lp-chat-bubble { padding: 11px 14px !important; font-size: 13px !important; line-height: 1.55 !important; }
+          .lp-chat-footer { padding: 10px 16px !important; }
+          .lp-chat-footer p { font-size: 11px !important; }
+          .lp-chat-caption { font-size: 10px !important; margin-top: 14px !important; }
+
+          /* ── Offer Banner ── */
+          .lp-offer-banner { padding: 16px !important; }
+          .lp-offer-banner-inner { flex-direction: column !important; gap: 10px !important; }
+          .lp-offer-banner-text { font-size: 13px !important; text-align: center !important; line-height: 1.45 !important; }
+          .lp-offer-banner-tag { font-size: 10px !important; }
+
+          /* ── Pain Points Section ── */
+          .lp-pain-section { padding: 56px 16px !important; }
+          .lp-pain-header { margin-bottom: 40px !important; }
+          .lp-section-eyebrow { font-size: 10px !important; margin-bottom: 10px !important; }
+          .lp-section-heading { font-size: clamp(22px, 6vw, 32px) !important; }
+          .lp-section-subtext { font-size: 15px !important; line-height: 1.65 !important; }
+          .pain-card { padding: 24px !important; border-radius: 16px !important; gap: 12px !important; }
+          .pain-card span:first-child { font-size: 26px !important; }
+          .pain-card h3 { font-size: 14px !important; }
+          .pain-card p { font-size: 13px !important; }
+          .pain-grid { gap: 16px !important; }
+
+          /* ── How It Works Section ── */
+          .lp-hiw-section { padding: 56px 16px !important; }
+          .lp-hiw-header { margin-bottom: 40px !important; }
+          .lp-step-card { padding: 20px !important; border-radius: 16px !important; gap: 14px !important; }
+          .lp-step-num {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+          }
+          .lp-step-num span { font-size: 12px !important; }
+          .lp-step-card h3 { font-size: 14px !important; }
+          .lp-step-card p { font-size: 13px !important; }
+          .lp-steps-list { gap: 16px !important; }
+
+          /* ── Offer Box ── */
+          .lp-offer-box {
+            padding: 28px 20px !important;
+            border-radius: 18px !important;
+            position: static !important;
+          }
+          .lp-offer-box h3 { font-size: 20px !important; margin-bottom: 20px !important; }
+          .lp-offer-items { gap: 16px !important; }
+          .lp-offer-item { gap: 10px !important; }
+          .lp-offer-item p:first-child { font-size: 13px !important; }
+          .lp-offer-item p:last-of-type { font-size: 12px !important; }
+          .lp-offer-price-row { margin-top: 20px !important; padding-top: 16px !important; }
+          .lp-offer-price { font-size: 16px !important; }
+
+          /* ── Testimonials Section ── */
+          .lp-testimonials-section { padding: 56px 16px !important; }
+          .lp-testimonials-header { margin-bottom: 40px !important; }
+          .testimonial-3col { gap: 16px !important; }
+          .lp-testimonial-card { padding: 24px !important; border-radius: 16px !important; }
+          .lp-testimonial-card p { font-size: 14px !important; line-height: 1.7 !important; margin-bottom: 20px !important; }
+
+          /* ── FAQ Section ── */
+          .lp-faq-section { padding: 56px 16px !important; }
+          .lp-faq-header { margin-bottom: 36px !important; }
+          .lp-faq-question { font-size: 15px !important; padding: 18px 0 !important; }
+          .lp-faq-answer { font-size: 14px !important; padding-right: 16px !important; }
+
+          /* ── CTA Section ── */
+          .lp-cta-section { padding: 56px 16px !important; }
+          .cta-split { gap: 32px !important; }
+          .lp-cta-headline { font-size: clamp(24px, 7vw, 36px) !important; }
+          .lp-cta-body { font-size: 15px !important; margin-bottom: 16px !important; }
+          .lp-cta-note { font-size: 13px !important; }
+
+          /* ── Footer ── */
+          .lp-footer { padding: 24px 16px !important; }
+          .lp-footer-inner {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 12px !important;
+          }
+          .lp-footer-logo { width: 100px !important; }
+          .lp-footer-copy { font-size: 11px !important; }
+          .lp-footer-link { font-size: 12px !important; }
+
+          /* ── Success / Error states ── */
+          .lp-status-card { padding: 32px 20px !important; border-radius: 18px !important; }
+          .lp-status-card h3 { font-size: 19px !important; }
+          .lp-status-card p { font-size: 14px !important; }
         }
 
         /* ── Chat animation ── */
@@ -673,6 +812,7 @@ export default function AILandingPageClient({
       >
         {/* ═══════ 1. STICKY HEADER ═══════ */}
         <header
+          className="lp-header-nav"
           style={{
             position: "sticky",
             top: 0,
@@ -685,6 +825,7 @@ export default function AILandingPageClient({
           }}
         >
           <div
+            className="lp-header-inner"
             style={{
               maxWidth: "1200px",
               margin: "0 auto",
@@ -701,6 +842,7 @@ export default function AILandingPageClient({
                 width={140}
                 height={37}
                 priority
+                className="lp-header-logo"
                 style={{ width: "140px", height: "auto" }}
               />
             </Link>
@@ -714,12 +856,13 @@ export default function AILandingPageClient({
                   fontWeight: 500,
                   transition: "color 200ms ease",
                 }}
-                className="header-link"
+                className="header-link lp-header-link"
               >
                 Talk to Our Team
               </Link>
               <a
                 href="#get-started"
+                className="lp-header-cta"
                 style={{
                   padding: "10px 22px",
                   background: accent,
@@ -739,6 +882,7 @@ export default function AILandingPageClient({
 
         {/* ═══════ 2. HERO SECTION ═══════ */}
         <section
+          className="lp-hero-section"
           style={{
             padding: "80px 24px 100px",
             position: "relative",
@@ -792,7 +936,7 @@ export default function AILandingPageClient({
             {/* Left: Headline + Form */}
             <div>
               <p
-                className="lp-fu-1"
+                className="lp-fu-1 lp-hero-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -805,7 +949,7 @@ export default function AILandingPageClient({
                 {content.eyebrow}
               </p>
               <h1
-                className="lp-fu-2"
+                className="lp-fu-2 lp-hero-headline"
                 style={{
                   fontSize: "clamp(36px, 5.5vw, 66px)",
                   fontWeight: 900,
@@ -827,7 +971,7 @@ export default function AILandingPageClient({
                 )}
               </h1>
               <p
-                className="lp-fu-3"
+                className="lp-fu-3 lp-hero-subhead"
                 style={{
                   fontSize: "clamp(15px, 1.8vw, 18px)",
                   lineHeight: 1.7,
@@ -841,7 +985,7 @@ export default function AILandingPageClient({
 
               {/* Proof Stats */}
               <div
-                className="lp-fu-4"
+                className="lp-fu-4 lp-hero-stats"
                 style={{
                   display: "flex",
                   gap: "32px",
@@ -852,6 +996,7 @@ export default function AILandingPageClient({
                 {content.stats.map((stat) => (
                   <div key={stat.label}>
                     <p
+                      className="lp-stat-number"
                       style={{
                         fontSize: "28px",
                         fontWeight: 900,
@@ -863,6 +1008,7 @@ export default function AILandingPageClient({
                       {stat.number}
                     </p>
                     <p
+                      className="lp-stat-label"
                       style={{
                         fontSize: "12px",
                         fontWeight: 600,
@@ -887,6 +1033,7 @@ export default function AILandingPageClient({
               <div>
                 <ChatMockup content={content} />
                 <p
+                  className="lp-chat-caption"
                   style={{
                     textAlign: "center",
                     fontSize: "11px",
@@ -906,6 +1053,7 @@ export default function AILandingPageClient({
 
         {/* ═══════ 3. OFFER BANNER ═══════ */}
         <section
+          className="lp-offer-banner"
           style={{
             background: accent,
             padding: "20px 24px",
@@ -913,6 +1061,7 @@ export default function AILandingPageClient({
           }}
         >
           <div
+            className="lp-offer-banner-inner"
             style={{
               maxWidth: "1200px",
               margin: "0 auto",
@@ -924,6 +1073,7 @@ export default function AILandingPageClient({
             }}
           >
             <p
+              className="lp-offer-banner-text"
               style={{
                 fontSize: "15px",
                 fontWeight: 700,
@@ -934,6 +1084,7 @@ export default function AILandingPageClient({
               {content.offerBanner}
             </p>
             <span
+              className="lp-offer-banner-tag"
               style={{
                 padding: "4px 14px",
                 background: accent === "#C9A84C" ? "rgba(9,9,12,0.15)" : "rgba(255,255,255,0.20)",
@@ -951,7 +1102,7 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 4. PAIN POINTS ═══════ */}
-        <section style={{ padding: "100px 24px", background: CARD, position: "relative", overflow: "hidden" }}>
+        <section className="lp-pain-section" style={{ padding: "100px 24px", background: CARD, position: "relative", overflow: "hidden" }}>
           {/* Subtle background image */}
           <div
             aria-hidden
@@ -980,8 +1131,9 @@ export default function AILandingPageClient({
             />
           </div>
           <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div className="lp-pain-header" style={{ textAlign: "center", marginBottom: "64px" }}>
               <p
+                className="lp-section-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -994,6 +1146,7 @@ export default function AILandingPageClient({
                 THE PROBLEM
               </p>
               <h2
+                className="lp-section-heading"
                 style={{
                   fontSize: "clamp(26px, 4vw, 44px)",
                   fontWeight: 800,
@@ -1006,6 +1159,7 @@ export default function AILandingPageClient({
                 {content.painHeadline}
               </h2>
               <p
+                className="lp-section-subtext"
                 style={{
                   fontSize: "17px",
                   color: "rgba(255,255,255,0.45)",
@@ -1085,10 +1239,11 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 5. HOW IT WORKS ═══════ */}
-        <section style={{ padding: "100px 24px", background: DARK }}>
+        <section className="lp-hiw-section" style={{ padding: "100px 24px", background: DARK }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div className="lp-hiw-header" style={{ textAlign: "center", marginBottom: "64px" }}>
               <p
+                className="lp-section-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -1101,6 +1256,7 @@ export default function AILandingPageClient({
                 HOW IT WORKS
               </p>
               <h2
+                className="lp-section-heading"
                 style={{
                   fontSize: "clamp(26px, 4vw, 44px)",
                   fontWeight: 800,
@@ -1116,10 +1272,11 @@ export default function AILandingPageClient({
 
             <div className="hiw-split">
               {/* Left: Steps */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              <div className="lp-steps-list" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
                 {content.steps.map((step) => (
                   <div
                     key={step.num}
+                    className="lp-step-card"
                     style={{
                       background: CARD,
                       borderRadius: "20px",
@@ -1131,6 +1288,7 @@ export default function AILandingPageClient({
                     }}
                   >
                     <div
+                      className="lp-step-num"
                       style={{
                         width: "44px",
                         height: "44px",
@@ -1184,6 +1342,7 @@ export default function AILandingPageClient({
 
               {/* Right: Offer Box */}
               <div
+                className="lp-offer-box"
                 style={{
                   background: CARD,
                   borderRadius: "24px",
@@ -1217,10 +1376,11 @@ export default function AILandingPageClient({
                   {content.offerBoxTitle}
                 </h3>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div className="lp-offer-items" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {content.offerItems.map((item) => (
                     <div
                       key={item.item}
+                      className="lp-offer-item"
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
@@ -1270,6 +1430,7 @@ export default function AILandingPageClient({
                 </div>
 
                 <div
+                  className="lp-offer-price-row"
                   style={{
                     marginTop: "28px",
                     paddingTop: "20px",
@@ -1291,6 +1452,7 @@ export default function AILandingPageClient({
                     YOUR INVESTMENT
                   </span>
                   <span
+                    className="lp-offer-price"
                     style={{
                       fontSize: "18px",
                       fontWeight: 800,
@@ -1306,10 +1468,11 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 6. TESTIMONIALS ═══════ */}
-        <section style={{ padding: "100px 24px", background: CARD }}>
+        <section className="lp-testimonials-section" style={{ padding: "100px 24px", background: CARD }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "64px" }}>
+            <div className="lp-testimonials-header" style={{ textAlign: "center", marginBottom: "64px" }}>
               <p
+                className="lp-section-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -1322,6 +1485,7 @@ export default function AILandingPageClient({
                 REAL RESULTS
               </p>
               <h2
+                className="lp-section-heading"
                 style={{
                   fontSize: "clamp(26px, 4vw, 44px)",
                   fontWeight: 800,
@@ -1339,6 +1503,7 @@ export default function AILandingPageClient({
               {content.testimonials.map((t) => (
                 <div
                   key={t.name}
+                  className="lp-testimonial-card"
                   style={{
                     background: DARK,
                     border: "1px solid rgba(255,255,255,0.07)",
@@ -1386,10 +1551,11 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 7. FAQ ACCORDION ═══════ */}
-        <section style={{ padding: "100px 24px", background: DARK }}>
+        <section className="lp-faq-section" style={{ padding: "100px 24px", background: DARK }}>
           <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-            <div style={{ textAlign: "center", marginBottom: "56px" }}>
+            <div className="lp-faq-header" style={{ textAlign: "center", marginBottom: "56px" }}>
               <p
+                className="lp-section-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -1402,6 +1568,7 @@ export default function AILandingPageClient({
                 QUESTIONS
               </p>
               <h2
+                className="lp-section-heading"
                 style={{
                   fontSize: "clamp(26px, 4vw, 44px)",
                   fontWeight: 800,
@@ -1427,11 +1594,12 @@ export default function AILandingPageClient({
         </section>
 
         {/* ═══════ 8. FINAL CTA ═══════ */}
-        <section style={{ padding: "100px 24px", background: CARD }}>
+        <section className="lp-cta-section" style={{ padding: "100px 24px", background: CARD }}>
           <div className="cta-split" style={{ maxWidth: "1200px", margin: "0 auto" }}>
             {/* Left: Copy */}
             <div>
               <p
+                className="lp-section-eyebrow"
                 style={{
                   fontSize: "11px",
                   fontWeight: 700,
@@ -1444,6 +1612,7 @@ export default function AILandingPageClient({
                 {content.ctaLabel}
               </p>
               <h2
+                className="lp-cta-headline"
                 style={{
                   fontSize: "clamp(28px, 4vw, 48px)",
                   fontWeight: 900,
@@ -1464,6 +1633,7 @@ export default function AILandingPageClient({
                 ))}
               </h2>
               <p
+                className="lp-cta-body"
                 style={{
                   fontSize: "17px",
                   lineHeight: 1.75,
@@ -1475,6 +1645,7 @@ export default function AILandingPageClient({
                 {content.ctaBody}
               </p>
               <p
+                className="lp-cta-note"
                 style={{
                   fontSize: "14px",
                   color: "rgba(255,255,255,0.35)",
@@ -1497,6 +1668,7 @@ export default function AILandingPageClient({
 
         {/* ═══════ 9. FOOTER ═══════ */}
         <footer
+          className="lp-footer"
           style={{
             borderTop: "1px solid rgba(255,255,255,0.06)",
             padding: "32px 24px",
@@ -1504,6 +1676,7 @@ export default function AILandingPageClient({
           }}
         >
           <div
+            className="lp-footer-inner"
             style={{
               maxWidth: "1200px",
               margin: "0 auto",
@@ -1520,10 +1693,12 @@ export default function AILandingPageClient({
                 alt="Creative Cowboys Media"
                 width={120}
                 height={32}
+                className="lp-footer-logo"
                 style={{ width: "120px", height: "auto" }}
               />
             </Link>
             <p
+              className="lp-footer-copy"
               style={{
                 fontSize: "12px",
                 color: "rgba(255,255,255,0.30)",
@@ -1535,6 +1710,7 @@ export default function AILandingPageClient({
             </p>
             <Link
               href="https://creativecowboys.co"
+              className="lp-footer-link"
               style={{
                 fontSize: "13px",
                 color: accent,
