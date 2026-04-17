@@ -114,6 +114,9 @@ export interface IndustryContent {
   ctaNote: string;
   ctaFormTitle: string;
   ctaFormSubtitle: string;
+
+  /* Live Demo */
+  agentId?: string;
 }
 
 /* ═════════════════════════════════════════════════════════════
@@ -344,6 +347,8 @@ export const roofingContent: IndustryContent = {
   ctaNote: "📍 Serving roofing contractors nationwide.",
   ctaFormTitle: "CLAIM YOUR SPOT",
   ctaFormSubtitle: "Free website + AI setup — Only 5 spots left this month",
+
+  agentId: "agent_7301kpdvynhxf17ta4j1271y2a20",
 };
 
 /* ═════════════════════════════════════════════════════════════
@@ -577,6 +582,8 @@ export const plumbingContent: IndustryContent = {
   ctaNote: "📍 Serving plumbing contractors nationwide.",
   ctaFormTitle: "CLAIM YOUR SPOT",
   ctaFormSubtitle: "Free website + AI setup — Only 5 spots left this month",
+
+  agentId: "agent_3101kpdxbcm3ejzvwgh7y7ha405f",
 };
 
 /* ═════════════════════════════════════════════════════════════
@@ -810,4 +817,6 @@ export const lawContent: IndustryContent = {
   ctaNote: "📍 Serving law firms and solo practitioners nationwide.",
   ctaFormTitle: "SCHEDULE YOUR DEMO",
   ctaFormSubtitle: "New website + AI setup — included. No obligation.",
+
+  agentId: "agent_0201kpdys5dreehavd57kgb0pqmg",
 };

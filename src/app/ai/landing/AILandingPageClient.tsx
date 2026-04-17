@@ -3,8 +3,11 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
 import type { IndustryContent } from "./content";
+
+const LiveChatDemo = dynamic(() => import("./LiveChatDemo"), { ssr: false });
 
 const DARK = "#0D0D0F";
 const CARD = "#15181e";
@@ -597,6 +600,138 @@ function ChatMockup({ content }: { content: IndustryContent }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   HERO CHAT — DUAL MODE (Animated Demo ↔ Live Chat)
+   ══════════════════════════════════════════════════════════════ */
+
+function HeroChatDual({
+  content,
+  accent,
+}: {
+  content: IndustryContent;
+  accent: string;
+}) {
+  const [mode, setMode] = useState<"animated" | "live">("animated");
+
+  return (
+    <div>
+      <div style={{ position: "relative" }}>
+        {/* Animated Demo */}
+        <div
+          style={{
+            opacity: mode === "animated" ? 1 : 0,
+            transform: mode === "animated" ? "scale(1)" : "scale(0.96)",
+            transition: "opacity 400ms ease, transform 400ms ease",
+            position: mode === "animated" ? "relative" : "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            pointerEvents: mode === "animated" ? "auto" : "none",
+          }}
+        >
+          <ChatMockup content={content} />
+
+          {/* "Try It Live" button — header area, top-right */}
+          {content.agentId && (
+            <div
+              style={{
+                position: "absolute",
+                top: "0",
+                right: "0",
+                height: "82px",
+                display: "flex",
+                alignItems: "center",
+                paddingRight: "24px",
+                zIndex: 10,
+              }}
+            >
+              <button
+                onClick={() => setMode("live")}
+                className="try-live-btn"
+                style={{
+                  padding: "10px 18px",
+                  background: accent,
+                  color: accent === "#C9A84C" ? "#09090C" : "#fff",
+                  border: "none",
+                  borderRadius: "10px",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  whiteSpace: "nowrap",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                ✨ Try It Live
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Live Chat */}
+        {content.agentId && (
+          <div
+            style={{
+              opacity: mode === "live" ? 1 : 0,
+              transform: mode === "live" ? "scale(1)" : "scale(1.04)",
+              transition: "opacity 400ms ease, transform 400ms ease",
+              position: mode === "live" ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              pointerEvents: mode === "live" ? "auto" : "none",
+            }}
+          >
+            <LiveChatDemo content={content} />
+          </div>
+        )}
+      </div>
+
+      {/* Caption */}
+      <p
+        className="lp-chat-caption"
+        style={{
+          textAlign: "center",
+          fontSize: "11px",
+          fontWeight: 700,
+          letterSpacing: "0.16em",
+          color: accent,
+          marginTop: "20px",
+          textTransform: "uppercase",
+        }}
+      >
+        {mode === "live"
+          ? "YOU'RE CHATTING WITH A REAL AI — TRY IT"
+          : content.chatCaption}
+      </p>
+
+      {/* Back to demo link when in live mode */}
+      {mode === "live" && (
+        <p style={{ textAlign: "center", marginTop: "8px" }}>
+          <button
+            onClick={() => setMode("animated")}
+            style={{
+              background: "none",
+              border: "none",
+              color: "rgba(255,255,255,0.30)",
+              fontSize: "11px",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            ← Back to demo
+          </button>
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
    MAIN PAGE COMPONENT
    ══════════════════════════════════════════════════════════════ */
 
@@ -606,6 +741,11 @@ export default function AILandingPageClient({
   content: IndustryContent;
 }) {
   const accent = content.accent;
+
+  // Always start at the top of the page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <>
@@ -624,6 +764,31 @@ export default function AILandingPageClient({
         .landing-input:focus {
           border-color: ${accent}99 !important;
           background: rgba(255,255,255,0.08) !important;
+        }
+        .live-chat-input:focus {
+          border-color: ${accent}60 !important;
+        }
+        .live-demo-start-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px ${accent}44;
+          filter: brightness(1.1);
+        }
+        .live-demo-start-btn:active {
+          transform: translateY(0);
+        }
+        @keyframes tryLivePulse {
+          0%, 100% { box-shadow: 0 0 0 0 ${accent}55, 0 4px 16px ${accent}44; }
+          50% { box-shadow: 0 0 0 8px ${accent}00, 0 4px 20px ${accent}66; }
+        }
+        .try-live-btn {
+          transition: transform 200ms ease, filter 200ms ease;
+          animation: tryLivePulse 2.2s ease-in-out infinite;
+        }
+        .try-live-btn:hover {
+          transform: translateY(-2px) scale(1.05);
+          filter: brightness(1.15);
+          animation: none;
+          box-shadow: 0 8px 28px ${accent}55;
         }
         .landing-input::placeholder { color: rgba(255,255,255,0.20); }
         .landing-submit:hover:not(:disabled) {
@@ -1079,25 +1244,9 @@ export default function AILandingPageClient({
               <LeadForm content={content} id="get-started" />
             </div>
 
-            {/* Right: Chat Mockup */}
+            {/* Right: Chat — Animated Demo or Live */}
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <div>
-                <ChatMockup content={content} />
-                <p
-                  className="lp-chat-caption"
-                  style={{
-                    textAlign: "center",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    letterSpacing: "0.16em",
-                    color: accent,
-                    marginTop: "20px",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {content.chatCaption}
-                </p>
-              </div>
+              <HeroChatDual content={content} accent={accent} />  
             </div>
           </div>
         </section>
