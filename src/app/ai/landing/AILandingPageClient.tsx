@@ -741,11 +741,22 @@ export default function AILandingPageClient({
   content: IndustryContent;
 }) {
   const accent = content.accent;
+  const [showFormModal, setShowFormModal] = useState(false);
 
   // Always start at the top of the page
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showFormModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [showFormModal]);
 
   return (
     <>
@@ -1076,8 +1087,8 @@ export default function AILandingPageClient({
               >
                 Talk to Our Team
               </Link>
-              <a
-                href="#get-started"
+              <button
+                onClick={() => setShowFormModal(true)}
                 className="lp-header-cta"
                 style={{
                   padding: "10px 22px",
@@ -1086,12 +1097,14 @@ export default function AILandingPageClient({
                   fontWeight: 700,
                   fontSize: "13px",
                   borderRadius: "10px",
-                  textDecoration: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
                   transition: "background 180ms ease, transform 180ms ease",
                 }}
               >
                 {accent === "#C9A84C" ? "Schedule a Demo" : "Claim Free Website"}
-              </a>
+              </button>
             </div>
           </div>
         </header>
@@ -1912,8 +1925,8 @@ export default function AILandingPageClient({
               </div>
 
               {/* CTA Button */}
-              <a
-                href="#get-started"
+              <button
+                onClick={() => setShowFormModal(true)}
                 className="pricing-cta-btn"
                 style={{
                   display: "block",
@@ -1926,14 +1939,13 @@ export default function AILandingPageClient({
                   fontSize: "17px",
                   fontWeight: 800,
                   fontFamily: "inherit",
-                  textDecoration: "none",
                   textAlign: "center",
                   cursor: "pointer",
                   letterSpacing: "0.01em",
                 }}
               >
                 {content.pricingCta}
-              </a>
+              </button>
 
               {/* No contract micro-copy */}
               <p
@@ -2237,6 +2249,80 @@ export default function AILandingPageClient({
           </div>
         </footer>
       </div>
+
+      {/* ═══════ FORM MODAL ═══════ */}
+      {showFormModal && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowFormModal(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setShowFormModal(false);
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(0,0,0,0.70)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+            animation: "modalFadeIn 0.25s ease-out both",
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "480px",
+              animation: "modalSlideUp 0.3s cubic-bezier(0.4,0,0.2,1) both",
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowFormModal(false)}
+              aria-label="Close form"
+              style={{
+                position: "absolute",
+                top: "-12px",
+                right: "-12px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.10)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "#fff",
+                fontSize: "18px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1,
+                transition: "background 150ms ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.20)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.10)")}
+            >
+              ✕
+            </button>
+            <LeadForm content={content} id="modal-form" />
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes modalFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes modalSlideUp {
+          from { opacity: 0; transform: translateY(24px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+      `}</style>
     </>
   );
 }
