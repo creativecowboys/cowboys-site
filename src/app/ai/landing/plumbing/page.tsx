@@ -5,7 +5,7 @@ import { plumbingContent } from "../content";
 export const metadata: Metadata = {
   title: "AI for Plumbing Contractors — First to Respond Gets the Job | Creative Cowboys",
   description:
-    "Your AI answers emergency calls at midnight, texts leads back in seconds, and books jobs while you sleep. Plus a free custom plumbing website ($2,500 value). No contracts.",
+    "Your AI answers emergency calls at midnight, texts leads back in seconds, and books jobs while you sleep. Plus a free custom plumbing website ($3,499 value). No contracts.",
   alternates: { canonical: "/ai/landing/plumbing" },
   openGraph: {
     title: "AI for Plumbing Contractors — First to Respond Gets the Job | Creative Cowboys",

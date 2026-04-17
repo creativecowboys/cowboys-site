@@ -640,6 +640,32 @@ export default function AILandingPageClient({
         .testimonial-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
         .cta-split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
 
+        .pricing-card {
+          transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 300ms ease;
+        }
+        .pricing-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 32px 80px rgba(0,0,0,0.50), 0 0 60px ${accent}20;
+        }
+        .pricing-cta-btn {
+          transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+        }
+        .pricing-cta-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 16px 48px ${accent}55;
+          filter: brightness(1.1);
+        }
+        .pricing-cta-btn:active {
+          transform: translateY(0);
+        }
+        @keyframes pricePulse {
+          0%, 100% { box-shadow: 0 0 0 0 ${accent}40; }
+          50% { box-shadow: 0 0 0 8px ${accent}00; }
+        }
+        .pricing-badge-pulse {
+          animation: pricePulse 2.5s ease-in-out infinite;
+        }
+
         @media (max-width: 900px) {
           .hero-split { grid-template-columns: 1fr !important; gap: 48px !important; }
           .pain-grid { grid-template-columns: 1fr !important; }
@@ -740,6 +766,31 @@ export default function AILandingPageClient({
           .lp-offer-item p:last-of-type { font-size: 12px !important; }
           .lp-offer-price-row { margin-top: 20px !important; padding-top: 16px !important; }
           .lp-offer-price { font-size: 16px !important; }
+
+          /* ── Pricing Section ── */
+          .lp-pricing-section { padding: 56px 16px !important; }
+          .lp-pricing-header { margin-bottom: 36px !important; }
+          .lp-pricing-card {
+            padding: 28px 20px !important;
+            border-radius: 20px !important;
+            max-width: 100% !important;
+          }
+          .lp-pricing-price { font-size: 48px !important; }
+          .lp-pricing-period { font-size: 16px !important; }
+          .lp-pricing-website-banner {
+            padding: 14px 16px !important;
+            border-radius: 12px !important;
+            flex-direction: column !important;
+            text-align: center !important;
+          }
+          .lp-pricing-website-banner .lp-pricing-old-price { font-size: 18px !important; }
+          .lp-pricing-website-banner .lp-pricing-free-label { font-size: 18px !important; }
+          .lp-pricing-guarantee {
+            padding: 16px !important;
+            border-radius: 12px !important;
+            flex-direction: column !important;
+            text-align: center !important;
+          }
 
           /* ── Testimonials Section ── */
           .lp-testimonials-section { padding: 56px 16px !important; }
@@ -1463,6 +1514,320 @@ export default function AILandingPageClient({
                   </span>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════ 5.5  PRICING SECTION ═══════ */}
+        <section
+          className="lp-pricing-section"
+          style={{
+            padding: "100px 24px",
+            background: CARD,
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Accent glow behind pricing */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "800px",
+              height: "600px",
+              background: `radial-gradient(ellipse, ${accent}12 0%, transparent 70%)`,
+              pointerEvents: "none",
+            }}
+          />
+
+          <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
+            {/* Section header */}
+            <div
+              className="lp-pricing-header"
+              style={{ textAlign: "center", marginBottom: "56px" }}
+            >
+              <p
+                className="lp-section-eyebrow"
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: accent,
+                  marginBottom: "14px",
+                }}
+              >
+                {content.pricingEyebrow}
+              </p>
+              <h2
+                className="lp-section-heading"
+                style={{
+                  fontSize: "clamp(26px, 4vw, 44px)",
+                  fontWeight: 800,
+                  letterSpacing: "-0.03em",
+                  color: "#fff",
+                  margin: "0 0 16px",
+                  lineHeight: 1.15,
+                }}
+              >
+                {content.pricingHeadline}
+              </h2>
+              <p
+                className="lp-section-subtext"
+                style={{
+                  fontSize: "17px",
+                  color: "rgba(255,255,255,0.45)",
+                  maxWidth: "600px",
+                  marginInline: "auto",
+                  lineHeight: 1.75,
+                }}
+              >
+                {content.pricingSubhead}
+              </p>
+            </div>
+
+            {/* Pricing Card */}
+            <div
+              className="pricing-card lp-pricing-card"
+              style={{
+                maxWidth: "560px",
+                margin: "0 auto",
+                background: DARK,
+                border: `2px solid ${accent}50`,
+                borderRadius: "28px",
+                padding: "44px 40px",
+                position: "relative",
+                boxShadow: `0 24px 80px rgba(0,0,0,0.40), 0 0 40px ${accent}10`,
+              }}
+            >
+              {/* "Everything You Need" badge */}
+              <div
+                className="pricing-badge-pulse"
+                style={{
+                  position: "absolute",
+                  top: "-14px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: `linear-gradient(135deg, ${accent} 0%, ${accent === "#C9A84C" ? "#E8C44A" : "#EA51FF"} 100%)`,
+                  color: accent === "#C9A84C" ? "#09090C" : "#fff",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  padding: "7px 24px",
+                  borderRadius: "999px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                ✦ Everything You Need
+              </div>
+
+              {/* Price */}
+              <div style={{ textAlign: "center", marginBottom: "32px", paddingTop: "8px" }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: "4px" }}>
+                  <span
+                    className="lp-pricing-price"
+                    style={{
+                      fontSize: "64px",
+                      fontWeight: 900,
+                      color: "#fff",
+                      letterSpacing: "-0.04em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {content.pricingPrice}
+                  </span>
+                  <span
+                    className="lp-pricing-period"
+                    style={{
+                      fontSize: "20px",
+                      fontWeight: 600,
+                      color: "rgba(255,255,255,0.40)",
+                    }}
+                  >
+                    {content.pricingPeriod}
+                  </span>
+                </div>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "rgba(255,255,255,0.35)",
+                    margin: "8px 0 0",
+                  }}
+                >
+                  per month · billed monthly
+                </p>
+              </div>
+
+              {/* FREE WEBSITE banner — the hero moment */}
+              <div
+                className="lp-pricing-website-banner"
+                style={{
+                  background: `${accent}12`,
+                  border: `1px solid ${accent}35`,
+                  borderRadius: "16px",
+                  padding: "18px 24px",
+                  marginBottom: "28px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <span style={{ fontSize: "24px" }}>🎁</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+                  <span
+                    className="lp-pricing-old-price"
+                    style={{
+                      fontSize: "22px",
+                      fontWeight: 800,
+                      color: "rgba(255,255,255,0.30)",
+                      textDecoration: "line-through",
+                      textDecorationColor: "rgba(255,60,60,0.6)",
+                      textDecorationThickness: "2px",
+                    }}
+                  >
+                    {content.pricingWebsiteValue} Website
+                  </span>
+                  <span
+                    className="lp-pricing-free-label"
+                    style={{
+                      fontSize: "22px",
+                      fontWeight: 900,
+                      color: accent,
+                    }}
+                  >
+                    FREE
+                  </span>
+                </div>
+              </div>
+
+              {/* Feature list */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  marginBottom: "32px",
+                }}
+              >
+                {content.pricingIncludes.map((feature) => (
+                  <div
+                    key={feature.item}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "12px",
+                    }}
+                  >
+                    <CheckCircle2
+                      size={18}
+                      color={accent}
+                      style={{ flexShrink: 0, marginTop: "2px" }}
+                    />
+                    <span
+                      style={{
+                        fontSize: "15px",
+                        lineHeight: 1.6,
+                        color: feature.highlight
+                          ? "#fff"
+                          : "rgba(255,255,255,0.55)",
+                        fontWeight: feature.highlight ? 700 : 400,
+                      }}
+                    >
+                      {feature.item}
+                      {feature.highlight && (
+                        <span
+                          style={{
+                            marginLeft: "8px",
+                            fontSize: "11px",
+                            fontWeight: 800,
+                            color: accent === "#C9A84C" ? "#09090C" : "#fff",
+                            background: accent,
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.06em",
+                          }}
+                        >
+                          {content.pricingWebsiteValue} value
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Button */}
+              <a
+                href="#get-started"
+                className="pricing-cta-btn"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "18px 24px",
+                  background: accent,
+                  color: accent === "#C9A84C" ? "#09090C" : "#fff",
+                  border: "none",
+                  borderRadius: "14px",
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  fontFamily: "inherit",
+                  textDecoration: "none",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                {content.pricingCta}
+              </a>
+
+              {/* No contract micro-copy */}
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: "13px",
+                  color: "rgba(255,255,255,0.32)",
+                  marginTop: "14px",
+                }}
+              >
+                {content.pricingGuarantee}
+              </p>
+            </div>
+
+            {/* Guarantee / Risk Reversal Banner */}
+            <div
+              className="lp-pricing-guarantee"
+              style={{
+                maxWidth: "560px",
+                margin: "28px auto 0",
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: "16px",
+                padding: "20px 28px",
+                display: "flex",
+                alignItems: "center",
+                gap: "16px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <span style={{ fontSize: "24px" }}>🛡️</span>
+              <p
+                style={{
+                  fontSize: "14px",
+                  color: "rgba(255,255,255,0.50)",
+                  margin: 0,
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong style={{ color: "#fff" }}>Zero risk.</strong>{" "}
+                No long-term contracts, no setup fees, no hidden charges. Start today and cancel anytime — your website stays yours.
+              </p>
             </div>
           </div>
         </section>

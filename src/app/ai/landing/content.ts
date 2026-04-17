@@ -95,6 +95,17 @@ export interface IndustryContent {
   /* FAQ */
   faqs: FAQ[];
 
+  /* Pricing */
+  pricingEyebrow: string;
+  pricingHeadline: string;
+  pricingSubhead: string;
+  pricingPrice: string;
+  pricingPeriod: string;
+  pricingIncludes: { item: string; highlight?: boolean }[];
+  pricingWebsiteValue: string;
+  pricingCta: string;
+  pricingGuarantee: string;
+
   /* Final CTA */
   ctaLabel: string;
   ctaHeadline: string;
@@ -169,7 +180,7 @@ export const roofingContent: IndustryContent = {
   chatCaption: "YOUR AI — WORKING WHILE YOU SLEEP",
 
   offerBanner:
-    "🏠 Free Custom Website ($2,500 Value) — Included with Every AI Signup",
+    "🏠 Free Custom Website ($3,499 Value) — Included with Every AI Signup",
   offerTag: "Only 5 Spots Left This Month",
 
   painHeadline: "EVERY MISSED CALL IS A MISSED JOB",
@@ -211,7 +222,7 @@ export const roofingContent: IndustryContent = {
       num: "02",
       title: "WE BUILD YOUR WEBSITE",
       description:
-        "Custom, mobile-ready roofing site built to rank on Google and convert visitors into calls — $2,500 value, free.",
+        "Custom, mobile-ready roofing site built to rank on Google and convert visitors into calls — $3,499 value, free.",
     },
     {
       num: "03",
@@ -233,7 +244,7 @@ export const roofingContent: IndustryContent = {
       item: "Custom Website — Roofing-Optimized",
       description:
         "Built to rank on Google and convert visitors into calls.",
-      value: "$2,500 value — FREE",
+      value: "$3,499 value — FREE",
     },
     {
       item: "AI Chat Widget (24/7)",
@@ -254,7 +265,26 @@ export const roofingContent: IndustryContent = {
       value: "Fully done-for-you",
     },
   ],
-  offerPrice: "Call Us",
+  offerPrice: "$497/mo",
+
+  pricingEyebrow: "SIMPLE, TRANSPARENT PRICING",
+  pricingHeadline: "ONE PLAN. EVERYTHING INCLUDED.",
+  pricingSubhead:
+    "No tiers to compare. No hidden fees. Every roofing contractor gets the full package — AI, CRM, website, and local SEO — for one flat monthly rate.",
+  pricingPrice: "$497",
+  pricingPeriod: "/mo",
+  pricingIncludes: [
+    { item: "AI Chat Widget — captures leads 24/7 on your website" },
+    { item: "AI Voice Receptionist — answers overflow & after-hours calls" },
+    { item: "Built-in CRM — manage every lead in one dashboard" },
+    { item: "Custom Roofing Website — mobile-ready, built to convert", highlight: true },
+    { item: "Local SEO — rank on Google in your service area" },
+    { item: "Lead text alerts — every new lead hits your phone instantly" },
+    { item: "Setup, training & ongoing support — fully done-for-you" },
+  ],
+  pricingWebsiteValue: "$3,499",
+  pricingCta: "🚀 Get Started — Claim Your Free Website",
+  pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT ROOFING CONTRACTORS ARE SAYING",
   testimonials: [
@@ -302,7 +332,7 @@ export const roofingContent: IndustryContent = {
     {
       question: 'What does "free website" mean exactly?',
       answer:
-        "We design and build a fully custom, professional roofing website — a $2,500+ value — included at no upfront cost when you sign up for AI services. Small monthly hosting fee applies.",
+        "We design and build a fully custom, professional roofing website — a $3,499+ value — included at no upfront cost when you sign up for AI services. Small monthly hosting fee applies.",
     },
   ],
 
@@ -383,7 +413,7 @@ export const plumbingContent: IndustryContent = {
   chatCaption: "YOUR AI — ON THE JOB AT MIDNIGHT",
 
   offerBanner:
-    "🔧 Free Custom Website ($2,500 Value) — Included with Every AI Signup",
+    "🔧 Free Custom Website ($3,499 Value) — Included with Every AI Signup",
   offerTag: "Only 5 Spots Left This Month",
 
   painHeadline: "EVERY UNANSWERED EMERGENCY IS A LOST JOB",
@@ -425,7 +455,7 @@ export const plumbingContent: IndustryContent = {
       num: "02",
       title: "WE BUILD YOUR WEBSITE",
       description:
-        "Custom, mobile-ready plumbing site built to rank on Google and convert visitors into booked jobs — $2,500 value, free.",
+        "Custom, mobile-ready plumbing site built to rank on Google and convert visitors into booked jobs — $3,499 value, free.",
     },
     {
       num: "03",
@@ -447,7 +477,7 @@ export const plumbingContent: IndustryContent = {
       item: "Custom Website — Plumbing-Optimized",
       description:
         "Built to rank on Google and convert visitors into calls.",
-      value: "$2,500 value — FREE",
+      value: "$3,499 value — FREE",
     },
     {
       item: "AI Chat Widget (24/7)",
@@ -468,7 +498,26 @@ export const plumbingContent: IndustryContent = {
       value: "Fully done-for-you",
     },
   ],
-  offerPrice: "Call Us",
+  offerPrice: "$497/mo",
+
+  pricingEyebrow: "SIMPLE, TRANSPARENT PRICING",
+  pricingHeadline: "ONE PLAN. EVERYTHING INCLUDED.",
+  pricingSubhead:
+    "No tiers to compare. No hidden fees. Every plumber gets the full package — AI, CRM, website, and local SEO — for one flat monthly rate.",
+  pricingPrice: "$497",
+  pricingPeriod: "/mo",
+  pricingIncludes: [
+    { item: "AI Chat Widget — captures leads & triages emergencies 24/7" },
+    { item: "AI Voice Receptionist — handles after-hours & overflow calls" },
+    { item: "Built-in CRM — manage every lead in one dashboard" },
+    { item: "Custom Plumbing Website — mobile-ready, built to convert", highlight: true },
+    { item: "Local SEO — rank on Google in your service area" },
+    { item: "Lead text alerts — every new lead hits your phone instantly" },
+    { item: "Setup, training & ongoing support — fully done-for-you" },
+  ],
+  pricingWebsiteValue: "$3,499",
+  pricingCta: "🚀 Get Started — Claim Your Free Website",
+  pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT PLUMBERS ARE SAYING",
   testimonials: [
@@ -516,7 +565,7 @@ export const plumbingContent: IndustryContent = {
     {
       question: 'What does the "free website" include?',
       answer:
-        "A fully custom, professionally built plumbing website — optimized for Google, mobile-ready, with your branding and services. $2,500+ value included when you sign up. Small monthly hosting fee applies.",
+        "A fully custom, professionally built plumbing website — optimized for Google, mobile-ready, with your branding and services. $3,499+ value included when you sign up. Small monthly hosting fee applies.",
     },
   ],
 
@@ -661,7 +710,7 @@ export const lawContent: IndustryContent = {
       item: "Custom Website — Law Firm-Optimized",
       description:
         "Built to rank on Google and convert visitors into consultations.",
-      value: "$2,500+ value — included",
+      value: "$3,499+ value — included",
     },
     {
       item: "AI Chat Widget (24/7)",
@@ -682,7 +731,26 @@ export const lawContent: IndustryContent = {
       value: "Fully done-for-you",
     },
   ],
-  offerPrice: "Contact for Pricing",
+  offerPrice: "$497/mo",
+
+  pricingEyebrow: "SIMPLE, TRANSPARENT PRICING",
+  pricingHeadline: "ONE PLAN. EVERYTHING INCLUDED.",
+  pricingSubhead:
+    "No tiers to compare. No hidden fees. Every firm gets the full package — AI intake, CRM, professional website, and local SEO — for one flat monthly rate.",
+  pricingPrice: "$497",
+  pricingPeriod: "/mo",
+  pricingIncludes: [
+    { item: "AI Chat Widget — engages visitors & pre-qualifies cases 24/7" },
+    { item: "AI Voice Receptionist — handles after-hours & overflow calls" },
+    { item: "Built-in CRM — manage every inquiry in one dashboard" },
+    { item: "Professional Law Firm Website — authoritative, built to convert", highlight: true },
+    { item: "Local SEO — rank on Google for your practice areas" },
+    { item: "Lead alerts — every new inquiry hits your phone instantly" },
+    { item: "Setup, training & ongoing support — fully done-for-you" },
+  ],
+  pricingWebsiteValue: "$3,499",
+  pricingCta: "⚖️ Get Started — Claim Your Free Website",
+  pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT ATTORNEYS ARE SAYING",
   testimonials: [
@@ -730,7 +798,7 @@ export const lawContent: IndustryContent = {
     {
       question: "What does the website include?",
       answer:
-        "A fully custom, professionally designed law firm website — practice area pages, attorney bios, contact forms, and local SEO optimization. A $2,500+ value, included with your AI service. Small monthly hosting fee applies.",
+        "A fully custom, professionally designed law firm website — practice area pages, attorney bios, contact forms, and local SEO optimization. A $3,499+ value, included with your AI service. Small monthly hosting fee applies.",
     },
   ],
 
