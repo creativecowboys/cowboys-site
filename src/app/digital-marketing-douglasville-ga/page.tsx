@@ -22,10 +22,10 @@ const CARD = "#15181e";
 
 const localSchema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": "https://creativecowboys.co/#organization",
-    name: "Creative Cowboys Media",
-    url: "https://creativecowboys.co",
+    "@type": "WebPage",
+    "@id": "https://www.creativecowboys.co/#organization",
+    name: "Digital Marketing in Douglasville, GA | Creative Cowboys",
+    url: "https://www.creativecowboys.co",
     telephone: "+14702437517",
     address: { "@type": "PostalAddress", streetAddress: "222 West Montgomery St", addressLocality: "Villa Rica", addressRegion: "GA", postalCode: "30180", addressCountry: "US" },
     areaServed: { "@type": "City", name: "Douglasville", containedIn: { "@type": "State", name: "Georgia" } },

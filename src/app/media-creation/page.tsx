@@ -26,10 +26,10 @@ const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "Media Creation",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://creativecowboys.co" },
+    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
     areaServed: "West Georgia",
     description: "Video production, business photography, graphic design, and social media content creation for businesses in West Georgia.",
-    url: "https://creativecowboys.co/media-creation",
+    url: "https://www.creativecowboys.co/media-creation",
 };
 
 const offerings = [

@@ -25,10 +25,10 @@ const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "Google Ads & PPC Management",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://creativecowboys.co" },
+    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
     areaServed: "West Georgia",
     description: "ROI-focused Google Ads and PPC campaign management for small businesses in West Georgia. Campaign setup, keyword targeting, conversion tracking, and transparent reporting.",
-    url: "https://creativecowboys.co/ppc",
+    url: "https://www.creativecowboys.co/ppc",
 };
 
 const faqSchema = {

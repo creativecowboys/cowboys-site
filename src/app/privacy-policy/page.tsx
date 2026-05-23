@@ -232,7 +232,7 @@ export default function PrivacyPolicyPage() {
                     </p>
                     <p style={bodyStyle}>
                         By visiting our website at{" "}
-                        <XLink href="https://creativecowboys.co">creativecowboys.co</XLink> or submitting any form or
+                        <XLink href="https://www.creativecowboys.co">creativecowboys.co</XLink> or submitting any form or
                         inquiry to us, you agree to the practices described in this policy.
                     </p>
 
@@ -571,7 +571,7 @@ export default function PrivacyPolicyPage() {
                         </p>
                         <p style={{ ...bodyStyle, margin: 0 }}>
                             Website:{" "}
-                            <XLink href="https://creativecowboys.co">creativecowboys.co</XLink>
+                            <XLink href="https://www.creativecowboys.co">creativecowboys.co</XLink>
                         </p>
                     </div>
 

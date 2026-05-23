@@ -22,14 +22,14 @@ export const metadata: Metadata = {
   },
   description:
     "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
-  metadataBase: new URL("https://creativecowboys.co"),
+  metadataBase: new URL("https://www.creativecowboys.co"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://creativecowboys.co",
+    url: "https://www.creativecowboys.co",
     siteName: "Creative Cowboys",
     title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
     description:
@@ -80,7 +80,7 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "ProfessionalService"],
   name: "Creative Cowboys Media",
-  url: "https://creativecowboys.co",
+  url: "https://www.creativecowboys.co",
   telephone: "+1-470-243-7517",
   email: "howdy@creativecowboys.co",
   address: {

@@ -1075,7 +1075,7 @@ export default function AILandingPageClient({
             </Link>
             <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               <Link
-                href="https://creativecowboys.co/contact"
+                href="https://www.creativecowboys.co/contact"
                 style={{
                   fontSize: "14px",
                   color: "rgba(255,255,255,0.55)",
@@ -2235,7 +2235,7 @@ export default function AILandingPageClient({
               Georgia&apos;s AI Marketing Agency
             </p>
             <Link
-              href="https://creativecowboys.co"
+              href="https://www.creativecowboys.co"
               className="lp-footer-link"
               style={{
                 fontSize: "13px",

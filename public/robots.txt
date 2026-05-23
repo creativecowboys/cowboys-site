@@ -7,4 +7,4 @@ Disallow: /proposals/
 Disallow: /api/
 
 # Sitemap location
-Sitemap: https://creativecowboys.co/sitemap.xml
+Sitemap: https://www.creativecowboys.co/sitemap.xml

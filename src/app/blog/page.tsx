@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Blog | Creative Cowboys",
+    title: "Digital Marketing Blog",
     description:
         "The Creative Cowboys blog — no-fluff digital marketing tips, SEO strategies, and growth insights for small businesses in West Georgia and beyond.",
     alternates: { canonical: "/blog" },

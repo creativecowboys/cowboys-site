@@ -26,10 +26,10 @@ const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "Brand Strategy & Identity",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://creativecowboys.co" },
+    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
     areaServed: "West Georgia",
     description: "Brand strategy, logo design, visual identity, brand voice, and competitive positioning for small businesses in West Georgia.",
-    url: "https://creativecowboys.co/brand-strategy",
+    url: "https://www.creativecowboys.co/brand-strategy",
 };
 
 const offerings = [

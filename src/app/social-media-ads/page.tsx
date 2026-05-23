@@ -25,10 +25,10 @@ const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "Social Media Advertising",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://creativecowboys.co" },
+    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
     areaServed: "West Georgia",
     description: "Facebook, Instagram and TikTok ad campaign management for small businesses in West Georgia. Audience targeting, creative strategy, and ROI reporting.",
-    url: "https://creativecowboys.co/social-media-ads",
+    url: "https://www.creativecowboys.co/social-media-ads",
 };
 
 const steps = [

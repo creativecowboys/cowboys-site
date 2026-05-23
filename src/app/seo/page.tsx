@@ -26,10 +26,10 @@ const serviceSchema = {
     "@context": "https://schema.org",
     "@type": "Service",
     name: "SEO Services",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://creativecowboys.co" },
+    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
     areaServed: "West Georgia",
     description: "Results-driven SEO services for small businesses in West Georgia including local SEO, keyword strategy, Google Business Profile optimization, and transparent reporting.",
-    url: "https://creativecowboys.co/seo",
+    url: "https://www.creativecowboys.co/seo",
 };
 
 const faqSchema = {
