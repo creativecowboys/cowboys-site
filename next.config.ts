@@ -4,14 +4,6 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   async redirects() {
     return [
-      { source: '/Home', destination: '/', permanent: true },
-      { source: '/About', destination: '/about', permanent: true },
-      { source: '/Contact', destination: '/contact', permanent: true },
-      { source: '/Services', destination: '/services', permanent: true },
-      { source: '/Blog', destination: '/blog', permanent: true },
-      { source: '/SEO', destination: '/seo', permanent: true },
-      { source: '/PPC', destination: '/ppc', permanent: true },
-      { source: '/WebDesign', destination: '/web-design', permanent: true },
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
       {

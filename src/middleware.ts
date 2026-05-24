@@ -21,6 +21,23 @@ async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
 // ─── Middleware ────────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
+    const PASCAL_REDIRECTS: Record<string, string> = {
+        '/Home':      '/',
+        '/About':     '/about',
+        '/Contact':   '/contact',
+        '/Services':  '/services',
+        '/Blog':      '/blog',
+        '/SEO':       '/seo',
+        '/PPC':       '/ppc',
+        '/WebDesign': '/web-design',
+    };
+
+    if (PASCAL_REDIRECTS[request.nextUrl.pathname]) {
+        const url = request.nextUrl.clone();
+        url.pathname = PASCAL_REDIRECTS[request.nextUrl.pathname];
+        return NextResponse.redirect(url, 308);
+    }
+
     const { pathname } = request.nextUrl;
 
     // ── Admin routes ──────────────────────────────────────────────────────────
