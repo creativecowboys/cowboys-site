@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "How Much Do Google Ads Cost? A Transparent Breakdown for Small Businesses | Creative Cowboys",
+    title: "How Much Do Google Ads Cost? A Transparent Breakdown for Small Businesses",
     description: "No fluff. Here's a real breakdown of what Google Ads costs — ad spend, management fees, and what to expect for West Georgia small businesses.",
     alternates: { canonical: "/blog/how-much-does-google-ads-cost" },
 };

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "10 Google Ads Mistakes Small Businesses Make (And How to Fix Them) | Creative Cowboys",
+    title: "10 Google Ads Mistakes Small Businesses Make (And How to Fix Them)",
     description: "We've audited hundreds of Google Ads accounts. Here are the 10 most common mistakes killing your ROI — and exactly how to fix them. Creative Cowboys, West Georgia.",
     alternates: { canonical: "/blog/ppc-mistakes-small-business" },
 };

@@ -5,7 +5,7 @@ import { Footer7 } from "@/components/ui/footer-7";
 import FloatingNav from "@/components/FloatingNav";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy | Creative Cowboys",
+    title: "Privacy Policy",
     description:
         "Learn how Creative Cowboys collects, uses, and protects your personal information. We believe in plain-English transparency about our data practices.",
     alternates: { canonical: "/privacy-policy" },

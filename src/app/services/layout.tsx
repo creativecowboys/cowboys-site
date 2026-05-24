@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Services for Small Businesses in West Georgia | Creative Cowboys",
+    title: "Digital Marketing Services for Small Businesses in West Georgia",
     description:
         "Explore Creative Cowboys' full suite of digital marketing services — SEO, PPC, web design, social media ads & branding — tailored for small businesses across West Georgia and Atlanta.",
     alternates: { canonical: "/services" },

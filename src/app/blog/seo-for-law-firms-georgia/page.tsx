@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "SEO for Law Firms in Georgia: How to Rank in a Competitive Market | Creative Cowboys",
+    title: "SEO for Law Firms in Georgia: How to Rank in a Competitive Market",
     description: "Law firm SEO is one of the most competitive markets in Georgia. Here's the strategy we used to get a client 21 #1 rankings in personal injury law search terms.",
     alternates: { canonical: "/blog/seo-for-law-firms-georgia" },
 };

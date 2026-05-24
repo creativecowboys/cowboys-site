@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "How Long Does SEO Take? A Realistic Timeline for West Georgia Small Businesses | Creative Cowboys",
+    title: "How Long Does SEO Take? A Realistic Timeline for West Georgia Small Businesses",
     description: "Honest answer: most West Georgia small businesses see meaningful SEO results in 3–6 months. Here's exactly what to expect and when — no fluff.",
     alternates: { canonical: "/blog/how-long-does-seo-take" },
     openGraph: {

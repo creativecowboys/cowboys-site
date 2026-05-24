@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AIDemoPageClient from "./AIDemoPageClient";
 
 export const metadata: Metadata = {
-    title: "Book a Free AI Demo | Creative Cowboys | West Georgia",
+    title: "Book a Free AI Demo | West Georgia",
     description:
         "Book your free 15-minute AI Chat & Voice demo with Creative Cowboys. We'll show you a live AI assistant built around your industry — no commitment, no contracts.",
     alternates: { canonical: "/ai/demo" },

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "What to Look for When Hiring a Digital Marketing Agency in West Georgia | Creative Cowboys",
+    title: "What to Look for When Hiring a Digital Marketing Agency in West Georgia",
     description: "Red flags, green flags, and the exact questions to ask before signing with any digital marketing agency. From Creative Cowboys — a West Georgia marketing agency.",
     alternates: { canonical: "/blog/what-to-look-for-marketing-agency" },
 };

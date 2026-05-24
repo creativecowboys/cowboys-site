@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Brand Strategy & Identity for West Georgia Small Businesses | Creative Cowboys",
+    title: "Brand Strategy & Identity for West Georgia Small Businesses",
     description:
         "Creative Cowboys builds cohesive brand identities for West Georgia small businesses — from logo to launch. Stand out, connect with customers & grow with confidence.",
     alternates: { canonical: "/brand-strategy" },

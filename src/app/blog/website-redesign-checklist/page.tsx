@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Website Redesign Checklist: 15 Things Your New Site Must Have | Creative Cowboys",
+    title: "Website Redesign Checklist: 15 Things Your New Site Must Have",
     description: "Before you launch a new website, run through this checklist. Missing any of these is leaving money on the table. From Creative Cowboys, West Georgia's web design experts.",
     alternates: { canonical: "/blog/website-redesign-checklist" },
 };

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Google Ads vs. SEO: Which Is Better for Your West Georgia Business? | Creative Cowboys",
+    title: "Google Ads vs. SEO: Which Is Better for Your West Georgia Business?",
     description: "Both Google Ads and SEO work. The right answer depends on your timeline, budget, and goals. Here's how to decide for your West Georgia small business.",
     alternates: { canonical: "/blog/google-ads-vs-seo-small-business" },
 };

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "The Complete Local SEO Guide for West Georgia Small Businesses (2025) | Creative Cowboys",
+    title: "The Complete Local SEO Guide for West Georgia Small Businesses (2025)",
     description: "Everything you need to rank in local search — keywords, Google Business Profile, on-page SEO, and link building — in one comprehensive guide for West Georgia businesses.",
     alternates: { canonical: "/blog/local-seo-guide-west-georgia" },
 };

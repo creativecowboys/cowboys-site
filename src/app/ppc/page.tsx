@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Google Ads & PPC Management in West Georgia | Creative Cowboys",
+    title: "Google Ads & PPC Management in West Georgia",
     description:
         "Creative Cowboys manages ROI-focused Google Ads & PPC campaigns for small businesses in West Georgia. No wasted spend — just qualified leads. Villa Rica, GA digital marketing agency.",
     alternates: { canonical: "/ppc" },

@@ -7,7 +7,7 @@ import { Footer7 } from "@/components/ui/footer-7";
 import { AnimatedCounter, ResultsMetricsChart, DonutChart } from "@/components/ui/animated-charts";
 
 export const metadata: Metadata = {
-    title: "Real Results for Real West Georgia Businesses | Creative Cowboys",
+    title: "Real Results for Real West Georgia Businesses",
     description:
         "See the real results Creative Cowboys has delivered for West Georgia small businesses. Case studies in SEO, PPC, and web design. Transparent reporting. Measurable growth.",
     alternates: { canonical: "/results" },

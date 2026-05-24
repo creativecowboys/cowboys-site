@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Agency for Newnan, GA Businesses | Creative Cowboys",
+    title: "Digital Marketing Agency for Newnan, GA Businesses",
     description:
         "Creative Cowboys helps Newnan, GA small businesses grow with local SEO, Google Ads, web design & social media advertising. West Georgia digital marketing agency. Free consultation.",
     alternates: { canonical: "/digital-marketing-newnan-ga" },

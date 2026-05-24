@@ -11,7 +11,7 @@ export const metadata: Metadata = {
         "The Creative Cowboys blog — no-fluff digital marketing tips, SEO strategies, and growth insights for small businesses in West Georgia and beyond.",
     alternates: { canonical: "/blog" },
     openGraph: {
-        title: "Digital Marketing Blog | Creative Cowboys",
+        title: "Digital Marketing Blog",
         description: "No-fluff digital marketing tips, SEO strategies, and growth insights for West Georgia small businesses.",
     },
 };

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Agency for Douglasville, GA Businesses | Creative Cowboys",
+    title: "Digital Marketing Agency for Douglasville, GA Businesses",
     description:
         "Creative Cowboys helps Douglasville, GA small businesses grow with local SEO, Google Ads, web design & social media advertising. West Georgia-based. Free consultation available.",
     alternates: { canonical: "/digital-marketing-douglasville-ga" },

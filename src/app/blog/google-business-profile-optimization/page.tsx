@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "How to Optimize Your Google Business Profile for More Local Leads | Creative Cowboys",
+    title: "How to Optimize Your Google Business Profile for More Local Leads",
     description: "Your GBP is your most powerful free local marketing tool. Here's exactly how to optimize every element for more calls, visits, and leads in West Georgia.",
     alternates: { canonical: "/blog/google-business-profile-optimization" },
 };

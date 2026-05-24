@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import ContactForm from "@/components/ui/contact-form";
 
 export const metadata: Metadata = {
-    title: "Free Digital Marketing Consultation in West Georgia | Creative Cowboys",
+    title: "Free Digital Marketing Consultation in West Georgia",
     description:
         "Ready to grow? Get a free consultation with Creative Cowboys — West Georgia's no-fluff digital marketing agency. Based in Villa Rica, GA. No contracts. No fluff. Just results.",
     alternates: { canonical: "/contact" },

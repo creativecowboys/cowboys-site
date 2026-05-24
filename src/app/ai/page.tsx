@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import AIPageClient from "./AIPageClient";
 
 export const metadata: Metadata = {
-    title: "AI Chat & Voice for Small Businesses | Creative Cowboys | West Georgia",
+    title: "AI Chat & Voice for Small Businesses | West Georgia",
     description:
         "Creative Cowboys' AI Chat and Voice services keep your business answering questions, booking appointments, and capturing leads 24/7 — even when you're off the clock. Serving West Georgia and beyond.",
     alternates: { canonical: "/ai" },

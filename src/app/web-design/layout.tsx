@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Web Design in West Georgia | Creative Cowboys",
+    title: "Web Design in West Georgia",
     description:
         "Creative Cowboys builds custom, SEO-optimized websites for small businesses in West Georgia. Fast, mobile-friendly & built to convert visitors into customers. Free consultation.",
     alternates: { canonical: "/web-design" },

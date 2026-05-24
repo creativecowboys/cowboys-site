@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Agency in Carrollton, GA | Creative Cowboys",
+    title: "Digital Marketing Agency in Carrollton, GA",
     description:
         "Creative Cowboys helps Carrollton, GA small businesses grow with local SEO, Google Ads, web design & social media advertising. Based in West Georgia. Free consultation available.",
     alternates: { canonical: "/digital-marketing-carrollton-ga" },

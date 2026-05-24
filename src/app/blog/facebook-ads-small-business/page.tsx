@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Do Facebook Ads Work for Small Businesses? (Honest Answer) | Creative Cowboys",
+    title: "Do Facebook Ads Work for Small Businesses? (Honest Answer)",
     description: "Yes — but only when done right. Here's what works, what doesn't, and what to expect from your first Facebook and Instagram ad campaign for your West Georgia business.",
     alternates: { canonical: "/blog/facebook-ads-small-business" },
 };

@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Social Media Advertising in West Georgia | Creative Cowboys",
+    title: "Social Media Advertising in West Georgia",
     description:
         "Creative Cowboys creates and manages Facebook, Instagram & TikTok ad campaigns for small businesses across West Georgia. Real engagement, real leads, real ROI.",
     alternates: { canonical: "/social-media-ads" },

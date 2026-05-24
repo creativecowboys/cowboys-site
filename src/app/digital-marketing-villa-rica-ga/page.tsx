@@ -6,7 +6,7 @@ import FloatingNav from "@/components/FloatingNav";
 import { Footer7 } from "@/components/ui/footer-7";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Agency in Villa Rica, GA | Creative Cowboys",
+    title: "Digital Marketing Agency in Villa Rica, GA",
     description:
         "Creative Cowboys is a digital marketing agency based in Villa Rica, GA. We help Villa Rica small businesses grow with local SEO, Google Ads, web design & social media ads.",
     alternates: { canonical: "/digital-marketing-villa-rica-ga" },
