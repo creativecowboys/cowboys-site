@@ -1,0 +1,154 @@
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+interface Metric {
+  label: string;
+  value: string;
+}
+
+interface CaseStudyProps {
+  clientName: string;
+  eyebrow: string;
+  quote: string;
+  attribution: string;
+  storyParagraphs: string[];
+  metrics: Metric[];
+  linkUrl: string;
+  liveSiteUrl?: string;     // Optional "View Site" link shown under the After image
+  imageSrc?: string;        // "After" screenshot path from /public
+  imageAlt?: string;        // Alt text for after image
+  beforeSrc?: string;       // "Before" screenshot path from /public
+  beforeAlt?: string;       // Alt text for before image
+  imagePlaceholder: string; // Shown when no imageSrc provided
+  reverseLayout?: boolean;
+}
+
+export default function CaseStudy({
+  clientName,
+  eyebrow,
+  quote,
+  attribution,
+  storyParagraphs,
+  metrics,
+  linkUrl,
+  liveSiteUrl,
+  imageSrc,
+  imageAlt,
+  beforeSrc,
+  beforeAlt,
+  imagePlaceholder,
+  reverseLayout = false
+}: CaseStudyProps) {
+  return (
+    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-neutral-200">
+      <div className="inline-block mb-6 px-3 py-1 rounded-[10px] bg-neutral-200 text-neutral-700 text-xs font-bold tracking-widest uppercase">
+        {eyebrow}
+      </div>
+      
+      <h2 className="font-display text-3xl md:text-5xl font-bold text-neutral-900 mb-16">
+        {clientName}
+      </h2>
+
+      <div className={`flex flex-col gap-12 lg:gap-20 ${reverseLayout ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+        <div className="lg:w-1/2 flex flex-col justify-center">
+          <blockquote className="font-display text-2xl md:text-3xl text-[#F26522] font-bold tracking-[-0.02em] leading-snug mb-4">
+            {quote}
+          </blockquote>
+          <p className="font-body text-neutral-500 font-medium mb-10">{attribution}</p>
+          
+          <div className="space-y-6 text-neutral-700 font-body text-lg leading-relaxed mb-10">
+            {storyParagraphs.map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
+          
+          <div className="bg-white p-8 rounded-[18px] border border-neutral-100 shadow-sm mb-8">
+            <h4 className="font-display font-bold text-neutral-900 mb-6 text-lg">The Results</h4>
+            <ul className="space-y-4">
+              {metrics.map((metric, i) => (
+                <li key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-neutral-100 last:border-0 last:pb-0">
+                  <span className="text-neutral-500 font-medium">{metric.label}</span>
+                  <span className="font-bold text-neutral-900">{metric.value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <Link href={linkUrl} className="inline-flex items-center text-[#F26522] font-bold hover:underline underline-offset-4 decoration-2">
+            See the full {clientName} case study <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+        
+        <div className="lg:w-1/2">
+          {imageSrc && beforeSrc ? (
+            /* Before / After comparison */
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative w-full rounded-[14px] overflow-hidden border border-neutral-200 shadow-sm">
+                <div className="absolute top-3 left-3 z-10 bg-neutral-800/80 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                  Before
+                </div>
+                <Image
+                  src={beforeSrc}
+                  alt={beforeAlt ?? `${clientName} — before`}
+                  width={800}
+                  height={450}
+                  className="w-full h-auto object-cover object-top"
+                />
+              </div>
+              <div className="flex items-center gap-3 text-neutral-400 text-xs font-bold uppercase tracking-widest">
+                <div className="flex-1 h-px bg-neutral-200" />
+                <span>Creative Cowboys rebuilt it</span>
+                <div className="flex-1 h-px bg-neutral-200" />
+              </div>
+              <div className="relative w-full rounded-[14px] overflow-hidden border border-[#F26522]/30 shadow-sm">
+                <div className="absolute top-3 left-3 z-10 bg-[#F26522] text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+                  After
+                </div>
+                <Image
+                  src={imageSrc}
+                  alt={imageAlt ?? `${clientName} — after`}
+                  width={800}
+                  height={450}
+                  className="w-full h-auto object-cover object-top"
+                />
+              </div>
+              {liveSiteUrl && (
+                <a
+                  href={liveSiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-neutral-200 hover:border-[#F26522] hover:text-[#F26522] text-neutral-700 font-bold rounded-full text-sm transition-colors shadow-sm self-center"
+                >
+                  View Site
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          ) : imageSrc ? (
+            /* Single image */
+            <div className="relative w-full rounded-[18px] overflow-hidden border border-neutral-200 shadow-md">
+              <Image
+                src={imageSrc}
+                alt={imageAlt ?? clientName}
+                width={800}
+                height={600}
+                className="w-full h-auto object-cover object-top"
+              />
+            </div>
+          ) : (
+            /* Placeholder */
+            <div className="w-full h-full min-h-[400px] bg-neutral-200 rounded-[18px] border border-neutral-300 flex items-center justify-center text-neutral-500 flex-col p-8 text-center">
+              <p className="font-bold mb-2">{imagePlaceholder}</p>
+              <p className="text-sm text-neutral-400">Asset coming soon</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

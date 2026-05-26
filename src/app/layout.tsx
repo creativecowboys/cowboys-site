@@ -1,9 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -173,7 +184,7 @@ export default function RootLayout({
           src="https://www.facebook.com/tr?id=1804089387217105&ev=PageView&noscript=1"/>`}
       </noscript>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0D0D0F]`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} antialiased bg-[#0D0D0F]`}
       >
         <ScrollToTop />
         <TopBar />

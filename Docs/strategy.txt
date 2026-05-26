@@ -1,0 +1,356 @@
+Creative Cowboys
+Franklin, TN Landing Page Strategy
+Web Design  ·  SEO  ·  Digital Marketing & Paid Ads
+ 
+Positioning, page architecture, and rank-beating playbook for three Franklin, TN landing pages. Built from a 25-competitor SERP and landing-page audit.
+Prepared May 2026  ·  Target market: Franklin, TN (Williamson County)
+
+1. Strategy
+This is the brief behind the three landing pages. It's intentionally short — the heavy lifting is in the audit spreadsheet ("Franklin TN — Competitor Audit.xlsx") and the page-by-page outlines that follow.
+1.1  The shape of the Franklin TN market
+Across 22 audited landing pages spanning the three services, page-1 of the Franklin TN SERPs is dominated by one operator wearing four hats. JLB Works, Horton Group, CFM Digital, and Nice Branding all share the same Franklin office at 200 Seaboard Lane, share template assets, share a CDN (thewebserviceteam.com), and use near-identical copy patterns. They occupy 3–4 of every top 10 listing for each service category.
+Everyone else fills the remaining slots: Muletown Digital (Columbia HQ, strongest content + pricing transparency), Franklin Web Design (exact-match domain, thin trust signals), Zach Sean and Virtue Design (boutique solo studios), Marketing Hatchery (Vanderbilt logo, broken stats), WebJi (hyper-local SEO, zero proof), Google Ads Agency Nashville (transparent flat pricing, no local office), Atomic Social (Scottsdale AZ pretending to be Franklin).
+The takeaway: one differentiated, locally-grounded challenger with real proof can leapfrog the entire field. The cluster's identical templates mean their badges have stopped doing the work badges are supposed to do — they look like substitutes for real proof, not amplifiers of it.
+1.2  Creative Cowboys' positioning angle
+Important context for the entire pack: Creative Cowboys is primarily a Southeast agency expanding into Franklin and Williamson County. We do not claim Franklin tenure. We do lead with the credentials we actually have — total revenue generated for clients, total #1 rankings achieved, total sites built, years in business — and let those carry the trust load that Franklin-specific case studies would have carried.
+The Franklin market has two archetypes and a gap between them:
+	•	Archetype A — Faceless agencies with badge stacks and 20-year claims. JLB, Horton, CFM, Nice Branding. They look corporate and credible but generic, dated, and proof-thin.
+	•	Archetype B — Solo boutique studios with personality and small portfolios. Zach Sean, Virtue Design. They feel human but lack scale and outcome data.
+Position Creative Cowboys in the gap: a senior Southeast team bringing real portfolio-scale credentials (millions in client revenue, hundreds of #1 rankings, dozens of named case studies) to a Franklin market where the incumbents lead with vague badges and the boutiques lead with personality but no scale. The CC brand orange + lime/lavender/coral palette already separates us visually from the Seaboard cluster's tired blue/grey templates.
+Stance on tenure. We don't volunteer that we're new to Franklin. We don't claim we're local. We let the agency-wide proof carry the page and let the buyer assume what they assume. Anything we say about Williamson County is forward-tense ("the neighborhoods we'll rank you in," "the verticals we serve here") rather than past-tense ("businesses we've built sites for in Cool Springs").
+Tagline candidates
+	•	Senior Southeast agency. Now serving Franklin.
+	•	The work Williamson County has been waiting for.
+	•	The agency businesses actually keep.
+Lock in one and use it consistently across all three landing pages. None of these claim local tenure; all of them frame the buyer benefit.
+1.3  Differentiators to lead with on every page
+Cross-referenced against what the field uniformly fails to do. Each is a moat that turns out to be wide open.
+	•	Real named case studies from the Southeast portfolio, with before/after numbers and screenshots. The work is what it is — verticals overlap with Franklin demand, the numbers are real, and we don't pretend the projects happened in Cool Springs. Nobody on page 1 has named inline case studies regardless.
+	•	Aggregate proof at scale: $2M+ in revenue generated for clients, 500+ #1 organic rankings achieved, 100+ websites built. Numbers that beat any local agency's quiet portfolio.
+	•	Transparent 3-tier pricing on the page itself. Only Muletown and Google Ads Agency Nashville publish pricing. Everyone else is opaque.
+	•	Hyper-local copy that names Cool Springs, Westhaven, Berry Farms, McKay's Mill, Downtown Franklin, The Factory, Carothers Pkwy — framed as the neighborhoods we'll serve, not the neighborhoods we've been in. Only WebJi gets close on local specificity, and WebJi has zero real proof.
+	•	Real founder + team faces. The Seaboard cluster brands are faceless. Putting humans on the page is differentiator-grade.
+	•	2026-quality visual design that proves the service. JLB still serves an 'Update your browser' popup. Sub-1.5s page load. Display Lighthouse score in the hero.
+	•	Live Google reviews feed embedded. Only CFM hints at this. Nobody embeds it live.
+	•	Multi-channel paid media positioning (Google + Meta + LinkedIn + YouTube), not Google-Ads-only. Wide-open lane.
+	•	Free 48-hour productized diagnostic per service (Franklin Web Design Scorecard, Franklin SEO Audit, Franklin Google Ads Audit). Lead magnet + qualifier.
+	•	Risk reversal: '30-day rolling, cancel anytime. You own all accounts, data, and creative.' Only Google Ads Agency Nashville says this.
+1.4  Voice and tone
+The Seaboard cluster's voice is 'corporate marketing brochure 2014' — superlatives, vague ROI claims, '#1 voted best' without sources. We win by sounding like a real person who knows the work and the town.
+	•	Concrete over abstract. 'Cool Springs HVAC client: $84 → $19 CPL in 60 days' beats 'we improve ROI.'
+	•	Confident, not breathless. Skip 'world-class', 'cutting-edge', 'innovative'.
+	•	Local voice without overdoing the Southern thing. Virtue Design's 'Southern charm' is sweet but soft. We're not playing the warm-blanket angle.
+	•	Senior-designer candor. We tell a Franklin restaurant owner their Squarespace site is fine and they don't need us yet. That posture is impossible to fake and rare in the field.
+
+2. Shared page architecture
+All three landing pages use the same skeleton. Service-specific content slots in at sections 3–7. Section ordering is the result of the SERP + UX audit — it's the order page-1 competitors don't combine.
+Section order
+#
+Section
+What's in it
+1
+Hero
+Outcome H1 + 1-sentence subhead + dual CTA (Free Scorecard + Book a Call) + 4-stat proof bar (live Google rating, agency-wide credentials: revenue generated / rankings achieved / sites built / years in business)
+2
+Logo wall
+12+ named client logos from the Southeast portfolio. Single horizontal strip.
+3
+Service overview
+What this service does, who it's for, what success looks like. 2–3 short paragraphs. Service-specific.
+4
+Named case study #1
+Real client from the Southeast portfolio. Photo of work. 3 metric callouts. Two-paragraph story. Vertical-labeled (e.g., BOUTIQUE RETAIL), not Franklin-labeled.
+5
+Productized service tiers
+3-tier pricing table. Starter / Growth / Scale. Real numbers. "What's included" bullets per tier. "How we price" explainer.
+6
+Named case study #2
+Different vertical from #1. Same format.
+7
+Process / methodology
+5-step process with realistic per-step timeline in days. Embedded sample artifact per step (sample audit, sample dashboard, sample weekly report).
+8
+Named case study #3
+Third vertical. Same format.
+9
+Franklin & Williamson County
+Williamson County map. Neighborhoods we'll serve (named, forward-tense). Verticals we serve (named). Chamber affiliation if joined. Office address once established.
+10
+Team strip
+Founder + 3–6 team members. Real names, real photos, roles.
+11
+Risk reversal + ownership
+'30-day rolling. Cancel anytime. You own all accounts.' One paragraph.
+12
+FAQ
+12–14 questions. FAQPage schema. Buyer-language. Service-specific.
+13
+Live Google reviews
+Embedded widget. Star rating + count + most recent 5 reviews + 'See all on Google.'
+14
+Final CTA
+Same dual CTA as hero. Phone number. Calendar embed.
+15
+Footer
+Clean NAP block + Google Partner + Meta Business Partner + Williamson Chamber + Live Google rating + nav.
+Technical baseline (all three pages)
+	•	Sub-1.5s Largest Contentful Paint. Lighthouse 95+ on mobile.
+	•	FAQPage schema on the FAQ section. LocalBusiness schema on the page. Review schema on testimonials.
+	•	OG tags + Twitter card with custom hero image per page.
+	•	Manrope body + Space Grotesk display headlines (matches LeadMax design system v3 we already have specified).
+	•	Real device mockups using actual recent client work (not stock).
+	•	Single primary CTA color (--primary orange #F26522). No orange-on-orange.
+	•	Dark mode optional toggle (signals modern design without being a gimmick).
+
+3. Web Design landing page
+3.1  Targeting
+Primary keywords: web design Franklin TN, Franklin web design company, web designer Franklin Tennessee, Franklin TN web development.
+Search intent we're capturing: a Franklin business owner who knows they need a new website and is comparing 4–6 local options. They are NOT comparison-shopping nationally — they want a real local agency they can sit across the table from.
+Who we are NOT targeting: enterprise procurement, agencies looking for white-label, anyone wanting a $500 Wix template.
+3.2  Hero specs
+H1
+Franklin Web Design That Pays For Itself in 90 Days.
+Subhead
+A senior Southeast agency, now serving Franklin and Williamson County. 100+ websites built · $2M+ in revenue generated for clients · 1.4-second average page load. No hand-off jargon, no offshore work, no surprise change orders.
+Proof bar (4 stats — agency-wide, not Franklin-specific)
+	•	★ 5.0 from 20+ Google reviews — live widget
+	•	100+ websites built since 2022
+	•	$2M+ in revenue generated for clients
+	•	500+ #1 organic rankings achieved
+Primary CTA
+"Get a Free Franklin Web Design Scorecard — 48-hour turnaround"
+Secondary CTA
+"Book a 20-min Williamson County web strategy call"
+3.3  Service tiers
+Tier
+Investment
+What's included
+Starter
+$6,500
+5-page marketing site for Franklin small business. Strategy → Design → Build → Launch in 5–6 weeks. WordPress or Webflow. SEO foundations included. Care plan optional.
+Growth
+$14,500
+8–15 page site for growing Franklin business. Custom design system. Conversion-tested forms. Integration with HubSpot / GHL / Mailchimp. Lighthouse 95+ guaranteed. 6–8 weeks.
+Scale
+$28,500+
+Full custom design + dev. CMS-driven. Custom integrations. eCom or membership. Schema + analytics. 10–14 weeks. Includes 90-day post-launch optimization.
+"How we price" explainer below the table: "Flat project fee, paid in three milestones (kickoff / design approval / launch). No retainers, no hidden change orders — we scope tight upfront. The single biggest reason web design projects go off the rails is fuzzy scope."
+3.4  Case studies to feature (3)
+Pull three case studies from the existing Creative Cowboys Southeast portfolio. Choose verticals that resonate with Franklin demand (boutique retail, professional services, home services). Case study labels in the live copy are vertical-only ("BOUTIQUE RETAIL," "LAW FIRM") — no Franklin neighborhood references. The story narratives are written to apply to any local market.
+	•	Case Study 1 (recommended vertical): A boutique retailer or restaurant. Visual-heavy redesign. Show before/after homepage screenshots. Metrics: page load time drop, online order increase, foot traffic from Google Maps.
+	•	Case Study 2 (recommended vertical): A professional services firm (law, dental, financial, healthcare). Conversion-focused. Metrics: form submissions, qualified leads, cost-per-lead drop if paired with ads.
+	•	Case Study 3 (recommended vertical): A home services business with a multi-neighborhood service area. Local SEO + web. Metrics: organic traffic growth, Google Business Profile call increase, revenue attribution.
+3.5  FAQ (write all 12)
+Suggested questions — all use FAQPage schema:
+	•	How much does a website cost in Franklin, TN?
+	•	How long does it take to build a website for a Franklin business?
+	•	Do you work with WordPress, Webflow, or both?
+	•	Will my new site actually rank in Cool Springs / Westhaven / Downtown Franklin search results?
+	•	What happens after launch? Do you offer maintenance?
+	•	Can you redesign my existing Squarespace / Wix / GoDaddy site?
+	•	Who owns the site, the domain, and the hosting when we're done?
+	•	Do you handle copywriting and photography?
+	•	What if I'm not happy with the design?
+	•	Do you build ecommerce sites for Franklin retailers?
+	•	Can you make my site ADA / WCAG compliant?
+	•	Why should I hire Creative Cowboys instead of JLB or Horton Group?
+3.6  What this page beats
+	•	Beats Franklin Web Design (EMD) by having real social proof, named case studies, transparent pricing, founder face, and modern visual design — they have none of those.
+	•	Beats JLB / Horton / Nice Branding by showing real Franklin-named case studies with numbers; by publishing pricing; by not looking like a 2018 template; by showing real humans.
+	•	Beats Muletown by being actually based in Franklin (Muletown HQ is Columbia).
+	•	Beats Zach Sean and Virtue Design by having team scale and an outcomes-led narrative (their solo positioning caps their upside).
+
+4. SEO landing page
+4.1  Targeting
+Primary keywords: SEO Franklin TN, Franklin TN SEO company, SEO services Franklin Tennessee, local SEO Franklin TN, SEO agency Franklin TN.
+Search intent: Franklin business owner who's been burned by an SEO agency, or hasn't started yet and wants to know what it costs and how long it takes. Skeptical buyer. Wants proof and pricing before a call.
+This page must work hardest on FAQ schema + AI Overview visibility — SEO buyers research heavily before reaching out.
+4.2  Hero specs
+H1
+Franklin SEO That Wins Williamson County Search Results.
+Subhead
+Local SEO, technical SEO, content, and link building for Franklin TN businesses. 500+ #1 organic rankings achieved for clients. Proven 90-day milestone playbook. Free Franklin SEO Audit — 48-hour turnaround.
+Proof bar (4 stats — agency-wide, not Franklin-specific)
+	•	★ 5.0 from 20+ Google reviews — live widget
+	•	500+ #1 organic rankings achieved for clients
+	•	$2M+ in revenue generated for clients
+	•	50+ AI Overview citations earned for clients
+Primary CTA
+"Get a Free Franklin SEO Audit — 48-hour turnaround"
+Secondary CTA
+"Book a 20-min Williamson County ranking strategy call"
+4.3  Service tiers
+Tier
+Investment
+What's included
+Local Foundations
+$1,500 / mo
+Google Business Profile optimization + citations + Williamson County keyword targets + monthly local content. For single-location Franklin businesses. 3–6 month minimum to see results.
+Growth
+$3,500 / mo
+Local Foundations + technical SEO + content production + link building + monthly ranking reports + AI Overview optimization. For Franklin SMBs ready to dominate Williamson County search.
+Scale
+$7,500+ / mo
+Multi-location, enterprise, or eCom Franklin businesses. Full strategy + dedicated team + content velocity + outreach. Quarterly executive review. Custom scope.
+"How we price" explainer: "Monthly retainer. Month-to-month after a 90-day initial commitment. We give you back a 90-day milestone scorecard at the end of month 3 — if we missed the marks we set together, you walk with no questions asked. You own the GA4 property, the GSC property, all content, and all links."
+4.4  Case studies to feature (3)
+Pull from the existing Southeast portfolio. Vertical-labeled, not Franklin-labeled.
+	•	Case Study 1: A healthcare / dental practice. Local SEO + GBP. Show GSC screenshot of keyword position growth + GA4 organic traffic chart. Metrics: rankings, new patient inquiries, GBP calls.
+	•	Case Study 2: A home services business with a multi-neighborhood service area (HVAC / roofing / pest control). Show ranking screenshots across the served neighborhoods. Metrics: leads from organic, cost-per-lead vs ads, revenue.
+	•	Case Study 3: An eCommerce or boutique retailer. Technical SEO + content. Show before/after Lighthouse + Core Web Vitals. Metrics: organic revenue, conversion rate lift, AI Overview citations earned.
+4.5  FAQ (write all 14)
+	•	How long does SEO take to work for a Franklin business?
+	•	What does SEO cost for a Williamson County small business?
+	•	What's the difference between local SEO and regular SEO?
+	•	Do I need both SEO and Google Ads?
+	•	Will I rank in Cool Springs / Westhaven / Downtown Franklin specifically?
+	•	What's AI Overview optimization and do I need it?
+	•	How is your SEO different from the JLB / Horton / CFM approach?
+	•	What do you do in month one vs. month six?
+	•	Do you guarantee rankings?
+	•	What happens if I leave — do I keep my content and links?
+	•	Will my Google Business Profile be optimized for the Franklin area?
+	•	How do you handle Google algorithm updates?
+	•	Do you do link building? What kind?
+	•	Can you show me a sample monthly SEO report?
+4.6  What this page beats
+	•	Beats Muletown by being actually located in Franklin (they're Columbia) and by having named Franklin case studies (they don't have any inline).
+	•	Beats CFM by showing real specific Franklin client case studies (CFM has 20+ logos but no inline Franklin-specific stories).
+	•	Beats JLB by being honest about timeline and price, by having an inline FAQ (JLB doesn't), and by not looking dated.
+	•	Beats Paar Media by, basically, existing in 2026.
+	•	Beats WebJi by having actual proof (real testimonials, real screenshots, real client names) — WebJi has the strongest local content but no proof.
+
+5. Digital Marketing & Paid Ads landing page
+5.1  Targeting
+Primary keywords: digital marketing agency Franklin TN, Google Ads management Franklin TN, PPC agency Franklin Tennessee, Franklin TN marketing agency, paid social Franklin TN.
+Search intent splits into two: (1) buyers ready to outsource ad management who want pricing and proof; (2) buyers who don't yet know if they should be running ads and want a diagnostic. Both segments are served by the same page if we lead with the free audit.
+This page is the easiest to differentiate because the field is uniformly weak — Atomic Social is from Arizona, JLB's copy is literally identical to CFM's, Marketing Hatchery's stat counters are broken, and the Seaboard cluster doesn't market Meta/LinkedIn/YouTube at all.
+5.2  Hero specs
+H1
+Franklin Paid Ads That Print Money — Not Just Impressions.
+Subhead
+Google Ads + Meta + LinkedIn + YouTube, orchestrated as one system. $2M+ in revenue generated for clients across 100+ accounts. Real ROAS, weekly Slack updates, flat monthly fees (not % of spend). Free Franklin Google Ads Audit — 48-hour turnaround.
+Proof bar (4 stats — agency-wide, not Franklin-specific)
+	•	★ 5.0 from 20+ Google reviews — live widget
+	•	$2M+ in revenue generated for clients
+	•	100+ active campaigns managed since 2022
+	•	Google Premier Partner  ·  Meta Business Partner
+Primary CTA
+"Get a Free Franklin Google Ads Audit — 48-hour turnaround"
+Secondary CTA
+"Book a 20-min Williamson County paid media strategy call"
+5.3  Service tiers
+Tier
+Investment
+What's included
+Starter
+$1,500 / mo
+Single channel (Google Ads or Meta). Up to $10K/mo media spend. Setup, optimization, weekly Slack updates, monthly dashboard. For Franklin SMBs testing paid for the first time.
+Growth
+$3,500 / mo
+Two channels (typically Google + Meta). Up to $50K/mo media spend. Conversion tracking + GA4 server-side. Landing page CRO. Quarterly strategy review.
+Scale
+$7,500+ / mo
+Full orchestrated multi-channel: Google + Meta + LinkedIn + YouTube + retargeting. Custom audiences. Creative production. Up to $250K/mo media spend. Dedicated strategist.
+"How we price" explainer: "Flat monthly management fee, separate from your media spend. Percentage-of-spend pricing creates a conflict of interest — when scaling back would be smarter, % agencies push you to spend more. Our fee doesn't move when your spend does. You own your Google Ads, Meta, and LinkedIn accounts. We just manage them."
+5.4  Case studies to feature (3)
+Pull from the existing Southeast portfolio. Vertical-labeled, not Franklin-labeled.
+	•	Case Study 1: A home services business with a multi-neighborhood service area. Google Ads + Local Services Ads. Show before/after CPL and call volume. Metrics: cost-per-lead, leads/month, revenue.
+	•	Case Study 2: A B2B / professional services firm. LinkedIn Ads + Google retargeting. Metrics: pipeline generated, cost-per-MQL, deal value.
+	•	Case Study 3: A DTC / eCom brand. Meta + Google Shopping + retargeting. Show ROAS trend chart. Metrics: ROAS, AOV, revenue.
+5.5  FAQ (write all 12)
+	•	How much should I spend on Google Ads in Franklin TN?
+	•	What's the difference between Google Ads, Meta Ads, and LinkedIn Ads — which should my Franklin business run?
+	•	How quickly will I see results from paid ads?
+	•	Do you charge a percentage of ad spend or a flat fee?
+	•	Will I own my Google Ads / Meta / LinkedIn accounts?
+	•	How often do you report and review performance?
+	•	What if my ads aren't working in month one?
+	•	Do you build the landing pages too?
+	•	What industries do you work with in Franklin and Williamson County?
+	•	How is your approach different from JLB / CFM / Horton?
+	•	Do you handle creative production (video, design, copy)?
+	•	What's a realistic ROAS for a Franklin small business?
+5.6  What this page beats
+	•	Beats Atomic Social by being in Tennessee.
+	•	Beats JLB / CFM by carrying the Meta Business Partner badge and explicitly marketing multi-channel (not Google-Ads-only) — and by not running literally identical copy on two different domains.
+	•	Beats Google Ads Agency Nashville by having a real local office, real founder face, and Google + Meta + LinkedIn (they're Google Ads only).
+	•	Beats Marketing Hatchery and Franklin Marketing Co. by having a finished, professional landing page with working stat counters.
+	•	Beats Muletown by going deeper on paid media specifics (Performance Max, LinkedIn, YouTube, retargeting) — Muletown lists paid as just 'Paid Traffic (Google + Facebook).'
+
+6. URL structure, schema, and supporting pages
+6.1  URLs
+Recommended structure (clean, keyword-rich, scalable):
+	•	creativecowboys.co/franklin-tn/web-design
+	•	creativecowboys.co/franklin-tn/seo
+	•	creativecowboys.co/franklin-tn/digital-marketing
+Then layer programmatic SEO sub-pages on top as Phase 2:
+	•	/franklin-tn/[service]/cool-springs
+	•	/franklin-tn/[service]/westhaven
+	•	/franklin-tn/[service]/berry-farms
+	•	/franklin-tn/[service]/downtown
+	•	/franklin-tn/[service]/brentwood
+	•	/franklin-tn/[service]/[vertical]  — healthcare, restaurants, home-services, professional-services, retail
+6.2  Schema
+	•	LocalBusiness schema on each landing page (NAP, geo coordinates, opening hours, areaServed: Williamson County)
+	•	FAQPage schema on the FAQ section of each landing page
+	•	Review schema on testimonials (aggregateRating + individual reviews)
+	•	BreadcrumbList schema
+	•	Organization schema sitewide
+	•	Service schema for each service tier (with priceRange / offers)
+6.3  Internal linking
+	•	From homepage: link to all three Franklin landing pages with anchor text 'Franklin TN web design', 'Franklin TN SEO', 'Franklin TN digital marketing'.
+	•	Between landing pages: cross-link with anchor 'Pair this with [other service] for Franklin businesses'.
+	•	From blog posts: link to relevant Franklin landing page from any Franklin-relevant article.
+	•	From case studies: link from case study to relevant service landing page.
+6.4  Off-page priorities (Phase 2)
+	•	Williamson Inc. Chamber of Commerce membership + member badge on site.
+	•	Local press: Nashville Business Journal, Williamson Herald, Williamson Source — pitch a case study or trend story tied to Franklin business growth.
+	•	Google Business Profile fully optimized + every Franklin client review.
+	•	Clutch profile rebuild (the Seaboard cluster's Clutch is one of their stronger signals).
+	•	Real backlinks from named Franklin client websites (footer credit on every site we build that the client agrees to).
+
+7. Recommended rollout
+Realistic sequence to ship these three pages without trying to do everything at once.
+When
+What
+Details
+Week 1
+Source case studies + confirm numbers
+Pull 3 case studies per service from existing Creative Cowboys Southeast portfolio. Get client approvals for naming. Capture screenshots, dashboards, real metrics. Confirm the bracketed agency-wide numbers in the hero proof bars: total revenue generated for clients, total #1 rankings, total sites built, years in business, total Google review count and rating.
+Week 1–2
+Photo + video assets
+Schedule real photography: founder + team headshots, in-the-wild client work shots. Optional: 60-sec founder intro video positioning the Franklin expansion.
+Week 2
+Logos + reviews
+Confirm 12+ portfolio client logo permissions for the logo wall. Wire live Google reviews widget.
+Week 2–3
+Copy + design
+Draft copy (see companion deliverable). Design hero + section layouts. Adapt LeadMax design system v3 typography (Space Grotesk display + Manrope body).
+Week 3
+Build Web Design page first
+Ship /franklin-tn/web-design. Validate schema. Test Lighthouse. Submit to GSC.
+Week 4
+Build SEO page
+Ship /franklin-tn/seo. Run on-page SEO audit on the page itself. Submit to GSC.
+Week 5
+Build Digital Marketing page
+Ship /franklin-tn/digital-marketing. Validate Google Ads + Meta Business Partner badges in place.
+Week 6
+Measure baseline + iterate
+GA4 baseline. GSC position tracking for primary keywords. Conversion tracking on all 3 CTAs. A/B test variants on heroes.
+Phase 2 (Month 3+)
+Programmatic geo + vertical pages
+Once core 3 pages have indexed and measured, ship the /franklin-tn/[service]/[neighborhood] and /[service]/[vertical] sub-pages from a single template.
+7.1  How to measure success
+	•	Primary: top 3 organic position for the three primary keywords per page within 90 days. Top 1 within 180 days.
+	•	Secondary: AI Overview citations on at least 5 buyer questions per page within 60 days.
+	•	Conversion: 8+ qualified leads/month from the three pages combined within 90 days.
+	•	Brand: featured in at least 2 local press mentions within 6 months.
+
+Appendix — Companion deliverables
+This strategy doc is one of three. The complete pack:
+	•	1. Franklin TN — Competitor Audit.xlsx — 25 deeply-audited competitor pages, gap analysis, scoring matrix, rank-beating playbook.
+	•	2. Franklin TN — Strategy & Page Outlines.docx — this document.
+	•	3. Franklin TN — Landing Page Copy.docx — full ready-to-build copy for all three landing pages (hero, sections, case study templates, FAQ answers, CTA microcopy).
+All three sit at: /Users/cowboysmac/Documents/Claude/Projects/Creative Cowboys/Franklin TN Landing Pages/

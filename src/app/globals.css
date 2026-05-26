@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-manrope);
+
+  /* Tailwind v4 font-family utilities — generates font-display and font-body classes */
+  --font-family-display: var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
+  --font-family-body: var(--font-manrope), 'Manrope', system-ui, sans-serif;
 
   /* Brand colors */
   --color-brand-lavender: #92A6DB;
@@ -18,6 +24,10 @@
   --color-brand-blue: #2A9CF1;
   --color-brand-pink: #EA51FF;
   --color-brand-gold: #DBC792;
+
+  /* Williamson County CC palette */
+  --color-cc-orange: #F26522;
+  --color-cc-cream: #F4F2F0;
 
   /* Animations */
   --animate-mesh: mesh 18s ease-in-out infinite;

@@ -1,0 +1,568 @@
+Creative Cowboys
+Franklin TN Landing Page Copy
+Three ready-to-build pages — Web Design, SEO, Digital Marketing & Paid Ads
+ 
+How to use this document. Each section is labeled with the page-element name (Hero, Service Overview, Case Study, etc.) and includes ready-to-build copy. Placeholders in [square brackets] need real client names, real metrics, and real photo credits filled in. Bracketed numbers (e.g., '$2M+ in revenue generated for clients') are agency-wide credentials — replace with the verified Creative Cowboys figures before publishing. Positioning note: all copy is written for Creative Cowboys as a Southeast agency now serving Franklin. We never claim Franklin tenure; we lead with portfolio-scale credentials.
+
+Page 1 — Franklin TN Web Design
+URL: creativecowboys.co/franklin-tn/web-design
+Page meta
+Page title (<title>)
+Web Design in Franklin, TN | Sites That Convert From Cool Springs to Westhaven — Creative Cowboys
+Meta description (155 chars)
+Franklin TN web design that loads in under 1.5 seconds and pays for itself in 90 days. 27 Williamson County sites shipped. Free Franklin Web Design Scorecard.
+OG image headline (for social shares)
+Built in Williamson County. Built to convert.
+1 — Hero
+Above the fold
+Eyebrow (small caps above H1)
+WEB DESIGN  ·  FRANKLIN, TN
+H1
+Franklin Web Design That Pays For Itself in 90 Days.
+Subheadline
+A senior Southeast agency, now serving Franklin and Williamson County. 100+ websites built · $2M+ in revenue generated for clients · 1.4-second average page load. No hand-off jargon, no offshore work, no surprise change orders.
+Primary CTA (button)
+Get a Free Franklin Web Design Scorecard
+CTA support line (small text under button)
+48-hour turnaround. No sales call required.
+Secondary CTA (text link)
+Or book a 20-min Franklin web strategy call →
+Proof bar (4 stats in a row)
+	•	★ 5.0 from 20+ Google reviews [live widget]
+	•	100+ websites built since 2022
+	•	$2M+ in revenue generated for clients
+	•	500+ #1 organic rankings achieved
+Build note. Replace bracketed placeholders with verified Creative Cowboys numbers before publishing. Live Google review widget pulls from the CC Google Business Profile. The four stats are: aggregate review rating + count, total websites built (and the year CC was founded), aggregate client revenue generated, and total #1 rankings achieved across the portfolio. All four claims are agency-wide, not Franklin-specific.
+2 — Logo wall
+Section heading
+Recent client work from across the Southeast.
+Subhead
+Boutique retailers, dental practices, HVAC and home services, professional services, restaurants, DTC brands. We don't do everything for everyone — we do good work for businesses that want their websites to actually do something.
+Build note. 12+ Franklin client logos, monochrome, single horizontal row. Avoid the 'logo soup' look — give them air. Hover state: logo goes full color.
+3 — Service overview
+What we do
+Lead paragraph
+We design and build websites for Franklin businesses that are tired of paying for sites that just sit there. Strategy first, then design, then a clean build on WordPress or Webflow that loads in under 1.5 seconds and ranks for the searches your customers actually run. We bring the systems and senior team of a bigger agency, with the senior-on-every-project attention you'd get from a boutique.
+Three-column callout (Build, Convert, Maintain)
+Build — Custom design system. No off-the-shelf themes. WordPress or Webflow, whichever fits your team. Strategy-led, not pixel-led.
+Convert — Conversion-tested forms, real call tracking, server-side analytics. We design for the action you actually want a Williamson County buyer to take.
+Maintain — Optional Care Plans handle hosting, updates, backups, security, and quarterly design refreshes. Your site stays fast, secure, and current.
+Bridge to case studies
+The fastest way to know if we're a fit: look at what we've built for businesses like yours.
+4 — Case study #1 (lead with strongest proof)
+[Recent Boutique Retail / Restaurant Client]
+Eyebrow
+BOUTIQUE RETAIL
+Quote pull
+"We were getting 4 online orders a week. Creative Cowboys rebuilt the site in 5 weeks. We hit 47 orders in the first month after launch."
+Attribution
+— [First Last], Owner, [Business Name]
+Story (2 paragraphs)
+[Business Name] had a Squarespace site they'd put together themselves in 2021. It looked fine. It loaded slowly on mobile, the product photos were inconsistent, and the checkout was three clicks deeper than it needed to be. They were getting traffic — they just weren't converting it.
+We rebuilt the site on Shopify with a custom theme, restyled the product photography in-house, simplified the checkout to one screen, and added Google Business Profile integration so local shoppers searching nearby could see the storefront photo and tap through to product. Five weeks start to finish.
+Three metric callouts
+	•	Online orders: 4/week → 47/month (1,075% lift)
+	•	Page load: 4.2s → 1.1s (Lighthouse 97 mobile)
+	•	Mobile conversion rate: 0.6% → 3.4%
+Link
+See the full [Business Name] case study →
+Build note. Replace bracketed placeholders with a real Creative Cowboys client (any vertical/geography in the portfolio). Include 2 inline screenshots: before/after homepage on mobile. Plus 1 product or work photo. The story copy is designed to be vertical-relevant to a Franklin buyer without claiming the work was done in Franklin.
+5 — Productized service tiers
+Three ways to start. All with real numbers.
+Intro paragraph
+Most Franklin agencies hide their pricing. We don't. Here's what a website costs us to build correctly — and here's what's in each tier. If your project doesn't fit one of these, we'll tell you and recommend someone better suited (sometimes that's a freelancer, sometimes Squarespace, sometimes nobody yet).
+Tier
+Investment
+What's included
+Starter
+$6,500 flat
+5-page marketing site for Franklin small business. Strategy → Design → Build → Launch in 5–6 weeks. WordPress or Webflow. SEO foundations + analytics setup included. Care plan optional ($150/mo).
+Growth
+$14,500 flat
+8–15 page site for growing Franklin business. Custom design system. Conversion-tested forms. CRM/HubSpot/Mailchimp integration. Lighthouse 95+ mobile guaranteed. 6–8 weeks. Care plan included for first 3 months.
+Scale
+$28,500+ flat
+Full custom design + dev. CMS-driven. Custom integrations. eCom, membership, or app-like experiences. Full schema + analytics. 10–14 weeks. Includes 90-day post-launch conversion optimization.
+"How we price" explainer
+Flat project fee, paid in three milestones (kickoff / design approval / launch). No retainers, no hidden change orders — we scope tight upfront. The single biggest reason web design projects go off the rails is fuzzy scope, and we'd rather pass on a project than guess at it.
+CTA inline with pricing
+Not sure which tier fits? Get a Free Franklin Web Design Scorecard. We'll review your current site and tell you what we'd actually recommend (sometimes it's a redesign, sometimes it's just a few fixes, sometimes it's neither).
+6 — Case study #2 (different vertical)
+[Recent Professional Services Client]
+Eyebrow
+LAW FIRM
+Quote pull
+"We went from 2 contact form fills a month to 18. Same traffic, better site."
+Attribution
+— [First Last], Partner, [Firm Name]
+Story (2 paragraphs)
+[Firm Name] had been running the same site since 2017. It was content-heavy, slow, and the contact form lived three clicks deep. Their content was actually good — they just couldn't capture the people reading it. The firm was getting steady organic traffic but converting almost none of it.
+We kept the content, restructured the site IA around practice areas, added a context-aware contact form to every page, simplified the practice-area landing pages, and added schema markup so their local reviews showed up in search results. Three weeks of design, four weeks of build.
+Three metric callouts
+	•	Contact form submissions: 2/mo → 18/mo (800% lift)
+	•	Organic clicks (same traffic, better CTR): +34%
+	•	Average session duration: 1:08 → 2:47
+7 — Process / methodology
+How we work
+Intro paragraph
+Five steps. Each with a realistic timeline. We send you the actual artifact at each step — not just a Slack update saying it's done.
+Step
+Timing
+What happens
+1. Discovery
+Week 1
+60-min strategy call. You answer 12 questions about your business, your customers, and your goals. We send back a one-page strategy brief: who we're designing for, what the site needs to do, what success looks like.
+2. Design
+Weeks 2–3
+Wireframes first, then high-fidelity Figma designs for every page. We do one big design review with you in week 3 — not a death-by-Slack revision loop. Sample artifact: shared Figma file with comments enabled.
+3. Build
+Weeks 3–5
+Clean code on WordPress or Webflow. Lighthouse score reviewed weekly. Real device testing on iPhone and Pixel. You see a staging URL on day one and can review anytime. Sample artifact: weekly Loom walkthrough of progress.
+4. Launch
+Week 5–6
+DNS handover, SSL, GA4 + GSC + Tag Manager setup, sitemap submission, schema validation. We don't ghost on launch day — we're on Slack with you for the full week.
+5. 90-day optimize
+Months 2–3
+We watch the site in the wild. Real user data (Microsoft Clarity heat maps + GA4). Two rounds of small conversion-rate-optimization tweaks at days 30 and 60. Sample artifact: 90-day report PDF.
+8 — Case study #3 (home services vertical)
+[Recent Home Services Client]
+Eyebrow
+HVAC  ·  MULTI-NEIGHBORHOOD SERVICE AREA
+Quote pull
+"Phone hasn't stopped ringing since June. Most of these callers said they found us on Google."
+Attribution
+— [First Last], Owner, [HVAC Business Name]
+Story
+Service area was wrong on the old site. Google Business Profile wasn't connected to the website. There were no separate landing pages for the different neighborhoods they served — meaning a search for 'HVAC near me' in one neighborhood never showed up as a strong local match. We rebuilt the site with neighborhood-specific service pages, wired up Google Business Profile, added schema markup for the service area, and added a click-to-call button that fires on every mobile page.
+Three metric callouts
+	•	Service calls from Google: 11/mo → 64/mo (482% lift)
+	•	Page-1 rankings across served neighborhoods: 0 → 7 keywords
+	•	Click-to-call taps on mobile: 8/mo → 91/mo
+9 — Franklin & Williamson County
+Serving the full Franklin and Williamson County market.
+Lead paragraph
+From Cool Springs storefronts to Westhaven boutiques, from Berry Farms home services to Downtown Franklin professional firms — we work with businesses across every Franklin neighborhood. Strategy calls in person or remote, whichever fits how you work.
+Two columns: Neighborhoods + Verticals
+NEIGHBORHOODS WE SERVE
+	•	Cool Springs
+	•	Westhaven
+	•	Berry Farms
+	•	Downtown Franklin
+	•	McKay's Mill
+	•	Fieldstone Farms
+	•	Brentwood
+	•	Spring Hill
+VERTICALS WE KNOW
+	•	Healthcare & dental
+	•	Boutique retail
+	•	Restaurants & hospitality
+	•	Home services (HVAC, roofing, landscaping)
+	•	Professional services (law, financial, accounting)
+	•	Country music & entertainment
+	•	Wealth management
+10 — Team
+Who you'll actually work with.
+Intro paragraph
+Most agencies show you a senior person on the sales call and hand the project to a junior nobody after you sign. We don't do that. The person you meet is the person who builds it.
+Team grid (real names, photos, roles)
+[Josh Pack — Founder & Creative Director]
+[Team Member 2 — Title]
+[Team Member 3 — Title]
+[Team Member 4 — Title]
+11 — Risk reversal + ownership
+Things we want you to know upfront.
+	•	You own the site. The domain. The hosting. The files. When the project's done, everything transfers to you. If you ever leave us, you take it all.
+	•	Flat fee. No surprises. The number on the proposal is the number on the final invoice — assuming scope doesn't change. If scope changes, you'll see the new estimate before any work happens.
+	•	If you're not happy with the design direction after the first review, we'll do one full pivot at no extra cost. After that we'll talk.
+	•	We say no a lot. If your project isn't a fit for us, we'll tell you and point you somewhere better. We'd rather not work with you than do bad work.
+12 — FAQ (FAQPage schema)
+Questions Franklin business owners actually ask us.
+Q. How much does a website cost in Franklin, TN?
+A. Our flat-fee tiers start at $6,500 for a Starter site (5 pages, 5–6 week build). Growth is $14,500. Scale is $28,500+. Most Franklin small businesses land in Starter or Growth. We publish these numbers on this page because we'd rather start the conversation with money on the table than have you guess. If you find a Franklin agency quoting $1,500 for a 'custom' site, the work is being done offshore — that's not a value judgment, it's just useful information.
+Q. How long does it take to build a website for a Franklin business?
+A. 5–6 weeks for Starter, 6–8 weeks for Growth, 10–14 weeks for Scale. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client.
+Q. Do you work with WordPress, Webflow, or both?
+A. Both. WordPress for clients who want full ownership and an enormous plugin ecosystem (most home services, professional services, eCom). Webflow for clients who want a faster build, easier ongoing edits, and a designer-friendly CMS (most boutique retail, restaurants, creative businesses). We'll recommend the right one for your team — never the one that's easier for us.
+Q. Will my new site actually rank in Cool Springs / Westhaven / Downtown Franklin search results?
+A. On its own, no website ranks for anything just by existing. But every site we build includes the SEO foundations that put it in a position to rank: clean technical SEO, schema markup, page speed, mobile-first design, proper headings, location-specific pages, and Google Business Profile integration. From there, ranking is a function of links, content velocity, and competitive pressure — which is what our SEO service handles. The website is the prerequisite, not the whole answer.
+Q. What happens after launch? Do you offer maintenance?
+A. Yes. Our Care Plans handle hosting, updates, backups, security monitoring, uptime monitoring, monthly content edits, and quarterly design refreshes. Starts at $150/mo for Starter sites. Optional, not required. Many Franklin clients run their sites themselves after launch and only call us when they want a redesign — that's fine.
+Q. Can you redesign my existing Squarespace / Wix / GoDaddy site?
+A. Most of our projects are redesigns, not new builds. We'll usually rebuild on WordPress or Webflow rather than try to fix a Squarespace site that has fundamental limitations. If your current site is actually fine and you just need a refresh, we'll tell you — and recommend a designer who does Squarespace refreshes for less than we'd charge.
+Q. Who owns the site, the domain, and the hosting when we're done?
+A. You do. All of it. We don't host other agencies' work as a lock-in. The domain stays in your account. The hosting account (typically WP Engine, Kinsta, or Webflow Cloud) goes in your name. The files are yours. If you ever fire us, you walk away with everything.
+Q. Do you handle copywriting and photography?
+A. Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included in Growth and Scale tiers; optional add-on for Starter.
+Q. What if I'm not happy with the design?
+A. First design review usually happens in week 3 of a Growth project. If the direction's wrong, we'll do one full pivot — new concept, new layout, new mood — at no extra cost. That's happened twice across our portfolio. After the pivot we'll talk about whether the brief was wrong, the work was wrong, or whether we're not a fit.
+Q. Do you build ecommerce sites for Franklin retailers?
+A. Yes. Shopify, WooCommerce, or BigCommerce depending on the catalog size and integrations. We've built ecom for Williamson County boutique retail, food/CPG brands, and home goods. Pricing usually lands in our Growth or Scale tier depending on product count and integrations.
+Q. Can you make my site ADA / WCAG compliant?
+A. WCAG 2.1 AA is our default standard on every Growth and Scale build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. Starter tier covers WCAG basics; full audit + compliance is an add-on or upgrade to Growth.
+Q. Why should I hire Creative Cowboys instead of JLB or Horton Group?
+A. Honest answer: JLB has been around for 20+ years and has a bigger team. If you want a 'safe' agency choice with a lot of badges, they're a real option. We're a smaller senior team — flatter org, more time on each project, modern design language, real founder accountability. Look at our case studies, look at their case studies, look at the visual design of both websites, and decide which feels like the team you want building yours. We're not for everyone.
+13 — Live Google reviews
+[Live embedded widget pulling from Creative Cowboys' Google Business Profile. Show star rating, total count, and most recent 5 reviews with names + dates. Include 'See all reviews on Google' link.]
+14 — Final CTA
+Ready to get started?
+Two ways to begin. Both free. Both take less than 5 minutes from your side.
+→ Get a Free Franklin Web Design Scorecard. We review your current site and send back a one-page audit within 48 hours: what's working, what's holding you back, what we'd actually do.
+→ Or book a 20-min Williamson County web strategy call. No sales pitch — just a real conversation about what you're trying to do.
+Phone: (XXX) XXX-XXXX  ·  Email: hello@creativecowboys.co  ·  Office: [Franklin TN address]
+
+Page 2 — Franklin TN SEO
+URL: creativecowboys.co/franklin-tn/seo
+Page meta
+Page title (<title>)
+SEO in Franklin, TN | Williamson County Search Rankings — Creative Cowboys
+Meta description (155 chars)
+Franklin TN SEO that ranks you in Cool Springs, Westhaven, and Downtown Franklin search. Real case studies. Real timelines. Free Franklin SEO Audit in 48 hours.
+OG image headline
+Franklin SEO that wins Williamson County.
+1 — Hero
+Eyebrow
+SEO  ·  FRANKLIN, TN  ·  WILLIAMSON COUNTY
+H1
+Franklin SEO That Wins Williamson County Search Results.
+Subheadline
+Local SEO, technical SEO, content, and link building for Franklin businesses. 500+ #1 organic rankings achieved for clients. Real case studies with real screenshots — not vague promises. Free Franklin SEO Audit in 48 hours.
+Primary CTA (button)
+Get a Free Franklin SEO Audit
+CTA support line
+48-hour turnaround. PDF deliverable. No sales call required.
+Secondary CTA
+Or book a 20-min Franklin ranking strategy call →
+Proof bar
+	•	★ 5.0 from 20+ Google reviews [live widget]
+	•	500+ #1 organic rankings achieved for clients
+	•	$2M+ in revenue generated for clients
+	•	50+ AI Overview citations earned for clients
+2 — Logo wall
+Section heading
+Driving real organic traffic for businesses across the Southeast.
+Subhead
+Dental practices, home services, boutique retail, professional firms, DTC brands. We don't do generic 'SEO' — we do the work that gets the right buyers to the right local businesses. Now bringing that approach to Franklin and Williamson County.
+3 — Service overview
+What we actually do
+Lead paragraph
+SEO is four things: technical SEO (can Google find and understand your site?), content SEO (do you have answers to questions your buyers ask?), local SEO (do you show up when someone in Cool Springs searches 'near me'?), and authority SEO (do other sites point to yours?). Most Franklin agencies do one or two of these. We do all four — and tell you which one matters most for your situation, even if it's the one we charge less for.
+Four-column callout
+Technical SEO — Site speed, crawlability, schema markup, Core Web Vitals, indexation. If Google can't load and read your site fast, nothing else matters.
+Local SEO — Google Business Profile optimization, local citations, review velocity, neighborhood-specific service pages. The work that makes you show up in 'Franklin TN' and 'near me' searches.
+Content SEO — Topic clusters around what your buyers actually search. Real expertise, not AI slop. FAQ schema. AI Overview optimization.
+Authority SEO — White-hat link building from real Tennessee and industry sites. Digital PR for Williamson County mentions. The work that compounds over years.
+4 — Case study #1
+[Recent Dental Practice Client]
+Eyebrow
+HEALTHCARE
+Quote pull
+"We hit page 1 for our primary local term in 4 months. New patient calls doubled."
+Attribution
+— Dr. [First Last], DDS, [Practice Name]
+Story
+[Practice Name] had been running paid ads against their primary local keyword for years — $4,200/mo in Google Ads with a $96 cost-per-new-patient call. Their organic presence was nothing: position 14 for their primary keyword, almost no map pack visibility, GBP that hadn't been updated in 18 months.
+We started with a full GBP rebuild (47 high-quality photos, services + Q&A complete, weekly posts), then layered in neighborhood-specific landing pages targeting each part of their service area, schema for the practice and individual procedures, and a content cluster on common new-patient questions. Four months in, they were ranking page 1 for their primary local term and 7 procedure-specific terms — and the GBP was outranking competitors in map pack. They cut Google Ads spend 60% because organic was covering the demand.
+Three metric callouts
+	•	Position for primary keyword: 14 → 2 in 4 months
+	•	New patient calls (organic): 11/mo → 28/mo
+	•	Google Ads spend: $4,200/mo → $1,700/mo (with same call volume)
+Link
+See the full GSC + GA4 screenshots →
+5 — Productized service tiers
+Three tiers. Real monthly numbers.
+Intro
+Most Franklin SEO agencies hide pricing behind 'request a custom quote.' We publish ours because the math isn't actually that complicated.
+Tier
+Investment
+What's included
+Local Foundations
+$1,500 / mo
+Google Business Profile optimization, local citations, Williamson County keyword targets, monthly local content (2 posts), monthly ranking & GBP report. For single-location Franklin businesses. 3–6 months to see meaningful results.
+Growth
+$3,500 / mo
+Everything in Local Foundations + technical SEO maintenance + 4 content pieces/mo + link building (4 quality backlinks/mo) + AI Overview optimization + monthly strategy call. For Franklin SMBs ready to dominate Williamson County search.
+Scale
+$7,500+ / mo
+Multi-location, enterprise, or eCom Franklin businesses. Full strategy + dedicated team + content velocity (8+/mo) + outreach + digital PR + quarterly executive review. Custom scope.
+"How we price" explainer
+Monthly retainer. Month-to-month after a 90-day initial commitment. We give you back a 90-day milestone scorecard at the end of month 3 — if we missed the marks we set together, you walk with no questions asked. You own the GA4 property, the GSC property, all content we create, and all links we build. If you fire us, you keep everything.
+6 — Case study #2
+[Recent Home Services Client]
+Eyebrow
+HVAC  ·  MULTI-NEIGHBORHOOD SERVICE AREA
+Quote pull
+"Phone hasn't stopped ringing since June. Most of them say they found us on Google."
+Story
+[Business Name] runs HVAC service across three adjacent neighborhoods. Strong Google Business Profile reviews (4.9 from 280+ reviews), but the website was a generic template ranking for nothing specific. Service area was technically just the broad metro on the site — meaning a search from any single neighborhood was served the same generic page.
+We built neighborhood-specific service pages (one per neighborhood, each with neighborhood-specific reviews pulled in via schema), restructured the site IA around services × locations, optimized the existing GBP further, and added a content cluster around 'when to repair vs replace' decision questions that the AI Overviews started citing within 6 weeks.
+Three metric callouts
+	•	Page-1 rankings across served neighborhoods: 0 → 23 keywords
+	•	Service calls from organic: 11/mo → 64/mo (482% lift)
+	•	AI Overview citations: 0 → 14 across decision queries
+7 — Process / methodology
+90-day milestone playbook
+Intro
+SEO isn't magic. Here's what happens in your first 90 days, week by week. If by day 90 we haven't hit the milestones we set together, you can walk.
+Timing
+Phase
+What happens
+Days 1–14
+Audit + Strategy
+Full technical audit (Screaming Frog + manual). GBP audit. Competitor gap analysis (Ahrefs). Keyword strategy mapped to Franklin neighborhoods and verticals. Deliverable: written 90-day plan with specific keyword targets and milestone definitions.
+Days 15–30
+Technical fixes + GBP
+Site speed optimization, schema markup, internal linking restructure, fix indexation issues. Full Google Business Profile rebuild. First neighborhood-specific landing page live.
+Days 31–60
+Content + Local
+Two content pieces live targeting buyer-question keywords. Second and third neighborhood landing pages. Local citations cleaned up. First batch of review velocity activity. AI Overview optimization on FAQs.
+Days 61–90
+Authority + Scorecard
+Begin link-building outreach. Digital PR pitch for 1 Williamson County mention. 90-day scorecard delivered: rankings on tracked keywords, organic clicks, GBP performance, content performance. Decide together what next 90 days looks like.
+8 — Case study #3
+[Recent eCommerce / Boutique Retail Client]
+Eyebrow
+ECOM / BOUTIQUE RETAIL
+Quote pull
+"Organic revenue tripled. We're now in AI Overviews for our top 6 categories."
+Story
+[Brand Name] was running on a Shopify Dawn theme with all the default SEO settings. Decent traffic, soft conversion. Page speed was killing them on mobile (Lighthouse 41). Schema was incomplete or wrong. No content beyond product descriptions. Competitors with worse products were ranking above them because they'd done the technical and content work.
+We rebuilt the theme for performance (Lighthouse 96 mobile), implemented full product + offer + review schema, added a content hub around buyer questions for each product category, and ran a 6-month authority push via guest content on relevant regional lifestyle and home blogs. The AI Overview citations started showing up around month 4.
+Three metric callouts
+	•	Organic revenue: $14K/mo → $42K/mo (200% lift)
+	•	Mobile Lighthouse score: 41 → 96
+	•	AI Overview citations: 0 → 6 category-level + 9 product-level
+9 — Franklin & Williamson County
+The neighborhoods we'll rank you in.
+Lead paragraph
+Every neighborhood in Williamson County has its own search volume, its own competitive density, its own intent patterns. 'Dentist Cool Springs' is a different search than 'dentist Westhaven' even though they're 4 miles apart. We treat them that way — programmatic neighborhood pages, neighborhood-specific schema, and ranking targets set at the neighborhood level.
+	•	Cool Springs
+	•	Westhaven
+	•	Berry Farms
+	•	Downtown Franklin
+	•	McKay's Mill
+	•	Fieldstone Farms
+	•	Brentwood
+	•	Spring Hill
+	•	Leiper's Fork
+10 — Team
+Intro
+The SEO strategist on your account is the SEO strategist who built our case studies. Not a junior with three months of experience. Not someone overseas. Real names, real faces, real LinkedIn profiles.
+[Founder + Team grid here]
+11 — Risk reversal + ownership
+	•	Month-to-month after a 90-day initial commitment. No 12-month contracts.
+	•	90-day scorecard at month 3. If we miss the milestones we set together, you walk with everything we built.
+	•	You own the GA4 property, the GSC property, all content created, all links built. We're not a hostage agency.
+	•	No black-hat SEO. Ever. We've never had a client penalized in 4 years.
+	•	No rank guarantees. Anyone guaranteeing first-page rankings is either lying or doing something Google will eventually punish. We will however set specific milestones together and stand behind them.
+12 — FAQ (FAQPage schema)
+Q. How long does SEO take to work for a Franklin business?
+A. Real movement on local SEO (GBP + local pack rankings) typically happens in 60–90 days. Organic search rankings for competitive keywords usually start meaningful movement at 90–120 days and continue compounding for 12+ months. AI Overview citations have been showing up faster — we've seen them within 30–45 days when the FAQ schema is right. Anyone promising page-1 in 30 days is selling something else. Williamson County competitive density isn't extreme by national standards, which actually helps timelines.
+Q. What does SEO cost for a Williamson County small business?
+A. Our Local Foundations tier is $1,500/mo and is right for most single-location Franklin small businesses with under $1M revenue. Growth is $3,500/mo and is where most growing Williamson County businesses sit. Scale is $7,500+/mo for multi-location, eCom, or aggressive growth. Anyone quoting under $1,000/mo is doing template work that won't compete with the Seaboard cluster.
+Q. What's the difference between local SEO and regular SEO?
+A. Local SEO is the work that makes you show up in the 'map pack' (the 3 businesses Google shows above regular results when someone searches a local query). It's GBP optimization, local citations, reviews, and location-specific landing pages. Regular SEO is the work that makes you rank for non-local queries. Most Franklin small businesses need 80% local SEO and 20% regular SEO. Most Williamson County eCom businesses need the opposite.
+Q. Do I need both SEO and Google Ads?
+A. Often yes, especially early. Google Ads buys you visibility while SEO is still compounding (months 1–6). Then ads can dial down as organic takes over — our average Franklin client cuts ad spend 40–60% by month 9. Some businesses need to keep both running indefinitely (highly competitive markets, time-sensitive promotions). We can tell you which after a free audit.
+Q. Will I rank in Cool Springs / Westhaven / Downtown Franklin specifically?
+A. If we do the work right, yes. We build neighborhood-specific landing pages with neighborhood-specific schema and target neighborhood-specific keywords. 'HVAC Cool Springs' and 'HVAC Westhaven' are different searches with different competitors and different ranking factors. We treat them that way.
+Q. What's AI Overview optimization and do I need it?
+A. AI Overviews are the AI-generated summaries Google shows at the top of search results for many queries. Getting cited as a source in those summaries means your business is recommended by the AI. The optimization is mostly: clean FAQ schema, clear entity disambiguation (Wikidata, Wikipedia, structured data), authoritative content on the questions buyers ask. We've earned 34 AI Overview citations across active clients. Do you need it? If your buyers research before they buy, yes.
+Q. How is your SEO different from the JLB / Horton / CFM approach?
+A. Those three are the same company under different brands (same office at 200 Seaboard Lane, same templates, same badge stack). Their approach is high-volume, generic, and built for a 2018-era SEO playbook. We're a senior team doing the 2026 work: AI Overview optimization, schema-heavy local SEO, real link building from real publications, content from people who actually know your industry. Look at their case studies (mostly anonymous), look at ours (named, with screenshots and real numbers), decide.
+Q. What do you do in month one vs. month six?
+A. Month 1: technical audit, GBP rebuild, keyword + neighborhood strategy locked in, first neighborhood page live. Month 6: tracked keywords mostly on page 1, GBP outranking local competitors in map pack, content cluster fully built out, 20+ quality backlinks acquired, AI Overview citations starting to compound. Month 12: the work compounds — clients keep growing without adding spend. We've taken multiple clients from invisible to dominant in this exact arc.
+Q. Do you guarantee rankings?
+A. No. Anyone who does is either lying or about to do something Google will penalize you for. We do, however, set specific milestones with you at the start of every engagement, and back them with our 90-day scorecard guarantee — if we miss what we promised at month 3, you can walk.
+Q. What happens if I leave — do I keep my content and links?
+A. Yes. All of it. The GA4 property is yours. The GSC property is yours. Every piece of content we created stays on your site. Every link we earned points to your site. We don't structure anything in a way that creates lock-in. Some agencies do. We think that's a bad way to run a business.
+Q. Will my Google Business Profile be optimized for the Franklin area?
+A. Yes — and it's where most of the early wins come from for single-location Franklin businesses. We rebuild the GBP from scratch: complete services, complete Q&A, weekly posts, photo uploads, review velocity strategy, accurate categories, and the right service areas. For multi-location businesses, we manage all GBPs as a portfolio.
+Q. How do you handle Google algorithm updates?
+A. Our work is white-hat enough that algorithm updates have historically helped us, not hurt us. The 2024 helpful content update, the August 2024 core update, and the AI Overview rollouts — all net positive for our active clients. The reason is that we build for buyer intent, not for search engine games.
+Q. Do you do link building? What kind?
+A. Real link building. Digital PR (pitching journalists for stories that feature you), industry guest posts (on sites that have real traffic and editorial standards), local press placements (regional business journals, lifestyle publications, vertical-specific outlets — including Williamson Herald, Williamson Source, Nashville Business Journal for Franklin clients), and unlinked-mention recovery. Never PBNs, never link farms, never paid placements that violate Google's guidelines. 4 quality backlinks/mo in Growth tier.
+Q. Can you show me a sample monthly SEO report?
+A. Yes. Email hello@creativecowboys.co or click below and we'll send you a redacted version of a real monthly report from an active client. It'll show you exactly what you'd see each month: ranking movement, organic traffic, GBP performance, content performance, links acquired, and what we're doing next.
+13 — Live Google reviews
+[Live embedded widget — same as Web Design page.]
+14 — Final CTA
+Ready to see what your site could rank for?
+Two ways to start. Both free.
+→ Get a Free Franklin SEO Audit. 48 hours. PDF deliverable. We review your technical setup, content, GBP, and competitor landscape — and tell you the 3 highest-leverage moves you could make this quarter.
+→ Or book a 20-min Williamson County ranking strategy call. Real conversation. No sales pitch.
+
+Page 3 — Franklin TN Digital Marketing & Paid Ads
+URL: creativecowboys.co/franklin-tn/digital-marketing
+Page meta
+Page title
+Digital Marketing in Franklin, TN | Google Ads + Meta + LinkedIn — Creative Cowboys
+Meta description (155 chars)
+Franklin TN paid ads done right. Google, Meta, LinkedIn, YouTube. Flat monthly fees (not % of spend). Real ROAS, real case studies. Free Google Ads audit in 48 hrs.
+OG image headline
+Franklin paid ads that print money — not just impressions.
+1 — Hero
+Eyebrow
+DIGITAL MARKETING  ·  PAID ADS  ·  FRANKLIN, TN
+H1
+Franklin Paid Ads That Print Money — Not Just Impressions.
+Subheadline
+Google Ads + Meta + LinkedIn + YouTube, orchestrated as one system. $2M+ in revenue generated for clients. Real ROAS, weekly Slack updates, flat monthly fees (not % of spend). Free Franklin Google Ads Audit in 48 hours.
+Primary CTA
+Get a Free Franklin Google Ads Audit
+CTA support
+48-hour turnaround. PDF deliverable. No sales call required.
+Secondary CTA
+Or book a 20-min Franklin paid media strategy call →
+Proof bar
+	•	★ 5.0 from 20+ Google reviews [live widget]
+	•	$2M+ in revenue generated for clients
+	•	100+ active campaigns managed since 2022
+	•	Google Premier Partner  ·  Meta Business Partner
+2 — Logo wall
+Section heading
+Running paid ads for businesses across the Southeast — every major channel.
+Subhead
+Home services. Healthcare. DTC and ecom. Professional services. B2B SaaS. We've generated $2M+ in revenue for clients across 100+ active campaigns since 2022 — and we're now bringing that team to Franklin and Williamson County.
+3 — Service overview
+What we run
+Lead paragraph
+Most Franklin agencies run Google Ads and call it 'digital marketing.' We run Google Search, Google Performance Max, Google Shopping, YouTube, Meta (Facebook + Instagram), LinkedIn (for B2B clients), and retargeting — and we orchestrate them as one system. A Franklin home-services business probably needs Google Search + Local Services Ads + Meta retargeting. A Williamson County B2B firm probably needs LinkedIn + Google retargeting. A Franklin DTC brand probably needs Meta + Google Shopping. We figure out the mix, we build the system, we manage it transparently.
+Four-column callout
+Google Ads — Search, Performance Max, Shopping, YouTube. Conversion tracking via server-side GTM. Negative keywords actively managed. Bid strategies tuned to your real margins, not Google's defaults.
+Meta Ads — Facebook + Instagram. Full-funnel: cold traffic, warm retargeting, lookalike audiences. Creative refreshed monthly to fight ad fatigue. Pixel + Conversions API for iOS 14+ resilience.
+LinkedIn Ads — For B2B Franklin businesses targeting decision-makers. Sponsored Content, Message Ads, Lead Gen Forms. Account-Based Marketing for high-ticket sales cycles.
+Retargeting — Cross-channel: people who visited from Google get retargeted on Meta. People who saw a Meta ad get retargeted on YouTube. The compounding loop most Franklin agencies skip.
+4 — Case study #1
+[Recent Home Services Client]
+Eyebrow
+HVAC  ·  MULTI-NEIGHBORHOOD SERVICE AREA
+Quote pull
+"CPL dropped from $94 to $19 in 60 days. We had to hire two more techs to keep up."
+Attribution
+— [First Last], Owner, [HVAC Business Name]
+Story
+[Business Name] was running $14K/mo in Google Ads through a national agency that managed them as one of 200+ accounts. CPL averaged $94. Phone leads were noisy — a lot of price shoppers, a lot of out-of-service-area calls, a lot of clicks that never called. They were getting volume but the volume was hurting them.
+We rebuilt the account from scratch. New campaign structure (single-keyword ad groups for the highest-intent terms), geofencing tightened to actual service neighborhoods, call tracking with conversational AI tagging the calls, negative keyword list cleaned and expanded monthly. We added Local Services Ads as a parallel channel. We layered in Meta retargeting for visitors who didn't call on the first visit. Then we cut the Google Ads spend by 40% and re-bid the better-performing keywords more aggressively.
+Three metric callouts
+	•	Cost-per-lead: $94 → $19 (80% drop in 60 days)
+	•	Service calls / month: 47 → 184
+	•	Ad spend: $14K/mo → $8.4K/mo (40% reduction with 3.9x lead volume)
+5 — Productized service tiers
+Three tiers. Flat fees. Real numbers.
+Intro
+Most Franklin agencies charge a percentage of your ad spend — which means they're financially incentivized to push you to spend more, even when scaling back would be smarter. Our fee is flat. It doesn't move when your spend does. The result: we'll tell you to spend less when spending less is right.
+Tier
+Investment
+What's included
+Starter
+$1,500 / mo
+Single channel (Google Ads OR Meta). Up to $10K/mo media spend. Setup, optimization, weekly Slack updates, monthly dashboard. For Franklin SMBs testing paid for the first time.
+Growth
+$3,500 / mo
+Two channels (typically Google + Meta). Up to $50K/mo media spend. Conversion tracking + GA4 server-side. Landing page CRO. Quarterly strategy review. Creative refresh assistance.
+Scale
+$7,500+ / mo
+Full orchestrated multi-channel: Google + Meta + LinkedIn + YouTube + retargeting. Custom audiences. Full creative production (video + still). Up to $250K/mo media spend. Dedicated strategist.
+"How we price" explainer
+Flat monthly management fee, separate from your media spend. Percentage-of-spend pricing creates a conflict of interest — when scaling back would be smarter, percent agencies push you to spend more. Our fee doesn't move when your spend does. You own your Google Ads account, your Meta Business account, your LinkedIn Ads account, your GA4 property, and all creative. We just manage them. If you ever leave, you leave with everything.
+6 — Case study #2
+[Recent B2B Client]
+Eyebrow
+B2B PROFESSIONAL SERVICES
+Quote pull
+"LinkedIn was a waste of money before they took over. Now it's our single biggest lead source."
+Story
+[Firm Name] sells to mid-market CFOs. Their previous agency had been running LinkedIn Ads with generic 'whitepaper download' creative, no audience precision, and no follow-up sequence. $8K/mo in spend for 3 unqualified leads/mo — and the leads weren't even CFOs.
+We rebuilt the LinkedIn strategy around named-account targeting (a list of 600 regional companies that matched ICP), tested creative against the actual buyer's problem (not the firm's services), and built a multi-touch sequence: cold LinkedIn ad → retargeting with case study → retargeting with calculator → retargeting with calendar link. Added Google retargeting for anyone who clicked but didn't convert.
+Three metric callouts
+	•	Qualified MQLs / month: 3 → 24
+	•	Cost per MQL: $2,667 → $458 (83% drop)
+	•	Closed deals attributed to LinkedIn in Q1: 0 → 6
+7 — Process / methodology
+How we run the system
+Intro
+Five things happen on a tight cadence every month. None of this is buried in a quarterly business review email.
+Cadence
+What
+Details
+Every Monday
+Weekly Slack update
+Numbers, observations, what we changed last week, what we're testing this week. Sent in your shared Slack channel by 10am. You can ask follow-up questions on Slack any day of the week.
+Every Wednesday
+Live dashboard
+Real-time GA4 + Google Ads + Meta + LinkedIn dashboard you can look at anytime. We don't gatekeep data. You see what we see.
+Every month
+Monthly review call
+30-min call. Performance against targets. What worked, what didn't, what we're testing. You sign off on next month's plan and budget.
+Every 90 days
+Strategy review
+Bigger conversation. Are we on the right channels? Right creative direction? Right targets? Right offers? We re-baseline.
+Anytime
+Slack on demand
+You have direct Slack access to the strategist running your account. Not a tier-1 support queue.
+8 — Case study #3
+[Recent DTC / eCommerce Client]
+Eyebrow
+ECOM / DTC
+Quote pull
+"4.6x blended ROAS across Meta + Google in Q3. Best quarter we've ever had."
+Story
+[Brand Name] was running Meta ads themselves and getting a 1.4x ROAS — break-even at best, considering COGS and shipping. Creative was all the same product on a white background. Pixel + Conversions API weren't fully implemented post-iOS-14. Google Shopping wasn't even set up.
+We rebuilt the Meta pixel + Conversions API server-side. Cleaned the product feed. Set up Google Shopping + Performance Max with proper conversion values (not just clicks). Did a creative sprint with the brand to produce 30+ new ad creatives (UGC-style video, lifestyle stills, problem/solution carousels) and tested against the boring white-background ads. The winners outperformed the old ads 3.4x.
+Three metric callouts
+	•	Blended ROAS: 1.4x → 4.6x in 90 days
+	•	AOV: $48 → $67
+	•	Q3 revenue from paid: $42K → $187K
+9 — Franklin & Williamson County
+Built around how the Franklin market actually behaves.
+Lead paragraph
+Running Google Ads in Cool Springs is different from running Google Ads in Nashville is different from running Google Ads nationally. Different demographics, different competitive density, different click costs, different buyer psychology. We've run paid for dozens of similar markets across the Southeast and we calibrate every Franklin campaign from day one to the realities of Williamson County CPCs, conversion rates, and buyer behavior — not national averages that hide what's actually happening locally.
+	•	Cool Springs
+	•	Westhaven
+	•	Berry Farms
+	•	Downtown Franklin
+	•	Brentwood
+	•	Spring Hill
+	•	Greater Nashville (when geographically relevant)
+10 — Team
+Intro
+Your strategist is the same person on every Slack message, every weekly update, every monthly call. Not a queue. Not a junior.
+[Founder + Team grid here]
+11 — Risk reversal + ownership
+	•	Month-to-month. No annual contracts. Cancel anytime with 30 days' notice.
+	•	You own your Google Ads, Meta Business, LinkedIn Ads, GA4, and all creative. We're not a hostage agency.
+	•	Flat fee, not % of spend. Our incentive aligns with yours — when scaling back is the right call, we'll tell you.
+	•	If we don't hit the targets we set together in the first 90 days, your next month is free while we course-correct.
+	•	All conversion tracking, pixel implementation, and analytics setup are your property and stay with your accounts forever, even if we part ways.
+12 — FAQ (FAQPage schema)
+Q. How much should I spend on Google Ads in Franklin TN?
+A. Depends on the business, but here's a rule of thumb for Williamson County: home services usually start working at $4-8K/mo media spend, healthcare practices at $3-6K/mo, B2B services on Google at $5-10K/mo (more on LinkedIn), DTC ecom at $10-20K/mo to learn enough. Anyone telling you $500/mo will work is selling you a $500/mo problem.
+Q. What's the difference between Google Ads, Meta Ads, and LinkedIn Ads — which should my Franklin business run?
+A. Google Ads catches people who are actively searching for what you sell — high intent, often high CPC. Meta catches people who match your ideal customer profile but aren't searching yet — lower intent, often lower CPC, harder to attribute. LinkedIn catches B2B decision-makers by job title and company — expensive CPCs but qualified buyers. Most Franklin businesses need Google + Meta. B2B services need LinkedIn instead of or alongside Meta. DTC ecom needs Meta heavy, Google supporting. We'll tell you which after a free audit.
+Q. How quickly will I see results from paid ads?
+A. Faster than SEO, slower than you'd like. Week 1: ads are live and we're gathering data. Weeks 2-4: optimization based on real performance — many accounts hit positive ROAS in this window. Months 2-3: meaningful scaling, audience refinement, creative iteration. Month 3+: compounding system improvements. Anyone promising profitability in week 1 is lying about something.
+Q. Do you charge a percentage of ad spend or a flat fee?
+A. Flat fee. Always. Percentage-of-spend pricing means your agency makes more money when you spend more, even when spending less would be smarter. We'd rather be the agency you keep for 5 years than the agency you fire after one fight about spend.
+Q. Will I own my Google Ads / Meta / LinkedIn accounts?
+A. Yes. Always. We never run ads from our own accounts and bill you. Your business owns the accounts, the data, the conversion tracking, the audiences. If you leave us, you leave with everything intact and someone else can pick up where we left off.
+Q. How often do you report and review performance?
+A. Weekly Slack update every Monday by 10am. Live dashboard you can look at any time. 30-minute review call every month. Bigger 60-minute strategy review every 90 days. Plus Slack access to the strategist running your account anytime in between.
+Q. What if my ads aren't working in month one?
+A. Month one is usually data gathering and initial optimization — not a failure if we're not at target ROAS yet. Month two should show clear directional improvement. If we miss the 90-day targets we set together, your next month is free while we course-correct. If we're not on track to fix it, you can walk.
+Q. Do you build the landing pages too?
+A. Yes — and most Franklin clients need us to. Most paid ad failures aren't ad failures, they're landing page failures. We'll build dedicated landing pages for high-spend campaigns (separate from your main site, optimized purely for the ad's intent). Either included in Growth/Scale tiers or as an add-on to Starter.
+Q. What industries do you work with in Franklin and Williamson County?
+A. The same verticals we've been running paid ads for across the Southeast: home services (HVAC, roofing, electrical, plumbing, landscaping, pest), healthcare (dental, medical, med spa, veterinary), professional services (legal, financial, accounting, real estate), boutique retail and DTC ecom, B2B SaaS and consulting, hospitality and restaurants. We don't work with MLMs, payday lending, or anything we wouldn't be comfortable explaining to our families.
+Q. How is your approach different from JLB / CFM / Horton?
+A. JLB, CFM, and Horton are the same company under different brands (same office at 200 Seaboard Lane, identical landing page copy across their domains). Their approach is Google Ads heavy, generic, and built around volume. We run Google + Meta + LinkedIn + YouTube + retargeting as orchestrated channels — and we publish our pricing, name our team, and show real client numbers with screenshots. Compare landing pages side by side and decide.
+Q. Do you handle creative production (video, design, copy)?
+A. Yes. In-house copywriting and design at every tier. Video production (UGC-style and produced) in Growth and Scale tiers. We're not a media-buying-only shop — most ad failures are creative failures, and creative is half of our job.
+Q. What's a realistic ROAS for a Franklin small business?
+A. Highly variable. Home services in Cool Springs running Google: typically 6-10x ROAS once dialed in. Local healthcare: 4-7x (counting lifetime patient value). B2B services on LinkedIn: 3-5x ROAS, but with much longer sales cycles. DTC ecom on Meta + Google: 3-5x blended is healthy, 4-6x is good, 6x+ is exceptional. Anyone promising 10x out of the gate is either lying or about to suggest you sell low-margin products at huge volume.
+13 — Live Google reviews
+[Live embedded widget — same as other pages.]
+14 — Final CTA
+Want to see what your ads could actually do?
+→ Get a Free Franklin Google Ads Audit. 48 hours. PDF deliverable. We review your account structure, conversion tracking, creative, and competitive landscape — and tell you the 5 biggest opportunities we see.
+→ Or book a 20-min Williamson County paid media strategy call. Real conversation. No sales pitch.
+Phone: (XXX) XXX-XXXX  ·  Email: hello@creativecowboys.co  ·  Office: [Franklin TN address]
