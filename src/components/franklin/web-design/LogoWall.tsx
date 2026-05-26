@@ -4,12 +4,6 @@ export default function LogoWall() {
     "PORTFOLIO CLIENT 02",
     "PORTFOLIO CLIENT 03",
     "PORTFOLIO CLIENT 04",
-    "PORTFOLIO CLIENT 05",
-    "PORTFOLIO CLIENT 06",
-    "PORTFOLIO CLIENT 07",
-    "PORTFOLIO CLIENT 08",
-    "PORTFOLIO CLIENT 09",
-    "PORTFOLIO CLIENT 10",
   ];
 
   return (

@@ -32,7 +32,7 @@ export default function TopBar() {
                         letterSpacing: "0.04em",
                     }}
                 >
-                    222 West Montgomery St. Villa Rica, GA 30180
+                    Now serving Franklin, TN
                 </span>
 
                 {/* Phone — turns orange on hover */}
