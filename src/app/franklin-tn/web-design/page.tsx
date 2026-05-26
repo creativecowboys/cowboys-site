@@ -49,7 +49,7 @@ export default function WebDesignFranklinPage() {
       <CaseStudy
         clientName="Harmonic Production"
         eyebrow="AV & EVENT PRODUCTION"
-        quote="“A complete rehaul of our site and SEO — almost 300% lift in customer engagement, 200% retention, zero downtime through the whole project.”"
+        quote="“A complete rehaul of our site and SEO. Zero downtime. I'd recommend Cowboys to anyone looking for SEO and market engagement.”"
         attribution="— Ryan Coffey, Founder, Harmonic Production · Cleveland, TN"
         storyParagraphs={[
           "Harmonic Production has been one of the Southeast’s leading AV and concert production outfits since 2014 — 500+ events across 12 states, from Sunday morning church services to stadium tours. The web didn’t match the work. We rebuilt the site from the ground up: bold identity, real photography from real shows, a service catalog mapped to how event planners think, and the gear brands they trust front and center — L-Acoustics, DiGiCo, Shure, JBL. SEO was rebuilt in parallel — technical fixes, schema, Southeast location targeting — with zero downtime through the cutover."
@@ -75,7 +75,7 @@ export default function WebDesignFranklinPage() {
       <CaseStudy 
         clientName="John B. Jackson & Associates"
         eyebrow="PERSONAL INJURY · WEST GEORGIA"
-        quote="We worked with a national marketing company for six years and never broke into the top 10 for 'personal injury.' Twelve months with Creative Cowboys: 22 #1 rankings and over $500,000 in new revenue. We should have made the switch sooner."
+        quote="“We worked with a national marketing company for six years and never broke into the top 10. We should have made the switch to Cowboys sooner.”"
         attribution="— John B. Jackson, Founding Attorney, John B. Jackson & Associates · West Georgia"
         storyParagraphs={[
           "John B. Jackson & Associates is one of West Georgia's most established personal injury and workers' comp firms — serving Carrollton, Douglasville, and Villa Rica since 2003. Before we partnered, they'd spent six years with a large national marketing agency and had never cracked the top 10 of Google for their primary keyword: \"personal injury.\" We rebuilt the website from the ground up — a modern firm site with practice-area pages, fast intake forms, and the polish a personal injury client expects before they trust someone with their case. In parallel, we built and ran integrated campaigns across CTV, Google Ads, and paid social, all routing back to conversion-tracked landing pages. Twelve months in: 22 #1 organic rankings, $500,000+ in new revenue, and a national marketing agency JBJ no longer needed."
@@ -101,7 +101,7 @@ export default function WebDesignFranklinPage() {
       <CaseStudy 
         clientName="McKinley Roofing & Restoration"
         eyebrow="ROOFING · DOUGLASVILLE, GA"
-        quote="We had a one-page site that nobody could find. Creative Cowboys built us a real online presence and the phone hasn't stopped ringing — 11 #1 rankings and 10x traffic since launch."
+        quote="“We had a one-page site that nobody could find. The Cowboys built us a real online presence — and the phone hasn't stopped ringing since.”"
         attribution="— [Owner Name], McKinley Roofing & Restoration · Douglasville, GA"
         storyParagraphs={[
           "McKinley Roofing & Restoration is a family-owned roofing company in Douglasville, GA. When we started working together, their entire web presence was a single-page site nobody could find — virtually no organic traffic, no inbound leads from search, no real digital footprint. We rebuilt the site as a proper local roofing presence: neighborhood-specific service area pages, an insurance claim assistance flow, real photography of their crew on real West Georgia roofs, and the Google Business Profile + local SEO foundations they'd been missing. We layered in active Google Ads, SEO, and paid social campaigns running together as one system. The result: 11 #1 organic rankings, website traffic up 1,000% since launch, and a phone that doesn't stop ringing during storm season."

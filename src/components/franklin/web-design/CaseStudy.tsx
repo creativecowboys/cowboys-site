@@ -46,23 +46,22 @@ export default function CaseStudy({
   isMobileImage = false,
   bgClass = "bg-white"
 }: CaseStudyProps) {
-  const pyClass = bgClass === "bg-white" ? "py-32" : "py-28";
   return (
-    <section className={`w-full ${bgClass} ${pyClass}`}>
+    <section className={`w-full ${bgClass} ${bgClass === "bg-white" ? "py-32" : "py-28"}`}>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="inline-block mb-6 px-3 py-1 rounded-[10px] bg-[#EDE9E4] text-[#121417] text-xs font-bold tracking-widest uppercase">
-          {eyebrow}
-        </div>
-        
-        <h2 className="font-display text-3xl md:text-5xl font-bold text-[#121417] mb-16">
-          {clientName}
-        </h2>
-
         <div className={`flex flex-col gap-12 lg:gap-20 ${reverseLayout ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
           <div className="lg:w-1/2 flex flex-col justify-center">
-          <blockquote className="font-display text-2xl md:text-3xl text-[#F26522] font-bold tracking-[-0.02em] leading-snug mb-4">
-            {quote}
-          </blockquote>
+            <div className="inline-block mb-0 px-3 py-1 rounded-[10px] bg-[#EDE9E4] text-[#121417] text-xs font-bold tracking-widest uppercase self-start">
+              {eyebrow}
+            </div>
+            
+            <h2 className="font-display text-[36px] md:text-[48px] font-bold text-[#121417] mt-0 mb-4 tracking-[-0.02em] leading-tight">
+              {clientName}
+            </h2>
+
+            <blockquote className="font-display text-[20px] md:text-[24px] text-[#F26522] font-medium italic tracking-[-0.01em] leading-snug mb-4">
+              {quote}
+            </blockquote>
           <p className="font-body text-neutral-500 font-medium mb-10">{attribution}</p>
           
           <div className="space-y-6 text-neutral-700 font-body text-lg leading-relaxed mb-10">
