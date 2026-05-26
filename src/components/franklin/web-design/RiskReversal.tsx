@@ -9,8 +9,8 @@ export default function RiskReversal() {
   ];
 
   return (
-    <section className="py-24 bg-[#F4F2F0]">
-      <div className="max-w-4xl mx-auto px-6 md:px-12 bg-white rounded-[24px] p-10 md:p-16 border border-neutral-200 shadow-sm relative overflow-hidden">
+    <section className="py-32 bg-white">
+      <div className="max-w-4xl mx-auto px-6 md:px-12 bg-[#F4F2F0] rounded-[24px] p-10 md:p-16 border border-[#ECEAE3] shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-5">
           <Shield className="w-64 h-64" />
         </div>

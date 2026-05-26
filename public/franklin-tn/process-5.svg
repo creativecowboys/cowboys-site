@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <!-- Sketched chart axes with overshoots -->
+  <path d="M 10,12 L 10,50 C 10,51 11,52 12,52 M 8,50 L 56,50 M 10,52 L 10,55" 
+        stroke="#121417" stroke-width="2.2" stroke-linecap="round" fill="none" />
+
+  <!-- Y-axis ticks -->
+  <line x1="6" y1="20" x2="10" y2="20" stroke="#121417" stroke-width="1.5" />
+  <line x1="6" y1="35" x2="10" y2="35" stroke="#121417" stroke-width="1.5" />
+
+  <!-- X-axis ticks -->
+  <line x1="25" y1="50" x2="25" y2="54" stroke="#121417" stroke-width="1.5" />
+  <line x1="42" y1="50" x2="42" y2="54" stroke="#121417" stroke-width="1.5" />
+
+  <!-- Background bar chart blocks (very faint wobbly blocks) -->
+  <path d="M 16,50 L 16,36 L 22,36 L 22,50" stroke="#121417" stroke-width="1" opacity="0.15" fill="none" />
+  <path d="M 30,50 L 30,28 L 36,28 L 36,50" stroke="#121417" stroke-width="1" opacity="0.15" fill="none" />
+  <path d="M 44,50 L 44,22 L 50,22 L 50,50" stroke="#121417" stroke-width="1" opacity="0.15" fill="none" />
+
+  <!-- Orange Highlight: Sketched trend line going UP and to the right -->
+  <!-- Hand-drawn wobbly trend line -->
+  <path d="M 12,42 L 24,34 L 38,36 L 54,16" stroke="#F26522" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  
+  <!-- Sketched dots at key points -->
+  <circle cx="12" cy="42" r="2.5" fill="#121417" />
+  <circle cx="24" cy="34" r="2.5" fill="#121417" />
+  <circle cx="38" cy="36" r="2.5" fill="#121417" />
+  
+  <!-- Highlight orange dot at peak of optimization -->
+  <path d="M 51,16 C 51,13 57,13 57,16 C 57,19 51,19 51,16 Z" fill="#F26522" stroke="#F26522" stroke-width="1" />
+</svg>

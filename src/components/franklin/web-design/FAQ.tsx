@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function FAQ() {
   const faqs = [
     {
@@ -51,28 +53,44 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="py-24 px-6 md:px-12 max-w-4xl mx-auto">
-      <div className="mb-12 text-center">
-        <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-neutral-900 mb-4">
-          Questions Franklin business owners actually ask us.
-        </h2>
-      </div>
-
-      <div className="space-y-4">
-        {faqs.map((faq, i) => (
-          <details key={i} className="group bg-white rounded-[14px] border border-neutral-200 overflow-hidden open:shadow-sm transition-all">
-            <summary className="flex cursor-pointer items-center justify-between p-6 font-display font-bold text-lg text-neutral-900 marker:content-none hover:text-[#F26522] transition-colors">
-              {faq.q}
-              <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
-                <span className="absolute h-0.5 w-5 bg-current transition-transform duration-300 ease-out group-open:rotate-180" />
-                <span className="absolute h-5 w-0.5 bg-current transition-transform duration-300 ease-out group-open:rotate-90" />
-              </span>
-            </summary>
-            <div className="px-6 pb-6 font-body text-neutral-600 leading-relaxed text-lg">
-              {faq.a}
+    <section className="py-28 bg-[#F4F2F0]">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Column (40% / col-span-4 on desktop) */}
+          <div className="lg:col-span-4 flex flex-col items-start lg:sticky lg:top-8">
+            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-neutral-900 mb-8 leading-[1.15]">
+              Questions Franklin business owners actually ask us.
+            </h2>
+            <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-square mx-auto lg:mx-0 select-none">
+              <Image
+                src="/franklin-tn/faq-illustration.svg"
+                alt="FAQ illustration"
+                fill
+                className="object-contain opacity-95"
+              />
             </div>
-          </details>
-        ))}
+          </div>
+
+          {/* Right Column (60% / col-span-6 on desktop) */}
+          <div className="lg:col-span-6 space-y-4 w-full">
+            {faqs.map((faq, i) => (
+              <details key={i} className="group bg-white rounded-[14px] border border-neutral-200 overflow-hidden open:shadow-sm transition-all">
+                <summary className="flex cursor-pointer items-center justify-between p-6 font-display font-bold text-lg text-neutral-900 marker:content-none hover:text-[#F26522] transition-colors">
+                  {faq.q}
+                  <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
+                    <span className="absolute h-0.5 w-5 bg-current transition-transform duration-300 ease-out group-open:rotate-180" />
+                    <span className="absolute h-5 w-0.5 bg-current transition-transform duration-300 ease-out group-open:rotate-90" />
+                  </span>
+                </summary>
+                <div className="px-6 pb-6 font-body text-neutral-600 leading-relaxed text-lg">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+
+        </div>
       </div>
     </section>
   );

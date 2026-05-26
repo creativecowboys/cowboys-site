@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 
 export default function PricingTiers() {
   return (
-    <section className="py-24 bg-white border-y border-neutral-200">
+    <section className="bg-white py-32">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-neutral-900 mb-6">
@@ -112,9 +112,10 @@ export default function PricingTiers() {
             <span className="font-body font-medium text-neutral-700">Not sure which tier fits?</span>
             <Link 
               href="#scorecard" 
-              className="inline-flex items-center justify-center px-6 py-3 bg-[#F26522] hover:bg-[#d9551a] text-white font-bold rounded-full transition-colors"
+              className="inline-flex items-center justify-center px-8 py-[18px] bg-[#F26522] hover:bg-[#ff7b3a] text-white font-semibold rounded-full transition-all duration-300 text-base shadow-[0_4px_16px_rgba(242,101,34,0.35)] hover:shadow-[0_4px_24px_rgba(242,101,34,0.5)] cursor-pointer text-center"
             >
               Get a Free Franklin Web Design Scorecard
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </div>
         </div>

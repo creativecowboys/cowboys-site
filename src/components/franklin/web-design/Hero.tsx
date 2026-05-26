@@ -1,83 +1,138 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      {/* Background photo */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/Franklin, TN/Living-in-Franklin-TN-A-Local-Perspective-cover.webp"
-          alt="Franklin, Tennessee"
-          fill
-          className="object-cover object-center"
-          priority
-          quality={85}
-        />
-        {/* Gradient overlay: dark top → transparent mid → cream bottom (blends into next section) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-900/80 via-neutral-900/50 to-[#F4F2F0]" />
+    <section className="relative overflow-hidden bg-[#121417] text-white pt-24 pb-20 md:pt-36 md:pb-28">
+      {/* 7.2 Hero background grain texture overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-repeat pointer-events-none opacity-[0.05]"
+        style={{ backgroundImage: "url('/franklin-tn/hero-noise.png')", backgroundSize: "1440px 900px" }}
+      />
+
+      {/* Chrome Brand bar - Top Left Page Chrome */}
+      <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 mb-8 md:mb-16">
+        <Link href="/" className="inline-block select-none group">
+          <span className="font-display text-lg font-bold tracking-tight text-[#F26522] transition-colors duration-200">
+            Creative Cowboys
+          </span>
+        </Link>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 pt-40 pb-32 px-6 md:px-12 max-w-7xl mx-auto text-center">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-bold tracking-widest uppercase">
-          Web Design · Franklin, TN
-        </div>
-
-        <h1 className="font-display text-5xl md:text-7xl font-bold tracking-[-0.02em] text-white mb-8 max-w-4xl mx-auto leading-tight drop-shadow-sm">
-          Franklin Web Design That Pays For Itself in 90 Days.
-        </h1>
-
-        <p className="font-body text-lg md:text-xl text-white/85 mb-10 max-w-3xl mx-auto leading-relaxed font-medium tracking-[-0.005em]">
-          A senior Southeast agency, now serving Franklin and Williamson County. 100+ websites built · $2M+ in revenue generated for clients · 1.4-second average page load. No hand-off jargon, no offshore work, no surprise change orders.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <div className="flex flex-col items-center">
-            <Link
-              href="#scorecard"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#F26522] hover:bg-[#d9551a] text-white font-bold rounded-full transition-colors text-lg shadow-lg"
-            >
-              Get a Free Franklin Web Design Scorecard
-            </Link>
-            <span className="text-sm text-white/70 mt-2 font-medium">48-hour turnaround. No sales call required.</span>
-          </div>
-
-          <div className="hidden sm:block text-white/40 mx-2">or</div>
-
-          <Link
-            href="#book-call"
-            className="inline-flex items-center justify-center px-6 py-4 text-white/90 hover:text-white font-bold transition-colors text-lg underline decoration-2 underline-offset-4"
-          >
-            Book a 20-min Franklin web strategy call &rarr;
-          </Link>
-        </div>
-
-        {/* Proof bar — sits over the fade-to-cream zone, white cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-5 flex flex-col items-center text-center shadow-sm">
-            <div className="flex items-center gap-1 text-[#F26522] mb-1">
-              <Star className="w-5 h-5 fill-current" />
-              <span className="font-bold text-xl text-neutral-900">5.0</span>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          
+          {/* LEFT COLUMN: 60% on desktop (col-span-7) */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            
+            {/* Eyebrow chip */}
+            <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs font-bold tracking-widest uppercase">
+              WEB DESIGN · FRANKLIN, TN
             </div>
-            <p className="text-sm font-medium text-neutral-600">from 20+ Google reviews</p>
+
+            {/* H1 */}
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[56px] font-bold tracking-[-0.02em] text-white leading-[1.1] mb-6 max-w-2xl">
+              Franklin Web Design That Pays For Itself in 90 Days.
+            </h1>
+
+            {/* Subhead */}
+            <p className="font-body text-base md:text-lg text-white/80 mb-8 max-w-xl leading-relaxed">
+              A senior Southeast agency, now serving Franklin and Williamson County. 100+ websites built · $2M+ in revenue generated for clients · 1.4-second average page load. No hand-off jargon, no offshore work, no surprise change orders.
+            </p>
+
+            {/* MOBILE DEVICE MOCKUP: Stacks BELOW subhead and ABOVE CTAs on mobile (hidden on desktop) */}
+            <div className="block lg:hidden w-[60%] sm:w-[50%] mx-auto my-8 relative">
+              {/* Glow Accent behind */}
+              <div className="absolute -inset-4 z-0 pointer-events-none opacity-30 blur-2xl">
+                <Image 
+                  src="/franklin-tn/hero-accent.png"
+                  alt="Accent Glow"
+                  width={400}
+                  height={400}
+                  className="w-full h-auto"
+                />
+              </div>
+              
+              {/* Photo-realistic MacBook Frame */}
+              <div className="relative z-10 rotate-[4deg] translate-x-2">
+                {/* Screen */}
+                <div className="relative aspect-[16/10] bg-[#121417] rounded-t-xl p-1.5 pb-0 shadow-2xl border-t border-x border-white/10">
+                  <div className="relative w-full h-full overflow-hidden rounded-t-md bg-neutral-950">
+                    <Image
+                      src="/franklin-tn/harmonic-desktop-hero.png"
+                      alt="Harmonic Production Desktop Mockup"
+                      fill
+                      className="object-cover object-top"
+                    />
+                  </div>
+                </div>
+                {/* Base */}
+                <div className="relative h-1.5 bg-neutral-800 rounded-b-xl border-t border-neutral-700 w-[102%] -left-[1%]"></div>
+                <div className="relative h-0.5 bg-black/50 rounded-b-xl w-[90%] mx-auto opacity-50 shadow-md"></div>
+              </div>
+            </div>
+
+            {/* CTA Stack */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+              <Link
+                href="#scorecard"
+                className="btn-primary inline-flex items-center justify-center px-8 py-4.5 bg-[#F26522] hover:bg-[#ff7b3a] text-white font-semibold rounded-full transition-all duration-300 text-base shadow-[0_4px_16px_rgba(242,101,34,0.35)] hover:shadow-[0_4px_24px_rgba(242,101,34,0.5)] cursor-pointer text-center"
+              >
+                Get a Free Franklin Web Design Scorecard
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              
+              <Link
+                href="#book-call"
+                className="inline-flex items-center justify-center py-4 text-white/90 hover:text-white font-semibold transition-colors text-base underline decoration-2 underline-offset-4 cursor-pointer text-center"
+              >
+                Book a 20-min Franklin web strategy call &rarr;
+              </Link>
+            </div>
+
+            {/* Trust microline */}
+            <span className="text-xs text-white/50 mt-3 font-medium w-full sm:w-auto sm:pl-2 text-center sm:text-left">
+              48-hour turnaround. No sales call required.
+            </span>
+
           </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-5 flex flex-col items-center text-center shadow-sm">
-            <span className="font-display font-bold text-2xl md:text-3xl text-neutral-900 mb-1">100+</span>
-            <p className="text-sm font-medium text-neutral-600">websites built since 2022</p>
+
+          {/* RIGHT COLUMN: 40% on desktop (col-span-5, hidden on mobile) */}
+          <div className="hidden lg:block lg:col-span-5 relative w-full">
+            {/* Glow Accent behind */}
+            <div className="absolute -left-1/4 -top-1/4 w-[150%] h-[150%] z-0 pointer-events-none opacity-20 blur-3xl select-none">
+              <Image 
+                src="/franklin-tn/hero-accent.png"
+                alt="Accent Glow"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            
+            {/* Photo-realistic MacBook Frame with slight rotation and offset */}
+            <div className="relative z-10 rotate-[5deg] translate-x-8 translate-y-2 transform hover:rotate-[3deg] transition-transform duration-700 ease-out select-none">
+              {/* Screen */}
+              <div className="relative aspect-[16/10] bg-[#121417] rounded-t-2xl p-3 pb-0 shadow-2xl border-t border-x border-white/10">
+                <div className="relative w-full h-full overflow-hidden rounded-t-lg bg-neutral-950">
+                  <Image
+                    src="/franklin-tn/harmonic-desktop-hero.png"
+                    alt="Harmonic Production Desktop Mockup"
+                    fill
+                    className="object-cover object-top"
+                    priority
+                  />
+                </div>
+              </div>
+              {/* Base */}
+              <div className="relative h-2.5 bg-neutral-800 rounded-b-2xl border-t border-neutral-700 w-[102%] -left-[1%]"></div>
+              <div className="relative h-1 bg-black/60 rounded-b-2xl w-[90%] mx-auto opacity-50 shadow-xl"></div>
+            </div>
           </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-5 flex flex-col items-center text-center shadow-sm">
-            <span className="font-display font-bold text-2xl md:text-3xl text-neutral-900 mb-1">$2M+</span>
-            <p className="text-sm font-medium text-neutral-600">in revenue generated for clients</p>
-          </div>
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-5 flex flex-col items-center text-center shadow-sm">
-            <span className="font-display font-bold text-2xl md:text-3xl text-neutral-900 mb-1">500+</span>
-            <p className="text-sm font-medium text-neutral-600">#1 organic rankings achieved</p>
-          </div>
+
         </div>
       </div>
     </section>
   );
 }
-

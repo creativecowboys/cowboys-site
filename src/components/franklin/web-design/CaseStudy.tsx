@@ -22,6 +22,8 @@ interface CaseStudyProps {
   beforeAlt?: string;       // Alt text for before image
   imagePlaceholder: string; // Shown when no imageSrc provided
   reverseLayout?: boolean;
+  isMobileImage?: boolean;  // Renders inside an iPhone device mockup
+  bgClass?: string;         // Background class like bg-white or bg-[#F4F2F0]
 }
 
 export default function CaseStudy({
@@ -38,20 +40,24 @@ export default function CaseStudy({
   beforeSrc,
   beforeAlt,
   imagePlaceholder,
-  reverseLayout = false
+  reverseLayout = false,
+  isMobileImage = false,
+  bgClass = "bg-white"
 }: CaseStudyProps) {
+  const pyClass = bgClass === "bg-white" ? "py-32" : "py-28";
   return (
-    <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto border-t border-neutral-200">
-      <div className="inline-block mb-6 px-3 py-1 rounded-[10px] bg-neutral-200 text-neutral-700 text-xs font-bold tracking-widest uppercase">
-        {eyebrow}
-      </div>
-      
-      <h2 className="font-display text-3xl md:text-5xl font-bold text-neutral-900 mb-16">
-        {clientName}
-      </h2>
+    <section className={`w-full ${bgClass} ${pyClass}`}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="inline-block mb-6 px-3 py-1 rounded-[10px] bg-[#EDE9E4] text-[#121417] text-xs font-bold tracking-widest uppercase">
+          {eyebrow}
+        </div>
+        
+        <h2 className="font-display text-3xl md:text-5xl font-bold text-[#121417] mb-16">
+          {clientName}
+        </h2>
 
-      <div className={`flex flex-col gap-12 lg:gap-20 ${reverseLayout ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
-        <div className="lg:w-1/2 flex flex-col justify-center">
+        <div className={`flex flex-col gap-12 lg:gap-20 ${reverseLayout ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
+          <div className="lg:w-1/2 flex flex-col justify-center">
           <blockquote className="font-display text-2xl md:text-3xl text-[#F26522] font-bold tracking-[-0.02em] leading-snug mb-4">
             {quote}
           </blockquote>
@@ -80,10 +86,10 @@ export default function CaseStudy({
           </Link>
         </div>
         
-        <div className="lg:w-1/2">
+        <div className="lg:w-1/2 flex justify-center items-center">
           {imageSrc && beforeSrc ? (
             /* Before / After comparison */
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3 w-full">
               <div className="relative w-full rounded-[14px] overflow-hidden border border-neutral-200 shadow-sm">
                 <div className="absolute top-3 left-3 z-10 bg-neutral-800/80 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">
                   Before
@@ -130,16 +136,33 @@ export default function CaseStudy({
               )}
             </div>
           ) : imageSrc ? (
-            /* Single image */
-            <div className="relative w-full rounded-[18px] overflow-hidden border border-neutral-200 shadow-md">
-              <Image
-                src={imageSrc}
-                alt={imageAlt ?? clientName}
-                width={800}
-                height={600}
-                className="w-full h-auto object-cover object-top"
-              />
-            </div>
+            isMobileImage ? (
+              /* Custom iPhone frame for mobile screenshots */
+              <div className="relative mx-auto w-full max-w-[310px] aspect-[9/19.5] bg-neutral-950 rounded-[44px] p-3 shadow-2xl border-[4px] border-neutral-800 ring-4 ring-neutral-900 select-none">
+                {/* Speaker notch / Dynamic island shape */}
+                <div className="absolute top-4.5 left-1/2 -translate-x-1/2 w-24 h-5 bg-neutral-900 rounded-full z-20"></div>
+                {/* Screen */}
+                <div className="relative w-full h-full overflow-hidden rounded-[34px] bg-neutral-950 border border-neutral-900">
+                  <Image
+                    src={imageSrc}
+                    alt={imageAlt ?? clientName}
+                    fill
+                    className="object-cover object-top"
+                  />
+                </div>
+              </div>
+            ) : (
+              /* Single image (desktop / generic) */
+              <div className="relative w-full rounded-[18px] overflow-hidden border border-neutral-200 shadow-md">
+                <Image
+                  src={imageSrc}
+                  alt={imageAlt ?? clientName}
+                  width={800}
+                  height={600}
+                  className="w-full h-auto object-cover object-top"
+                />
+              </div>
+            )
           ) : (
             /* Placeholder */
             <div className="w-full h-full min-h-[400px] bg-neutral-200 rounded-[18px] border border-neutral-300 flex items-center justify-center text-neutral-500 flex-col p-8 text-center">
@@ -148,6 +171,7 @@ export default function CaseStudy({
             </div>
           )}
         </div>
+      </div>
       </div>
     </section>
   );

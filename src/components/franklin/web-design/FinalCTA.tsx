@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default function FinalCTA() {
   return (
@@ -14,9 +15,10 @@ export default function FinalCTA() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
           <Link 
             href="#scorecard" 
-            className="inline-flex items-center justify-center px-8 py-5 bg-[#F26522] hover:bg-[#d9551a] text-white font-bold rounded-full transition-colors text-lg w-full sm:w-auto"
+            className="inline-flex items-center justify-center px-8 py-[18px] bg-[#F26522] hover:bg-[#ff7b3a] text-white font-semibold rounded-full transition-all duration-300 text-base shadow-[0_4px_16px_rgba(242,101,34,0.35)] hover:shadow-[0_4px_24px_rgba(242,101,34,0.5)] cursor-pointer text-center w-full sm:w-auto"
           >
             Get a Free Franklin Web Design Scorecard
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
           <Link 
             href="#book-call" 

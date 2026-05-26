@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Hero from "@/components/franklin/web-design/Hero";
+import ProofBar from "@/components/franklin/web-design/ProofBar";
 import LogoWall from "@/components/franklin/web-design/LogoWall";
 import ServiceOverview from "@/components/franklin/web-design/ServiceOverview";
 import CaseStudy from "@/components/franklin/web-design/CaseStudy";
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     description: "Franklin TN web design that loads in under 1.5 seconds and pays for itself in 90 days.",
     images: [
       {
-        url: "/og-franklin-web-design.jpg", // TODO: Custom OG image
+        url: "/franklin-tn/og-web-design.png", // Updated to final unified path
         width: 1200,
         height: 630,
         alt: "Franklin Web Design - Creative Cowboys",
@@ -34,6 +35,9 @@ export default function WebDesignFranklinPage() {
     <main className="w-full overflow-x-hidden">
       {/* 1. Hero */}
       <Hero />
+      
+      {/* Proof Bar */}
+      <ProofBar />
       
       {/* 2. Logo Wall */}
       <LogoWall />
@@ -57,11 +61,11 @@ export default function WebDesignFranklinPage() {
         ]}
         linkUrl="#"
         liveSiteUrl="https://www.harmonicproduction.co"
-        beforeSrc="/Franklin, TN/Harmonic - Before.png"
-        beforeAlt="Harmonic Production old website — before Creative Cowboys"
-        imageSrc="/Franklin, TN/Harmonic - Desktop Hero.png"
+        imageSrc="/franklin-tn/harmonic-mobile-hero.png"
         imageAlt="Harmonic Production new website — after Creative Cowboys"
         imagePlaceholder="Harmonic Production — Asset Coming Soon"
+        isMobileImage={true}
+        bgClass="bg-[#F4F2F0]"
       />
       
       {/* 5. Pricing Tiers */}
@@ -85,6 +89,7 @@ export default function WebDesignFranklinPage() {
         linkUrl="#"
         imagePlaceholder="Before/After Homepage + Work Photo"
         reverseLayout={true}
+        bgClass="bg-[#F4F2F0]"
       />
       
       {/* 7. Process */}
@@ -106,6 +111,7 @@ export default function WebDesignFranklinPage() {
         ]}
         linkUrl="#"
         imagePlaceholder="Before/After Screens + Work Photo"
+        bgClass="bg-[#F4F2F0]"
       />
       
       {/* 9. Service Area */}

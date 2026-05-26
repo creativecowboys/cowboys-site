@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="100%" height="100%">
+  <!-- Background: Cream Paper -->
+  <rect width="1200" height="900" fill="#F4F2F0" />
+  
+  <!-- Subtle background grid lines for editorial structure -->
+  <g stroke="#121417" stroke-width="0.5" opacity="0.08" stroke-dasharray="2 6">
+    <line x1="100" y1="0" x2="100" y2="900" />
+    <line x1="300" y1="0" x2="300" y2="900" />
+    <line x1="500" y1="0" x2="500" y2="900" />
+    <line x1="700" y1="0" x2="700" y2="900" />
+    <line x1="900" y1="0" x2="900" y2="900" />
+    <line x1="1100" y1="0" x2="1100" y2="900" />
+    
+    <line x1="0" y1="150" x2="1200" y2="150" />
+    <line x1="0" y1="350" x2="1200" y2="350" />
+    <line x1="0" y1="550" x2="1200" y2="550" />
+    <line x1="0" y1="750" x2="1200" y2="750" />
+  </g>
+
+  <!-- County Border: Sketched imperfect polygon (New Yorker style) -->
+  <!-- Note slightly overshooting and wiggled vertices -->
+  <path d="M 120,80 L 118,85 L 125,78 M 120,80 L 580,70 L 1080,90 L 1110,480 L 980,820 L 520,830 L 150,780 L 80,450 Z" 
+        fill="none" stroke="#121417" stroke-width="2" stroke-dasharray="4 6" opacity="0.3" stroke-linecap="round" />
+  
+  <!-- Williamson County Map Title Block -->
+  <g transform="translate(140, 140)">
+    <!-- Sketched frame border with overshoots -->
+    <path d="M -10,-10 L 290,-8 M 285,-10 L 285,90 M 290,85 L -8,85 M -10,90 L -10,-5" fill="none" stroke="#121417" stroke-width="1.5" opacity="0.6" />
+    <text x="15" y="32" font-family="var(--font-space-grotesk), Space Grotesk, sans-serif" font-size="12" font-weight="700" letter-spacing="0.2em" fill="#121417" opacity="0.5">EDITORIAL SERVICE AREA MAP</text>
+    <text x="15" y="65" font-family="var(--font-space-grotesk), Space Grotesk, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.02em" fill="#121417">Williamson Co.</text>
+  </g>
+
+  <!-- Roads: Hand-drawn style with wiggles and slightly variable stroke-width -->
+  
+  <!-- I-65 Corridor: Thick key vertical line, slightly wiggled, split stroke for hand-drawn feel -->
+  <!-- Main thick line -->
+  <path d="M 680,60 C 678,120 670,220 682,320 C 695,420 725,520 735,620 C 740,680 730,760 742,840" 
+        fill="none" stroke="#121417" stroke-width="3" opacity="0.85" stroke-linecap="round" />
+  <!-- Inner parallel line to make it look like a highway map drawing -->
+  <path d="M 684,60 C 682,120 674,220 686,320 C 699,420 729,520 739,620 C 744,680 734,760 746,840" 
+        fill="none" stroke="#F4F2F0" stroke-width="1" opacity="0.9" />
+
+  <!-- Hillsboro Road / Old Hillsboro Rd -->
+  <path d="M 450,75 C 445,150 435,260 455,340 C 475,410 495,500 480,590 C 460,700 410,750 350,810" 
+        fill="none" stroke="#121417" stroke-width="1.8" opacity="0.4" stroke-linecap="round" />
+
+  <!-- Mack Hatcher Parkway Loop (looping around Franklin) -->
+  <path d="M 450,280 C 490,260 610,250 670,290 C 720,320 730,410 710,480 C 690,530 580,550 510,530 C 470,510 420,440 430,360 C 435,320 442,300 450,280" 
+        fill="none" stroke="#121417" stroke-width="2.2" opacity="0.5" stroke-dasharray="3 3" stroke-linecap="round" />
+
+  <!-- State Route 96 (East-West through Downtown) -->
+  <path d="M 160,390 C 280,380 400,375 510,380 C 600,385 700,390 850,370 C 950,360 1050,350 1120,345" 
+        fill="none" stroke="#121417" stroke-width="1.8" opacity="0.4" stroke-linecap="round" />
+
+  <!-- Neighborhood Markers & Labels -->
+  <!-- Each neighborhood has a hand-sketched marker (asymmetric circle/blob) and label -->
+  
+  <!-- 1. BRENTWOOD (North) -->
+  <g transform="translate(680, 110)">
+    <!-- Asymmetric circle marker -->
+    <path d="M -3,-3 C 3,-6 8,-2 6,4 C 4,8 -2,7 -6,3 C -9,-1 -6,-6 -3,-3 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">BRENTWOOD</text>
+  </g>
+
+  <!-- 2. COOL SPRINGS (Northeast of loop) -->
+  <g transform="translate(710, 240)">
+    <!-- Asymmetric marker -->
+    <path d="M -2,-4 C 4,-7 7,-1 5,3 C 3,7 -3,6 -6,2 C -8,-2 -6,-6 -2,-4 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">COOL SPRINGS</text>
+  </g>
+
+  <!-- 3. MCKAY'S MILL (East of Cool Springs) -->
+  <g transform="translate(850, 280)">
+    <!-- Asymmetric marker -->
+    <path d="M -4,-2 C 1,-5 6,-2 5,4 C 4,8 -2,6 -5,3 C -7,-1 -6,-5 -4,-2 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">MCKAY'S MILL</text>
+  </g>
+
+  <!-- 4. FIELDSTONE FARMS (North of loop) -->
+  <g transform="translate(480, 210)">
+    <!-- Asymmetric marker -->
+    <path d="M -3,-3 C 3,-5 7,-2 6,3 C 4,7 -2,6 -5,2 C -7,-2 -6,-5 -3,-3 Z" fill="#121417" />
+    <text x="-165" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">FIELDSTONE FARMS</text>
+  </g>
+
+  <!-- 5. DOWNTOWN FRANKLIN (Center) -->
+  <!-- This is the premium center, highlighted in orange with a sketched double circle -->
+  <g transform="translate(510, 380)">
+    <!-- Hand-drawn look outer circle -->
+    <path d="M -10,-10 C -2,-13 9,-9 11,-1 C 13,8 7,12 -1,11 C -8,10 -12,4 -10,-4 M -9,-8 L 8,9" fill="none" stroke="#F26522" stroke-width="2" />
+    <!-- Solid orange center -->
+    <circle cx="0" cy="0" r="4" fill="#F26522" />
+    <!-- Label -->
+    <rect x="15" y="-12" width="180" height="22" fill="#F4F2F0" opacity="0.8" />
+    <text x="18" y="4" font-family="var(--font-space-grotesk), Space Grotesk, sans-serif" font-size="14" font-weight="700" letter-spacing="0.18em" fill="#121417">DOWNTOWN FRANKLIN</text>
+  </g>
+
+  <!-- 6. WESTHAVEN (West) -->
+  <g transform="translate(320, 370)">
+    <!-- Asymmetric marker -->
+    <path d="M -4,-4 C 2,-7 6,-3 5,3 C 3,7 -3,6 -6,1 C -7,-3 -6,-6 -4,-4 Z" fill="#121417" />
+    <text x="-105" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">WESTHAVEN</text>
+  </g>
+
+  <!-- 7. LEIPER'S FORK (Far Southwest) -->
+  <g transform="translate(240, 610)">
+    <!-- Asymmetric marker -->
+    <path d="M -3,-3 C 3,-6 8,-2 6,4 C 4,8 -2,7 -6,3 C -9,-1 -6,-6 -3,-3 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">LEIPER'S FORK</text>
+  </g>
+
+  <!-- 8. BERRY FARMS (South on I-65) -->
+  <g transform="translate(720, 580)">
+    <!-- Asymmetric marker -->
+    <path d="M -3,-3 C 3,-5 7,-2 6,3 C 4,7 -2,6 -5,2 C -7,-2 -6,-5 -3,-3 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">BERRY FARMS</text>
+  </g>
+
+  <!-- 9. SPRING HILL (Far South) -->
+  <g transform="translate(740, 780)">
+    <!-- Asymmetric marker -->
+    <path d="M -3,-3 C 3,-6 8,-2 6,4 C 4,8 -2,7 -6,3 C -9,-1 -6,-6 -3,-3 Z" fill="#121417" />
+    <text x="18" y="5" font-family="var(--font-manrope), Manrope, sans-serif" font-size="12" font-weight="700" letter-spacing="0.15em" fill="#121417">SPRING HILL</text>
+  </g>
+
+  <!-- Accent element: Hand-drawn Compass Rose (bottom right) -->
+  <g transform="translate(1020, 720)" opacity="0.4">
+    <!-- Wobbly circle -->
+    <path d="M -25,-25 C -5,-35 25,-25 32,-3 C 36,20 15,35 -5,32 C -25,29 -32,5 -25,-25 Z" fill="none" stroke="#121417" stroke-width="1" />
+    <path d="M 0,-40 L 0,40 M -40,0 L 40,0" stroke="#121417" stroke-width="1.2" stroke-linecap="round" />
+    <path d="M -5,-5 L 0,-25 L 5,-5 L 25,0 L 5,5 L 0,25 L -5,5 L -25,0 Z" fill="#121417" opacity="0.8" />
+    <text x="-4" y="-45" font-family="var(--font-space-grotesk), Space Grotesk, sans-serif" font-size="11" font-weight="700">N</text>
+  </g>
+</svg>

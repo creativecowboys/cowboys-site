@@ -1,6 +1,31 @@
+import Image from "next/image";
+
 export default function TeamStrip() {
+  const team = [
+    {
+      name: "Josh Pack",
+      role: "Founder & Creative Director",
+      image: "/franklin-tn/team-placeholder-1.png",
+    },
+    {
+      name: "[Team Member 2]",
+      role: "[Role]",
+      image: "/franklin-tn/team-placeholder-2.png",
+    },
+    {
+      name: "[Team Member 3]",
+      role: "[Role]",
+      image: "/franklin-tn/team-placeholder-3.png",
+    },
+    {
+      name: "[Team Member 4]",
+      role: "[Role]",
+      image: "/franklin-tn/team-placeholder-4.png",
+    },
+  ];
+
   return (
-    <section className="py-24 bg-white border-b border-neutral-200">
+    <section className="py-28 bg-[#F4F2F0]">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="max-w-3xl mb-16">
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-neutral-900 mb-6">
@@ -12,27 +37,27 @@ export default function TeamStrip() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {/* TODO: Replace with real team photos + names once confirmed */}
-          <div className="flex flex-col text-center">
-            <div className="aspect-square bg-neutral-200 rounded-[18px] mb-4 overflow-hidden" />
-            <h3 className="font-display font-bold text-lg text-neutral-900">Josh Pack</h3>
-            <p className="font-body text-sm text-[#F26522] font-bold">Founder & Creative Director</p>
-          </div>
-          <div className="flex flex-col text-center">
-            <div className="aspect-square bg-neutral-200 rounded-[18px] mb-4 overflow-hidden" />
-            <h3 className="font-display font-bold text-lg text-neutral-900">[Team Member 2]</h3>
-            <p className="font-body text-sm text-[#F26522] font-bold">[Role]</p>
-          </div>
-          <div className="flex flex-col text-center">
-            <div className="aspect-square bg-neutral-200 rounded-[18px] mb-4 overflow-hidden" />
-            <h3 className="font-display font-bold text-lg text-neutral-900">[Team Member 3]</h3>
-            <p className="font-body text-sm text-[#F26522] font-bold">[Role]</p>
-          </div>
-          <div className="flex flex-col text-center">
-            <div className="aspect-square bg-neutral-200 rounded-[18px] mb-4 overflow-hidden" />
-            <h3 className="font-display font-bold text-lg text-neutral-900">[Team Member 4]</h3>
-            <p className="font-body text-sm text-[#F26522] font-bold">[Role]</p>
-          </div>
+          {team.map((member, i) => (
+            <div key={i} className="flex flex-col text-center">
+              <div className="aspect-square bg-[#EDE9E4] rounded-[18px] mb-4 overflow-hidden relative shadow-sm select-none">
+                <Image
+                  src={member.image}
+                  alt={member.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="font-display font-bold text-lg text-neutral-900">
+                {member.name}
+              </h3>
+              <p className="font-body text-sm text-[#F26522] font-bold">
+                {member.role}
+              </p>
+              <p className="font-body text-[11px] text-neutral-500 mt-2 italic leading-tight">
+                Illustrated placeholder · Real photo coming soon
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
