@@ -27,8 +27,9 @@ export default function TopBar() {
                 {/* Address */}
                 <span
                     style={{
-                        fontSize: "12px",
-                        color: "#cccccc",
+                        fontFamily: "var(--font-body), sans-serif",
+                        fontSize: "13px",
+                        color: "#6a6a68",
                         letterSpacing: "0.04em",
                     }}
                 >
@@ -39,17 +40,18 @@ export default function TopBar() {
                 <a
                     href="tel:4702437517"
                     style={{
-                        fontSize: "12px",
-                        color: "#cccccc",
+                        fontFamily: "var(--font-body), sans-serif",
+                        fontSize: "13px",
+                        color: "#6a6a68",
                         letterSpacing: "0.04em",
                         textDecoration: "none",
                         transition: "color 0.2s ease",
                     }}
                     onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLAnchorElement).style.color = "#F15F2A")
+                        ((e.currentTarget as HTMLAnchorElement).style.color = "#F26522")
                     }
                     onMouseLeave={(e) =>
-                        ((e.currentTarget as HTMLAnchorElement).style.color = "#cccccc")
+                        ((e.currentTarget as HTMLAnchorElement).style.color = "#6a6a68")
                     }
                 >
                     (470) 243-7517

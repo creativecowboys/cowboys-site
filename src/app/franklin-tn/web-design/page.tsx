@@ -73,21 +73,23 @@ export default function WebDesignFranklinPage() {
       
       {/* 6. Case Study #2 */}
       <CaseStudy 
-        clientName="[Recent Professional Services Client]"
-        eyebrow="LAW FIRM"
-        quote="We went from 2 contact form fills a month to 18. Same traffic, better site."
-        attribution="[First Last], Partner, [Firm Name]"
+        clientName="John B. Jackson & Associates"
+        eyebrow="PERSONAL INJURY · WEST GEORGIA"
+        quote="We worked with a national marketing company for six years and never broke into the top 10 for 'personal injury.' Twelve months with Creative Cowboys: 22 #1 rankings and over $500,000 in new revenue. We should have made the switch sooner."
+        attribution="— John B. Jackson, Founding Attorney, John B. Jackson & Associates · West Georgia"
         storyParagraphs={[
-          "[Firm Name] had been running the same site since 2017. It was content-heavy, slow, and the contact form lived three clicks deep. Their content was actually good — they just couldn't capture the people reading it. The firm was getting steady organic traffic but converting almost none of it.",
-          "We kept the content, restructured the site IA around practice areas, added a context-aware contact form to every page, simplified the practice-area landing pages, and added schema markup so their local reviews showed up in search results. Three weeks of design, four weeks of build."
+          "John B. Jackson & Associates is one of West Georgia's most established personal injury and workers' comp firms — serving Carrollton, Douglasville, and Villa Rica since 2003. Before we partnered, they'd spent six years with a large national marketing agency and had never cracked the top 10 of Google for their primary keyword: \"personal injury.\" We rebuilt the website from the ground up — a modern firm site with practice-area pages, fast intake forms, and the polish a personal injury client expects before they trust someone with their case. In parallel, we built and ran integrated campaigns across CTV, Google Ads, and paid social, all routing back to conversion-tracked landing pages. Twelve months in: 22 #1 organic rankings, $500,000+ in new revenue, and a national marketing agency JBJ no longer needed."
         ]}
         metrics={[
-          { label: "Contact form submissions", value: "2/mo → 18/mo (800% lift)" },
-          { label: "Organic clicks", value: "+34% (same traffic, better CTR)" },
-          { label: "Average session duration", value: "1:08 → 2:47" }
+          { label: "#1 organic rankings", value: "0 → 22 in 12 months" },
+          { label: "New revenue generated", value: "$500,000+" },
+          { label: "Active marketing channels", value: "0 → 3 (CTV, Google Ads, paid social)" }
         ]}
-        linkUrl="#"
-        imagePlaceholder="Before/After Homepage + Work Photo"
+        linkUrl="/case-studies/john-b-jackson" // TODO: build sub-page
+        linkText="See the full John B. Jackson case study"
+        imageSrc="/franklin-tn/jbjackson-desktop-hero.png"
+        imageAlt="John B. Jackson & Associates website redesign"
+        imagePlaceholder="John B. Jackson & Associates — Asset Coming Soon"
         reverseLayout={true}
         bgClass="bg-[#F4F2F0]"
       />
@@ -97,20 +99,23 @@ export default function WebDesignFranklinPage() {
       
       {/* 8. Case Study #3 */}
       <CaseStudy 
-        clientName="[Recent Home Services Client]"
-        eyebrow="HVAC · MULTI-NEIGHBORHOOD SERVICE AREA"
-        quote="Phone hasn't stopped ringing since June. Most of these callers said they found us on Google."
-        attribution="[First Last], Owner, [HVAC Business Name]"
+        clientName="McKinley Roofing & Restoration"
+        eyebrow="ROOFING · DOUGLASVILLE, GA"
+        quote="We had a one-page site that nobody could find. Creative Cowboys built us a real online presence and the phone hasn't stopped ringing — 11 #1 rankings and 10x traffic since launch."
+        attribution="— [Owner Name], McKinley Roofing & Restoration · Douglasville, GA"
         storyParagraphs={[
-          "Service area was wrong on the old site. Google Business Profile wasn't connected to the website. There were no separate landing pages for the different neighborhoods they served — meaning a search for 'HVAC near me' in one neighborhood never showed up as a strong local match. We rebuilt the site with neighborhood-specific service pages, wired up Google Business Profile, added schema markup for the service area, and added a click-to-call button that fires on every mobile page."
+          "McKinley Roofing & Restoration is a family-owned roofing company in Douglasville, GA. When we started working together, their entire web presence was a single-page site nobody could find — virtually no organic traffic, no inbound leads from search, no real digital footprint. We rebuilt the site as a proper local roofing presence: neighborhood-specific service area pages, an insurance claim assistance flow, real photography of their crew on real West Georgia roofs, and the Google Business Profile + local SEO foundations they'd been missing. We layered in active Google Ads, SEO, and paid social campaigns running together as one system. The result: 11 #1 organic rankings, website traffic up 1,000% since launch, and a phone that doesn't stop ringing during storm season."
         ]}
         metrics={[
-          { label: "Service calls from Google", value: "11/mo → 64/mo (482% lift)" },
-          { label: "Page-1 rankings across served neighborhoods", value: "0 → 7 keywords" },
-          { label: "Click-to-call taps on mobile", value: "8/mo → 91/mo" }
+          { label: "#1 organic rankings", value: "0 → 11" },
+          { label: "Website traffic", value: "+1,000% since launch" },
+          { label: "Active marketing channels", value: "0 → 3 (Google Ads, SEO, paid social)" }
         ]}
-        linkUrl="#"
-        imagePlaceholder="Before/After Screens + Work Photo"
+        linkUrl="/case-studies/mckinley-roofing" // TODO: build sub-page
+        linkText="See the full McKinley Roofing case study"
+        imageSrc="/franklin-tn/mckinley-desktop-hero.png"
+        imageAlt="McKinley Roofing & Restoration website redesign"
+        imagePlaceholder="McKinley Roofing & Restoration — Asset Coming Soon"
         bgClass="bg-[#F4F2F0]"
       />
       

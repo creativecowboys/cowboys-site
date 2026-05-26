@@ -53,7 +53,7 @@ export default function TeamStrip() {
               <p className="font-body text-sm text-[#F26522] font-bold">
                 {member.role}
               </p>
-              <p className="font-body text-[12px] text-[#6a6a68] mt-2 italic leading-tight">
+              <p className="font-body text-[11px] text-[#6a6a68] mt-2 italic leading-tight">
                 Illustrated portrait · Real photo coming soon
               </p>
             </div>

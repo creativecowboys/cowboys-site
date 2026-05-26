@@ -15,6 +15,7 @@ interface CaseStudyProps {
   storyParagraphs: string[];
   metrics: Metric[];
   linkUrl: string;
+  linkText?: string;         // Optional custom link text
   liveSiteUrl?: string;     // Optional "View Site" link shown under the After image
   imageSrc?: string;        // "After" screenshot path from /public
   imageAlt?: string;        // Alt text for after image
@@ -34,6 +35,7 @@ export default function CaseStudy({
   storyParagraphs,
   metrics,
   linkUrl,
+  linkText,
   liveSiteUrl,
   imageSrc,
   imageAlt,
@@ -82,7 +84,7 @@ export default function CaseStudy({
           </div>
           
           <Link href={linkUrl} className="inline-flex items-center text-[#F26522] font-bold hover:underline underline-offset-4 decoration-2">
-            See the full {clientName} case study <ArrowRight className="ml-2 w-5 h-5" />
+            {linkText ?? `See the full ${clientName} case study`} <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
         
@@ -153,7 +155,7 @@ export default function CaseStudy({
               </div>
             ) : (
               /* Single image (desktop / generic) */
-              <div className="relative w-full rounded-[18px] overflow-hidden border border-neutral-200 shadow-md">
+              <div className="relative w-full rounded-[24px] overflow-hidden border border-neutral-200 shadow-md">
                 <Image
                   src={imageSrc}
                   alt={imageAlt ?? clientName}
