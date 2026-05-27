@@ -3,7 +3,7 @@ import { TestimonialStack } from "@/components/ui/glass-testimonial-swiper";
 
 export default function LiveReviews() {
   return (
-    <section className="py-32 bg-gradient-to-b from-[#f0ddd4] via-[#fce8d5] to-[#f0ddd4]">
+    <section className="py-32 bg-testimonial-warm">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
         {/* Header */}

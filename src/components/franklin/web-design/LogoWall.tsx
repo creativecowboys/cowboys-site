@@ -48,13 +48,13 @@ export default function LogoWall() {
                   alt={item.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 20vw"
-                  className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="object-cover object-top transition-transform duration-[250ms] ease-out group-hover:scale-[1.03]"
                 />
-                {/* 4% darkening overlay on hover */}
-                <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10 pointer-events-none" />
+                {/* Subtle brand orange tint overlay on hover */}
+                <div className="absolute inset-0 bg-[#F26522]/0 transition-colors duration-[250ms] ease-out group-hover:bg-[#F26522]/[0.08] pointer-events-none z-10" />
               </div>
               {/* Caption */}
-              <div className="transition-opacity duration-300 opacity-80 group-hover:opacity-100 font-body text-[13px] font-medium text-left leading-normal">
+              <div className="transition-opacity duration-[250ms] ease-out opacity-80 group-hover:opacity-100 font-body text-[13px] font-medium text-left leading-normal">
                 <div className="text-white font-semibold tracking-tight">{item.name}</div>
                 <div className="text-neutral-400">{item.vertical}</div>
               </div>

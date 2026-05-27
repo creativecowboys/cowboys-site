@@ -1,6 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   const faqs = [
     {
       q: "How much does a website cost in Franklin, TN?",
@@ -57,18 +63,18 @@ export default function FAQ() {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-12 lg:gap-16 items-start">
           
-          {/* Left Column (40% / col-span-4 on desktop) */}
-          <div className="lg:col-span-4 flex flex-col items-start lg:sticky lg:top-8">
+          {/* Left Column (40% / col-span-4 on desktop, vertically centered relative to grid) */}
+          <div className="lg:col-span-4 flex flex-col items-center lg:items-start lg:self-center w-full lg:sticky lg:top-12">
             <p className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-3">
               &mdash; FAQ &mdash;
             </p>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-white mb-8 leading-[1.15]">
+            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-white mb-8 leading-[1.15] text-center lg:text-left w-full">
               Questions Franklin business owners{" "}
               <span className="bg-gradient-to-r from-brand-orange to-brand-pink bg-clip-text text-transparent">
                 actually ask us.
               </span>
             </h2>
-            <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-square mx-auto lg:mx-0 select-none">
+            <div className="relative w-full max-w-[360px] md:max-w-[400px] aspect-square select-none">
               <Image
                 src="/franklin-tn/faq-illustration-dark.svg"
                 alt="FAQ illustration"
@@ -80,20 +86,37 @@ export default function FAQ() {
 
           {/* Right Column (60% / col-span-6 on desktop) */}
           <div className="lg:col-span-6 space-y-4 w-full text-white">
-            {faqs.map((faq, i) => (
-              <details key={i} className="group bg-[#121417] rounded-[14px] border border-white/10 overflow-hidden open:shadow-sm transition-all">
-                <summary className="flex cursor-pointer items-center justify-between p-6 font-display font-bold text-lg text-white marker:content-none hover:text-brand-orange transition-colors">
-                  {faq.q}
-                  <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
-                    <span className="absolute h-0.5 w-5 bg-current transition-transform duration-300 ease-out group-open:rotate-180" />
-                    <span className="absolute h-5 w-0.5 bg-current transition-transform duration-300 ease-out group-open:rotate-90" />
-                  </span>
-                </summary>
-                <div className="px-6 pb-6 font-body text-neutral-300 leading-relaxed text-lg">
-                  {faq.a}
+            {faqs.map((faq, i) => {
+              const isOpen = openIndex === i;
+              return (
+                <div 
+                  key={i} 
+                  className="bg-[#121417] rounded-[14px] border border-white/10 overflow-hidden transition-colors duration-300"
+                >
+                  <button 
+                    onClick={() => setOpenIndex(isOpen ? null : i)}
+                    className="flex w-full cursor-pointer items-center justify-between p-6 font-display font-bold text-lg text-white hover:text-brand-orange transition-colors focus:outline-none text-left"
+                  >
+                    {faq.q}
+                    <span className="relative flex h-5 w-5 shrink-0 items-center justify-center text-current">
+                      <span className={`absolute h-0.5 w-5 bg-current transition-transform duration-300 ease-out ${isOpen ? "rotate-180" : ""}`} />
+                      <span className={`absolute h-5 w-0.5 bg-current transition-transform duration-300 ease-out ${isOpen ? "rotate-90 scale-y-0" : ""}`} />
+                    </span>
+                  </button>
+                  
+                  <motion.div
+                    initial={false}
+                    animate={{ height: isOpen ? "auto" : 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-6 pb-6 font-body text-neutral-300 leading-relaxed text-lg border-t border-white/5 pt-4">
+                      {faq.a}
+                    </div>
+                  </motion.div>
                 </div>
-              </details>
-            ))}
+              );
+            })}
           </div>
 
         </div>

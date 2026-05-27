@@ -14,12 +14,12 @@ export default function ServiceArea() {
   ];
 
   return (
-    <section className="py-32 bg-[#0D0D0F] text-[#F4F2F0] border-b border-white/10">
+    <section className="py-32 bg-[#0D0D0F] text-[#F4F2F0] border-b border-white/10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* Left Column (50% on desktop) */}
-          <div className="lg:col-span-6 flex flex-col justify-center">
+          {/* Left Column (41.7% on desktop) */}
+          <div className="lg:col-span-5 flex flex-col justify-center">
             <p className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-3">
               &mdash; WILLIAMSON COUNTY &mdash;
             </p>
@@ -64,14 +64,14 @@ export default function ServiceArea() {
             </div>
           </div>
 
-          {/* Right Column (50% on desktop) */}
-          <div className="lg:col-span-6 flex justify-center items-center">
-            <div className="relative w-full aspect-square max-w-[500px] select-none">
+          {/* Right Column (58.3% on desktop, bleeds 24px past right edge) */}
+          <div className="lg:col-span-7 flex justify-center items-center lg:-mr-6 lg:translate-x-6 overflow-visible w-full">
+            <div className="relative w-full aspect-[4/3] select-none">
               <Image 
                 src="/franklin-tn/williamson-county-map.svg" 
                 alt="Williamson County Map"
                 fill
-                className="object-contain"
+                className="object-contain object-right lg:object-right"
               />
             </div>
           </div>

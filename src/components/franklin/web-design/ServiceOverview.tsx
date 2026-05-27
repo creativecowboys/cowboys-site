@@ -76,12 +76,23 @@ export default function ServiceOverview() {
           {services.map((service) => (
             <div 
               key={service.id}
-              className="relative bg-[#121417] p-8 rounded-[24px] border border-white/10 overflow-hidden group hover:border-white/20 transition-all duration-300 flex flex-col justify-between"
-              style={{
-                backgroundImage: `radial-gradient(circle at 100% 100%, ${service.glowColor} 0%, transparent 60%)`
-              }}
+              className="relative bg-[#121417] p-8 rounded-[24px] border border-white/10 overflow-hidden group hover:border-white/20 hover:-translate-y-1 transition-all duration-200 ease-out flex flex-col justify-between"
             >
-              <div>
+              {/* Glow layers */}
+              <div 
+                className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-200 pointer-events-none z-0"
+                style={{
+                  backgroundImage: `radial-gradient(circle at 100% 100%, ${service.glowColor} 0%, transparent 60%)`
+                }}
+              />
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-0"
+                style={{
+                  backgroundImage: `radial-gradient(circle at 100% 100%, ${service.glowColor.replace('0.12', '0.32')} 0%, transparent 60%)`
+                }}
+              />
+
+              <div className="relative z-10">
                 {/* Top Icon inside pill background */}
                 <div className={`mb-6 select-none inline-flex items-center justify-center p-3 rounded-2xl border ${service.borderClass} ${service.bgOpacityClass}`}>
                   <Image 
@@ -122,9 +133,9 @@ export default function ServiceOverview() {
               {/* Learn More Link */}
               <Link 
                 href="#book-call" 
-                className={`inline-flex items-center text-sm font-semibold ${service.accentClass} hover:opacity-85 transition-opacity mt-4`}
+                className={`relative z-10 inline-flex items-center text-sm font-semibold ${service.accentClass} hover:opacity-85 transition-opacity mt-4`}
               >
-                Learn more &rarr;
+                Learn more <span className="inline-block transition-transform duration-200 ease-out group-hover:translate-x-1 ml-1">&rarr;</span>
               </Link>
             </div>
           ))}

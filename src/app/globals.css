@@ -255,6 +255,10 @@ chat-widget,
   background: linear-gradient(180deg, #f0ddd4 0%, #fce8d5 60%, #f0ddd4 100%);
 }
 
+.bg-testimonial-warm {
+  background: linear-gradient(180deg, #f4e7df 0%, #fbeee0 50%, #f4e7df 100%);
+}
+
 .testimonials-eyebrow {
   display: inline-block;
   font-size: 11px;

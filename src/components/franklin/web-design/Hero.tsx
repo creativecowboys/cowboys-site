@@ -1,15 +1,63 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [supportsHover, setSupportsHover] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    setSupportsHover(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSupportsHover(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    const handleMove = (e: MouseEvent) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      sectionRef.current.style.setProperty("--mouse-x", `${x}px`);
+      sectionRef.current.style.setProperty("--mouse-y", `${y}px`);
+    };
+
+    const section = sectionRef.current;
+    if (section && mediaQuery.matches) {
+      section.addEventListener("mousemove", handleMove);
+    }
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+      if (section) {
+        section.removeEventListener("mousemove", handleMove);
+      }
+    };
+  }, []);
+
   return (
-    <section className="relative overflow-hidden bg-[#0D0D0F] text-white pt-24 pb-20 md:pt-36 md:pb-28">
+    <section ref={sectionRef} className="relative overflow-hidden bg-[#0D0D0F] text-white pt-24 pb-20 md:pt-36 md:pb-28 group">
       {/* 7.2 Hero background grain texture overlay */}
       <div 
         className="absolute inset-0 z-0 bg-repeat pointer-events-none opacity-[0.05]"
         style={{ backgroundImage: "url('/franklin-tn/hero-noise.png')", backgroundSize: "1440px 900px" }}
       />
+
+      {/* Cursor-following highlight overlay (omitted on touch devices) */}
+      {supportsHover && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+          style={{
+            background: "radial-gradient(200px circle at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(242, 101, 34, 0.15), transparent 80%)"
+          }}
+        />
+      )}
 
       {/* Chrome Brand bar - Top Left Page Chrome */}
       <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 mb-8 md:mb-16">
