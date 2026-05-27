@@ -9,22 +9,25 @@ export default function RiskReversal() {
   ];
 
   return (
-    <section className="py-32 bg-white">
-      <div className="max-w-4xl mx-auto px-6 md:px-12 bg-[#F4F2F0] rounded-[24px] p-10 md:p-16 border border-[#ECEAE3] shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-5">
+    <section className="py-32 bg-[#0D0D0F] border-b border-white/10">
+      <div className="max-w-4xl mx-auto px-6 md:px-12 bg-[#121417] rounded-[24px] p-10 md:p-16 border border-white/10 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-[0.02] text-white">
           <Shield className="w-64 h-64" />
         </div>
         
         <div className="relative z-10">
-          <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-neutral-900 mb-10">
+          <p className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-3">
+            &mdash; OUR GUARANTEE &mdash;
+          </p>
+          <h2 className="font-display text-3xl font-bold tracking-[-0.02em] text-white mb-10">
             Things we want you to know upfront.
           </h2>
           
           <ul className="space-y-6">
             {points.map((point, i) => (
               <li key={i} className="flex gap-4">
-                <div className="w-2 h-2 rounded-full bg-[#F26522] shrink-0 mt-2.5" />
-                <p className="font-body text-neutral-700 text-lg leading-relaxed">{point}</p>
+                <div className="w-2 h-2 rounded-full bg-brand-orange shrink-0 mt-2.5" />
+                <p className="font-body text-neutral-300 text-lg leading-relaxed">{point}</p>
               </li>
             ))}
           </ul>

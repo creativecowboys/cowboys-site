@@ -65,7 +65,7 @@ export default function WebDesignFranklinPage() {
         imageAlt="Harmonic Production new website — after Creative Cowboys"
         imagePlaceholder="Harmonic Production — Asset Coming Soon"
         isMobileImage={true}
-        bgClass="bg-[#F4F2F0]"
+        bgClass="bg-gradient-to-b from-[#f0ddd4] via-[#fce8d5] to-[#f0ddd4]"
       />
       
       {/* 5. Pricing Tiers */}
@@ -91,7 +91,7 @@ export default function WebDesignFranklinPage() {
         imageAlt="John B. Jackson & Associates website redesign"
         imagePlaceholder="John B. Jackson & Associates — Asset Coming Soon"
         reverseLayout={true}
-        bgClass="bg-[#F4F2F0]"
+        bgClass="bg-gradient-to-b from-[#f0ddd4] via-[#fce8d5] to-[#f0ddd4]"
       />
       
       {/* 7. Process */}
@@ -116,7 +116,7 @@ export default function WebDesignFranklinPage() {
         imageSrc="/franklin-tn/mckinley-desktop-hero.png"
         imageAlt="McKinley Roofing & Restoration website redesign"
         imagePlaceholder="McKinley Roofing & Restoration — Asset Coming Soon"
-        bgClass="bg-[#F4F2F0]"
+        bgClass="bg-gradient-to-b from-[#f0ddd4] via-[#fce8d5] to-[#f0ddd4]"
       />
       
       {/* 9. Service Area */}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <!-- Gear 1: Light-cream large wobbly gear -->
+  <g transform="translate(26, 38)">
+    <!-- Sketched outer wheel -->
+    <path d="M -16,-16 C -5,-26 15,-22 22,-8 C 28,5 18,22 4,23 C -9,24 -22,12 -21,-3 C -20,-11 -18,-14 -16,-16 Z" 
+          stroke="#F4F2F0" stroke-width="2" fill="none" stroke-linecap="round" />
+    <!-- Sketched gear teeth -->
+    <path d="M -18,-9 L -23,-11 M -13,-18 L -16,-23 M -4,-21 L -4,-26 M 7,-18 L 10,-22 M 16,-9 L 21,-11 M 17,4 L 22,6 M 10,14 L 13,19 M -2,17 L -2,22 M -13,12 L -17,17 M -19,1 L -24,1" 
+          stroke="#F4F2F0" stroke-width="2.2" stroke-linecap="round" />
+    <!-- Inner shaft circle -->
+    <circle cx="0" cy="0" r="5" stroke="#F4F2F0" stroke-width="1.5" fill="none" />
+  </g>
+
+  <!-- Gear 2: Interlocking smaller orange gear (sketched) -->
+  <g transform="translate(45, 20)">
+    <!-- Sketched outer wheel (orange highlight) -->
+    <path d="M -11,-11 C -4,-18 9,-15 13,-6 C 17,3 11,14 2,15 C -7,16 -15,8 -14,-2 C -13,-7 -12,-9 -11,-11 Z" 
+          stroke="#F26522" stroke-width="2" fill="none" stroke-linecap="round" />
+    <!-- Sketched orange teeth -->
+    <path d="M -13,-5 L -17,-7 M -8,-12 L -10,-16 M -1,-13 L -1,-17 M 7,-9 L 10,-12 M 11,-2 L 15,-3 M 9,6 L 12,9 M 3,11 L 4,15 M -6,9 L -8,12" 
+          stroke="#F26522" stroke-width="2" stroke-linecap="round" />
+    <!-- Inner shaft circle -->
+    <circle cx="0" cy="0" r="3" stroke="#F26522" stroke-width="1.2" fill="none" />
+  </g>
+</svg>

@@ -51,15 +51,15 @@ export default function CaseStudy({
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className={`flex flex-col gap-12 lg:gap-20 ${reverseLayout ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
           <div className="lg:w-1/2 flex flex-col justify-center">
-            <div className="inline-block mb-0 px-3 py-1 rounded-[10px] bg-[#EDE9E4] text-[#121417] text-xs font-bold tracking-widest uppercase self-start">
-              {eyebrow}
+            <div className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-3 self-start">
+              &mdash; {eyebrow} &mdash;
             </div>
             
             <h2 className="font-display text-[36px] md:text-[48px] font-bold text-[#121417] mt-0 mb-4 tracking-[-0.02em] leading-tight">
               {clientName}
             </h2>
 
-            <blockquote className="font-display text-[20px] md:text-[24px] text-[#F26522] font-medium italic tracking-[-0.01em] leading-snug mb-4">
+            <blockquote className="font-display text-[20px] md:text-[24px] text-brand-orange font-medium italic tracking-[-0.01em] leading-snug mb-4">
               {quote}
             </blockquote>
           <p className="font-body text-neutral-500 font-medium mb-10">{attribution}</p>
@@ -70,7 +70,7 @@ export default function CaseStudy({
             ))}
           </div>
           
-          <div className="bg-white p-8 rounded-[18px] border border-neutral-100 shadow-sm mb-8">
+          <div className="bg-white p-8 rounded-[18px] border border-neutral-100 shadow-sm mb-6">
             <h4 className="font-display font-bold text-neutral-900 mb-6 text-lg">The Results</h4>
             <ul className="space-y-4">
               {metrics.map((metric, i) => (
@@ -81,8 +81,21 @@ export default function CaseStudy({
               ))}
             </ul>
           </div>
+
+          {/* Tags under the Results card */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            <span className="text-[11px] font-semibold tracking-wider text-brand-orange uppercase bg-brand-orange/10 border border-brand-orange/20 px-3 py-1 rounded-full">
+              FEATURED
+            </span>
+            <span className="text-[11px] font-semibold tracking-wider text-neutral-500 uppercase bg-neutral-100 border border-neutral-200 px-3 py-1 rounded-full">
+              {eyebrow}
+            </span>
+            <span className="text-[11px] font-semibold tracking-wider text-neutral-500 uppercase bg-neutral-100 border border-neutral-200 px-3 py-1 rounded-full">
+              CONVERSION DESIGN
+            </span>
+          </div>
           
-          <Link href={linkUrl} className="inline-flex items-center text-[#F26522] font-bold hover:underline underline-offset-4 decoration-2">
+          <Link href={linkUrl} className="inline-flex items-center text-brand-orange font-bold hover:underline underline-offset-4 decoration-2">
             {linkText ?? `See the full ${clientName} case study`} <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

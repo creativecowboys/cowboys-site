@@ -14,14 +14,20 @@ export default function ServiceArea() {
   ];
 
   return (
-    <section className="py-32 bg-[#121417] text-[#F4F2F0]">
+    <section className="py-32 bg-[#0D0D0F] text-[#F4F2F0] border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
           {/* Left Column (50% on desktop) */}
           <div className="lg:col-span-6 flex flex-col justify-center">
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-[#F4F2F0] mb-6">
-              Serving the full Franklin and Williamson County market.
+            <p className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-3">
+              &mdash; WILLIAMSON COUNTY &mdash;
+            </p>
+            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-[-0.02em] text-white mb-6">
+              Serving the full Franklin{" "}
+              <span className="bg-gradient-to-r from-brand-orange to-brand-pink bg-clip-text text-transparent">
+                and Williamson County market.
+              </span>
             </h2>
             <p className="font-body text-lg text-neutral-300 leading-relaxed mb-10">
               From Cool Springs storefronts to Westhaven boutiques, from Berry Farms home services to Downtown Franklin professional firms — we work with businesses across every Franklin neighborhood. Strategy calls in person or remote, whichever fits how you work.
@@ -29,13 +35,13 @@ export default function ServiceArea() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               <div>
-                <h3 className="font-body text-sm font-bold tracking-widest uppercase text-[#F26522] mb-4">
+                <h3 className="font-body text-xs font-semibold tracking-[0.12em] uppercase text-brand-orange mb-4">
                   Neighborhoods We Serve
                 </h3>
                 <ul className="space-y-3 font-body text-neutral-300">
                   {neighborhoods.map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#F26522]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
                       {item}
                     </li>
                   ))}
@@ -43,13 +49,13 @@ export default function ServiceArea() {
               </div>
               
               <div>
-                <h3 className="font-body text-sm font-bold tracking-widest uppercase text-[#F26522] mb-4">
+                <h3 className="font-body text-xs font-semibold tracking-[0.12em] uppercase text-brand-orange mb-4">
                   Verticals We Know
                 </h3>
                 <ul className="space-y-3 font-body text-neutral-300">
                   {verticals.map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#F26522]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
                       {item}
                     </li>
                   ))}

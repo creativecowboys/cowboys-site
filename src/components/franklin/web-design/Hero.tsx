@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#121417] text-white pt-24 pb-20 md:pt-36 md:pb-28">
+    <section className="relative overflow-hidden bg-[#0D0D0F] text-white pt-24 pb-20 md:pt-36 md:pb-28">
       {/* 7.2 Hero background grain texture overlay */}
       <div 
         className="absolute inset-0 z-0 bg-repeat pointer-events-none opacity-[0.05]"
@@ -13,10 +13,15 @@ export default function Hero() {
 
       {/* Chrome Brand bar - Top Left Page Chrome */}
       <div className="relative z-20 max-w-7xl mx-auto px-6 md:px-12 mb-8 md:mb-16">
-        <Link href="/" className="inline-block select-none group">
-          <span className="font-display text-lg font-bold tracking-tight text-[#F26522] transition-colors duration-200">
-            Creative Cowboys
-          </span>
+        <Link href="/" className="site-logo inline-block select-none">
+          <Image
+            src="/Main%20logo%202.png"
+            alt="Creative Cowboys"
+            width={180}
+            height={48}
+            priority
+            style={{ width: "180px", height: "auto" }}
+          />
         </Link>
       </div>
 
@@ -27,13 +32,16 @@ export default function Hero() {
           <div className="lg:col-span-7 flex flex-col items-start text-left">
             
             {/* Eyebrow chip */}
-            <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/90 text-xs font-bold tracking-widest uppercase">
-              WEB DESIGN · FRANKLIN, TN
+            <div className="font-body text-xs font-semibold tracking-[0.12em] text-brand-orange uppercase mb-6">
+              &mdash; WEB DESIGN &middot; FRANKLIN, TN &mdash;
             </div>
 
             {/* H1 */}
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[56px] font-bold tracking-[-0.02em] text-white leading-[1.1] mb-6 max-w-2xl">
-              Franklin Web Design That Pays For Itself in 90 Days.
+              Franklin Web Design That Pays For Itself{" "}
+              <span className="bg-gradient-to-r from-brand-orange to-brand-pink bg-clip-text text-transparent">
+                in 90 Days.
+              </span>
             </h1>
 
             {/* Subhead */}
@@ -77,7 +85,7 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
               <Link
                 href="#scorecard"
-                className="btn-primary inline-flex items-center justify-center px-8 py-4.5 bg-[#F26522] hover:bg-[#ff7b3a] text-white font-semibold rounded-full transition-all duration-300 text-base shadow-[0_4px_16px_rgba(242,101,34,0.35)] hover:shadow-[0_4px_24px_rgba(242,101,34,0.5)] cursor-pointer text-center"
+                className="inline-flex items-center justify-center px-8 py-[18px] bg-brand-orange hover:bg-brand-orange/90 text-white font-semibold rounded-full transition-all duration-300 text-base shadow-[0_4px_16px_rgba(242,101,34,0.35)] hover:shadow-[0_4px_24px_rgba(242,101,34,0.5)] cursor-pointer text-center"
               >
                 Get a Free Franklin Web Design Scorecard
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -85,9 +93,9 @@ export default function Hero() {
               
               <Link
                 href="#book-call"
-                className="inline-flex items-center justify-center py-4 text-white/90 hover:text-white font-semibold transition-colors text-base underline decoration-2 underline-offset-4 cursor-pointer text-center"
+                className="inline-flex items-center justify-center py-[18px] px-8 border border-white/20 hover:bg-white/5 bg-transparent text-white font-semibold rounded-full transition-all duration-300 text-base cursor-pointer text-center"
               >
-                Book a 20-min Franklin web strategy call &rarr;
+                Book a 20-min Franklin web strategy call
               </Link>
             </div>
 
