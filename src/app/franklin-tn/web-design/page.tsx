@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Hero from "@/components/franklin/web-design/Hero";
 import ProofBar from "@/components/franklin/web-design/ProofBar";
-import LogoWall from "@/components/franklin/web-design/LogoWall";
+import IntegrationsSection from "@/components/ui/integrations-section";
 import ServiceOverview from "@/components/franklin/web-design/ServiceOverview";
 import CaseStudy from "@/components/franklin/web-design/CaseStudy";
 import PricingTiers from "@/components/franklin/web-design/PricingTiers";
@@ -44,9 +44,9 @@ export default function WebDesignFranklinPage() {
         <ProofBar />
       </ScrollFadeIn>
       
-      {/* 2. Logo Wall */}
+      {/* 2. Integrations Wall */}
       <ScrollFadeIn>
-        <LogoWall />
+        <IntegrationsSection />
       </ScrollFadeIn>
       
       {/* 3. Service Overview */}
