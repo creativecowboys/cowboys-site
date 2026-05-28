@@ -11,7 +11,8 @@ interface Message {
     text: string;
 }
 
-export default function WranglerChat() {
+export default function WranglerChat({ variant = "glass" }: { variant?: "glass" | "brutalist" }) {
+    const isBrutalist = variant === "brutalist";
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
@@ -21,6 +22,18 @@ export default function WranglerChat() {
     const inputRef = useRef<HTMLInputElement>(null);
     const sessionID = useRef("cc_" + Math.random().toString(36).substr(2, 9));
     const conversationStarted = useRef(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMessages([
+                {
+                    role: "bot",
+                    text: "Howdy! I'm Wrangler. Ask me anything about our web design, SEO, or how we can help your business grow!",
+                },
+            ]);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         if (messagesContainerRef.current) {
@@ -106,7 +119,16 @@ export default function WranglerChat() {
         <div style={{ width: "100%", maxWidth: "560px", margin: "0 auto", fontFamily: "inherit" }}>
             {/* Chat box */}
             <div
-                style={{
+                style={isBrutalist ? {
+                    background: "#FFFBF7",
+                    border: "3px solid #1A1423",
+                    borderRadius: "0px",
+                    boxShadow: "4px 4px 0px #1A1423",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "240px",
+                } : {
                     background: "rgba(255,255,255,0.92)",
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
@@ -151,7 +173,17 @@ export default function WranglerChat() {
                             }}
                         >
                             <div
-                                style={{
+                                style={isBrutalist ? {
+                                    maxWidth: "80%",
+                                    padding: "10px 16px",
+                                    borderRadius: "0px",
+                                    border: "2px solid #1A1423",
+                                    fontSize: "14px",
+                                    lineHeight: 1.5,
+                                    fontWeight: msg.role === "user" ? "600" : "500",
+                                    background: msg.role === "user" ? "#FF6B35" : "#FFFFFF",
+                                    color: "#1A1423",
+                                } : {
                                     maxWidth: "80%",
                                     padding: "10px 16px",
                                     borderRadius: "16px",
@@ -171,14 +203,30 @@ export default function WranglerChat() {
                     {/* Typing indicator */}
                     {typing && (
                         <div className="wrangler-msg" style={{ display: "flex", justifyContent: "flex-start", marginBottom: "14px" }}>
-                            <div style={{ background: "#f3f3f3", borderRadius: "16px", borderBottomLeftRadius: "4px", padding: "12px 16px", display: "flex", alignItems: "center", gap: "4px" }}>
+                            <div style={isBrutalist ? {
+                                background: "#FFFFFF",
+                                border: "2px solid #1A1423",
+                                borderRadius: "0px",
+                                padding: "12px 16px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "4px"
+                            } : {
+                                background: "#f3f3f3",
+                                borderRadius: "16px",
+                                borderBottomLeftRadius: "4px",
+                                padding: "12px 16px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "4px"
+                            }}>
                                 {[0, 0.2, 0.4].map((delay, i) => (
                                     <span
                                         key={i}
                                         style={{
                                             width: "6px",
                                             height: "6px",
-                                            background: "#aaa",
+                                            background: isBrutalist ? "#1A1423" : "#aaa",
                                             borderRadius: "50%",
                                             display: "inline-block",
                                             animation: `blink 1.2s ${delay}s infinite`,
@@ -193,7 +241,15 @@ export default function WranglerChat() {
 
                 {/* Input area */}
                 <div
-                    style={{
+                    style={isBrutalist ? {
+                        display: "flex",
+                        alignItems: "center",
+                        padding: "14px 16px",
+                        gap: "10px",
+                        borderTop: "3px solid #1A1423",
+                        background: "#FFFFFF",
+                        flexShrink: 0,
+                    } : {
                         display: "flex",
                         alignItems: "center",
                         padding: "14px 16px",
@@ -219,14 +275,28 @@ export default function WranglerChat() {
                             fontSize: "15px",
                             color: "#1a1a1a",
                             fontFamily: "inherit",
-                            caretColor: "#F15F2A",
+                            caretColor: isBrutalist ? "#FF6B35" : "#F15F2A",
                         }}
                     />
                     <button
                         onClick={handleSend}
                         disabled={disabled}
                         aria-label="Send"
-                        style={{
+                        style={isBrutalist ? {
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "0px",
+                            background: "#FF6B35",
+                            border: "2px solid #1A1423",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            boxShadow: "2px 2px 0px #1A1423",
+                            transition: "background 0.2s, transform 0.1s",
+                            opacity: disabled ? 0.6 : 1,
+                        } : {
                             width: "36px",
                             height: "36px",
                             borderRadius: "50%",
@@ -241,7 +311,7 @@ export default function WranglerChat() {
                             opacity: disabled ? 0.6 : 1,
                         }}
                     >
-                        <svg viewBox="0 0 24 24" width={16} height={16} style={{ fill: "white" }}>
+                        <svg viewBox="0 0 24 24" width={16} height={16} style={{ fill: isBrutalist ? "#1A1423" : "white" }}>
                             <path d="M2 21l21-9L2 3v7l15 2-15 2z" />
                         </svg>
                     </button>

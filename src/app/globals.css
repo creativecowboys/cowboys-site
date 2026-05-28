@@ -31,6 +31,41 @@
 
   /* Animations */
   --animate-mesh: mesh 18s ease-in-out infinite;
+
+  /* Home 2 design tokens */
+  --color-h2-brand-primary: #FF6B35;
+  --color-h2-brand-secondary: #F7931E;
+  --color-h2-brand-tertiary: #004E89;
+  --color-h2-brand-accent: #1A1423;
+  --color-h2-neutral-background: #FFFBF7;
+  --color-h2-neutral-surface: #FFFFFF;
+  --color-h2-neutral-surface1: #FFF4E6;
+  --color-h2-neutral-border: #FFE4CC;
+  --color-h2-neutral-border-interactive: #FF6B35;
+  --color-h2-text-primary: #1A1423;
+  --color-h2-text-secondary: #6B5B62;
+  --color-h2-text-on-primary: #FFFBF7;
+  --color-h2-text-on-primary-alt: #1A1423;
+
+  --font-h2-primary: var(--font-space-grotesk), sans-serif;
+  --font-h2-secondary: var(--font-inter), sans-serif;
+  --font-h2-display: var(--font-bebas-neue), sans-serif;
+
+  --shadow-h2-card: 8px 8px 0px rgba(26, 20, 35, 0.1);
+  --shadow-h2-subtle: 4px 4px 0px rgba(26, 20, 35, 0.05);
+  --shadow-h2-bold: 12px 12px 0px #FF6B35;
+  --shadow-h2-hover: 16px 16px 0px rgba(255, 107, 53, 0.3);
+
+  /* Home 3 design tokens */
+  --color-h3-cream: #f3efe0;
+  --color-h3-red: #e94e33;
+  --color-h3-blue: #005eb8;
+  --color-h3-green: #008f4c;
+  --color-h3-black: #1a1a1a;
+  --color-h3-yellow: #fdb913;
+
+  --font-h3-display: var(--font-anton), sans-serif;
+  --font-h3-secondary: var(--font-roboto-condensed), sans-serif;
 }
 
 html {

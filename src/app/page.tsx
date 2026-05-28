@@ -9,14 +9,14 @@ import { TestimonialStack } from "@/components/ui/glass-testimonial-swiper";
 import { FAQSection } from "@/components/ui/faq-section";
 
 export const metadata: Metadata = {
-  title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+  title: "Digital Marketing Agency in the Southeast That Actually Drives Results | Creative Cowboys",
   description:
-    "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
+    "Creative Cowboys is the Southeast's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+    title: "Digital Marketing Agency in the Southeast That Actually Drives Results | Creative Cowboys",
     description:
-      "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA.",
+      "Creative Cowboys is the Southeast's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA.",
   },
 };
 

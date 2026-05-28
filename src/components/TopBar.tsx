@@ -9,53 +9,61 @@ export default function TopBar() {
                 }
             `}</style>
             <div
-                className="topbar-hide-mobile"
+                className="topbar-hide-mobile px-6 md:px-12"
                 style={{
                     position: "fixed",
                     top: 0,
                     left: 0,
                     right: 0,
                     zIndex: 100,
-                    backgroundColor: "#111111",
+                    backgroundColor: "#fdb913",
                     height: "36px",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "0 24px",
+                    borderBottom: "2px solid #1a1a1a",
                 }}
             >
-                {/* Address */}
-                <span
-                    style={{
-                        fontFamily: "var(--font-body), sans-serif",
-                        fontSize: "13px",
-                        color: "#6a6a68",
-                        letterSpacing: "0.04em",
-                    }}
+                <div
+                    className="w-full flex justify-between items-center"
+                    style={{ width: "100%" }}
                 >
-                    Now serving Franklin, TN
-                </span>
+                    {/* Address */}
+                    <span
+                        style={{
+                            fontFamily: "var(--font-body), sans-serif",
+                            fontSize: "12px",
+                            color: "#1a1a1a",
+                            fontWeight: "bold",
+                            letterSpacing: "0.05em",
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        Now serving Franklin, TN
+                    </span>
 
-                {/* Phone — turns orange on hover */}
-                <a
-                    href="tel:4702437517"
-                    style={{
-                        fontFamily: "var(--font-body), sans-serif",
-                        fontSize: "13px",
-                        color: "#6a6a68",
-                        letterSpacing: "0.04em",
-                        textDecoration: "none",
-                        transition: "color 0.2s ease",
-                    }}
-                    onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLAnchorElement).style.color = "#F26522")
-                    }
-                    onMouseLeave={(e) =>
-                        ((e.currentTarget as HTMLAnchorElement).style.color = "#6a6a68")
-                    }
-                >
-                    (470) 243-7517
-                </a>
+                    {/* Phone — turns red-orange on hover */}
+                    <a
+                        href="tel:4702437517"
+                        style={{
+                            fontFamily: "var(--font-body), sans-serif",
+                            fontSize: "12px",
+                            color: "#1a1a1a",
+                            fontWeight: "bold",
+                            letterSpacing: "0.05em",
+                            textTransform: "uppercase",
+                            textDecoration: "none",
+                            transition: "color 0.2s ease",
+                        }}
+                        onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLAnchorElement).style.color = "#e94e33")
+                        }
+                        onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLAnchorElement).style.color = "#1a1a1a")
+                        }
+                    >
+                        (470) 243-7517
+                    </a>
+                </div>
             </div>
         </>
     );
