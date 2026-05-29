@@ -761,39 +761,39 @@ export default function WebDesignFranklinPage() {
           </div>
 
           {/* Hero Right Mockup Pair */}
-          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[660px] mx-auto select-none overflow-visible">
+          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] mx-auto select-none overflow-visible">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
-            <div className="absolute top-[45px] left-0 right-[105px] bg-white border-[3px] border-[#0a0a0a] shadow-[15px_15px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+            <div className="absolute top-[30px] left-0 right-[80px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
               {/* Browser chrome bar at top */}
-              <div className="bg-[#0a0a0a] p-[12px_18px] flex gap-[9px] items-center">
-                <div className="flex gap-[9px] shrink-0">
-                  <span className="w-[13px] h-[13px] rounded-full bg-[#DD5A2E]" />
-                  <span className="w-[13px] h-[13px] rounded-full bg-[#F5C842]" />
-                  <span className="w-[13px] h-[13px] rounded-full bg-[#4CAF50]" />
+              <div className="bg-[#0a0a0a] p-[8px_12px] flex gap-[6px] items-center">
+                <div className="flex gap-[6px] shrink-0">
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#DD5A2E]" />
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#F5C842]" />
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#4CAF50]" />
                 </div>
-                <div className="flex-1 bg-[#2a2a2a] h-[21px] font-mono text-[13px] text-[#888] flex items-center justify-center select-all truncate px-2">
+                <div className="flex-1 bg-[#2a2a2a] h-[14px] font-mono text-[9px] text-[#888] flex items-center justify-center select-all truncate px-2">
                   harmonicproduction.co
                 </div>
               </div>
 
               {/* Screen below chrome */}
-              <div className="aspect-[16/10] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[33px] flex flex-col justify-between text-white text-left relative overflow-hidden">
+              <div className="aspect-[16/10] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[22px] flex flex-col justify-between text-white text-left relative overflow-hidden">
                 {/* Top Nav Row */}
                 <div className="flex justify-between items-center w-full">
-                  <div className="font-h3-display text-[15px] tracking-[3px] text-white">
+                  <div className="font-h3-display text-[10px] tracking-[2px] text-white">
                     HARMONIC <span className="text-white">◆</span>
                   </div>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[13px] py-[6px] px-[13px] uppercase tracking-wider">
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[4px] px-[9px] uppercase tracking-wider">
                     GET A QUOTE
                   </div>
                 </div>
 
                 {/* Bottom Hero Content */}
-                <div className="flex flex-col items-start mt-9">
-                  <span className="font-h3-display text-[13px] text-[#DD5A2E] tracking-[3px] mb-2.5">
+                <div className="flex flex-col items-start mt-6">
+                  <span className="font-h3-display text-[9px] text-[#DD5A2E] tracking-[2px] mb-1.5">
                     CLEVELAND, TN &middot; EST. 2014
                   </span>
-                  <h2 className="font-h3-display text-[42px] leading-[0.88] text-white uppercase text-left mt-1.5">
+                  <h2 className="font-h3-display text-[28px] leading-[0.88] text-white uppercase text-left mt-1">
                     WE MAKE <br />
                     <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
                     LEGENDARY.
@@ -803,22 +803,22 @@ export default function WebDesignFranklinPage() {
             </div>
 
             {/* Phone Mockup (Front Layer, z-index 2) */}
-            <div className="absolute bottom-[-15px] right-0 w-[195px] bg-[#0a0a0a] rounded-[33px] p-[13px] border border-white/10 shadow-[10px_10px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
+            <div className="absolute bottom-[-10px] right-0 w-[130px] bg-[#0a0a0a] rounded-[22px] p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
               {/* Screen Inside */}
-              <div className="rounded-[21px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[21px] px-[18px] flex flex-col justify-between text-white text-left overflow-hidden">
+              <div className="rounded-[14px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[14px] px-[12px] flex flex-col justify-between text-white text-left overflow-hidden">
                 {/* Top Label */}
-                <div className="font-h3-display text-[12px] text-white/95 text-center tracking-[1.8px] opacity-90 block">
+                <div className="font-h3-display text-[8px] text-white/95 text-center tracking-[1.2px] opacity-90 block">
                   HARMONIC ◆
                 </div>
 
                 {/* Bottom Block */}
                 <div className="flex flex-col mt-auto">
-                  <h3 className="font-h3-display text-[27px] leading-[0.88] text-white uppercase text-left">
+                  <h3 className="font-h3-display text-[18px] leading-[0.88] text-white uppercase text-left">
                     WE MAKE <br />
                     <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
                     LEGENDARY.
                   </h3>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[13px] py-[7px] px-0 text-center mt-[12px] block uppercase tracking-wider">
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[5px] px-0 text-center mt-[8px] block uppercase tracking-wider">
                     GET A QUOTE
                   </div>
                 </div>
