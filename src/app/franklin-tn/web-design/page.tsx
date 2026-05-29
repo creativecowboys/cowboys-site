@@ -786,17 +786,8 @@ export default function WebDesignFranklinPage() {
           {/* Hero Right Mockup Pair */}
           <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] sm:max-w-[560px] lg:max-w-[620px] mx-auto select-none overflow-visible">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
-            <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
-              {/* Browser chrome bar at top */}
-              <div className="bg-[#0a0a0a] p-[8px_10px] sm:p-[10px_14px] flex gap-[6px] items-center">
-                <div className="flex gap-[6px] shrink-0">
-                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#DD5A2E]" />
-                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#F5C842]" />
-                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#4CAF50]" />
-                </div>
-              </div>
-
-              {/* Screen below chrome */}
+            <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-[#0a0a0a] border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+              {/* Screen Inside */}
               <div className="aspect-[16/10] w-full overflow-hidden relative">
                 <img 
                   src="/images/aetheria-desktop-hero.png" 
