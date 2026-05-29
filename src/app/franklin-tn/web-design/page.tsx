@@ -795,56 +795,29 @@ export default function WebDesignFranklinPage() {
                   <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#4CAF50]" />
                 </div>
                 <div className="flex-1 bg-[#2a2a2a] h-[12px] sm:h-[14px] font-mono text-[7px] sm:text-[9px] text-[#888] flex items-center justify-center select-all truncate px-2">
-                  harmonicproduction.co
+                  aetheria.creativecowboys.co
                 </div>
               </div>
 
               {/* Screen below chrome */}
-              <div className="aspect-[16/10.5] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[16px] sm:p-[20px] lg:p-[24px] flex flex-col justify-between text-white text-left relative overflow-hidden">
-                {/* Top Nav Row */}
-                <div className="flex justify-between items-center w-full">
-                  <div className="font-h3-display text-[9px] sm:text-[11px] lg:text-[12px] tracking-[2px] text-white">
-                    HARMONIC <span className="text-white">◆</span>
-                  </div>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[8px] sm:text-[9px] lg:text-[10px] py-[3px] px-[8px] sm:py-[4px] sm:px-[10px] uppercase tracking-wider">
-                    GET A QUOTE
-                  </div>
-                </div>
-
-                {/* Bottom Hero Content */}
-                <div className="flex flex-col items-start mt-4 sm:mt-6 lg:mt-8">
-                  <span className="font-h3-display text-[7px] sm:text-[8px] lg:text-[9px] text-[#DD5A2E] tracking-[2px] mb-1">
-                    CLEVELAND, TN &middot; EST. 2014
-                  </span>
-                  <h2 className="font-h3-display text-[22px] sm:text-[26px] lg:text-[30px] leading-[0.88] text-white uppercase text-left mt-0.5 sm:mt-1">
-                    WE MAKE <br />
-                    <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
-                    LEGENDARY.
-                  </h2>
-                </div>
+              <div className="aspect-[16/10] w-full overflow-hidden relative">
+                <img 
+                  src="/images/aetheria-desktop-hero.png" 
+                  alt="Aetheria website" 
+                  className="w-full h-full object-cover object-top block"
+                />
               </div>
             </div>
 
             {/* Phone Mockup (Front Layer, z-index 2) */}
             <div className="absolute bottom-[-10px] sm:bottom-[-15px] right-0 w-[115px] sm:w-[135px] lg:w-[145px] bg-[#0a0a0a] rounded-[18px] sm:rounded-[22px] p-[7px] sm:p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
               {/* Screen Inside */}
-              <div className="rounded-[11px] sm:rounded-[14px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[12px] px-[10px] sm:py-[16px] sm:px-[12px] flex flex-col justify-between text-white text-left overflow-hidden">
-                {/* Top Label */}
-                <div className="font-h3-display text-[7px] sm:text-[9px] text-white/95 text-center tracking-[1.2px] opacity-90 block">
-                  HARMONIC ◆
-                </div>
-
-                {/* Bottom Block */}
-                <div className="flex flex-col mt-auto">
-                  <h3 className="font-h3-display text-[16px] sm:text-[18px] lg:text-[20px] leading-[0.88] text-white uppercase text-left">
-                    WE MAKE <br />
-                    <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
-                    LEGENDARY.
-                  </h3>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[8px] sm:text-[9px] lg:text-[10px] py-[4px] sm:py-[6px] px-0 text-center mt-[6px] sm:mt-[8px] block uppercase tracking-wider">
-                    GET A QUOTE
-                  </div>
-                </div>
+              <div className="rounded-[11px] sm:rounded-[14px] aspect-[9/16] w-full overflow-hidden relative">
+                <img 
+                  src="/images/aetheria-mobile-hero.png" 
+                  alt="Aetheria mobile" 
+                  className="w-full h-full object-cover object-top block"
+                />
               </div>
             </div>
           </div>
