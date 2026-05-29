@@ -786,9 +786,9 @@ export default function WebDesignFranklinPage() {
           {/* Hero Right Mockup Pair */}
           <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] sm:max-w-[560px] lg:max-w-[620px] mx-auto select-none overflow-visible">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
-            <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-[#0a0a0a] border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+            <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-[#8F8A83] border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-[10px] sm:rounded-[14px] lg:rounded-[16px] p-[5px] sm:p-[7px] lg:p-[8px] overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
               {/* Screen Inside */}
-              <div className="aspect-[16/10] w-full overflow-hidden relative">
+              <div className="rounded-[6px] sm:rounded-[8px] lg:rounded-[10px] aspect-[16/10] w-full overflow-hidden relative">
                 <img 
                   src="/images/aetheria-desktop-hero.png" 
                   alt="Aetheria website" 
@@ -798,7 +798,7 @@ export default function WebDesignFranklinPage() {
             </div>
 
             {/* Phone Mockup (Front Layer, z-index 2) */}
-            <div className="absolute bottom-[-10px] sm:bottom-[-15px] lg:bottom-[-20px] right-0 w-[130px] sm:w-[160px] lg:w-[185px] bg-[#0a0a0a] rounded-[20px] sm:rounded-[26px] lg:rounded-[30px] p-[5px] sm:p-[7px] lg:p-[8px] border border-white/10 shadow-[8px_8px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
+            <div className="absolute bottom-[-10px] sm:bottom-[-15px] lg:bottom-[-20px] right-0 w-[130px] sm:w-[160px] lg:w-[185px] bg-[#8F8A83] border-[2.5px] border-[#0a0a0a] rounded-[20px] sm:rounded-[26px] lg:rounded-[30px] p-[5px] sm:p-[7px] lg:p-[8px] shadow-[8px_8px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
               {/* Screen Inside */}
               <div className="rounded-[15px] sm:rounded-[20px] lg:rounded-[23px] aspect-[9/16] w-full overflow-hidden relative">
                 <img 
