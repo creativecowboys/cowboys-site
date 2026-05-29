@@ -370,6 +370,14 @@ export default function Home3Page() {
   const [activeTestimonial, setActiveTestimonial] = useState<number>(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
+
+  const toggleCardFlip = (idx: number) => {
+    setFlippedCards((prev) => ({
+      ...prev,
+      [idx]: !prev[idx],
+    }));
+  };
 
   // Setup reveal observer
   useEffect(() => {
@@ -422,7 +430,7 @@ export default function Home3Page() {
   }, [activeTestimonial, isHovered]);
 
   return (
-    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col pt-[36px]`}>
+    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}>
       
       {/* Scope specific styles */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -520,9 +528,14 @@ export default function Home3Page() {
           transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
           transform-style: preserve-3d;
         }
-        /* Hover or Touch active state */
-        .h3-flip-card-container:hover .h3-flip-card-inner,
-        .h3-flip-card-container:focus-within .h3-flip-card-inner {
+        /* Hover, focus, or flipped state */
+        @media (hover: hover) {
+          .h3-flip-card-container:hover .h3-flip-card-inner {
+            transform: rotateY(180deg);
+          }
+        }
+        .h3-flip-card-container:focus-within .h3-flip-card-inner,
+        .h3-flip-card-inner.flipped {
           transform: rotateY(180deg);
         }
         .h3-flip-card-front, .h3-flip-card-back {
@@ -552,7 +565,7 @@ export default function Home3Page() {
         @keyframes h3-slide-in-right {
           from {
             opacity: 0;
-            transform: translateX(120px) rotate(8deg);
+            transform: translateX(40px) rotate(8deg);
           }
           to {
             opacity: 1;
@@ -679,13 +692,13 @@ export default function Home3Page() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative w-full py-24 px-6 md:px-12 z-10 flex-grow flex items-center">
+      <section className="relative w-full py-16 md:py-24 px-6 md:px-12 z-10 flex-grow flex items-center">
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
           {/* Hero Left Content */}
           <div className="lg:col-span-7 flex flex-col gap-6 text-left">
             
-            <h1 className="font-h3-display text-6xl md:text-8xl leading-[0.9] text-h3-black uppercase tracking-tight h3-animate-fade-in-up">
+            <h1 className="font-h3-display text-4xl sm:text-6xl md:text-8xl leading-[0.9] text-h3-black uppercase tracking-tight h3-animate-fade-in-up">
               DIGITAL <br className="hidden md:inline" />
               MARKETING <br />
               THAT <span className="text-h3-red">DRIVES</span> <br className="hidden md:inline" />
@@ -708,15 +721,15 @@ export default function Home3Page() {
             {/* Performance Stats Strip */}
             <div className="grid grid-cols-3 gap-4 border-t-2 border-h3-black/20 pt-8 mt-4 h3-animate-fade-in-up h3-delay-3">
               <div>
-                <span className="font-h3-display text-4xl text-h3-blue block">300% ↑</span>
+                <span className="font-h3-display text-3xl sm:text-4xl text-h3-blue block">300% ↑</span>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Avg Site Traffic</span>
               </div>
               <div>
-                <span className="font-h3-display text-4xl text-h3-green block">90-DAY</span>
+                <span className="font-h3-display text-3xl sm:text-4xl text-h3-green block">90-DAY</span>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Payback Target</span>
               </div>
               <div>
-                <span className="font-h3-display text-4xl text-h3-red block">100+</span>
+                <span className="font-h3-display text-3xl sm:text-4xl text-h3-red block">100+</span>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Brands Shipped</span>
               </div>
             </div>
@@ -778,7 +791,7 @@ export default function Home3Page() {
       </section>
 
       {/* Case Studies Section */}
-      <section id="case-studies" className="w-full py-20 px-6 md:px-12 bg-h3-cream z-10 border-b-4 border-h3-black">
+      <section id="case-studies" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-cream z-10 border-b-4 border-h3-black">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Case Studies Header & Left Poster */}
@@ -794,7 +807,7 @@ export default function Home3Page() {
             </p>
 
             {/* Brutalist Skew Poster Card */}
-            <div className="h3-reveal-on-scroll h3-brutalist-card bg-h3-red text-h3-cream p-8 flex flex-col justify-between aspect-square mt-4 -rotate-2 select-none">
+            <div className="hidden md:flex h3-reveal-on-scroll h3-brutalist-card bg-h3-red text-h3-cream p-8 flex-col justify-between aspect-square mt-4 -rotate-2 select-none">
               <span className="font-h3-secondary text-xs uppercase tracking-widest font-bold">Creative Cowboys</span>
               <h3 className="font-h3-display text-6xl md:text-7xl -rotate-6 uppercase text-center my-auto leading-none text-h3-yellow">
                 NO<br />FLUFF
@@ -851,7 +864,7 @@ export default function Home3Page() {
       </section>
 
       {/* Services Menu Section */}
-      <section id="services" className="w-full py-20 px-6 md:px-12 bg-h3-black border-b-4 border-h3-black z-10 text-white">
+      <section id="services" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-black border-b-4 border-h3-black z-10 text-white">
         <div className="max-w-7xl mx-auto">
           
           {/* Header row */}
@@ -883,7 +896,7 @@ export default function Home3Page() {
                     <span className="font-h3-display text-4xl md:text-5xl text-h3-yellow select-none leading-none min-w-[50px] text-left">
                       {item.num}
                     </span>
-                    <span className="font-h3-display text-xl md:text-2xl text-white uppercase tracking-wide leading-none group-hover:text-h3-yellow transition-colors duration-150">
+                    <span className="font-h3-display text-lg sm:text-xl md:text-2xl text-white uppercase tracking-wide leading-none group-hover:text-h3-yellow transition-colors duration-150">
                       {item.title}
                     </span>
                   </div>
@@ -916,7 +929,7 @@ export default function Home3Page() {
       </section>
 
       {/* Selected Works Portfolio Section */}
-      <section id="portfolio" className="w-full py-20 px-6 md:px-12 bg-h3-cream border-b-4 border-h3-black z-10">
+      <section id="portfolio" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-cream border-b-4 border-h3-black z-10">
         <div className="max-w-7xl mx-auto">
           
           <div className="h3-reveal-on-scroll flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
@@ -930,15 +943,23 @@ export default function Home3Page() {
             </p>
           </div>
 
-          {/* Grid Layout of 6 items */}
+          {/* Grid Layout of 3 items */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {portfolioItems.map((item, idx) => (
               <div 
                 key={idx}
                 className="h3-reveal-on-scroll h3-flip-card-container aspect-square w-full"
+                onClick={() => toggleCardFlip(idx)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleCardFlip(idx);
+                  }
+                }}
                 tabIndex={0}
+                aria-label={`Portfolio item: ${item.title}. Click or press Enter to see details.`}
               >
-                <div className="h3-flip-card-inner">
+                <div className={`h3-flip-card-inner ${flippedCards[idx] ? "flipped" : ""}`}>
                   
                   {/* Card Front */}
                   <div className={`h3-flip-card-front ${item.bgClass} p-6`}>
@@ -1022,9 +1043,9 @@ export default function Home3Page() {
       <section 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`w-full py-20 px-6 md:px-12 border-b-4 border-h3-black z-10 relative flex flex-col items-center justify-between transition-colors duration-500 overflow-hidden ${testimonials[activeTestimonial].themeBg}`}
+        className={`w-full py-12 md:py-20 px-6 md:px-12 border-b-4 border-h3-black z-10 relative flex flex-col items-center justify-between transition-colors duration-500 overflow-hidden ${testimonials[activeTestimonial].themeBg}`}
       >
-        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[600px] relative z-10">
+        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[500px] md:min-h-[600px] relative z-10">
           
           {/* Top Header Row */}
           <div className="w-full flex items-center justify-between font-h3-secondary text-xs md:text-sm font-bold tracking-widest text-white/95 uppercase border-b border-white/20 pb-4 mb-12">
@@ -1048,7 +1069,7 @@ export default function Home3Page() {
               </div>
 
               {/* Large Client Name */}
-              <h2 className={`font-h3-display text-5xl md:text-7xl leading-none mt-2 select-none uppercase tracking-tight ${testimonials[activeTestimonial].accentColor}`}>
+              <h2 className={`font-h3-display text-3xl sm:text-5xl md:text-7xl leading-none mt-2 select-none uppercase tracking-tight ${testimonials[activeTestimonial].accentColor}`}>
                 {testimonials[activeTestimonial].name}
               </h2>
 
@@ -1169,7 +1190,7 @@ export default function Home3Page() {
                     {/* Short client label */}
                     <span className={`text-[10px] md:text-xs font-bold font-h3-secondary tracking-widest uppercase transition-colors duration-200 ${
                       isActive ? "text-white" : "text-white/40"
-                    }`}>
+                    } hidden md:inline`}>
                       {item.shortName}
                     </span>
                   </button>
@@ -1189,7 +1210,7 @@ export default function Home3Page() {
       </section>
 
       {/* FAQ Accordion Section */}
-      <section className="w-full py-20 px-6 md:px-12 bg-h3-cream border-b-4 border-h3-black z-10 text-h3-black">
+      <section className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-cream border-b-4 border-h3-black z-10 text-h3-black">
         <div className="max-w-7xl mx-auto">
           
           {/* Section Header */}
@@ -1312,7 +1333,7 @@ export default function Home3Page() {
       </section>
 
       {/* Contact & Footer Section */}
-      <footer id="contact" className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-16 px-6 md:px-12 relative z-20">
+      <footer id="contact" className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-12 md:py-16 px-6 md:px-12 relative z-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
           
           {/* Footer Contact Details */}
@@ -1363,7 +1384,7 @@ export default function Home3Page() {
           </div>
 
           {/* Quick links & Brand tag */}
-          <div className="md:col-span-3 flex flex-col gap-6 text-right md:text-left">
+          <div className="md:col-span-3 flex flex-col gap-6 text-left">
             <h4 className="font-h3-display text-xl uppercase tracking-widest text-h3-blue">DIRECT LINKS</h4>
             <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
               <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
