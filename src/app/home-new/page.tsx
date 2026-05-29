@@ -64,9 +64,9 @@ const caseStudies = [
     result: "300% Engagement",
     link: "/services",
     impacts: [
-      "Delivered full brand rehaul and localized SEO keywords.",
-      "Boosted customer retention metrics by 200% year-over-year.",
-      "Cut servers launch downtime to 0 minutes during final domain transition."
+      "Delivered a full brand overhaul and localized SEO strategy.",
+      "Boosted year-over-year customer retention by 200%.",
+      "Cut server downtime to zero during the domain transition."
     ]
   },
   {
@@ -74,13 +74,13 @@ const caseStudies = [
     title: "JOHN B. JACKSON & ASSOC",
     category: "SEO & PPC ADS",
     client: "Personal Injury Lawyers",
-    location: "Southeast",
+    location: "Douglasville, GA + Across the Southeast",
     result: "+$500k Revenue",
     link: "/seo",
     impacts: [
       "Achieved 22 #1 organic placements on Google in 12 months.",
-      "Designed multi-platform lead funnels tracking phone queries.",
-      "Launched integrated branding campaigns across CTV and paid social."
+      "Designed multi-platform lead funnels with phone-call tracking.",
+      "Launched integrated brand campaigns across streaming TV and paid social."
     ]
   },
   {
@@ -93,8 +93,8 @@ const caseStudies = [
     link: "/web-design",
     impacts: [
       "Built dynamic neighborhood service-area landing pages.",
-      "Established C-level Google Profile SEO and schema metrics.",
-      "Shipped custom storm intake insurance lead flows."
+      "Established top-tier Google Business Profile optimization and schema markup.",
+      "Shipped custom storm-damage intake forms that feed straight to insurance leads."
     ]
   }
 ];
@@ -109,19 +109,19 @@ const services = [
   {
     num: "02",
     title: "SEO SEARCH.",
-    desc: "Keywords · GBP · audits · links",
+    desc: "Local keywords · Google Business Profile · audits · authority links",
     link: "/seo"
   },
   {
     num: "03",
     title: "PPC ADVERTISING.",
-    desc: "Google · Meta · funnels · tracking",
+    desc: "Google Ads · Meta · funnel optimization · lead tracking",
     link: "/ppc"
   },
   {
     num: "04",
     title: "BRAND IDENTITY.",
-    desc: "Logos · type · style guides · print",
+    desc: "Logos · typography · style guides · print + vector",
     link: "/brand-strategy"
   },
   {
@@ -133,7 +133,7 @@ const services = [
   {
     num: "06",
     title: "LOCAL SEO.",
-    desc: "Service-area pages · reviews · citations",
+    desc: "Service-area pages · reviews · citations · maps ranking",
     link: "/seo"
   },
   {
@@ -153,14 +153,14 @@ const services = [
 const portfolioItems = [
   {
     title: "Harmonic Web Design",
-    desc: "AV & Concert production agency hub",
+    desc: "Custom site for Cleveland, TN concert AV outfit",
     bgClass: "bg-h3-green text-h3-cream",
-    tag: "Next.js / SEO",
+    tag: "WEB DESIGN + SEO",
     services: [
-      "Custom Next.js Platform",
-      "SEO Keywords Strategy",
+      "Custom-built website",
+      "Localized SEO strategy",
       "Event Calendar Integration",
-      "High-Speed Hosting Setup"
+      "High-performance hosting"
     ]
   },
   {
@@ -169,10 +169,10 @@ const portfolioItems = [
     bgClass: "bg-h3-cream text-h3-black",
     tag: "Google PPC",
     services: [
-      "Google PPC Strategy",
+      "Google Ads strategy",
       "Retargeting Ad Design",
-      "Local Leads Funnels",
-      "Phone Conversions Tracking"
+      "Local lead funnels",
+      "Phone conversion tracking"
     ]
   },
   {
@@ -181,46 +181,10 @@ const portfolioItems = [
     bgClass: "bg-h3-blue text-h3-cream",
     tag: "Web Design",
     services: [
-      "Local Service Pages",
-      "Schema Markup Coding",
-      "Google Profile SEO",
-      "Review Accumulator Pipeline"
-    ]
-  },
-  {
-    title: "Creative Branding Reels",
-    desc: "High-retention social advertising videos",
-    bgClass: "bg-h3-yellow text-h3-black",
-    tag: "Media Creation",
-    services: [
-      "Multi-format Video Edits",
-      "Scriptwriting & Voiceover",
-      "Hook Testing Campaigns",
-      "Organic Instagram Posting"
-    ]
-  },
-  {
-    title: "Cowboys Merchandise Layout",
-    desc: "Brand logo and apparel typography",
-    bgClass: "bg-h3-red text-h3-cream",
-    tag: "Brand Identity",
-    services: [
-      "Vector Logo Redraw",
-      "Custom Apparel Marks",
-      "Print-ready Color Profiles",
-      "Production Proofing"
-    ]
-  },
-  {
-    title: "Local Search Optimization",
-    desc: "Dominating local citation footprints",
-    bgClass: "bg-h3-black text-h3-cream",
-    tag: "Local SEO",
-    services: [
-      "Directory Index Building",
-      "Citation Audit & Fixes",
-      "Google Maps Ranking Push",
-      "Profile Synchronization"
+      "Neighborhood service-area pages",
+      "Schema markup",
+      "Google Business Profile optimization",
+      "Review generation system"
     ]
   }
 ];
@@ -232,7 +196,7 @@ const testimonials = [
     date: "04.15",
     tag: "WEB DESIGN + SEO",
     subtitle: "CONCERT AV · CLEVELAND, TN",
-    quote: '"Top notch service. We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question."',
+    quote: '"Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime. Would recommend them to anyone looking for SEO and market engagement."',
     domain: "harmonicproduction.co",
     themeBg: "bg-h3-blue",
     activeBtnBg: "bg-h3-yellow",
@@ -249,13 +213,13 @@ const testimonials = [
     }
   },
   {
-    name: "JOHN B. JACKSON LAW.",
-    shortName: "JACKSON",
+    name: "COMMERCIAL INSURANCE AGENCY.",
+    shortName: "COMMERCIAL INSURANCE",
     date: "05.20",
-    tag: "SEO + PPC ADS",
-    subtitle: "PI LAW · SOUTHEAST",
-    quote: '"If you need some help with your web work, these guys can get it all together for you. No worries, just solutions."',
-    domain: "johnbjacksonlaw.com",
+    tag: "WEB + SEO",
+    subtitle: "INSURANCE · BREMEN, GA",
+    quote: '"Top notch service. We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question or issue. Highly recommend."',
+    domain: "bremencia.com",
     themeBg: "bg-h3-red",
     activeBtnBg: "bg-h3-yellow",
     activeBtnText: "text-h3-black",
@@ -263,21 +227,21 @@ const testimonials = [
     barColor: "bg-h3-yellow",
     scriptColor: "text-h3-yellow",
     mockup: {
-      title: "JOHN B. JACKSON",
-      subtitle: "WEST GEORGIA · INJURY LAW",
-      headline: "When the wreck wasn't your fault.",
-      btnText: "FREE CASE REVIEW",
-      btnBg: "bg-[#B0C4DE] text-[#0f1d3a]"
+      title: "COMMERCIAL INSURANCE",
+      subtitle: "BREMEN, GA",
+      headline: "COMMERCIAL & PERSONAL INSURANCE",
+      btnText: "GET A PROPOSAL",
+      btnBg: "bg-h3-red text-white"
     }
   },
   {
-    name: "McKINLEY ROOFING.",
-    shortName: "McKINLEY",
+    name: "DAY ACCOUNTING.",
+    shortName: "DAY ACCOUNTING",
     date: "06.15",
-    tag: "WEB + LOCAL SEO",
-    subtitle: "ROOFING + RESTORATION · DOUGLASVILLE, GA",
-    quote: '"Our old website was embarrassing us. Creative Cowboys turned it around fast — clean, modern, and built to convert. Form submissions went up immediately."',
-    domain: "mckinleyroofing.net",
+    tag: "WEB DESIGN",
+    subtitle: "CPA · NEWNAN, GA · LOCAL GUIDE / 23 REVIEWS",
+    quote: '"If you need some help with your web work, these guys can get it all together for you. No worries, just solutions."',
+    domain: "dayacct.com",
     themeBg: "bg-h3-black",
     activeBtnBg: "bg-h3-red",
     activeBtnText: "text-white",
@@ -285,11 +249,11 @@ const testimonials = [
     barColor: "bg-h3-red",
     scriptColor: "text-h3-red",
     mockup: {
-      title: "★ McKINLEY ROOFING",
-      subtitle: "DOUGLASVILLE, GA",
-      headline: "STORM HIT? WE'RE ON IT.",
-      btnText: "FREE INSPECTION",
-      btnBg: "bg-white text-[#b91c1c]"
+      title: "DAY ACCOUNTING",
+      subtitle: "NEWNAN, GA",
+      headline: "ACCOUNTING & CPA SERVICES",
+      btnText: "GET IN TOUCH",
+      btnBg: "bg-white text-h3-black"
     }
   }
 ];
@@ -317,7 +281,7 @@ const faqs = [
     category: "TIMELINE",
     answer: (
       <>
-        Most builds ship in <span className="text-h3-yellow font-bold">3-6 weeks</span>. Custom landing pages can be live in 7 days. Full e-commerce builds run 5-8 weeks. We send a fixed timeline with the proposal — no scope creep, no surprises.
+        Most builds ship in <span className="text-h3-yellow font-bold">3 to 6 weeks</span>. A custom landing page can be live in a week. Full e-commerce builds run 5 to 8 weeks. We send a <span className="text-h3-yellow font-bold">fixed timeline</span> with the proposal — no scope creep, no surprises.
       </>
     ),
     related: [
@@ -332,7 +296,7 @@ const faqs = [
     category: "AUDIENCE",
     answer: (
       <>
-        Absolutely — <span className="text-h3-yellow font-bold">small and local businesses</span> are our butter. Whether you're just starting out or ready to scale, we build strategies that fit where you are right now.
+        Yes — most of our clients are <span className="text-h3-yellow font-bold">small or family-owned</span>. We've worked with roofers, lawyers, AV companies, restaurants, churches, and accountants. If you're a local or regional business looking for real growth, you're the kind of client we built this agency for.
       </>
     ),
     related: [
@@ -347,7 +311,7 @@ const faqs = [
     category: "LOCATION",
     answer: (
       <>
-        We're based in <span className="text-h3-yellow font-bold">Villa Rica, GA</span>, but we work with clients all over the country. Most of what we do is remote-friendly, so location is never a barrier.
+        <span className="text-h3-yellow font-bold">Villa Rica, GA</span> — about 35 miles west of Atlanta. We ride for clients across the Southeast. Currently serving Villa Rica, Carrollton, Douglasville, Cleveland TN, Franklin TN, and beyond. Distance is no issue; results are.
       </>
     ),
     related: [
@@ -361,7 +325,7 @@ const faqs = [
     category: "METRICS",
     answer: (
       <>
-        That depends on the service, but we always tie our work to real metrics — <span className="text-h3-yellow font-bold">more traffic, more leads, more revenue</span>. We'll set clear goals upfront so you know exactly what we're working toward.
+        Results vary by business and starting point, but the goal we work toward on every engagement is the same: traffic that costs less than the revenue it brings in. Most of our long-term clients see traffic, lead volume, and revenue grow within <span className="text-h3-yellow font-bold">the first 90 days</span>. We send monthly reports so you can see the math yourself.
       </>
     ),
     related: [
@@ -376,7 +340,7 @@ const faqs = [
     category: "STARTING",
     answer: (
       <>
-        Send us a message or click <span className="text-h3-yellow font-bold">Get A Proposal</span> at the top of the page! We'll ask you a few quick questions and get you connected with our team.
+        Hit <span className="text-h3-yellow font-bold">"Get a Proposal"</span> or call us at <span className="text-h3-yellow font-bold">(470) 243-7517</span>. We'll have a 20-minute conversation about what you're trying to do, what you've tried, and where you're stuck. If we're a fit, we'll send you a custom proposal within 3 business days. No high-pressure sales calls, no monthly retainer commitments before you've seen real work.
       </>
     ),
     related: [
@@ -726,7 +690,7 @@ export default function Home3Page() {
             </h1>
 
             <p className="font-h3-secondary text-lg md:text-xl text-h3-black/80 max-w-xl leading-relaxed h3-animate-fade-in-up h3-delay-1">
-              Creative Cowboys is the Southeast marketing agency that dumps the fluff. We build fast, high-converting websites, run ROI-driven advertising campaigns, and secure top search rankings.
+              We're the Southeast's no-fluff marketing agency. We build fast, high-converting websites, run advertising that pays for itself, and get small businesses found on Google. Serving Villa Rica, Carrollton, Douglasville, Cleveland TN, Franklin TN, and beyond.
             </p>
 
             <div className="flex flex-wrap gap-4 mt-2 h3-animate-fade-in-up h3-delay-2">
@@ -745,11 +709,11 @@ export default function Home3Page() {
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Avg Site Traffic</span>
               </div>
               <div>
-                <span className="font-h3-display text-4xl text-h3-green block">90 DAYS</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Avg Payback Target</span>
+                <span className="font-h3-display text-4xl text-h3-green block">90-DAY</span>
+                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Payback Target</span>
               </div>
               <div>
-                <span className="font-h3-display text-4xl text-h3-red block">27+</span>
+                <span className="font-h3-display text-4xl text-h3-red block">100+</span>
                 <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Brands Shipped</span>
               </div>
             </div>
@@ -789,15 +753,21 @@ export default function Home3Page() {
         <div className="h3-marquee-track">
           {[1, 2, 3, 4].map((index) => (
             <div key={index} className="flex gap-16 font-h3-display text-2xl md:text-3xl uppercase tracking-widest select-none whitespace-nowrap">
-              <span>LOCAL SEO MAPPING</span>
-              <span className="text-h3-red">★</span>
               <span>CUSTOM WEB DESIGN</span>
+              <span className="text-h3-red">★</span>
+              <span>SEO SEARCH</span>
               <span className="text-h3-yellow">★</span>
               <span>ROI PPC ADVERTISING</span>
               <span className="text-h3-blue">★</span>
-              <span>BRAND STRATEGY</span>
+              <span>BRAND IDENTITY</span>
               <span className="text-h3-green">★</span>
               <span>SOCIAL MEDIA ADS</span>
+              <span className="text-h3-red">★</span>
+              <span>LOCAL SEO MAPPING</span>
+              <span className="text-h3-yellow">★</span>
+              <span>CONTENT + COPY</span>
+              <span className="text-h3-blue">★</span>
+              <span>EMAIL + CRM</span>
               <span className="text-h3-cream">★</span>
             </div>
           ))}
@@ -931,11 +901,11 @@ export default function Home3Page() {
             <div className="flex flex-col gap-2 text-left">
               <h3 className="font-h3-display text-2xl text-h3-red uppercase tracking-widest leading-none">NEED A CUSTOM MARKETING BUILD?</h3>
               <p className="font-h3-secondary text-sm text-h3-black/80 max-w-2xl leading-relaxed mt-2">
-                We formulate customized combinations of high-performing SEO campaigns, fast Next.js templates, and tailored advertisement spend targets. Reach out and secure a comprehensive digital analysis.
+                Every business is different. We build custom packages — combining the right mix of SEO, fast websites, and ad spend — to hit your specific growth target. Tell us what you're trying to do, we'll send you a plan.
               </p>
             </div>
             <a href="#contact" className="h3-btn-brutalist bg-h3-black text-h3-cream font-bold px-8 py-3.5 uppercase tracking-wider text-xs w-fit flex-shrink-0 border-h3-black">
-              PROPOSE A PROJECT
+              GET A PROPOSAL
             </a>
           </div>
 
@@ -990,14 +960,7 @@ export default function Home3Page() {
 
                   {/* Card Back */}
                   <div className="h3-flip-card-back bg-h3-black text-h3-cream p-6">
-                    <div className="flex justify-between items-center w-full border-b border-h3-cream/20 pb-2">
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-h3-yellow">
-                        DELIVERED SERVICES
-                      </span>
-                      <span className="text-[9px] font-bold uppercase tracking-widest text-h3-cream/45 font-h3-display">
-                        CASE STUDY
-                      </span>
-                    </div>
+
 
                     {/* Services bullet list */}
                     <ul className="flex flex-col gap-3 my-auto w-full text-left">
@@ -1348,7 +1311,7 @@ export default function Home3Page() {
           <div className="md:col-span-5 flex flex-col gap-6">
             <h3 className="font-h3-display text-4xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
             <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed max-w-sm">
-              We operate out of Villa Rica, GA. No useless vanity metrics, just clean strategies designed to optimize your return on investment.
+              We're Josh and Dave — based in Villa Rica, GA. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.
             </p>
 
             <div className="flex flex-col gap-3 font-bold text-sm tracking-wider uppercase">
@@ -1377,7 +1340,7 @@ export default function Home3Page() {
               COWBOYS
             </div>
             <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-h3-cream/40">
-              © 2025 ALL RIGHTS RESERVED
+              © 2026 ALL RIGHTS RESERVED
             </div>
             
             {/* Social Icons Badge Grid */}
@@ -1402,7 +1365,6 @@ export default function Home3Page() {
               <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
               <a href="/ppc" className="hover:text-h3-red transition-colors">PPC Campaigns</a>
               <a href="/brand-strategy" className="hover:text-h3-red transition-colors">Brand Strategy</a>
-              <a href="/pricing" className="hover:text-h3-red transition-colors">Pricing Packages</a>
               <a href="/privacy-policy" className="hover:text-h3-red transition-colors mt-2">Privacy Policy</a>
             </div>
           </div>
