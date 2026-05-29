@@ -197,6 +197,7 @@ const testimonials = [
     tag: "WEB DESIGN + SEO",
     subtitle: "CONCERT AV · CLEVELAND, TN",
     quote: '"Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime. Would recommend them to anyone looking for SEO and market engagement."',
+    attribution: "— Ryan Coffey",
     domain: "harmonicproduction.co",
     themeBg: "bg-h3-blue",
     activeBtnBg: "bg-h3-yellow",
@@ -219,6 +220,7 @@ const testimonials = [
     tag: "WEB + SEO",
     subtitle: "INSURANCE · BREMEN, GA",
     quote: '"Top notch service. We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question or issue. Highly recommend."',
+    attribution: "— Rob Goldin",
     domain: "bremencia.com",
     themeBg: "bg-h3-red",
     activeBtnBg: "bg-h3-yellow",
@@ -241,6 +243,7 @@ const testimonials = [
     tag: "WEB DESIGN",
     subtitle: "CPA · NEWNAN, GA · LOCAL GUIDE / 23 REVIEWS",
     quote: '"If you need some help with your web work, these guys can get it all together for you. No worries, just solutions."',
+    attribution: "— Lance Day",
     domain: "dayacct.com",
     themeBg: "bg-h3-black",
     activeBtnBg: "bg-h3-red",
@@ -1059,6 +1062,11 @@ export default function Home3Page() {
                 {testimonials[activeTestimonial].quote}
               </blockquote>
 
+              {/* Attribution */}
+              <p className="font-h3-secondary font-bold text-sm tracking-widest text-h3-yellow uppercase mt-2">
+                {testimonials[activeTestimonial].attribution}
+              </p>
+
               {/* 5 Stars */}
               <div className="flex gap-1.5 mt-2 text-h3-yellow">
                 {[...Array(5)].map((_, i) => (
@@ -1345,14 +1353,11 @@ export default function Home3Page() {
             
             {/* Social Icons Badge Grid */}
             <div className="flex gap-4 mt-6">
-              <a href="https://www.facebook.com/creativecowboys" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+              <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">fb</span>
               </a>
-              <a href="https://www.instagram.com/creativecowboys" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">ig</span>
-              </a>
-              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
-                <span className="-rotate-45 font-bold text-xs">in</span>
               </a>
             </div>
           </div>
