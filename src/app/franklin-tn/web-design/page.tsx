@@ -719,81 +719,65 @@ export default function WebDesignFranklinPage() {
           
           {/* Hero Left Content */}
           <div className="lg:col-span-7 flex flex-col gap-6 text-left">
-            <div className="font-h3-secondary text-xs font-bold tracking-[0.12em] text-h3-red uppercase h3-animate-fade-in-up">
+            <div className="font-h3-display text-sm sm:text-base tracking-[0.12em] text-h3-red uppercase h3-animate-fade-in-up">
               &mdash; WEB DESIGN &middot; FRANKLIN, TN &mdash;
             </div>
 
-            <h1 className="font-h3-display text-4xl sm:text-6xl md:text-7xl leading-[0.95] text-h3-black uppercase tracking-tight h3-animate-fade-in-up">
+            <h1 className="font-h3-display text-5xl sm:text-6xl md:text-7xl lg:text-[76px] leading-[0.88] text-h3-black uppercase tracking-tight h3-animate-fade-in-up">
               FRANKLIN <br />
               WEB DESIGN <br />
-              THAT PAYS <br className="hidden md:inline" />
+              THAT PAYS <br />
               FOR <span className="text-h3-red">ITSELF</span>.
             </h1>
 
             <p className="font-h3-secondary text-lg md:text-xl text-h3-black/80 max-w-xl leading-relaxed h3-animate-fade-in-up h3-delay-1">
-              A senior Southeast agency, serving Franklin and Williamson County. 100+ websites built · $2M+ in client revenue generated · 1.4s average page load. No hand-off jargon, no offshore work, no surprise change orders.
+              A senior Southeast agency, serving Franklin and Williamson County. 100+ websites built &middot; $2M+ revenue.
             </p>
 
             <div className="flex flex-wrap gap-4 mt-2 h3-animate-fade-in-up h3-delay-2">
-              <a href="#contact" className="h3-btn-brutalist bg-h3-red text-h3-cream font-bold px-8 py-4 uppercase tracking-wider text-sm inline-flex items-center gap-2">
-                Get a Free Scorecard <ArrowUpRight size={18} />
+              <a 
+                href="#contact" 
+                className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
+              >
+                GET A FREE SCORECARD ↗
               </a>
-              <a href="#contact" className="h3-btn-brutalist bg-h3-cream text-h3-black font-bold px-8 py-4 uppercase tracking-wider text-sm">
-                Book a Strategy Call
-              </a>
-            </div>
-
-            {/* Performance Stats Strip */}
-            <div className="grid grid-cols-3 gap-4 border-t-2 border-h3-black/20 pt-8 mt-4 h3-animate-fade-in-up h3-delay-3">
-              <div>
-                <span className="font-h3-display text-3xl sm:text-4xl text-h3-blue block">1.4s</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Avg Page Load</span>
-              </div>
-              <div>
-                <span className="font-h3-display text-3xl sm:text-4xl text-h3-green block">100+</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Sites Shipped</span>
-              </div>
-              <div>
-                <span className="font-h3-display text-3xl sm:text-4xl text-h3-red block">$2M+</span>
-                <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-h3-black/60">Client Revenue</span>
-              </div>
             </div>
           </div>
 
           {/* Hero Right Mockup Pair */}
-          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] mx-auto select-none overflow-visible">
+          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[440px] sm:max-w-[500px] lg:max-w-[540px] mx-auto select-none overflow-visible">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
-            <div className="absolute top-[30px] left-0 right-[80px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+            <div className="absolute top-[20px] left-0 right-[75px] sm:right-[95px] lg:right-[105px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
               {/* Browser chrome bar at top */}
-              <div className="bg-[#0a0a0a] p-[8px_12px] flex gap-[6px] items-center">
+              <div className="bg-[#0a0a0a] p-[6px_10px] sm:p-[8px_12px] flex gap-[6px] items-center">
                 <div className="flex gap-[6px] shrink-0">
-                  <span className="w-[9px] h-[9px] rounded-full bg-[#DD5A2E]" />
-                  <span className="w-[9px] h-[9px] rounded-full bg-[#F5C842]" />
-                  <span className="w-[9px] h-[9px] rounded-full bg-[#4CAF50]" />
+                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#DD5A2E]" />
+                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#F5C842]" />
+                  <span className="w-[7px] h-[7px] sm:w-[9px] sm:h-[9px] rounded-full bg-[#4CAF50]" />
                 </div>
-                <div className="flex-1 bg-[#2a2a2a] h-[14px] font-mono text-[9px] text-[#888] flex items-center justify-center select-all truncate px-2">
+                <div className="flex-1 bg-[#2a2a2a] h-[12px] sm:h-[14px] font-mono text-[7px] sm:text-[9px] text-[#888] flex items-center justify-center select-all truncate px-2">
                   harmonicproduction.co
                 </div>
               </div>
 
               {/* Screen below chrome */}
-              <div className="aspect-[16/10] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[22px] flex flex-col justify-between text-white text-left relative overflow-hidden">
+              <div className="aspect-[16/10.5] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[16px] sm:p-[20px] lg:p-[24px] flex flex-col justify-between text-white text-left relative overflow-hidden">
                 {/* Top Nav Row */}
                 <div className="flex justify-between items-center w-full">
-                  <div className="font-h3-display text-[10px] tracking-[2px] text-white">
+                  <div className="font-h3-display text-[9px] sm:text-[11px] lg:text-[12px] tracking-[2px] text-white">
                     HARMONIC <span className="text-white">◆</span>
                   </div>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[4px] px-[9px] uppercase tracking-wider">
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[8px] sm:text-[9px] lg:text-[10px] py-[3px] px-[8px] sm:py-[4px] sm:px-[10px] uppercase tracking-wider">
                     GET A QUOTE
                   </div>
                 </div>
 
                 {/* Bottom Hero Content */}
-                <div className="flex flex-col items-start mt-6">
-                  <span className="font-h3-display text-[9px] text-[#DD5A2E] tracking-[2px] mb-1.5">
-                    CLEVELAND, TN &middot; EST. 2014
+                <div className="flex flex-col items-start mt-4 sm:mt-6 lg:mt-8">
+                  <span className="font-h3-display text-[7px] sm:text-[8px] lg:text-[9px] text-[#DD5A2E] tracking-[2px] mb-1">
+                    CLEVELAND, TN
                   </span>
-                  <h2 className="font-h3-display text-[28px] leading-[0.88] text-white uppercase text-left mt-1">
+                  <h2 className="font-h3-display text-[22px] sm:text-[26px] lg:text-[30px] leading-[0.88] text-white uppercase text-left mt-0.5 sm:mt-1">
                     WE MAKE <br />
                     <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
                     LEGENDARY.
@@ -803,22 +787,22 @@ export default function WebDesignFranklinPage() {
             </div>
 
             {/* Phone Mockup (Front Layer, z-index 2) */}
-            <div className="absolute bottom-[-10px] right-0 w-[130px] bg-[#0a0a0a] rounded-[22px] p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
+            <div className="absolute bottom-[-10px] sm:bottom-[-15px] right-0 w-[115px] sm:w-[135px] lg:w-[145px] bg-[#0a0a0a] rounded-[18px] sm:rounded-[22px] p-[7px] sm:p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
               {/* Screen Inside */}
-              <div className="rounded-[14px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[14px] px-[12px] flex flex-col justify-between text-white text-left overflow-hidden">
+              <div className="rounded-[11px] sm:rounded-[14px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[12px] px-[10px] sm:py-[16px] sm:px-[12px] flex flex-col justify-between text-white text-left overflow-hidden">
                 {/* Top Label */}
-                <div className="font-h3-display text-[8px] text-white/95 text-center tracking-[1.2px] opacity-90 block">
+                <div className="font-h3-display text-[7px] sm:text-[9px] text-white/95 text-center tracking-[1.2px] opacity-90 block">
                   HARMONIC ◆
                 </div>
 
                 {/* Bottom Block */}
                 <div className="flex flex-col mt-auto">
-                  <h3 className="font-h3-display text-[18px] leading-[0.88] text-white uppercase text-left">
+                  <h3 className="font-h3-display text-[16px] sm:text-[18px] lg:text-[20px] leading-[0.88] text-white uppercase text-left">
                     WE MAKE <br />
                     <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
                     LEGENDARY.
                   </h3>
-                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[5px] px-0 text-center mt-[8px] block uppercase tracking-wider">
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[8px] sm:text-[9px] lg:text-[10px] py-[4px] sm:py-[6px] px-0 text-center mt-[6px] sm:mt-[8px] block uppercase tracking-wider">
                     GET A QUOTE
                   </div>
                 </div>

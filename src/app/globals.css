@@ -57,12 +57,12 @@
   --shadow-h2-hover: 16px 16px 0px rgba(255, 107, 53, 0.3);
 
   /* Home 3 design tokens */
-  --color-h3-cream: #f3efe0;
-  --color-h3-red: #e94e33;
+  --color-h3-cream: #F2EBDA;
+  --color-h3-red: #DD5A2E;
   --color-h3-blue: #005eb8;
   --color-h3-green: #008f4c;
-  --color-h3-black: #1a1a1a;
-  --color-h3-yellow: #fdb913;
+  --color-h3-black: #0a0a0a;
+  --color-h3-yellow: #F5C842;
 
   --font-h3-display: var(--font-anton), sans-serif;
   --font-h3-secondary: var(--font-roboto-condensed), sans-serif;
