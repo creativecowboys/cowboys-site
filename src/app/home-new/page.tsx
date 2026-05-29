@@ -755,7 +755,7 @@ export default function Home3Page() {
       <section className="w-full bg-h3-black text-h3-cream border-y-4 border-h3-black overflow-hidden py-4 z-20">
         <div className="h3-marquee-track">
           {[1, 2, 3, 4].map((index) => (
-            <div key={index} className="flex gap-16 font-h3-display text-2xl md:text-3xl uppercase tracking-widest select-none whitespace-nowrap">
+            <div key={index} className="flex gap-16 items-center pr-16 font-h3-display text-2xl md:text-3xl uppercase tracking-widest select-none whitespace-nowrap">
               <span>CUSTOM WEB DESIGN</span>
               <span className="text-h3-red">★</span>
               <span>SEO SEARCH</span>
