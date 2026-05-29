@@ -784,9 +784,9 @@ export default function WebDesignFranklinPage() {
           </div>
 
           {/* Hero Right Mockup Pair */}
-          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[440px] sm:max-w-[500px] lg:max-w-[540px] mx-auto select-none overflow-visible">
+          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] sm:max-w-[560px] lg:max-w-[620px] mx-auto select-none overflow-visible">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
-            <div className="absolute top-[20px] left-0 right-[75px] sm:right-[95px] lg:right-[105px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+            <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
               {/* Browser chrome bar at top */}
               <div className="bg-[#0a0a0a] p-[6px_10px] sm:p-[8px_12px] flex gap-[6px] items-center">
                 <div className="flex gap-[6px] shrink-0">
@@ -810,9 +810,9 @@ export default function WebDesignFranklinPage() {
             </div>
 
             {/* Phone Mockup (Front Layer, z-index 2) */}
-            <div className="absolute bottom-[-10px] sm:bottom-[-15px] right-0 w-[115px] sm:w-[135px] lg:w-[145px] bg-[#0a0a0a] rounded-[18px] sm:rounded-[22px] p-[7px] sm:p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
+            <div className="absolute bottom-[-10px] sm:bottom-[-15px] lg:bottom-[-20px] right-0 w-[130px] sm:w-[160px] lg:w-[185px] bg-[#0a0a0a] rounded-[20px] sm:rounded-[26px] lg:rounded-[30px] p-[8px] sm:p-[10px] lg:p-[12px] border border-white/10 shadow-[8px_8px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
               {/* Screen Inside */}
-              <div className="rounded-[11px] sm:rounded-[14px] aspect-[9/16] w-full overflow-hidden relative">
+              <div className="rounded-[13px] sm:rounded-[17px] lg:rounded-[20px] aspect-[9/16] w-full overflow-hidden relative">
                 <img 
                   src="/images/aetheria-mobile-hero.png" 
                   alt="Aetheria mobile" 
