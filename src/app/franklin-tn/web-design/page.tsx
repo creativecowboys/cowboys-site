@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Anton, Roboto_Condensed, Syne, Playfair_Display, Alfa_Slab_One } from "next/font/google";
+import { Anton, Roboto_Condensed, Syne, Playfair_Display, Alfa_Slab_One, Lobster } from "next/font/google";
 import { 
   ArrowUpRight, 
   Menu, 
@@ -51,6 +51,12 @@ const alfaSlabOne = Alfa_Slab_One({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-alfa-slab-one",
+});
+
+const lobster = Lobster({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-lobster",
 });
 
 // Static Page Data
@@ -440,7 +446,7 @@ export default function WebDesignFranklinPage() {
   }, [activeTestimonial, isHovered]);
 
   return (
-    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}>
+    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} ${lobster.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}>
       
       {/* Scope specific styles */}
       <style dangerouslySetInnerHTML={{ __html: `
@@ -459,6 +465,9 @@ export default function WebDesignFranklinPage() {
         .font-sign-painter {
           font-family: 'SignPainter', cursive;
           font-weight: bold;
+        }
+        .font-lobster {
+          font-family: var(--font-lobster), cursive;
         }
         .h3-vertical-text {
           writing-mode: vertical-rl;
@@ -751,33 +760,68 @@ export default function WebDesignFranklinPage() {
             </div>
           </div>
 
-          {/* Hero Right Banner Image Card */}
-          <div className="lg:col-span-5 flex justify-center items-center relative">
-            <div className="bg-[#DD5A2E] text-white p-6 sm:p-8 aspect-[3/4] w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] -rotate-3 shadow-[10px_10px_0_#1a1a1a] border-4 border-[#1a1a1a] flex flex-col justify-between relative overflow-hidden h3-animate-slide-in-right">
-              {/* Top row */}
-              <div className="border-b-2 border-white/40 pb-3 flex flex-col items-start">
-                <div className="font-h3-display text-sm tracking-wider">FRANKLIN, TN</div>
-                <div className="inline-block border-2 border-white/60 rounded-full px-3 py-1 font-h3-display text-[9px] tracking-wider mt-2.5">
-                  EXIT 65 &middot; I-65
+          {/* Hero Right Mockup Pair */}
+          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[440px] mx-auto select-none overflow-visible">
+            {/* Desktop Mockup (Back Layer, z-index 1) */}
+            <div className="absolute top-[30px] left-0 right-[70px] bg-white border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-md overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
+              {/* Browser chrome bar at top */}
+              <div className="bg-[#0a0a0a] p-[8px_12px] flex gap-[6px] items-center">
+                <div className="flex gap-[6px] shrink-0">
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#DD5A2E]" />
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#F5C842]" />
+                  <span className="w-[9px] h-[9px] rounded-full bg-[#4CAF50]" />
                 </div>
-              </div>
-              
-              {/* Middle row */}
-              <div className="flex flex-col items-start my-auto">
-                <div className="font-h3-display text-xs text-h3-yellow tracking-wider mb-2">
-                  OUR PROMISE
-                </div>
-                <div className="font-h3-display text-4xl sm:text-5xl leading-[0.85] text-white uppercase text-left">
-                  FLAT FEE.<br />
-                  FAST CODE.<br />
-                  NO BS.
+                <div className="flex-1 bg-[#2a2a2a] h-[14px] font-mono text-[9px] text-[#888] flex items-center justify-center select-all truncate px-2">
+                  harmonicproduction.co
                 </div>
               </div>
 
-              {/* Bottom row */}
-              <div className="border-t border-white/40 pt-2.5 flex justify-between font-h3-display text-[9px] tracking-wider">
-                <span>ESTABLISHED 2025</span>
-                <span>VILLA RICA &middot; FRANKLIN</span>
+              {/* Screen below chrome */}
+              <div className="aspect-[16/10] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-[22px] flex flex-col justify-between text-white text-left relative overflow-hidden">
+                {/* Top Nav Row */}
+                <div className="flex justify-between items-center w-full">
+                  <div className="font-h3-display text-[10px] tracking-[2px] text-white">
+                    HARMONIC <span className="text-white">◆</span>
+                  </div>
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[4px] px-[9px] uppercase tracking-wider">
+                    GET A QUOTE
+                  </div>
+                </div>
+
+                {/* Bottom Hero Content */}
+                <div className="flex flex-col items-start mt-6">
+                  <span className="font-h3-display text-[9px] text-[#DD5A2E] tracking-[2px] mb-1.5">
+                    CLEVELAND, TN &middot; EST. 2014
+                  </span>
+                  <h2 className="font-h3-display text-[28px] leading-[0.88] text-white uppercase text-left mt-1">
+                    WE MAKE <br />
+                    <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
+                    LEGENDARY.
+                  </h2>
+                </div>
+              </div>
+            </div>
+
+            {/* Phone Mockup (Front Layer, z-index 2) */}
+            <div className="absolute bottom-[-10px] right-0 w-[130px] bg-[#0a0a0a] rounded-[22px] p-[9px] border border-white/10 shadow-[7px_7px_0_#DD5A2E] z-20 rotate-5 flex flex-col">
+              {/* Screen Inside */}
+              <div className="rounded-[14px] aspect-[9/16] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] py-[14px] px-[12px] flex flex-col justify-between text-white text-left overflow-hidden">
+                {/* Top Label */}
+                <div className="font-h3-display text-[8px] text-white/95 text-center tracking-[1.2px] opacity-90 block">
+                  HARMONIC ◆
+                </div>
+
+                {/* Bottom Block */}
+                <div className="flex flex-col mt-auto">
+                  <h3 className="font-h3-display text-[18px] leading-[0.88] text-white uppercase text-left">
+                    WE MAKE <br />
+                    <span className="text-[#DD5A2E]">PRODUCTION</span> <br />
+                    LEGENDARY.
+                  </h3>
+                  <div className="bg-[#DD5A2E] text-white font-h3-display text-[9px] py-[5px] px-0 text-center mt-[8px] block uppercase tracking-wider">
+                    GET A QUOTE
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -809,32 +853,60 @@ export default function WebDesignFranklinPage() {
         </div>
       </section>
 
-      {/* Recent Clients Screenshot Proof Grid */}
-      <section className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-cream border-b-4 border-h3-black z-10">
-        <div className="max-w-7xl mx-auto text-center">
-          <span className="text-h3-red font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-10">&mdash; RECENT CLIENTS &middot; SOUTHEAST PORTFOLIO &mdash;</span>
+      {/* Recent Clients Logo Wall Grid */}
+      <section className="w-full py-[60px] px-6 md:px-[60px] bg-h3-cream border-b-4 border-h3-black z-10">
+        <div className="max-w-7xl mx-auto">
+          {/* Eyebrow */}
+          <div className="font-h3-display text-xs text-[#DD5A2E] tracking-[2.5px] text-center mb-8 uppercase select-none">
+            &mdash; RECENT CLIENTS &middot; SOUTHEAST PORTFOLIO &mdash;
+          </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6">
-            {clientPortfolio.map((item, idx) => (
-              <div 
-                key={idx} 
-                className="h3-reveal-on-scroll h3-brutalist-card bg-white p-4 flex flex-col justify-between"
-              >
-                <div className="relative aspect-[16/10] w-full rounded border-2 border-h3-black overflow-hidden mb-3.5 shadow-sm">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    sizes="(max-w-[768px]) 100vw, 20vw"
-                    className="object-cover object-top hover:scale-[1.03] transition-transform duration-[250ms] ease-out"
-                  />
-                </div>
-                <div className="text-left">
-                  <h4 className="font-h3-display text-base uppercase tracking-tight text-h3-black leading-tight">{item.name}</h4>
-                  <p className="font-h3-secondary text-[10px] font-bold uppercase tracking-wider text-h3-black/50 mt-0.5">{item.vertical}</p>
-                </div>
-              </div>
-            ))}
+          {/* Logo grid */}
+          <div className="grid grid-cols-6 gap-0 border-y-[1.5px] border-black/15">
+            {/* Cell 1: HARMONIC */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[0.5px] uppercase">
+                HARMONIC<span className="text-[#DD5A2E] ml-[2px]">◆</span>
+              </span>
+            </div>
+            
+            {/* Cell 2: John B. Jackson */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex flex-col items-center justify-center border-r-[1.5px] border-black/15">
+              <span className="font-serif italic text-[10px] xs:text-[12px] sm:text-base md:text-lg text-[#0a0a0a] leading-tight">
+                John B.<br />Jackson,
+              </span>
+              <span className="text-[7px] xs:text-[8px] sm:text-[10px] md:text-[11px] text-[#888] tracking-[2px] mt-1 font-h3-display uppercase">
+                ESQ
+              </span>
+            </div>
+
+            {/* Cell 3: McKINLEY */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[0.5px] uppercase">
+                McKINLEY <span className="font-sans font-normal ml-0.5 text-[0.85em] align-baseline">&#x2302;</span>
+              </span>
+            </div>
+
+            {/* Cell 4: LEUCO */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[4px] uppercase mr-[-4px]">
+                LEUCO
+              </span>
+            </div>
+
+            {/* Cell 5: Squirrel. */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <span className="font-lobster text-[14px] xs:text-[18px] sm:text-[22px] md:text-[26px] text-[#0a0a0a] leading-none">
+                Squirrel.
+              </span>
+            </div>
+
+            {/* Cell 6: DAY ACCT. */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center">
+              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[1px] uppercase">
+                DAY ACCT.
+              </span>
+            </div>
           </div>
         </div>
       </section>
