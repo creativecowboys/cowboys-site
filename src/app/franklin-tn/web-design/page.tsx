@@ -731,16 +731,55 @@ export default function WebDesignFranklinPage() {
             </h1>
 
             <p className="font-h3-secondary text-lg md:text-xl text-h3-black/80 max-w-xl leading-relaxed h3-animate-fade-in-up h3-delay-1">
-              A senior Southeast agency, serving Franklin and Williamson County. 100+ websites built &middot; $2M+ revenue.
+              A senior Southeast agency, serving Franklin and Williamson County. 100+ websites built &middot; $2M+ in client revenue generated &middot; 1.4s average page load. No hand-off jargon, no offshore work, no surprise change orders.
             </p>
 
-            <div className="flex flex-wrap gap-4 mt-2 h3-animate-fade-in-up h3-delay-2">
+            <div className="flex flex-wrap items-center gap-[12px] mt-2 h3-animate-fade-in-up h3-delay-2">
               <a 
                 href="#contact" 
                 className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
               >
                 GET A FREE SCORECARD ↗
               </a>
+              <a 
+                href="#contact" 
+                className="border-[2.5px] border-[#0a0a0a] bg-white text-[#0a0a0a] font-h3-display text-[13px] p-[14px_22px] tracking-[1.2px] uppercase inline-flex items-center justify-center whitespace-nowrap transition-colors hover:bg-h3-cream/20"
+              >
+                BOOK A STRATEGY CALL
+              </a>
+            </div>
+
+            {/* Stats Strip */}
+            <div className="w-full border-t border-[#0a0a0a]/15 pt-5 mt-6 grid grid-cols-3 gap-4 h3-animate-fade-in-up h3-delay-3">
+              {/* Stat 1 */}
+              <div>
+                <span className="font-h3-display text-[52px] leading-none text-[#185FA5] block">
+                  1.4s
+                </span>
+                <span className="font-h3-display text-[11px] tracking-[1.5px] text-[#0a0a0a] uppercase block mt-1.5">
+                  AVG PAGE LOAD
+                </span>
+              </div>
+              
+              {/* Stat 2 */}
+              <div>
+                <span className="font-h3-display text-[52px] leading-none text-[#3B6D11] block">
+                  100+
+                </span>
+                <span className="font-h3-display text-[11px] tracking-[1.5px] text-[#0a0a0a] uppercase block mt-1.5">
+                  SITES SHIPPED
+                </span>
+              </div>
+              
+              {/* Stat 3 */}
+              <div>
+                <span className="font-h3-display text-[52px] leading-none text-[#DD5A2E] block">
+                  $2M+
+                </span>
+                <span className="font-h3-display text-[11px] tracking-[1.5px] text-[#0a0a0a] uppercase block mt-1.5">
+                  CLIENT REVENUE
+                </span>
+              </div>
             </div>
           </div>
 
@@ -775,7 +814,7 @@ export default function WebDesignFranklinPage() {
                 {/* Bottom Hero Content */}
                 <div className="flex flex-col items-start mt-4 sm:mt-6 lg:mt-8">
                   <span className="font-h3-display text-[7px] sm:text-[8px] lg:text-[9px] text-[#DD5A2E] tracking-[2px] mb-1">
-                    CLEVELAND, TN
+                    CLEVELAND, TN &middot; EST. 2014
                   </span>
                   <h2 className="font-h3-display text-[22px] sm:text-[26px] lg:text-[30px] leading-[0.88] text-white uppercase text-left mt-0.5 sm:mt-1">
                     WE MAKE <br />
