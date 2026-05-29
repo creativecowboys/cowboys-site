@@ -87,13 +87,13 @@ const capabilities = [
     num: "01",
     title: "LANDING PAGES.",
     desc: "Built to convert ad traffic. Focused headers, frictionless forms, and server-side conversion mapping. Payback tracked weekly.",
-    bullets: ["Lighthouse 95+ mobile score", "Integrated call tracking", "HubSpot & CRM connections"]
+    bullets: ["FAST MOBILE PERFORMANCE", "Integrated call tracking", "CRM AND HUBSPOT INTEGRATIONS"]
   },
   {
     num: "02",
     title: "BRAND WEBSITES.",
     desc: "Complete custom digital architectures. High-fidelity layouts, local keywords, and fast loads to capture Williamson County organic search.",
-    bullets: ["Zero off-the-shelf templates", "Fully custom Webflow or WordPress", "Built-in local schema tags"]
+    bullets: ["CUSTOM DESIGN, NO TEMPLATES", "Fully custom Webflow or WordPress", "LOCAL SEO MARKUP"]
   },
   {
     num: "03",
@@ -104,20 +104,20 @@ const capabilities = [
   {
     num: "04",
     title: "LOCAL SEO SETUP.",
-    desc: "Neighborhood service area page mapping, citations audit, and deep Google Business Profile optimizations to place you on the Map Pack.",
-    bullets: ["Map Pack ranking targets", "Location page builders", "Review generation hooks"]
+    desc: "Neighborhood service-area pages, citation audits, and deep Google Business Profile optimization. The goal: show up in the Map Pack when someone in Franklin searches for what you do.",
+    bullets: ["MAP PACK RANKINGS", "NEIGHBORHOOD PAGE BUILD-OUT", "REVIEW GENERATION SYSTEM"]
   },
   {
     num: "05",
     title: "FAST EDGE HOSTING.",
-    desc: "Ditch the sluggish servers. We host on Next.js/Vercel global CDNs with zero maintenance overhead, automated backups, and 99.9% uptime.",
-    bullets: ["Global Vercel/Next CDNs", "Uptime monitor alarms", "SSL & cloud backup assets"]
+    desc: "Ditch the sluggish servers. We host on global content delivery networks with zero maintenance overhead, automated backups, and 99.9% uptime.",
+    bullets: ["GLOBAL CDN HOSTING", "UPTIME MONITORING", "SSL + AUTOMATED BACKUPS"]
   },
   {
     num: "06",
     title: "SPEED AUDITS.",
-    desc: "Identify page load speed leakage and technical blockers. We rewrite code blocks and compress payloads to guarantee sub-1.5s mobile paint times.",
-    bullets: ["LCP speed optimization", "Image payload reduction", "Core Web Vitals validation"]
+    desc: "Identify page-load slowdowns and technical blockers. We rewrite code and compress assets to guarantee sub-1.5-second mobile load times.",
+    bullets: ["PAGE LOAD OPTIMIZATION", "IMAGE COMPRESSION", "GOOGLE SPEED METRICS VALIDATION"]
   }
 ];
 
@@ -272,7 +272,7 @@ const testimonials = [
     accentColor: "text-h3-yellow",
     barColor: "bg-h3-yellow",
     scriptColor: "text-h3-yellow",
-    mockup: "/franklin-tn/jbjackson-desktop-hero.png"
+    mockup: "/franklin-tn/bremencia-desktop-hero.png"
   },
   {
     name: "DAY ACCOUNTING.",
@@ -289,24 +289,7 @@ const testimonials = [
     accentColor: "text-h3-red",
     barColor: "bg-h3-red",
     scriptColor: "text-h3-red",
-    mockup: "/franklin-tn/mckinley-desktop-hero.png"
-  },
-  {
-    name: "HORIZON REAL ESTATE.",
-    shortName: "HORIZON REAL ESTATE",
-    date: "07.22",
-    tag: "WEB DESIGN",
-    subtitle: "REAL ESTATE · FRANKLIN, TN",
-    quote: '"Our old website was embarrassing us at networking events. Creative Cowboys turned it around fast — clean, modern, and built to convert. Our inquiry form submissions went up immediately after launch."',
-    attribution: "— Samantha Lee",
-    domain: "horizonrealestate.co",
-    themeBg: "bg-h3-green",
-    activeBtnBg: "bg-h3-yellow",
-    activeBtnText: "text-h3-black",
-    accentColor: "text-h3-yellow",
-    barColor: "bg-h3-yellow",
-    scriptColor: "text-h3-yellow",
-    mockup: "/franklin-tn/leuco-desktop-hero.png"
+    mockup: "/franklin-tn/dayacct-desktop-hero.png"
   }
 ];
 
@@ -770,32 +753,31 @@ export default function WebDesignFranklinPage() {
 
           {/* Hero Right Banner Image Card */}
           <div className="lg:col-span-5 flex justify-center items-center relative">
-            <div className="h3-brutalist-card bg-h3-red p-4 sm:p-6 text-h3-cream h3-animate-slide-in-right w-full max-w-[440px] flex flex-col justify-between aspect-[4/3] relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-h3-black/20 rounded-full blur-xl pointer-events-none" />
+            <div className="bg-[#DD5A2E] text-white p-6 sm:p-8 aspect-[3/4] w-full max-w-[280px] sm:max-w-[320px] md:max-w-[360px] -rotate-3 shadow-[10px_10px_0_#1a1a1a] border-4 border-[#1a1a1a] flex flex-col justify-between relative overflow-hidden h3-animate-slide-in-right">
+              {/* Top row */}
+              <div className="border-b-2 border-white/40 pb-3 flex flex-col items-start">
+                <div className="font-h3-display text-sm tracking-wider">FRANKLIN, TN</div>
+                <div className="inline-block border-2 border-white/60 rounded-full px-3 py-1 font-h3-display text-[9px] tracking-wider mt-2.5">
+                  EXIT 65 &middot; I-65
+                </div>
+              </div>
               
-              {/* Browser Header Bar */}
-              <div className="h-8 bg-h3-black rounded-t-md border-b border-white/10 flex items-center px-3 justify-between gap-4 mb-3">
-                <div className="flex gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#ff5f56]" />
-                  <span className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-                  <span className="w-2 h-2 rounded-full bg-[#27c93f]" />
+              {/* Middle row */}
+              <div className="flex flex-col items-start my-auto">
+                <div className="font-h3-display text-xs text-h3-yellow tracking-wider mb-2">
+                  OUR PROMISE
                 </div>
-                <div className="bg-white/10 rounded px-3 py-0.5 text-[9px] font-mono truncate w-1/2 text-center text-white/60">
-                  harmonicproduction.co
+                <div className="font-h3-display text-4xl sm:text-5xl leading-[0.85] text-white uppercase text-left">
+                  FLAT FEE.<br />
+                  FAST CODE.<br />
+                  NO BS.
                 </div>
-                <div className="w-8" />
               </div>
 
-              {/* Mockup Frame Screen */}
-              <div className="flex-grow relative overflow-hidden bg-[#1a1a1a] rounded-b-md border border-h3-black/40">
-                <Image
-                  src="/franklin-tn/harmonic-desktop-hero.png"
-                  alt="Harmonic Production new website redesign"
-                  fill
-                  className="object-cover object-top"
-                  sizes="(max-w-[768px]) 100vw, 440px"
-                  priority
-                />
+              {/* Bottom row */}
+              <div className="border-t border-white/40 pt-2.5 flex justify-between font-h3-display text-[9px] tracking-wider">
+                <span>ESTABLISHED 2025</span>
+                <span>VILLA RICA &middot; FRANKLIN</span>
               </div>
             </div>
           </div>
@@ -973,33 +955,98 @@ export default function WebDesignFranklinPage() {
       <section id="process" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-black border-b-4 border-h3-black z-10 text-white">
         <div className="max-w-7xl mx-auto">
           
-          <div className="max-w-3xl mb-16 text-left">
-            <span className="text-h3-yellow font-bold text-xs uppercase tracking-widest font-h3-secondary">&mdash; OUR PROCESS &mdash;</span>
-            <h2 className="font-h3-display text-5xl md:text-6xl text-white uppercase mt-1 leading-none">HOW WE WORK.</h2>
-            <p className="font-h3-secondary text-sm md:text-base text-h3-cream/70 leading-relaxed mt-4">
-              Five steps. Each with a realistic timeline. We send you the actual artifact at each step — not just a Slack update saying it's done.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-16">
+            <div className="text-left max-w-3xl">
+              <span className="text-h3-yellow font-bold text-xs uppercase tracking-widest font-h3-secondary block">&mdash; OUR PROCESS &mdash;</span>
+              <h2 className="font-h3-display text-5xl md:text-6xl text-white uppercase mt-1 leading-none">HOW WE WORK.</h2>
+              <p className="font-h3-secondary text-sm md:text-base text-h3-cream/70 leading-relaxed mt-4">
+                Five steps. Each with a realistic timeline. We send you the actual artifact at each step &mdash; not just a Slack update saying it's done.
+              </p>
+            </div>
+            
+            <span className="font-sign-painter text-2xl text-h3-yellow -rotate-3 inline-block font-bold sm:self-end self-start">
+              &mdash; five steps
+            </span>
           </div>
 
-          {/* Stepped Process List */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {processSteps.map((step, idx) => (
-              <div 
-                key={idx}
-                className="h3-brutalist-card bg-h3-cream text-h3-black p-6 flex flex-col justify-between text-left"
-              >
-                <div>
-                  <div className="w-10 h-10 rounded-full border-2 border-h3-black bg-h3-yellow flex items-center justify-center font-h3-display text-lg text-h3-black mb-4 select-none">
-                    {step.num}
+          {/* Desktop/Tablet Horizontal Timeline */}
+          <div className="hidden lg:block timeline relative mt-16 mb-8">
+            {/* Connecting line behind circles */}
+            <div className="absolute top-[95px] left-[6%] right-[6%] h-[3px] bg-gradient-to-r from-h3-yellow via-[#DD5A2E] to-h3-yellow z-1" />
+
+            <div className="grid grid-cols-5 gap-6 relative z-10">
+              {processSteps.map((step, idx) => {
+                const isStep3 = idx === 2; // Step 3 (BUILD)
+                return (
+                  <div key={idx} className="text-center flex flex-col items-center">
+                    {/* Week label above circle */}
+                    <div className="font-h3-display text-xs text-h3-yellow tracking-wider mb-4 h-6 flex items-end justify-center select-none">
+                      {step.timing.toUpperCase()}
+                    </div>
+                    
+                    {/* Circle Wrap */}
+                    <div className="h-[76px] flex items-center justify-center mb-4">
+                      <div className={`rounded-full border-4 border-h3-black flex items-center justify-center font-h3-display z-20 select-none ${
+                        isStep3 
+                          ? "w-[70px] h-[70px] bg-[#DD5A2E] text-white text-2xl shadow-[0_0_0_4px_#F5C842]" 
+                          : "w-14 h-14 bg-h3-yellow text-h3-black text-xl"
+                      }`}>
+                        {step.num}
+                      </div>
+                    </div>
+
+                    {/* Step title below circle */}
+                    <h3 className="font-h3-display text-lg text-h3-cream uppercase tracking-wider mb-2">
+                      {step.title.toUpperCase()}.
+                    </h3>
+                    
+                    {/* Description */}
+                    <p className="font-h3-secondary text-xs text-h3-cream/70 leading-relaxed max-w-[200px]">
+                      {step.desc}
+                    </p>
                   </div>
-                  
-                  <h3 className="font-h3-display text-lg uppercase tracking-wide mb-1 leading-none">{step.title}</h3>
-                  <span className="text-[10px] font-bold text-h3-red bg-h3-red/10 px-2 py-0.5 rounded-full inline-block mb-4">{step.timing}</span>
-                  
-                  <p className="font-h3-secondary text-xs text-h3-black/80 leading-relaxed">{step.desc}</p>
-                </div>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Mobile Vertical Timeline */}
+          <div className="block lg:hidden relative pl-8 mt-12 mb-6">
+            {/* Vertical connecting line */}
+            <div className="absolute top-4 bottom-4 left-6 w-[3px] bg-gradient-to-b from-h3-yellow via-[#DD5A2E] to-h3-yellow z-1" />
+
+            <div className="flex flex-col gap-10">
+              {processSteps.map((step, idx) => {
+                const isStep3 = idx === 2; // Step 3 (BUILD)
+                return (
+                  <div key={idx} className="relative flex flex-col text-left">
+                    {/* Circle Indicator on the left */}
+                    <div className="absolute -left-10 top-0 w-8 h-8 flex items-center justify-center select-none">
+                      <div className={`rounded-full border-2 border-h3-black flex items-center justify-center font-h3-display z-20 ${
+                        isStep3
+                          ? "w-8 h-8 bg-[#DD5A2E] text-white text-sm shadow-[0_0_0_2px_#F5C842]"
+                          : "w-7 h-7 bg-h3-yellow text-h3-black text-xs"
+                      }`}>
+                        {step.num}
+                      </div>
+                    </div>
+
+                    {/* Step Info */}
+                    <div>
+                      <span className="text-[10px] font-bold text-h3-yellow tracking-wider block mb-1">
+                        {step.timing.toUpperCase()}
+                      </span>
+                      <h3 className={`font-h3-display text-lg text-h3-cream uppercase tracking-wider mb-1 ${isStep3 ? 'text-[#DD5A2E]' : ''}`}>
+                        {step.title.toUpperCase()}.
+                      </h3>
+                      <p className="font-h3-secondary text-xs text-h3-cream/70 leading-relaxed">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
         </div>
@@ -1075,59 +1122,97 @@ export default function WebDesignFranklinPage() {
       {/* Williamson County Service Area map and neighborhood details */}
       <section className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-black text-white border-b-4 border-h3-black z-10 overflow-hidden text-left">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-8">
             
-            {/* Left Info Columns */}
+            {/* Left Info Column */}
             <div className="lg:col-span-5 flex flex-col justify-center">
-              <span className="font-h3-secondary text-xs font-bold tracking-[0.12em] text-h3-yellow uppercase mb-3 block">&mdash; WILLIAMSON COUNTY &mdash;</span>
+              <span className="font-h3-secondary text-xs font-bold tracking-[0.12em] text-h3-yellow uppercase mb-3 block">&mdash; SERVICE AREA &mdash;</span>
               
-              <h2 className="font-h3-display text-4xl md:text-5xl uppercase leading-none mb-6">
-                SERVING THE FULL FRANKLIN & WILLIAMSON COUNTY MARKET.
+              <h2 className="font-h3-display text-4xl md:text-5xl uppercase leading-[0.9] mb-6">
+                YOUR NEIGHBORHOOD.<br />WE'RE THERE.
               </h2>
               
-              <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed mb-10">
-                From Cool Springs storefronts to Westhaven boutiques, from Berry Farms home services to Downtown Franklin professional firms — we work with businesses across every Franklin neighborhood. Strategy calls in person or remote, whichever fits how you work.
+              <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed mb-6">
+                From Cool Springs storefronts to Westhaven boutiques, from Berry Farms home services to Downtown Franklin professional firms &mdash; we work with businesses across every Franklin neighborhood.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-h3-cream/15 pt-6">
-                <div>
-                  <h3 className="font-h3-display text-sm uppercase text-h3-yellow mb-3">Neighborhoods</h3>
-                  <ul className="space-y-2 text-xs font-h3-secondary font-bold text-h3-cream/80 uppercase tracking-wide">
-                    {neighborhoods.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-h3-red rotate-45" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+              <span className="font-sign-painter text-2xl text-h3-yellow -rotate-3 inline-block font-bold mt-4 self-start">
+                strategy calls in person or remote &mdash;
+              </span>
+            </div>
+
+            {/* Right Map SVG Container */}
+            <div className="lg:col-span-7 flex justify-center items-center w-full">
+              <div className="relative w-full aspect-[4/3] bg-[#1a1a2a] border-2 border-h3-yellow p-6 rounded-lg shadow-2xl overflow-hidden select-none">
+                <div className="absolute top-4 left-4 font-h3-display text-[11px] text-h3-yellow tracking-wider z-10">
+                  WILLIAMSON CO &middot; TN
                 </div>
                 
-                <div>
-                  <h3 className="font-h3-display text-sm uppercase text-h3-yellow mb-3">Verticals</h3>
-                  <ul className="space-y-2 text-xs font-h3-secondary font-bold text-h3-cream/80 uppercase tracking-wide">
-                    {verticals.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-h3-red rotate-45" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <svg className="w-full h-full opacity-45 pointer-events-none" viewBox="0 0 600 450" preserveAspectRatio="none">
+                  {/* County outline */}
+                  <path d="M60,180 Q120,80 200,90 Q300,70 400,100 Q500,90 560,180 Q580,260 540,340 Q500,400 380,410 Q260,420 140,400 Q60,360 50,280 Z" fill="none" stroke="#F2EBDA" strokeWidth="1.5" strokeDasharray="5,4"/>
+                  {/* Reference lines */}
+                  <line x1="80" y1="240" x2="540" y2="240" stroke="#F2EBDA" strokeWidth="0.6" strokeDasharray="2,3"/>
+                  <line x1="310" y1="100" x2="310" y2="400" stroke="#F2EBDA" strokeWidth="0.6" strokeDasharray="2,3"/>
+                  {/* Subtle elevation contour suggestion */}
+                  <path d="M180,180 Q260,150 340,180 Q400,210 460,180" fill="none" stroke="#F2EBDA" strokeWidth="0.4" strokeDasharray="2,4"/>
+                  <path d="M180,300 Q280,330 380,300 Q440,280 480,310" fill="none" stroke="#F2EBDA" strokeWidth="0.4" strokeDasharray="2,4"/>
+                </svg>
+
+                {/* Pins */}
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2 hero-pin" style={{ top: "52%", left: "50%" }}>
+                  <div className="w-[18px] h-[18px] bg-[#DD5A2E] border-3 border-h3-yellow rounded-full mx-auto shadow-[0_0_14px_rgba(221,90,46,0.6)]" />
+                  <div className="font-h3-display text-xs text-[#F2EBDA] tracking-wider mt-1.5 whitespace-nowrap">FRANKLIN</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "28%", left: "65%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">BRENTWOOD</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "42%", left: "78%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">COOL SPRINGS</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "38%", left: "28%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">WESTHAVEN</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "70%", left: "70%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">BERRY FARMS</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "80%", left: "50%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">SPRING HILL</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "32%", left: "82%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">MCKAY'S MILL</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "70%", left: "22%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">LEIPER'S FORK</div>
+                </div>
+                <div className="absolute text-center -translate-x-1/2 -translate-y-1/2" style={{ top: "60%", left: "36%" }}>
+                  <div className="w-2.5 h-2.5 bg-h3-yellow rounded-full mx-auto shadow-[0_0_8px_rgba(245,200,66,0.5)]" />
+                  <div className="font-h3-display text-[9px] text-[#d4ccb8] tracking-wider mt-1 whitespace-nowrap">FIELDSTONE</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Map Image */}
-            <div className="lg:col-span-7 flex justify-center items-center lg:translate-x-6 overflow-visible w-full">
-              <div className="relative w-full aspect-[4/3] select-none border-4 border-h3-black shadow-2xl rounded-lg bg-h3-cream p-4">
-                <Image 
-                  src="/franklin-tn/williamson-county-map.svg" 
-                  alt="Williamson County Map"
-                  fill
-                  className="object-contain p-2"
-                />
-              </div>
-            </div>
+          </div>
 
+          {/* Verticals Chip Row */}
+          <div className="border-t border-h3-yellow/30 pt-6 mt-6">
+            <div className="font-h3-display text-xs text-h3-yellow tracking-wider mb-4">
+              WHO WE WORK WITH IN WILLIAMSON CO
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["HEALTHCARE", "BOUTIQUE RETAIL", "RESTAURANTS", "HOME SERVICES", "LAW + FINANCIAL", "COUNTRY MUSIC", "WEALTH MGMT"].map((item, i) => (
+                <span key={i} className="bg-h3-yellow/12 text-h3-yellow px-3.5 py-1.5 font-h3-display text-xs tracking-wider border border-h3-yellow">
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -1167,7 +1252,7 @@ export default function WebDesignFranklinPage() {
           <div className="w-full flex items-center justify-between font-h3-secondary text-xs md:text-sm font-bold tracking-widest text-white/95 uppercase border-b border-white/20 pb-4 mb-12">
             <span>Client Testimonials</span>
             <div className="flex-grow h-[1px] bg-white/20 mx-6 hidden sm:block" />
-            <span>{`0${activeTestimonial + 1} / 04`}</span>
+            <span>{`0${activeTestimonial + 1} / 0${testimonials.length}`}</span>
           </div>
 
           {/* Grid Layout for Content */}
