@@ -849,47 +849,56 @@ export default function WebDesignFranklinPage() {
           <div className="grid grid-cols-6 gap-0 border-y-[1.5px] border-black/15">
             {/* Cell 1: HARMONIC */}
             <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[0.5px] uppercase">
-                HARMONIC<span className="text-[#DD5A2E] ml-[2px]">◆</span>
-              </span>
+              <img 
+                src="/Client Logos/Harmonic Logo (Black).png" 
+                alt="Harmonic Logo" 
+                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
             
             {/* Cell 2: John B. Jackson */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex flex-col items-center justify-center border-r-[1.5px] border-black/15">
-              <span className="font-serif italic text-[10px] xs:text-[12px] sm:text-base md:text-lg text-[#0a0a0a] leading-tight">
-                John B.<br />Jackson,
-              </span>
-              <span className="text-[7px] xs:text-[8px] sm:text-[10px] md:text-[11px] text-[#888] tracking-[2px] mt-1 font-h3-display uppercase">
-                ESQ
-              </span>
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/johnbjackson-dark-Blue.png" 
+                alt="John B. Jackson Logo" 
+                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
 
             {/* Cell 3: McKINLEY */}
             <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[0.5px] uppercase">
-                McKINLEY <span className="font-sans font-normal ml-0.5 text-[0.85em] align-baseline">&#x2302;</span>
-              </span>
+              <img 
+                src="/Client Logos/McKinley (Black).png" 
+                alt="McKinley Logo" 
+                className="max-h-[34px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
 
             {/* Cell 4: LEUCO */}
             <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[4px] uppercase mr-[-4px]">
-                LEUCO
-              </span>
+              <img 
+                src="/Client Logos/Leuco transparent 2.png" 
+                alt="Leuco Logo" 
+                className="max-h-[26px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
 
-            {/* Cell 5: Squirrel. */}
+            {/* Cell 5: MetLane */}
             <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <span className="font-lobster text-[14px] xs:text-[18px] sm:text-[22px] md:text-[26px] text-[#0a0a0a] leading-none">
-                Squirrel.
-              </span>
+              <img 
+                src="/Client Logos/big-MetLane_logo_full.png" 
+                alt="MetLane Logo" 
+                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
 
-            {/* Cell 6: DAY ACCT. */}
+            {/* Cell 6: FireBible */}
             <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center">
-              <span className="font-h3-display text-[11px] xs:text-sm sm:text-lg md:text-xl text-[#0a0a0a] tracking-[1px] uppercase">
-                DAY ACCT.
-              </span>
+              <img 
+                src="/Client Logos/FireBible logo Black.webp" 
+                alt="FireBible Logo" 
+                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
             </div>
           </div>
         </div>
