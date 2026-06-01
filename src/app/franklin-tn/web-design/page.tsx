@@ -1311,7 +1311,7 @@ export default function WebDesignFranklinPage() {
         onMouseLeave={() => setIsHovered(false)}
         className={`w-full py-12 md:py-20 px-6 md:px-12 border-b-4 border-h3-black z-10 relative flex flex-col items-center justify-between transition-colors duration-500 overflow-hidden ${testimonials[activeTestimonial].themeBg}`}
       >
-        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[500px] md:min-h-[600px] relative z-10">
+        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[980px] sm:min-h-[850px] lg:min-h-[750px] relative z-10">
           
           {/* Top Header Row */}
           <div className="w-full flex items-center justify-between font-h3-secondary text-xs md:text-sm font-bold tracking-widest text-white/95 uppercase border-b border-white/20 pb-4 mb-12">
@@ -1323,7 +1323,7 @@ export default function WebDesignFranklinPage() {
           {/* Grid Layout for Content */}
           <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 items-center transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             {/* Left Column: Review text and rating */}
-            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4 min-h-[400px] sm:min-h-[350px] lg:min-h-[380px]">
+            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4 min-h-[480px] sm:min-h-[380px] lg:min-h-[480px] xl:min-h-[420px]">
               {/* Badges */}
               <div className="flex gap-3">
                 <span className="bg-black/30 backdrop-blur-sm border border-white/10 text-white font-h3-secondary font-bold text-xs tracking-wider px-3 py-1 rounded">
