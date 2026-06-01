@@ -1323,12 +1323,9 @@ export default function WebDesignFranklinPage() {
           {/* Grid Layout for Content */}
           <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 items-center transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             {/* Left Column: Review text and rating */}
-            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4">
+            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4 min-h-[400px] sm:min-h-[350px] lg:min-h-[380px]">
               {/* Badges */}
               <div className="flex gap-3">
-                <span className="bg-black/30 backdrop-blur-sm border border-white/10 text-white font-h3-secondary font-bold text-xs tracking-wider px-3 py-1 rounded">
-                  {testimonials[activeTestimonial].date}
-                </span>
                 <span className="bg-black/30 backdrop-blur-sm border border-white/10 text-white font-h3-secondary font-bold text-xs tracking-wider px-3 py-1 rounded">
                   {testimonials[activeTestimonial].tag}
                 </span>
