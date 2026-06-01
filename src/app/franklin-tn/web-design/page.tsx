@@ -281,21 +281,21 @@ const testimonials = [
     mockup: "/franklin-tn/bremencia-desktop-hero.png"
   },
   {
-    name: "DAY ACCOUNTING.",
-    shortName: "DAY ACCOUNTING",
+    name: "MCKINLEY ROOFING.",
+    shortName: "McKINLEY ROOFING",
     date: "06.15",
-    tag: "WEB DESIGN",
-    subtitle: "CPA · NEWNAN, GA",
-    quote: '"If you need some help with your web work, these guys can get it all together for you. No worries, just solutions."',
-    attribution: "— Lance Day",
-    domain: "dayacct.com",
+    tag: "WEB + LOCAL SEO",
+    subtitle: "ROOFING + RESTORATION · DOUGLASVILLE, GA",
+    quote: '"Creative Cowboys Media knows exactly what they\'re doing! They get the job done right and it shows in the projects that they get their hands on. These guys have so much experience between the two of them and all of that wisdom and experience can be trusted!"',
+    attribution: "— ALEXANDRA McKINLEY",
+    domain: "mckinleyroofing.net",
     themeBg: "bg-h3-black",
     activeBtnBg: "bg-h3-red",
     activeBtnText: "text-white",
     accentColor: "text-h3-red",
     barColor: "bg-h3-red",
     scriptColor: "text-h3-red",
-    mockup: "/franklin-tn/dayacct-desktop-hero.png"
+    mockup: "/franklin-tn/mckinley-roofing-desktop.png"
   }
 ];
 
