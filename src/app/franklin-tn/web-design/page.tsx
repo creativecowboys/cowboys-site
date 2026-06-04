@@ -1582,7 +1582,7 @@ export default function WebDesignFranklinPage() {
           
           {/* Footer Contact Details */}
           <div className="md:col-span-5 flex flex-col gap-6 text-left">
-            <h3 className="font-h3-display text-4xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
+            <h3 className="font-h3-display text-3xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
             <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed max-w-sm">
               We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
             </p>
@@ -1609,7 +1609,7 @@ export default function WebDesignFranklinPage() {
 
           {/* Footer Logo Wordmark */}
           <div className="md:col-span-4 flex flex-col items-center justify-center py-6 border-y-2 md:border-y-0 md:border-x-2 border-h3-cream/10">
-            <div className="font-h3-display text-5xl uppercase tracking-widest text-h3-red mb-2">
+            <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red mb-2">
               COWBOYS
             </div>
             <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-h3-cream/40">
@@ -1629,7 +1629,7 @@ export default function WebDesignFranklinPage() {
 
           {/* Quick links */}
           <div className="md:col-span-3 flex flex-col gap-6 text-left">
-            <h4 className="font-h3-display text-xl uppercase tracking-widest text-h3-blue">DIRECT LINKS</h4>
+            <h4 className="font-h3-display text-3xl uppercase tracking-widest text-h3-blue">DIRECT LINKS</h4>
             <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
               <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
               <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
