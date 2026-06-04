@@ -349,7 +349,8 @@ export default function WebDesignFranklinPage() {
   const [isHovered, setIsHovered] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
 
-  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">( "idle" );
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -358,6 +359,19 @@ export default function WebDesignFranklinPage() {
     service: "",
     message: "",
   });
+
+  const openContactModal = (serviceName: string) => {
+    setForm((prev) => ({ 
+      ...prev, 
+      service: serviceName === "Select a service..." ? "" : serviceName 
+    }));
+    setFormStatus("idle");
+    setIsContactModalOpen(true);
+  };
+
+  const closeContactModal = () => {
+    setIsContactModalOpen(false);
+  };
 
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -376,6 +390,14 @@ export default function WebDesignFranklinPage() {
       });
       if (!res.ok) throw new Error("Submission failed");
       setFormStatus("success");
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        service: "",
+        message: "",
+      });
     } catch (err) {
       console.error("Form submit error:", err);
       setFormStatus("error");
@@ -638,12 +660,12 @@ export default function WebDesignFranklinPage() {
           </nav>
  
           <div className="flex items-center gap-4">
-            <a 
-              href="#contact" 
-              className="hidden md:inline-flex h3-btn-brutalist border-h3-cream bg-h3-red text-white font-bold px-6 py-3 uppercase tracking-wider text-sm items-center gap-2 whitespace-nowrap shadow-[4px_4px_0px_#f3efe0] hover:shadow-[6px_6px_0px_#f3efe0]"
+            <button 
+              onClick={(e) => { e.preventDefault(); openContactModal("Select a service..."); }}
+              className="hidden md:inline-flex h3-btn-brutalist border-h3-cream bg-h3-red text-white font-bold px-6 py-3 uppercase tracking-wider text-sm items-center gap-2 whitespace-nowrap shadow-[4px_4px_0px_#f3efe0] hover:shadow-[6px_6px_0px_#f3efe0] cursor-pointer"
             >
               Get a Scorecard <ArrowUpRight size={16} />
-            </a>
+            </button>
  
             {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
@@ -696,13 +718,12 @@ export default function WebDesignFranklinPage() {
             >
               FAQ
             </a>
-            <a 
-              href="#contact" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="h3-btn-brutalist border-h3-cream bg-h3-red text-white font-bold px-4 py-2.5 uppercase tracking-wider text-xs inline-flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#f3efe0] hover:shadow-[4px_4px_0px_#f3efe0]"
+            <button 
+              onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); openContactModal("Select a service..."); }}
+              className="h3-btn-brutalist border-h3-cream bg-h3-red text-white font-bold px-4 py-2.5 uppercase tracking-wider text-xs inline-flex items-center justify-center gap-1.5 mt-2 shadow-[3px_3px_0px_#f3efe0] hover:shadow-[4px_4px_0px_#f3efe0] cursor-pointer"
             >
               Get a Scorecard <ArrowUpRight size={14} />
-            </a>
+            </button>
           </div>
         )}
       </header>
@@ -729,18 +750,18 @@ export default function WebDesignFranklinPage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-[12px] mt-2 h3-animate-fade-in-up h3-delay-2">
-              <a 
-                href="#contact" 
-                className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
+              <button 
+                onClick={(e) => { e.preventDefault(); openContactModal("Select a service..."); }}
+                className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all cursor-pointer"
               >
                 GET A FREE SCORECARD ↗
-              </a>
-              <a 
-                href="#contact" 
-                className="h3-btn-brutalist bg-white text-[#0a0a0a] font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
+              </button>
+              <button 
+                onClick={(e) => { e.preventDefault(); openContactModal("Custom Complex Project"); }}
+                className="h3-btn-brutalist bg-white text-[#0a0a0a] font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all cursor-pointer"
               >
                 BOOK A STRATEGY CALL
-              </a>
+              </button>
             </div>
 
             {/* Stats Strip */}
@@ -1179,9 +1200,12 @@ export default function WebDesignFranklinPage() {
                 </p>
               </div>
               
-              <a href="#contact" className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-red text-white">
+              <button 
+                onClick={(e) => { e.preventDefault(); openContactModal("Ongoing Website ($497/mo)"); }}
+                className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-red text-white cursor-pointer"
+              >
                 GET STARTED
-              </a>
+              </button>
             </div>
 
             {/* Card 2 — ONE TIME (right) */}
@@ -1232,9 +1256,12 @@ export default function WebDesignFranklinPage() {
                 </ul>
               </div>
               
-              <a href="#contact" className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-cream text-h3-black">
+              <button 
+                onClick={(e) => { e.preventDefault(); openContactModal("One Time Build (from $3,500)"); }}
+                className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-cream text-h3-black cursor-pointer"
+              >
                 GET A CUSTOM QUOTE
-              </a>
+              </button>
             </div>
 
           </div>
@@ -1247,9 +1274,12 @@ export default function WebDesignFranklinPage() {
                 Two ways to start. Monthly is everything bundled &mdash; no upfront, just $497 a month. One time is a flat project fee paid in three milestones (kickoff / design approval / launch). No surprise charge orders either way. If your project doesn't fit, we'll tell you and recommend someone better suited (even if that's Squarespace or a freelancer).
               </p>
             </div>
-            <a href="#contact" className="h3-btn-brutalist bg-h3-red text-h3-cream font-bold px-8 py-3.5 uppercase tracking-wider text-xs w-fit flex-shrink-0 border-h3-black">
+            <button 
+              onClick={(e) => { e.preventDefault(); openContactModal("Custom Complex Project"); }}
+              className="h3-btn-brutalist bg-h3-red text-h3-cream font-bold px-8 py-3.5 uppercase tracking-wider text-xs w-fit flex-shrink-0 border-h3-black cursor-pointer"
+            >
               BOOK A STRATEGY CALL
-            </a>
+            </button>
           </div>
 
         </div>
@@ -1609,28 +1639,102 @@ export default function WebDesignFranklinPage() {
         </div>
       </section>
 
-      {/* Contact Form Section */}
-      <section id="contact" className="w-full bg-[#F2EBDA] border-t-4 border-h3-black py-16 md:py-24 px-6 md:px-12 relative z-20 text-h3-black">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      {/* Contact & Footer Section */}
+      <footer id="contact" className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-12 md:py-16 px-6 md:px-12 relative z-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
           
-          {/* Left Column: Form Info & Form */}
-          <div className="lg:col-span-7 flex flex-col gap-8 text-left">
-            <div>
-              <span className="text-[#DD5A2E] font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-2">
+          {/* Footer Contact Details */}
+          <div className="md:col-span-5 flex flex-col gap-6 text-left">
+            <h3 className="font-h3-display text-3xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
+            <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed max-w-sm">
+              We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
+            </p>
+
+            <div className="flex flex-col gap-3 font-bold text-sm tracking-wider uppercase">
+              <div className="flex items-center gap-3">
+                <Clock size={16} className="text-h3-yellow" />
+                <span>Mon - Fri: 9:00 AM - 5:00 PM</span>
+              </div>
+              <a href="mailto:howdy@creativecowboys.co" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
+                <Mail size={16} className="text-h3-yellow" />
+                <span>howdy@creativecowboys.co</span>
+              </a>
+              <a href="tel:4702437517" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
+                <Phone size={16} className="text-h3-yellow" />
+                <span>(470) 243-7517</span>
+              </a>
+              <div className="flex items-center gap-3">
+                <MapPin size={16} className="text-h3-yellow" />
+                <span>Franklin, Tennessee</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Logo Wordmark */}
+          <div className="md:col-span-4 flex flex-col items-center justify-center py-6 md:pt-0 md:pb-6 border-y-2 md:border-y-0 md:border-x-2 border-h3-cream/10">
+            <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red mb-2">
+              COWBOYS
+            </div>
+            <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-h3-cream/40">
+              © 2026 ALL RIGHTS RESERVED
+            </div>
+            
+            {/* Social Icons Badge Grid */}
+            <div className="flex gap-4 mt-6">
+              <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+                <span className="-rotate-45 font-bold text-xs">fb</span>
+              </a>
+              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+                <span className="-rotate-45 font-bold text-xs">ig</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Quick links */}
+          <div className="md:col-span-3 flex flex-col gap-6 text-left">
+            <h4 className="font-h3-display text-3xl uppercase tracking-widest text-h3-blue">DIRECT LINKS</h4>
+            <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
+              <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
+              <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
+              <a href="/ppc" className="hover:text-h3-red transition-colors">PPC Campaigns</a>
+              <a href="/brand-strategy" className="hover:text-h3-red transition-colors">Brand Strategy</a>
+              <a href="/privacy-policy" className="hover:text-h3-red transition-colors mt-2">Privacy Policy</a>
+            </div>
+          </div>
+
+        </div>
+      </footer>
+
+      {/* Contact Form Popup Modal */}
+      {isContactModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          {/* Backdrop Click Dismiss */}
+          <div className="absolute inset-0 cursor-pointer" onClick={closeContactModal} />
+          
+          {/* Modal Container */}
+          <div className="relative w-full max-w-2xl bg-[#F2EBDA] border-4 border-[#0a0a0a] shadow-[12px_12px_0_#0a0a0a] p-6 sm:p-8 text-h3-black z-10 flex flex-col max-h-[90vh] overflow-y-auto rounded-[4px]">
+            {/* Close Button */}
+            <button 
+              onClick={closeContactModal}
+              className="absolute top-4 right-4 w-10 h-10 border-[3px] border-[#0a0a0a] bg-white text-[#0a0a0a] flex items-center justify-center hover:bg-h3-red hover:text-white transition-colors duration-200 shadow-[3px_3px_0_#0a0a0a] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#0a0a0a] cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X size={20} className="stroke-[3px]" />
+            </button>
+
+            {/* Header */}
+            <div className="text-left mb-6 pr-10">
+              <span className="text-[#DD5A2E] font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-1">
                 — LET'S GET STARTED —
               </span>
-              <h2 className="font-h3-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] text-h3-black uppercase tracking-tight">
-                TELL US ABOUT <br />
-                YOUR PROJECT.
+              <h2 className="font-h3-display text-3xl sm:text-4xl leading-none text-h3-black uppercase tracking-tight">
+                TELL US ABOUT YOUR PROJECT.
               </h2>
-              <p className="font-h3-secondary text-sm text-h3-black/70 leading-relaxed max-w-xl mt-4">
-                Ready to grow your Franklin business? Drop us a line below. Whether you need a high-converting website, custom e-commerce, or a full SEO & ad campaign to make your phone ring, we'll send you a plan.
-              </p>
             </div>
 
-            {/* Brutalist Contact Form */}
+            {/* Content states */}
             {formStatus === "success" ? (
-              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4">
+              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4 my-4">
                 <div className="w-16 h-16 rounded-full bg-[#3B6D11] border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a] flex items-center justify-center text-white">
                   <Check size={32} />
                 </div>
@@ -1640,9 +1744,15 @@ export default function WebDesignFranklinPage() {
                 <p className="font-h3-secondary text-sm text-h3-black/70 max-w-md">
                   We've received your request and will get back to you with a proposal or to set up a strategy call within one business day. Talk soon, partner!
                 </p>
+                <button
+                  onClick={closeContactModal}
+                  className="h3-btn-brutalist bg-[#DD5A2E] text-white font-h3-secondary font-bold px-8 py-3 uppercase tracking-wider text-xs border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a] mt-2 cursor-pointer"
+                >
+                  CLOSE WINDOW
+                </button>
               </div>
             ) : formStatus === "error" ? (
-              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4">
+              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4 my-4">
                 <h3 className="font-h3-display text-2xl uppercase tracking-wider text-h3-red">
                   SOMETHING WENT WRONG
                 </h3>
@@ -1654,15 +1764,15 @@ export default function WebDesignFranklinPage() {
                 </p>
                 <button
                   onClick={() => setFormStatus("idle")}
-                  className="h3-btn-brutalist bg-[#DD5A2E] text-white font-h3-secondary font-bold px-8 py-3.5 uppercase tracking-wider text-xs border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a]"
+                  className="h3-btn-brutalist bg-[#DD5A2E] text-white font-h3-secondary font-bold px-8 py-3 uppercase tracking-wider text-xs border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a] mt-2 cursor-pointer"
                 >
                   TRY AGAIN
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleFormSubmit} className="flex flex-col gap-6 w-full">
+              <form onSubmit={handleFormSubmit} className="flex flex-col gap-5 w-full text-left">
                 {/* Row: Name & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="form-name" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
                       Name
@@ -1676,7 +1786,7 @@ export default function WebDesignFranklinPage() {
                       autoComplete="name"
                       value={form.name}
                       onChange={handleFormChange}
-                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                      className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
                     />
                   </div>
                   <div>
@@ -1692,13 +1802,13 @@ export default function WebDesignFranklinPage() {
                       autoComplete="email"
                       value={form.email}
                       onChange={handleFormChange}
-                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                      className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Row: Phone & Company */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="form-phone" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
                       Phone Number
@@ -1711,7 +1821,7 @@ export default function WebDesignFranklinPage() {
                       autoComplete="tel"
                       value={form.phone}
                       onChange={handleFormChange}
-                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                      className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
                     />
                   </div>
                   <div>
@@ -1726,7 +1836,7 @@ export default function WebDesignFranklinPage() {
                       autoComplete="organization"
                       value={form.company}
                       onChange={handleFormChange}
-                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                      className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
                     />
                   </div>
                 </div>
@@ -1741,7 +1851,7 @@ export default function WebDesignFranklinPage() {
                     name="service"
                     value={form.service}
                     onChange={handleFormChange}
-                    className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all cursor-pointer"
+                    className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all cursor-pointer"
                   >
                     <option value="">Select a service...</option>
                     <option value="Ongoing Website ($497/mo)">Ongoing Website ($497/mo)</option>
@@ -1762,11 +1872,11 @@ export default function WebDesignFranklinPage() {
                     id="form-message"
                     name="message"
                     required
-                    rows={5}
+                    rows={4}
                     placeholder="Give us the quick rundown — what you do, what you're trying to fix or build, and any details that help."
                     value={form.message}
                     onChange={handleFormChange}
-                    className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all resize-vertical min-h-[120px]"
+                    className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all resize-vertical min-h-[90px]"
                   />
                 </div>
 
@@ -1774,79 +1884,15 @@ export default function WebDesignFranklinPage() {
                 <button
                   type="submit"
                   disabled={formStatus === "loading"}
-                  className="h3-btn-brutalist w-full bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                  className="h3-btn-brutalist w-full bg-h3-red text-white font-h3-secondary font-bold px-8 py-3.5 uppercase tracking-wider text-sm border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2 cursor-pointer"
                 >
                   {formStatus === "loading" ? "SENDING..." : "SEND MESSAGE ↗"}
                 </button>
               </form>
             )}
           </div>
-
-          {/* Right Column: Info Panel */}
-          <div className="lg:col-span-5 flex flex-col gap-8 text-left lg:pl-12 lg:border-l-2 lg:border-h3-black/10">
-            <div>
-              <span className="text-[#185FA5] font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-2">
-                — HOWDY PARTNER —
-              </span>
-              <h3 className="font-h3-display text-3xl text-h3-black uppercase leading-none">
-                CREATIVE COWBOYS
-              </h3>
-              <p className="font-h3-secondary text-sm text-h3-black/70 leading-relaxed mt-4">
-                We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 font-bold text-xs uppercase tracking-widest text-h3-black/80">
-              <div className="flex items-center gap-3">
-                <Clock size={18} className="text-[#DD5A2E]" />
-                <span>Mon - Fri: 9:00 AM - 5:00 PM</span>
-              </div>
-              <a href="mailto:howdy@creativecowboys.co" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
-                <Mail size={18} className="text-[#DD5A2E]" />
-                <span className="lowercase font-sans text-sm">howdy@creativecowboys.co</span>
-              </a>
-              <a href="tel:4702437517" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
-                <Phone size={18} className="text-[#DD5A2E]" />
-                <span>(470) 243-7517</span>
-              </a>
-              <div className="flex items-center gap-3">
-                <MapPin size={18} className="text-[#DD5A2E]" />
-                <span>Franklin, Tennessee</span>
-              </div>
-            </div>
-
-            {/* Social Icons Badge Grid */}
-            <div className="flex gap-4 mt-2">
-              <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-black rotate-45 flex items-center justify-center hover:bg-h3-black hover:text-white transition-colors duration-200 group">
-                <span className="-rotate-45 font-bold text-xs">fb</span>
-              </a>
-              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-black rotate-45 flex items-center justify-center hover:bg-h3-black hover:text-white transition-colors duration-200 group">
-                <span className="-rotate-45 font-bold text-xs">ig</span>
-              </a>
-            </div>
-          </div>
-
         </div>
-      </section>
-
-      {/* Footer Section */}
-      <footer className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-12 px-6 md:px-12 relative z-20">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red">
-            COWBOYS
-          </div>
-          <div className="font-h3-secondary text-[11px] uppercase tracking-[0.2em] font-bold text-h3-cream/40 text-center md:text-left">
-            © 2026 ALL RIGHTS RESERVED &middot; FRANKLIN, TN
-          </div>
-          <div className="flex flex-wrap justify-center gap-6 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
-            <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
-            <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
-            <a href="/ppc" className="hover:text-h3-red transition-colors">PPC Campaigns</a>
-            <a href="/brand-strategy" className="hover:text-h3-red transition-colors">Brand Strategy</a>
-            <a href="/privacy-policy" className="hover:text-h3-red transition-colors">Privacy Policy</a>
-          </div>
-        </div>
-      </footer>
+      )}
 
     </div>
   );
