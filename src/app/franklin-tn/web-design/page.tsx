@@ -349,6 +349,39 @@ export default function WebDesignFranklinPage() {
   const [isHovered, setIsHovered] = useState(false);
   const [flippedCards, setFlippedCards] = useState<Record<number, boolean>>({});
 
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">( "idle" );
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    service: "",
+    message: "",
+  });
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus("loading");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, source: "Franklin Landing Page" }),
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      setFormStatus("success");
+    } catch (err) {
+      console.error("Form submit error:", err);
+      setFormStatus("error");
+    }
+  };
+
   const toggleCardFlip = (idx: number) => {
     setFlippedCards((prev) => ({
       ...prev,
@@ -1576,69 +1609,242 @@ export default function WebDesignFranklinPage() {
         </div>
       </section>
 
-      {/* Contact & Footer Section */}
-      <footer id="contact" className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-12 md:py-16 px-6 md:px-12 relative z-20">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+      {/* Contact Form Section */}
+      <section id="contact" className="w-full bg-[#F2EBDA] border-t-4 border-h3-black py-16 md:py-24 px-6 md:px-12 relative z-20 text-h3-black">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
-          {/* Footer Contact Details */}
-          <div className="md:col-span-5 flex flex-col gap-6 text-left">
-            <h3 className="font-h3-display text-3xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
-            <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed max-w-sm">
-              We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
-            </p>
+          {/* Left Column: Form Info & Form */}
+          <div className="lg:col-span-7 flex flex-col gap-8 text-left">
+            <div>
+              <span className="text-[#DD5A2E] font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-2">
+                — LET'S GET STARTED —
+              </span>
+              <h2 className="font-h3-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] text-h3-black uppercase tracking-tight">
+                TELL US ABOUT <br />
+                YOUR PROJECT.
+              </h2>
+              <p className="font-h3-secondary text-sm text-h3-black/70 leading-relaxed max-w-xl mt-4">
+                Ready to grow your Franklin business? Drop us a line below. Whether you need a high-converting website, custom e-commerce, or a full SEO & ad campaign to make your phone ring, we'll send you a plan.
+              </p>
+            </div>
 
-            <div className="flex flex-col gap-3 font-bold text-sm tracking-wider uppercase">
+            {/* Brutalist Contact Form */}
+            {formStatus === "success" ? (
+              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-[#3B6D11] border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a] flex items-center justify-center text-white">
+                  <Check size={32} />
+                </div>
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider text-h3-black mt-2">
+                  MESSAGE SENT!
+                </h3>
+                <p className="font-h3-secondary text-sm text-h3-black/70 max-w-md">
+                  We've received your request and will get back to you with a proposal or to set up a strategy call within one business day. Talk soon, partner!
+                </p>
+              </div>
+            ) : formStatus === "error" ? (
+              <div className="bg-white border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] p-8 text-center flex flex-col items-center justify-center gap-4">
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider text-h3-red">
+                  SOMETHING WENT WRONG
+                </h3>
+                <p className="font-h3-secondary text-sm text-h3-black/70 max-w-md">
+                  Your message couldn't be sent. Please try again or email us directly at{" "}
+                  <a href="mailto:howdy@creativecowboys.co" className="underline font-bold hover:text-h3-red">
+                    howdy@creativecowboys.co
+                  </a>
+                </p>
+                <button
+                  onClick={() => setFormStatus("idle")}
+                  className="h3-btn-brutalist bg-[#DD5A2E] text-white font-h3-secondary font-bold px-8 py-3.5 uppercase tracking-wider text-xs border-[3px] border-[#0a0a0a] shadow-[4px_4px_0_#0a0a0a]"
+                >
+                  TRY AGAIN
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleFormSubmit} className="flex flex-col gap-6 w-full">
+                {/* Row: Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="form-name" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                      Name
+                    </label>
+                    <input
+                      id="form-name"
+                      name="name"
+                      type="text"
+                      required
+                      placeholder="Jake Rivera"
+                      autoComplete="name"
+                      value={form.name}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="form-email" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                      Email
+                    </label>
+                    <input
+                      id="form-email"
+                      name="email"
+                      type="email"
+                      required
+                      placeholder="jake@company.com"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Row: Phone & Company */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="form-phone" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                      Phone Number
+                    </label>
+                    <input
+                      id="form-phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="(615) 555-0199"
+                      autoComplete="tel"
+                      value={form.phone}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="form-company" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                      Company / Business
+                    </label>
+                    <input
+                      id="form-company"
+                      name="company"
+                      type="text"
+                      placeholder="Lone Star HVAC"
+                      autoComplete="organization"
+                      value={form.company}
+                      onChange={handleFormChange}
+                      className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Service Selection */}
+                <div>
+                  <label htmlFor="form-service" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                    What service do you need?
+                  </label>
+                  <select
+                    id="form-service"
+                    name="service"
+                    value={form.service}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all cursor-pointer"
+                  >
+                    <option value="">Select a service...</option>
+                    <option value="Ongoing Website ($497/mo)">Ongoing Website ($497/mo)</option>
+                    <option value="One Time Build (from $3,500)">One Time Build (from $3,500)</option>
+                    <option value="Local SEO & Maps Ranking">Local SEO & Maps Ranking</option>
+                    <option value="PPC Advertising (Google/Meta)">PPC Advertising (Google/Meta)</option>
+                    <option value="Brand Identity & Design">Brand Identity & Design</option>
+                    <option value="Custom Complex Project">Custom Complex Project</option>
+                  </select>
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label htmlFor="form-message" className="font-h3-display text-xs tracking-wider text-[#0a0a0a]/70 uppercase block mb-1.5">
+                    Tell us about your project
+                  </label>
+                  <textarea
+                    id="form-message"
+                    name="message"
+                    required
+                    rows={5}
+                    placeholder="Give us the quick rundown — what you do, what you're trying to fix or build, and any details that help."
+                    value={form.message}
+                    onChange={handleFormChange}
+                    className="w-full px-4 py-3 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all resize-vertical min-h-[120px]"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={formStatus === "loading"}
+                  className="h3-btn-brutalist w-full bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+                >
+                  {formStatus === "loading" ? "SENDING..." : "SEND MESSAGE ↗"}
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Right Column: Info Panel */}
+          <div className="lg:col-span-5 flex flex-col gap-8 text-left lg:pl-12 lg:border-l-2 lg:border-h3-black/10">
+            <div>
+              <span className="text-[#185FA5] font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-2">
+                — HOWDY PARTNER —
+              </span>
+              <h3 className="font-h3-display text-3xl text-h3-black uppercase leading-none">
+                CREATIVE COWBOYS
+              </h3>
+              <p className="font-h3-secondary text-sm text-h3-black/70 leading-relaxed mt-4">
+                We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 font-bold text-xs uppercase tracking-widest text-h3-black/80">
               <div className="flex items-center gap-3">
-                <Clock size={16} className="text-h3-yellow" />
+                <Clock size={18} className="text-[#DD5A2E]" />
                 <span>Mon - Fri: 9:00 AM - 5:00 PM</span>
               </div>
               <a href="mailto:howdy@creativecowboys.co" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
-                <Mail size={16} className="text-h3-yellow" />
-                <span>howdy@creativecowboys.co</span>
+                <Mail size={18} className="text-[#DD5A2E]" />
+                <span className="lowercase font-sans text-sm">howdy@creativecowboys.co</span>
               </a>
               <a href="tel:4702437517" className="flex items-center gap-3 hover:text-h3-red transition-colors duration-200">
-                <Phone size={16} className="text-h3-yellow" />
+                <Phone size={18} className="text-[#DD5A2E]" />
                 <span>(470) 243-7517</span>
               </a>
               <div className="flex items-center gap-3">
-                <MapPin size={16} className="text-h3-yellow" />
+                <MapPin size={18} className="text-[#DD5A2E]" />
                 <span>Franklin, Tennessee</span>
               </div>
             </div>
-          </div>
 
-          {/* Footer Logo Wordmark */}
-          <div className="md:col-span-4 flex flex-col items-center justify-center py-6 md:pt-0 md:pb-6 border-y-2 md:border-y-0 md:border-x-2 border-h3-cream/10">
-            <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red mb-2">
-              COWBOYS
-            </div>
-            <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-h3-cream/40">
-              © 2026 ALL RIGHTS RESERVED
-            </div>
-            
             {/* Social Icons Badge Grid */}
-            <div className="flex gap-4 mt-6">
-              <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+            <div className="flex gap-4 mt-2">
+              <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-black rotate-45 flex items-center justify-center hover:bg-h3-black hover:text-white transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">fb</span>
               </a>
-              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-black rotate-45 flex items-center justify-center hover:bg-h3-black hover:text-white transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">ig</span>
               </a>
             </div>
           </div>
 
-          {/* Quick links */}
-          <div className="md:col-span-3 flex flex-col gap-6 text-left">
-            <h4 className="font-h3-display text-3xl uppercase tracking-widest text-h3-blue">DIRECT LINKS</h4>
-            <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
-              <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
-              <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
-              <a href="/ppc" className="hover:text-h3-red transition-colors">PPC Campaigns</a>
-              <a href="/brand-strategy" className="hover:text-h3-red transition-colors">Brand Strategy</a>
-              <a href="/privacy-policy" className="hover:text-h3-red transition-colors mt-2">Privacy Policy</a>
-            </div>
-          </div>
+        </div>
+      </section>
 
+      {/* Footer Section */}
+      <footer className="w-full bg-h3-black text-h3-cream border-t-4 border-h3-black py-12 px-6 md:px-12 relative z-20">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red">
+            COWBOYS
+          </div>
+          <div className="font-h3-secondary text-[11px] uppercase tracking-[0.2em] font-bold text-h3-cream/40 text-center md:text-left">
+            © 2026 ALL RIGHTS RESERVED &middot; FRANKLIN, TN
+          </div>
+          <div className="flex flex-wrap justify-center gap-6 font-bold text-xs uppercase tracking-widest text-h3-cream/70">
+            <a href="/seo" className="hover:text-h3-red transition-colors">SEO Programs</a>
+            <a href="/web-design" className="hover:text-h3-red transition-colors">Web Design</a>
+            <a href="/ppc" className="hover:text-h3-red transition-colors">PPC Campaigns</a>
+            <a href="/brand-strategy" className="hover:text-h3-red transition-colors">Brand Strategy</a>
+            <a href="/privacy-policy" className="hover:text-h3-red transition-colors">Privacy Policy</a>
+          </div>
         </div>
       </footer>
 
