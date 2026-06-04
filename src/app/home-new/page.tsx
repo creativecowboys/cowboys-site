@@ -1364,7 +1364,7 @@ export default function Home3Page() {
           </div>
 
           {/* Footer Logo Wordmark */}
-          <div className="md:col-span-4 flex flex-col items-center justify-center py-6 border-y-2 md:border-y-0 md:border-x-2 border-h3-cream/10">
+          <div className="md:col-span-4 flex flex-col items-center justify-center py-6 md:pt-0 md:pb-6 border-y-2 md:border-y-0 md:border-x-2 border-h3-cream/10">
             <div className="font-h3-display text-3xl uppercase tracking-widest text-h3-red mb-2">
               COWBOYS
             </div>
