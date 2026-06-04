@@ -698,13 +698,13 @@ export default function WebDesignFranklinPage() {
             <div className="flex flex-wrap items-center gap-[12px] mt-2 h3-animate-fade-in-up h3-delay-2">
               <a 
                 href="#contact" 
-                className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
+                className="h3-btn-brutalist bg-h3-red text-white font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
               >
                 GET A FREE SCORECARD ↗
               </a>
               <a 
                 href="#contact" 
-                className="border-[2.5px] border-[#0a0a0a] bg-white text-[#0a0a0a] font-h3-display text-[13px] p-[14px_22px] tracking-[1.2px] uppercase inline-flex items-center justify-center whitespace-nowrap transition-colors hover:bg-h3-cream/20"
+                className="h3-btn-brutalist bg-white text-[#0a0a0a] font-h3-secondary font-bold px-8 py-4 uppercase tracking-wider text-base md:text-lg inline-flex items-center justify-center gap-3 border-[3px] border-[#0a0a0a] shadow-[6px_6px_0_#0a0a0a] hover:shadow-[8px_8px_0_#0a0a0a] transition-all"
               >
                 BOOK A STRATEGY CALL
               </a>
