@@ -205,45 +205,6 @@ const processSteps = [
   }
 ];
 
-const pricingPlans = [
-  {
-    name: "Starter",
-    price: "$6,500 flat",
-    desc: "For local Franklin small businesses looking for a professional web presence.",
-    bullets: [
-      "5-page custom marketing website",
-      "Strategy &rarr; Design &rarr; Build in 5–6 weeks",
-      "WordPress or Webflow core development",
-      "SEO foundations & Google Analytics setup",
-      "Care plan optional ($150/mo after launch)"
-    ]
-  },
-  {
-    name: "Growth",
-    price: "$14,500 flat",
-    desc: "For growing Franklin companies targeting aggressive local search lead flow.",
-    isPopular: true,
-    bullets: [
-      "8–15 page comprehensive custom site",
-      "Custom brand system & UI design elements",
-      "HubSpot, CRM, and call-tracking integration",
-      "Lighthouse 95+ mobile page speed guaranteed",
-      "Includes 3 months of free website care"
-    ]
-  },
-  {
-    name: "Scale",
-    price: "$28,500+ flat",
-    desc: "For established firms requiring advanced custom databases, apps, or e-commerce.",
-    bullets: [
-      "Full custom design + database development",
-      "CMS-driven pages with complex APIs",
-      "Shopify, eCom, or app-like workflows (10-14 wks)",
-      "90-day post-launch CRO conversion tracking",
-      "Full schema markup audit and schema cataloging"
-    ]
-  }
-];
 
 const testimonials = [
   {
@@ -1123,49 +1084,126 @@ export default function WebDesignFranklinPage() {
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-h3-red font-bold text-xs uppercase tracking-widest font-h3-secondary block mb-3">&mdash; PRICING TIERS &mdash;</span>
-            <h2 className="font-h3-display text-5xl md:text-6xl uppercase leading-none">THREE WAYS TO START.</h2>
+            <h2 className="font-h3-display text-5xl md:text-6xl uppercase leading-none">TWO WAYS TO START.</h2>
             <p className="font-h3-secondary text-sm md:text-base text-h3-black/60 max-w-2xl mx-auto mt-4 leading-relaxed">
-              Most Franklin agencies hide their pricing. We don't. Here's what a website costs us to build correctly — flat project fees with zero hidden charge orders.
+              Most Franklin agencies hide their pricing. We don't. Two ways to work with us, plain numbers, no hidden charge orders. Subscribe and grow with us, or buy your site outright.
             </p>
           </div>
 
           {/* Pricing Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch mb-12">
-            {pricingPlans.map((plan, idx) => (
-              <div 
-                key={idx}
-                className={`h3-brutalist-card p-8 flex flex-col justify-between text-left relative ${
-                  plan.isPopular ? "bg-white border-h3-red shadow-[6px_6px_0px_#e94e33]" : "bg-white"
-                }`}
-              >
-                {plan.isPopular && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-h3-red border-2 border-h3-black text-h3-cream px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
-                    MOST POPULAR
-                  </div>
-                )}
-                
-                <div>
-                  <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">{plan.name}</h3>
-                  <div className="font-h3-display text-3xl text-h3-red my-4">{plan.price}</div>
-                  <p className="font-h3-secondary text-xs text-h3-black/75 mb-6">{plan.desc}</p>
-                  
-                  <ul className="space-y-3.5 mb-8 border-t border-h3-black/10 pt-6">
-                    {plan.bullets.map((bullet, bIdx) => (
-                      <li key={bIdx} className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
-                        <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                        <span dangerouslySetInnerHTML={{ __html: bullet }} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <a href="#contact" className={`h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs ${
-                  plan.isPopular ? "bg-h3-red text-white" : "bg-h3-cream text-h3-black"
-                }`}>
-                  Get Started
-                </a>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch mb-12">
+            
+            {/* Card 1 — ONGOING (left, with "Most Popular" badge) */}
+            <div className="h3-brutalist-card p-8 flex flex-col justify-between text-left relative bg-white border-h3-red shadow-[6px_6px_0px_#e94e33]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-h3-red border-2 border-h3-black text-h3-cream px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest">
+                MOST POPULAR
               </div>
-            ))}
+              
+              <div>
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">ONGOING</h3>
+                <div className="my-4">
+                  <div className="font-h3-display text-3xl text-h3-red flex items-baseline gap-1">
+                    <span className="font-h3-secondary text-[11px] font-bold text-h3-black/60 lowercase italic mr-1">starting at</span>
+                    <span>$497/mo</span>
+                  </div>
+                  <div className="text-[10px] font-bold tracking-wider text-h3-black/60 uppercase mt-1">
+                    $0 UPFRONT &middot; 12-MONTH AGREEMENT
+                  </div>
+                </div>
+                <p className="font-h3-secondary text-xs text-h3-black/75 mb-6">
+                  For local Franklin small businesses who want a real web presence &mdash; without writing a big check upfront.
+                </p>
+                
+                <ul className="space-y-3.5 mb-8 border-t border-h3-black/10 pt-6">
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>New custom website built for you</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Hosting, SSL, and security included</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Minor content updates on request</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Local SEO + Google Business Profile management</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Built and launched in 4–6 weeks</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Monthly performance report</span>
+                  </li>
+                </ul>
+
+                <p className="font-h3-secondary text-[11px] text-h3-black/60 leading-relaxed mb-6 mt-4 pt-4 border-t border-h3-black/5">
+                  Scale up with Regional SEO, PPC, CTV, Social Media Ads, or AI Services &mdash; added to your monthly plan as you grow.
+                </p>
+              </div>
+              
+              <a href="#contact" className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-red text-white">
+                GET STARTED
+              </a>
+            </div>
+
+            {/* Card 2 — ONE TIME (right) */}
+            <div className="h3-brutalist-card p-8 flex flex-col justify-between text-left relative bg-white">
+              <div>
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">ONE TIME</h3>
+                <div className="my-4">
+                  <div className="font-h3-display text-3xl text-h3-red">
+                    Starting at $3,500
+                  </div>
+                  <div className="text-[10px] font-bold tracking-wider text-h3-black/60 uppercase mt-1">
+                    YOU OWN IT &middot; NO ONGOING REQUIRED
+                  </div>
+                </div>
+                <p className="font-h3-secondary text-xs text-h3-black/75 mb-6">
+                  For Franklin businesses ready to invest once and own their digital presence outright.
+                </p>
+                
+                <ul className="space-y-3.5 mb-8 border-t border-h3-black/10 pt-6">
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Custom-built website, scoped to your needs</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Hosted on your own secure cloud server &mdash; yours to keep</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Custom brand integration + UI design</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Mobile responsive across every device</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>Form integrations + analytics setup</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>90 days of post-launch support included</span>
+                  </li>
+                  <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
+                    <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
+                    <span>You own the domain, files, design, and code outright</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <a href="#contact" className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-cream text-h3-black">
+                GET A CUSTOM QUOTE
+              </a>
+            </div>
+
           </div>
 
           {/* Pricing detail explainer card */}
@@ -1173,7 +1211,7 @@ export default function WebDesignFranklinPage() {
             <div className="flex flex-col gap-2">
               <h3 className="font-h3-display text-xl text-h3-yellow uppercase tracking-widest leading-none">HOW WE PRICE OUR PROJECTS</h3>
               <p className="font-h3-secondary text-xs text-h3-cream/80 max-w-3xl leading-relaxed mt-1.5">
-                Flat project fee, paid in three milestones (kickoff / design approval / launch). No retainers, no hidden charge orders — we scope tight upfront. If your project doesn't fit one of these, we'll tell you and recommend someone better suited (even if that's Squarespace or a freelancer).
+                Two ways to start. Monthly is everything bundled &mdash; no upfront, just $497 a month. One time is a flat project fee paid in three milestones (kickoff / design approval / launch). No surprise charge orders either way. If your project doesn't fit, we'll tell you and recommend someone better suited (even if that's Squarespace or a freelancer).
               </p>
             </div>
             <a href="#contact" className="h3-btn-brutalist bg-h3-red text-h3-cream font-bold px-8 py-3.5 uppercase tracking-wider text-xs w-fit flex-shrink-0 border-h3-black">
