@@ -745,7 +745,7 @@ export default function WebDesignFranklinPage() {
           </div>
 
           {/* Hero Right Mockup Pair */}
-          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] sm:max-w-[560px] lg:max-w-[620px] mx-auto select-none overflow-visible lg:scale-125 lg:origin-right">
+          <div className="lg:col-span-5 flex justify-center items-center relative w-full aspect-[4/3] max-w-[480px] sm:max-w-[560px] lg:max-w-[620px] mx-auto select-none overflow-visible lg:scale-[1.15] lg:origin-right">
             {/* Desktop Mockup (Back Layer, z-index 1) */}
             <div className="absolute top-[20px] left-0 right-[85px] sm:right-[110px] lg:right-[125px] bg-[#0a0a0a] border-[3px] border-[#0a0a0a] shadow-[10px_10px_0_#0a0a0a] rounded-[10px] sm:rounded-[14px] lg:rounded-[16px] p-[3px] sm:p-[4px] lg:p-[5px] overflow-hidden z-10 -rotate-[1.5deg] flex flex-col w-auto h-auto">
               {/* Screen Inside */}
