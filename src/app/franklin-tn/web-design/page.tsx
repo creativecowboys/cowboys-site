@@ -267,7 +267,7 @@ const faqs = [
   },
   {
     question: "HOW LONG DOES IT TAKE TO BUILD A WEBSITE?",
-    answer: "As little as 2 weeks for most Ongoing builds, 6–10 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
+    answer: "As little as 2 weeks for most Ongoing builds, 3–5 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 6–10 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
   },
   {
     question: "DO YOU BUILD ON WORDPRESS, WEBFLOW, OR SOMETHING ELSE?",
