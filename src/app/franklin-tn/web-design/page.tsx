@@ -21,6 +21,7 @@ import {
   ArrowRight,
   Shield
 } from "lucide-react";
+import IntegrationsSection from "@/components/ui/integrations-section";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -852,72 +853,8 @@ export default function WebDesignFranklinPage() {
         </div>
       </section>
 
-      {/* Recent Clients Logo Wall Grid */}
-      <section className="w-full py-[60px] px-6 md:px-[60px] bg-h3-cream border-b-4 border-h3-black z-10">
-        <div className="max-w-7xl mx-auto">
-          {/* Eyebrow */}
-          <div className="font-h3-display text-xs text-[#DD5A2E] tracking-[2.5px] text-center mb-8 uppercase select-none">
-            &mdash; RECENT CLIENTS &middot; SOUTHEAST PORTFOLIO &mdash;
-          </div>
-          
-          {/* Logo grid */}
-          <div className="grid grid-cols-6 gap-0 border-y-[1.5px] border-black/15">
-            {/* Cell 1: HARMONIC */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <img 
-                src="/Client Logos/Harmonic Logo (Black).png" 
-                alt="Harmonic Logo" 
-                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-            
-            {/* Cell 2: John B. Jackson */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <img 
-                src="/Client Logos/johnbjackson-dark-Blue.png" 
-                alt="John B. Jackson Logo" 
-                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-
-            {/* Cell 3: McKINLEY */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <img 
-                src="/Client Logos/McKinley (Black).png" 
-                alt="McKinley Logo" 
-                className="max-h-[34px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-
-            {/* Cell 4: LEUCO */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <img 
-                src="/Client Logos/Leuco transparent 2.png" 
-                alt="Leuco Logo" 
-                className="max-h-[26px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-
-            {/* Cell 5: MetLane */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
-              <img 
-                src="/Client Logos/big-MetLane_logo_full.png" 
-                alt="MetLane Logo" 
-                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-
-            {/* Cell 6: FireBible */}
-            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center">
-              <img 
-                src="/Client Logos/FireBible logo Black.webp" 
-                alt="FireBible Logo" 
-                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Integrations Section */}
+      <IntegrationsSection />
 
       {/* Capabilities Section */}
       <section id="capabilities" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-black border-b-4 border-h3-black z-10 text-white">
