@@ -1,697 +1,643 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, BarChart3, Target, Zap, MonitorSmartphone, Search, TrendingUp, ShieldCheck, Telescope, LayoutTemplate, Paintbrush, Rocket } from "lucide-react";
-import FloatingNav from "@/components/FloatingNav";
-import { Footer7 } from "@/components/ui/footer-7";
-import Image from "next/image";
+import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
-import { FeatureCard } from "@/components/ui/grid-feature-cards";
-import { ThreeDPhotoCarousel } from "@/components/ui/3d-carousel";
+import { Anton, Roboto_Condensed, Lobster } from "next/font/google";
+import { X, ArrowRight } from "lucide-react";
+import Header from "@/components/global/Header";
+import Footer from "@/components/global/Footer";
 
-/* ── Brand tokens (mirror features-4 / globals) ─────────────── */
-const ORANGE = "#F15F2A";
-const PINK = "#EA51FF";
-const DARK = "#0D0D0F";
-const CARD = "#15181e";
+const anton = Anton({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-anton",
+});
 
-/* ── Process steps data ──────────────────────────────────────── */
-const processSteps = [
-    { step: "01", title: "Discovery & Strategy", icon: Telescope, description: "We dive deep into your business, audience, and competitors to find your unique edge." },
-    { step: "02", title: "Structure & Messaging", icon: LayoutTemplate, description: "We map out the user journey and craft compelling copy that sells your value." },
-    { step: "03", title: "Design & Development", icon: Paintbrush, description: "We bring the strategy to life with stunning, high-performance custom design." },
-    { step: "04", title: "Launch & Optimization", icon: Rocket, description: "We deploy, test, and integrate analytics to ensure maximum ROI from day one." },
-];
+const robotoCondensed = Roboto_Condensed({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-roboto-condensed",
+});
 
-/* ── AnimatedContainer ───────────────────────────────────────── */
-function AnimatedContainer({
-    className,
-    delay = 0.1,
-    children,
-}: {
-    delay?: number;
-    className?: string;
-    children: React.ReactNode;
-}) {
-    const shouldReduceMotion = useReducedMotion();
-    if (shouldReduceMotion) return <>{children}</>;
-    return (
-        <motion.div
-            initial={{ filter: "blur(4px)", translateY: -8, opacity: 0 }}
-            whileInView={{ filter: "blur(0px)", translateY: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay, duration: 0.8 }}
-            className={className}
-        >
-            {children}
-        </motion.div>
-    );
-}
-
-/* ── ProcessSection ──────────────────────────────────────────── */
-function ProcessSection() {
-    return (
-        <div style={{ width: "100%" }}>
-            <style>{`
-                .process-card {
-                    transition: transform 240ms cubic-bezier(0.34,1.56,0.64,1),
-                                box-shadow 240ms ease,
-                                background 240ms ease;
-                }
-                .process-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 20px 48px rgba(241,95,42,0.16), 0 6px 16px rgba(26,21,20,0.10);
-                    background: #ffffff !important;
-                }
-                .process-icon-badge {
-                    transition: background 240ms ease, box-shadow 240ms ease, transform 240ms cubic-bezier(0.34,1.56,0.64,1);
-                }
-                .process-card:hover .process-icon-badge {
-                    background: rgba(241,95,42,0.14) !important;
-                    box-shadow: 0 0 0 6px rgba(241,95,42,0.08);
-                    transform: scale(1.08);
-                }
-                .process-cta-link {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #F15F2A;
-                    text-decoration: none;
-                    border-bottom: 1.5px solid rgba(241,95,42,0.35);
-                    padding-bottom: 2px;
-                    transition: border-color 180ms ease;
-                }
-                .process-cta-link:hover {
-                    border-color: #F15F2A;
-                }
-            `}</style>
-
-            {/* ── Header ── */}
-            <AnimatedContainer delay={0.05}>
-                <div style={{ textAlign: "center", marginBottom: "64px" }}>
-                    <span style={{
-                        display: "inline-block",
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        letterSpacing: "0.16em",
-                        textTransform: "uppercase",
-                        color: "#F15F2A",
-                        marginBottom: "18px",
-                        fontFamily: "var(--font-geist-sans, sans-serif)",
-                    }}>
-                        Our Process
-                    </span>
-                    <h2 style={{
-                        fontSize: "clamp(30px, 4.5vw, 52px)",
-                        fontWeight: 800,
-                        letterSpacing: "-0.03em",
-                        color: "#1a1514",
-                        margin: "0 0 18px",
-                        lineHeight: 1.08,
-                        fontFamily: "var(--font-geist-sans, sans-serif)",
-                    }}>
-                        Strategy First.{" "}
-                        <span style={{
-                            background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                        }}>
-                            Design Second.
-                        </span>
-                    </h2>
-                    <p style={{
-                        fontSize: "17px",
-                        color: "rgba(26,21,20,0.50)",
-                        maxWidth: "520px",
-                        marginInline: "auto",
-                        lineHeight: 1.7,
-                        fontFamily: "var(--font-geist-sans, sans-serif)",
-                    }}>
-                        We don&rsquo;t just start pushing pixels. We follow a battle-tested process to ensure your website actually achieves your business goals.
-                    </p>
-                </div>
-            </AnimatedContainer>
-
-            {/* ── Card Grid ── */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px", position: "relative" }}>
-
-                {processSteps.map((step, i) => {
-                    const Icon = step.icon;
-                    return (
-                        <motion.div
-                            key={step.step}
-                            className="process-card"
-                            initial={{ opacity: 0, y: 28 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.15 + i * 0.12, duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-                            style={{
-                                background: "rgba(255,255,255,0.92)",
-                                border: "1px solid rgba(26,21,20,0.09)",
-                                borderRadius: "20px",
-                                padding: "28px 24px",
-                                position: "relative",
-                                overflow: "hidden",
-                                zIndex: 1,
-                                cursor: "default",
-                            }}
-                        >
-                            {/* Watermark step number */}
-                            <span style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "14px",
-                                fontSize: "64px",
-                                fontWeight: 900,
-                                color: "rgba(26,21,20,0.05)",
-                                lineHeight: 1,
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                                pointerEvents: "none",
-                                userSelect: "none",
-                                letterSpacing: "-0.04em",
-                            }}>
-                                {step.step}
-                            </span>
-
-                            {/* Icon badge */}
-                            <div
-                                className="process-icon-badge"
-                                style={{
-                                    width: "44px",
-                                    height: "44px",
-                                    borderRadius: "12px",
-                                    background: "rgba(241,95,42,0.08)",
-                                    border: "1px solid rgba(241,95,42,0.15)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    marginBottom: "20px",
-                                    position: "relative",
-                                    zIndex: 2,
-                                }}
-                            >
-                                <Icon size={20} color="#F15F2A" strokeWidth={1.5} />
-                            </div>
-
-                            {/* Step micro-label */}
-                            <p style={{
-                                fontSize: "10px",
-                                fontWeight: 700,
-                                letterSpacing: "0.12em",
-                                textTransform: "uppercase",
-                                color: "rgba(241,95,42,0.65)",
-                                margin: "0 0 7px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
-                                Step {step.step}
-                            </p>
-
-                            <h3 style={{
-                                fontSize: "15px",
-                                fontWeight: 700,
-                                color: "#1a1514",
-                                margin: "0 0 10px",
-                                lineHeight: 1.3,
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
-                                {step.title}
-                            </h3>
-
-                            <p style={{
-                                fontSize: "13px",
-                                lineHeight: 1.75,
-                                color: "rgba(26,21,20,0.50)",
-                                margin: 0,
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}>
-                                {step.description}
-                            </p>
-                        </motion.div>
-                    );
-                })}
-            </div>
-
-            {/* ── Bottom micro-CTA ── */}
-            <AnimatedContainer delay={0.65}>
-                <div style={{ textAlign: "center", marginTop: "48px" }}>
-                    <p style={{
-                        fontSize: "14px",
-                        color: "rgba(26,21,20,0.38)",
-                        fontFamily: "var(--font-geist-sans, sans-serif)",
-                        margin: "0 0 14px",
-                    }}>
-                        Ready to start your project?
-                    </p>
-                    <a href="/contact" className="process-cta-link">
-                        Book a free strategy call <ArrowRight size={14} />
-                    </a>
-                </div>
-            </AnimatedContainer>
-        </div>
-    );
-}
+const lobster = Lobster({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-lobster",
+});
 
 export default function WebDesignPage() {
-    return (
-        <>
-            <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(22px); }
-          to   { opacity: 1; transform: translateY(0); }
+  const [stickyVisible, setStickyVisible] = useState(true);
+
+  // Conversion event tracking helper
+  const trackCTA = (eventName: string) => {
+    if (typeof window !== "undefined") {
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      (window as any).dataLayer.push({
+        event: eventName,
+      });
+      console.log(`GA4 Event tracked: ${eventName}`);
+    }
+  };
+
+  return (
+    <div className={`${anton.variable} ${robotoCondensed.variable} ${lobster.variable} bg-[#F2EBDA] text-[#0a0a0a] font-sans selection:bg-[#DD5A2E] selection:text-white min-h-screen relative overflow-hidden flex flex-col`}>
+      <style>{`
+        .dotgrid { 
+          background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); 
+          background-size: 18px 18px; 
         }
-        .fu-1 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
-        .fu-2 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
-        .fu-3 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.30s both; }
-        .fu-4 { animation: fadeUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.42s both; }
-        @media (prefers-reduced-motion: reduce) {
-          .fu-1,.fu-2,.fu-3,.fu-4 { animation: none; }
+        .font-anton {
+          font-family: var(--font-anton), 'Anton', Impact, 'Arial Black', sans-serif;
         }
-        .wd-card {
-          transition: border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease;
+        .font-roboto {
+          font-family: var(--font-roboto-condensed), 'Roboto Condensed', sans-serif;
         }
-        .wd-card:hover {
-          border-color: rgba(241,95,42,0.35) !important;
-          transform: translateY(-3px);
-          box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+        .font-lobster {
+          font-family: var(--font-lobster), 'Lobster', 'Brush Script MT', cursive;
         }
-        .wd-step-icon {
-          transition: background 220ms ease;
+        
+        /* FAQ Accordion Styling */
+        .faq-item {
+          border-bottom: 2.5px solid #0a0a0a;
         }
-        .wd-card:hover .wd-step-icon {
-          background: rgba(241,95,42,0.12);
+        .faq-item summary {
+          font-family: var(--font-anton), 'Anton', sans-serif;
+          font-size: 19px;
+          letter-spacing: 0.5px;
+          padding: 22px 0;
+          cursor: pointer;
+          list-style: none;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
-        .wd-pill {
-          transition: background 200ms ease, border-color 200ms ease;
+        .faq-item summary::-webkit-details-marker {
+          display: none;
         }
-        .wd-pill:hover {
-          background: rgba(241,95,42,0.12);
-          border-color: rgba(241,95,42,0.4);
+        .faq-item summary::after {
+          content: '+';
+          font-size: 26px;
+          color: #DD5A2E;
         }
-        .wd-cta-btn-primary {
-          background: ${ORANGE};
-          transition: background 180ms ease, transform 180ms ease;
+        .faq-item[open] summary::after {
+          content: '—';
+          font-size: 18px;
         }
-        .wd-cta-btn-primary:hover {
-          background: #d44d1e;
-          transform: translateY(-1px);
+
+        /* Marquee Animation */
+        @keyframes scrollMarquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
         }
-        .wd-cta-btn-ghost {
-          transition: background 180ms ease;
-        }
-        .wd-cta-btn-ghost:hover {
-          background: rgba(255,255,255,0.08);
+        .marquee-track {
+          display: flex;
+          white-space: nowrap;
+          animation: scrollMarquee 30s linear infinite;
         }
       `}</style>
 
-            <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
+      {/* JSON-LD Schemas */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://www.creativecowboys.co"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Web Design",
+                    "item": "https://www.creativecowboys.co/web-design"
+                  }
+                ]
+              },
+              {
+                "@type": "Service",
+                "name": "Web Design Services",
+                "provider": {
+                  "@type": "LocalBusiness",
+                  "name": "Creative Cowboys Media",
+                  "telephone": "+1-470-243-7517",
+                  "email": "howdy@creativecowboys.co",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "222 West Montgomery St",
+                    "addressLocality": "Villa Rica",
+                    "addressRegion": "GA",
+                    "postalCode": "30180",
+                    "addressCountry": "US"
+                  }
+                },
+                "description": "Bespoke, conversion-focused custom web design services built for revenue growth.",
+                "areaServed": [
+                  { "@type": "City", name: "Villa Rica" },
+                  { "@type": "City", name: "Carrollton" },
+                  { "@type": "City", name: "Douglasville" },
+                  { "@type": "City", name: "Newnan" },
+                  { "@type": "City", name: "Bremen" },
+                  { "@type": "City", name: "Dallas" },
+                  { "@type": "AdministrativeArea", name: "West Georgia" },
+                  { "@type": "City", name: "Franklin", "containedInPlace": { "@type": "State", "name": "TN" } }
+                ]
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "HOW MUCH DOES A WEBSITE COST?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and local SEO. One-time builds start at $3,500 flat — you own everything outright. We publish these numbers because we'd rather start the conversation with money on the table than have you guess."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "HOW LONG DOES A SITE TAKE?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Most sites launch in 4–6 weeks. Smaller monthly-plan sites can launch in as little as 2 weeks. You'll see a staging link early and can review progress anytime — no black box."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "DO YOU USE TEMPLATES?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. Every site is custom-designed around your business, your customers, and your goals. Templates are why most small-business websites all look the same — and why they don't convert."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "WHO OWNS THE SITE WHEN WE'RE DONE?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "You do. The domain, the hosting, the files, the design. When the project's done, everything transfers to you. If you ever leave us, you take it all."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "CAN YOU REDESIGN MY EXISTING SITE?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Yes — Squarespace, Wix, GoDaddy, WordPress, whatever you've got. We'll audit what's working, keep the equity you've built, and rebuild the rest."
+                    }
+                  }
+                ]
+              }
+            ]
+          })
+        }}
+      />
 
-                {/* ── Logo ───────────────────────────────────────────────── */}
-                <Link href="/" className="site-logo" style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
-                    <Image
-                        src="/Main%20logo%202.png"
-                        alt="Creative Cowboys Media — Home"
-                        width={180}
-                        height={48}
-                        priority
-                        style={{ width: "180px", height: "auto", display: "block" }}
-                    />
-                </Link>
+      {/* Global Header (handles Utility Bar + Main Nav) */}
+      <Header dark={false} />
 
-                {/* ── SECTION 5: Why Creative Cowboys — Editorial Manifesto ── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "160px 24px 120px", position: "relative", overflow: "hidden" }}>
-
-                    {/* bg glow */}
-                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "900px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.07) 0%, transparent 70%)`, pointerEvents: "none" }} />
-
-                    <style>{`
-                        @keyframes marqueeTicker {
-                            from { transform: translateX(0); }
-                            to   { transform: translateX(-50%); }
-                        }
-                        .why-ticker-track {
-                            display: flex;
-                            white-space: nowrap;
-                            animation: marqueeTicker 22s linear infinite;
-                            gap: 0;
-                        }
-                        .why-proof-bar {
-                            transition: transform 220ms cubic-bezier(0.34,1.56,0.64,1), border-color 200ms ease;
-                        }
-                        .why-proof-bar:hover {
-                            transform: translateX(6px);
-                            border-color: rgba(241,95,42,0.40) !important;
-                        }
-                    `}</style>
-
-                    <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-
-                        {/* ── Eyebrow ── */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                            style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}
-                        >
-                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px" }} />
-                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                Why Creative Cowboys
-                            </span>
-                        </motion.div>
-
-                        {/* ── GIANT display headline ── */}
-                        <motion.h2
-                            initial={{ opacity: 0, y: 24 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.65, ease: [0.4, 0, 0.2, 1] }}
-                            style={{
-                                fontSize: "clamp(52px, 9vw, 120px)",
-                                fontWeight: 900,
-                                letterSpacing: "-0.04em",
-                                lineHeight: 0.96,
-                                color: "#ffffff",
-                                margin: "0 0 40px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                            }}
-                        >
-                            We Don&rsquo;t<br />
-                            Build{" "}
-                            <span style={{
-                                background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                backgroundClip: "text",
-                            }}>
-                                Websites.
-                            </span><br />
-                            We Build<br />
-                            <span style={{ color: "rgba(255,255,255,0.22)", fontStyle: "italic" }}>Revenue Machines.</span>
-                        </motion.h2>
-
-                        {/* ── Bold italic pull quote ── */}
-                        <motion.p
-                            initial={{ opacity: 0, y: 16 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                            style={{
-                                fontSize: "clamp(18px, 2.2vw, 24px)",
-                                fontStyle: "italic",
-                                lineHeight: 1.6,
-                                color: "rgba(255,255,255,0.50)",
-                                maxWidth: "680px",
-                                marginBottom: "72px",
-                                fontFamily: "var(--font-geist-sans, sans-serif)",
-                                borderLeft: `3px solid ${ORANGE}`,
-                                paddingLeft: "24px",
-                            }}
-                        >
-                            Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers.
-                        </motion.p>
-
-                        {/* ── Proof point bars ── */}
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "72px" }}>
-                            {[
-                                { num: "01", title: "Conversion-Focused Design", desc: "Psychological triggers, clear CTAs, and strategic layout that guide visitors to a decision." },
-                                { num: "02", title: "Technical SEO Built-In", desc: "Your site launches ranking-ready. Clean code, proper structure, fast load times — from day one." },
-                                { num: "03", title: "Ad Campaign Integration", desc: "Landing pages engineered for your paid traffic so every dollar you spend works harder." },
-                                { num: "04", title: "Analytics & Revenue Tracking", desc: "Know exactly what's working. We set up advanced tracking tied directly to your revenue." },
-                            ].map(({ num, title, desc }, i) => (
-                                <motion.div
-                                    key={num}
-                                    className="why-proof-bar"
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                                    style={{
-                                        display: "grid",
-                                        gridTemplateColumns: "56px 1fr",
-                                        gap: "28px",
-                                        alignItems: "start",
-                                        padding: "24px 0",
-                                        borderBottom: "1px solid rgba(255,255,255,0.06)",
-                                        cursor: "default",
-                                    }}
-                                >
-                                    <span style={{ fontSize: "12px", fontWeight: 700, color: ORANGE, letterSpacing: "0.06em", paddingTop: "3px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{num}</span>
-                                    <div>
-                                        <p style={{ fontSize: "17px", fontWeight: 700, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.01em", fontFamily: "var(--font-geist-sans, sans-serif)" }}>{title}</p>
-                                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>{desc}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* ── Inline CTA ── */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                            style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}
-                        >
-                            <Link
-                                href="/contact"
-                                className="wd-cta-btn-primary"
-                                style={{ padding: "16px 36px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
-                            >
-                                Start a Project <ArrowRight size={17} />
-                            </Link>
-                            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                No long-term contracts. No BS. Just results.
-                            </p>
-                        </motion.div>
-                    </div>
-                </section>
-
-
-
-                {/* ── SECTION 2: What We Build ──────────────────────────── */}
-                <section style={{ padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "1160px", margin: "0 auto" }}>
-                        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-                            <h2 style={{ fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 18px" }}>
-                                Custom Websites Built for Growth
-                            </h2>
-                            <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.45)", maxWidth: "600px", marginInline: "auto", lineHeight: 1.7 }}>
-                                We don&rsquo;t use cookie-cutter templates. We build bespoke digital assets designed to dominate your market and drive revenue.
-                            </p>
-                        </div>
-
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
-                            {[
-                                { Icon: Target, title: "Conversion-Focused", desc: "Structured with clear calls-to-action and psychological triggers that guide users to buy." },
-                                { Icon: Zap, title: "Lightning Fast", desc: "Optimized for speed. Because every second of delay costs you conversions and search rankings." },
-                                { Icon: MonitorSmartphone, title: "Mobile-First", desc: "Flawless experience on every device. We design for where your customers actually are." },
-                                { Icon: Search, title: "SEO-Ready", desc: "Built with clean code and proper structure so Google loves your site from day one." },
-                                { Icon: ShieldCheck, title: "Secure & Scalable", desc: "Enterprise-grade security and architecture that grows as your business scales." },
-                                { Icon: TrendingUp, title: "Data-Driven", desc: "Integrated with advanced analytics so you know exactly how your site is performing." },
-                            ].map(({ Icon, title, desc }) => (
-                                <div key={title} className="wd-card" style={{ background: CARD, border: "1px solid rgba(255,255,255,0.06)", borderRadius: "18px", padding: "32px" }}>
-                                    <div className="wd-step-icon" style={{ width: "48px", height: "48px", background: "rgba(255,255,255,0.05)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "24px" }}>
-                                        <Icon size={22} color={ORANGE} />
-                                    </div>
-                                    <h3 style={{ fontSize: "17px", fontWeight: 700, color: "#fff", margin: "0 0 10px" }}>{title}</h3>
-                                    <p style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.45)", margin: 0 }}>{desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── CAROUSEL: Work Showcase ───────────────────────────── */}
-                <section style={{ background: "#0a0a0c", borderTop: "1px solid rgba(255,255,255,0.05)", padding: "96px 0 80px", position: "relative", overflow: "hidden" }}>
-                    {/* bg glow */}
-                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "800px", height: "400px", background: `radial-gradient(ellipse, rgba(241,95,42,0.06) 0%, transparent 70%)`, pointerEvents: "none" }} />
-
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", padding: "0 24px 48px", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-                        {/* Eyebrow */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px", flexShrink: 0 }} />
-                            <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: ORANGE, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                Our Work
-                            </span>
-                            <div style={{ width: "24px", height: "2px", background: ORANGE, borderRadius: "1px", flexShrink: 0 }} />
-                        </div>
-
-                        <h2 style={{ fontSize: "clamp(32px, 5vw, 58px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: "0 0 16px", lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                            Sites That{" "}
-                            <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                                Actually Convert.
-                            </span>
-                        </h2>
-                        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.32)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)", display: "flex", alignItems: "center", gap: "6px" }}>
-                            <span style={{ fontSize: "16px" }}>←</span> drag to explore <span style={{ fontSize: "16px" }}>→</span>
-                        </p>
-                    </div>
-
-                    {/* 3D Carousel */}
-                    <ThreeDPhotoCarousel />
-                </section>
-
-
-                <section style={{ background: "linear-gradient(180deg, #f0ddd4 0%, #fce8d5 60%, #f0ddd4 100%)", borderTop: "1px solid rgba(26,21,20,0.07)", borderBottom: "1px solid rgba(26,21,20,0.07)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
-                    <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", width: "700px", height: "350px", background: "rgba(241,95,42,0.10)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-
-                        <ProcessSection />
-
-                    </div>
-                </section>
-
-                {/* ── SECTION 4: Who It's For ───────────────────────────── */}
-                <section style={{ background: "#0D0D0F", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
-                    {/* Decorative glow */}
-                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "600px", height: "300px", background: "rgba(241,95,42,0.06)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
-                    <style>{`
-                        .af-dark-card {
-                            transition: transform 230ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 230ms ease, border-color 230ms ease;
-                            cursor: default;
-                        }
-                        .af-dark-card:hover {
-                            transform: translateY(-4px);
-                            box-shadow: 0 20px 48px rgba(0,0,0,0.35), 0 0 0 1px rgba(241,95,42,0.18);
-                            border-color: rgba(241,95,42,0.22) !important;
-                        }
-                        .af-dark-card:hover .afd-icon {
-                            color: #F15F2A !important;
-                            transform: scale(1.12);
-                        }
-                        .afd-icon {
-                            transition: transform 230ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease;
-                        }
-                    `}</style>
-                    <div style={{ maxWidth: "1060px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-
-                        {/* Header */}
-                        <AnimatedContainer delay={0.05}>
-                            <div style={{ marginBottom: "56px" }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-                                    <div style={{ width: "24px", height: "2px", background: "#F15F2A", borderRadius: "1px", flexShrink: 0 }} />
-                                    <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: "#F15F2A", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                        Who We Work With
-                                    </span>
-                                </div>
-                                <h2 style={{ fontSize: "clamp(36px, 5.5vw, 64px)", fontWeight: 900, letterSpacing: "-0.04em", color: "#ffffff", margin: "0 0 20px", lineHeight: 1.02, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                    Built for Businesses<br />That Want to{" "}
-                                    <span style={{ background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Grow</span>
-                                </h2>
-                                <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.58)", lineHeight: 1.75, maxWidth: "520px", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                    We partner with ambitious companies that understand the value of a premium digital presence.
-                                </p>
-                            </div>
-                        </AnimatedContainer>
-
-                        {/* April Ford dark individual cards — 3-column grid */}
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
-                            {[
-                                { Icon: MonitorSmartphone, title: "Local Businesses", desc: "Service businesses and brick-and-mortar shops ready to dominate their local market online." },
-                                { Icon: Zap, title: "Contractors & Trades", desc: "Builders, HVAC, electricians — companies that need leads flowing consistently." },
-                                { Icon: TrendingUp, title: "Professional Firms", desc: "Law firms, accountants, consultants who need a site that commands authority." },
-                                { Icon: ShieldCheck, title: "E-Commerce Brands", desc: "Stores that need a high-converting storefront, not just another Shopify theme." },
-                                { Icon: Target, title: "Scaling Startups", desc: "Early-stage companies that need to establish credibility fast and attract investment." },
-                                { Icon: BarChart3, title: "B2B Services", desc: "Companies selling to other businesses where trust and clarity drive every deal." },
-                            ].map(({ Icon, title, desc }, i) => (
-                                <motion.div
-                                    key={title}
-                                    className="af-dark-card"
-                                    initial={{ opacity: 0, y: 18 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: 0.08 + i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                                    style={{
-                                        background: "#15181e",
-                                        border: "1px solid rgba(255,255,255,0.06)",
-                                        borderRadius: "18px",
-                                        padding: "28px",
-                                    }}
-                                >
-                                    <Icon
-                                        size={20}
-                                        className="afd-icon"
-                                        style={{ color: "rgba(255,255,255,0.25)", marginBottom: "20px", display: "block" }}
-                                        strokeWidth={1.5}
-                                    />
-                                    <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: "rgba(255,255,255,0.72)", margin: "0 0 10px", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                        {title}
-                                    </p>
-                                    <p style={{ fontSize: "14px", lineHeight: 1.72, color: "rgba(255,255,255,0.60)", margin: 0, fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                                        {desc}
-                                    </p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-
-
-
-                {/* ── HERO ───────────────────────────────────────────────── */}
-                <section style={{ maxWidth: "860px", margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
-                    <p className="fu-1" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "24px" }}>
-                        Web Design Services
-                    </p>
-
-                    <h1 className="fu-2" style={{
-                        fontSize: "clamp(38px, 6vw, 72px)",
-                        fontWeight: 800,
-                        lineHeight: 1.06,
-                        letterSpacing: "-0.03em",
-                        color: "#ffffff",
-                        margin: "0 0 24px",
-                    }}>
-                        Web Design That{" "}
-                        <span style={{
-                            background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                        }}>
-                            Actually Converts.
-                        </span>
-                    </h1>
-
-                    <p className="fu-3" style={{ fontSize: "clamp(16px, 2vw, 20px)", lineHeight: 1.65, color: "rgba(255,255,255,0.5)", marginBottom: "12px" }}>
-                        Your website shouldn&rsquo;t just look pretty. It should generate leads, close sales, and move your business forward.
-                    </p>
-                    <p className="fu-3" style={{ fontSize: "clamp(15px, 1.6vw, 17px)", lineHeight: 1.7, color: "rgba(255,255,255,0.38)", marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
-                        We build high-performance, revenue-generating websites for brands that are serious about growth. Stop losing customers to a confusing digital experience.
-                    </p>
-
-                    <div className="fu-4" style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
-                        <Link
-                            href="/contact"
-                            className="wd-cta-btn-primary"
-                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "none", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
-                        >
-                            Start Your Project <ArrowRight size={18} />
-                        </Link>
-                        <button
-                            className="wd-cta-btn-ghost"
-                            style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", cursor: "pointer" }}
-                        >
-                            Get a Free Strategy Call
-                        </button>
-                    </div>
-                </section>
-
-
-
-
-
-
-                {/* ── Footer ────────────────────────────────────────────── */}
-                <Footer7 />
+      {/* HERO SECTION */}
+      <section className="hero dotgrid py-12 md:py-24 px-6 md:px-12 border-b-[2.5px] border-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          
+          {/* Left Column Text & Details */}
+          <div className="lg:col-span-7 flex flex-col text-left">
+            <div className="font-anton text-xs md:text-sm text-[#DD5A2E] tracking-[2.5px] uppercase mb-4">
+              — CUSTOM WEB DESIGN · WEST GEORGIA —
+            </div>
+            <h1 className="font-anton text-5xl sm:text-6xl md:text-[76px] leading-[0.88] text-[#0a0a0a] uppercase mb-6 tracking-wide">
+              WEB DESIGN<br />
+              THAT ACTUALLY<br />
+              <span className="text-[#DD5A2E]">CONVERTS</span>.
+            </h1>
+            <p className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-lg mb-8">
+              Your website shouldn't just look pretty. It should generate leads, close sales, and move your business forward. We build high-performance, revenue-generating websites for brands serious about growth — serving Villa Rica, Carrollton, Douglasville, and the Southeast.
+            </p>
+            
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4 mb-10">
+              <Link 
+                href="/contact"
+                onClick={() => trackCTA("web_design_hero_start")}
+                className="bg-[#DD5A2E] text-white font-anton text-sm md:text-base uppercase tracking-wider py-4 px-6 md:px-8 border-[2.5px] border-[#0a0a0a] shadow-[4px_4px_0px_#0a0a0a] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#0a0a0a] transition-all"
+              >
+                START YOUR PROJECT ↗
+              </Link>
+              <Link 
+                href="/contact"
+                onClick={() => trackCTA("web_design_hero_strategy")}
+                className="bg-white text-[#0a0a0a] font-anton text-sm md:text-base uppercase tracking-wider py-4 px-6 md:px-8 border-[2.5px] border-[#0a0a0a] hover:bg-neutral-50 transition-colors"
+              >
+                BOOK A FREE STRATEGY CALL
+              </Link>
             </div>
 
-            {/* Floating Nav */}
-            <FloatingNav />
-        </>
-    );
+            {/* Stat Strip */}
+            <div className="grid grid-cols-3 border-[2.5px] border-[#0a0a0a] bg-white shadow-[6px_6px_0px_#0a0a0a] max-w-lg">
+              <div className="p-4 border-r-[2.5px] border-[#0a0a0a] text-center">
+                <div className="font-anton text-xl sm:text-2xl text-[#DD5A2E]">100+</div>
+                <div className="font-anton text-[9px] sm:text-[10px] tracking-wider text-[#0a0a0a] mt-1">SITES SHIPPED</div>
+              </div>
+              <div className="p-4 border-r-[2.5px] border-[#0a0a0a] text-center">
+                <div className="font-anton text-xl sm:text-2xl text-[#DD5A2E]">1.4s</div>
+                <div className="font-anton text-[9px] sm:text-[10px] tracking-wider text-[#0a0a0a] mt-1">AVG PAGE LOAD</div>
+              </div>
+              <div className="p-4 text-center">
+                <div className="font-anton text-xl sm:text-2xl text-[#DD5A2E]">$2M+</div>
+                <div className="font-anton text-[9px] sm:text-[10px] tracking-wider text-[#0a0a0a] mt-1">CLIENT REVENUE</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: HTML/CSS Desktop & Phone Mockup Pair */}
+          <div className="lg:col-span-5 relative w-full h-[460px] md:h-[500px]">
+            {/* Desktop Mockup Card */}
+            <div className="absolute top-8 left-0 right-12 md:right-16 bg-white border-3 border-[#0a0a0a] shadow-[10px_10px_0px_#0a0a0a] -rotate-[1.5deg] z-10 overflow-hidden flex flex-col">
+              {/* Browser Header Bar */}
+              <div className="bg-[#0a0a0a] py-2 px-3 flex gap-1.5 items-center">
+                <span className="w-2 h-2 rounded-full bg-[#DD5A2E]" />
+                <span className="w-2 h-2 rounded-full bg-[#F5C842]" />
+                <span className="w-2 h-2 rounded-full bg-[#4CAF50]" />
+                <div className="flex-1 bg-[#2a2a2a] h-4.5 ml-2.5 rounded text-[9px] text-neutral-400 px-2 flex items-center font-mono select-none">
+                  harmonicproduction.co
+                </div>
+              </div>
+              {/* Browser Viewport */}
+              <div className="aspect-[16/10] bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] p-5 flex flex-col justify-between text-white select-none">
+                <div className="flex justify-between items-center text-[10px]">
+                  <span className="font-anton tracking-widest text-[9px] uppercase">HARMONIC ◆</span>
+                  <span className="bg-[#DD5A2E] text-white px-2 py-0.5 text-[8px] font-anton tracking-wider uppercase">GET A QUOTE</span>
+                </div>
+                <div className="text-left mt-6">
+                  <div className="font-anton text-[8px] text-[#DD5A2E] tracking-widest uppercase">CLEVELAND, TN · EST. 2014</div>
+                  <div className="font-anton text-xl md:text-2xl leading-[0.88] uppercase mt-1">
+                    WE MAKE<br />
+                    <span className="text-[#DD5A2E]">PRODUCTION</span><br />
+                    LEGENDARY.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Phone Mockup Card */}
+            <div className="absolute bottom-4 right-0 w-28 md:w-32 bg-[#0a0a0a] rounded-[22px] p-2 rotate-[5deg] shadow-[7px_7px_0px_#DD5A2E] z-20 overflow-hidden">
+              <div className="bg-gradient-to-br from-[#0a0a0a] to-[#2a1a15] rounded-[14px] aspect-[9/16] p-3 flex flex-col justify-between text-white select-none">
+                <div className="font-anton text-[7px] tracking-wider text-center opacity-90 uppercase">HARMONIC ◆</div>
+                <div className="text-left">
+                  <div className="font-anton text-[11px] md:text-xs leading-[0.88] uppercase">
+                    WE MAKE<br />
+                    <span className="text-[#DD5A2E]">PRODUCTION</span><br />
+                    LEGENDARY.
+                  </div>
+                  <div className="bg-[#DD5A2E] text-white py-1 text-[7px] text-center font-anton tracking-wider uppercase mt-2">
+                    GET A QUOTE
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* MARQUEE STRIP */}
+      <div className="w-full bg-[#0a0a0a] text-[#F2EBDA] py-3.5 border-y-[2.5px] border-[#0a0a0a] overflow-hidden select-none z-10 relative">
+        <div className="marquee-track">
+          {Array(3).fill([
+            "CONVERSION-FOCUSED", "1.4S PAGE LOADS", "NO TEMPLATES", "SEO BUILT-IN", "MOBILE-FIRST", "NO OFFSHORE WORK", "REVENUE TRACKING"
+          ]).flat().map((text, i) => (
+            <span key={i} className="font-anton text-sm tracking-[2px] uppercase flex items-center gap-4 px-3.5">
+              <span>{text}</span>
+              <span className="text-[#DD5A2E]">★</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* WHY US SECTION */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#F2EBDA]" id="why">
+        <div className="max-w-7xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-3">— WHY CREATIVE COWBOYS —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase max-w-xl">
+              WE DON'T BUILD WEBSITES.<br />
+              WE BUILD <span className="text-[#DD5A2E]">REVENUE MACHINES</span>.
+            </h2>
+            <p className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-xl mt-4">
+              Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers. <span className="font-lobster text-xl md:text-2xl text-[#DD5A2E] inline-block rotate-[-3deg] ml-1.5">no fluff, partner</span>
+            </p>
+          </div>
+
+          {/* 4 Numbered Rows */}
+          <div className="border-t-[2.5px] border-[#0a0a0a]">
+            {[
+              { num: "01", title: "CONVERSION-FOCUSED DESIGN.", desc: "Psychological triggers, clear calls-to-action, and strategic layout that guide visitors to a decision." },
+              { num: "02", title: "SEO BUILT-IN FROM DAY ONE.", desc: "Your site launches ranking-ready. Clean code, proper structure, fast load times — so Google finds you from the start." },
+              { num: "03", title: "AD CAMPAIGN INTEGRATION.", desc: "Landing pages engineered for your paid traffic so every dollar you spend works harder." },
+              { num: "04", title: "ANALYTICS & REVENUE TRACKING.", desc: "Know exactly what's working. We set up advanced tracking tied directly to your revenue." }
+            ].map((row) => (
+              <div key={row.num} className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 items-center py-8 border-b-[2.5px] border-[#0a0a0a]">
+                <div className="md:col-span-1 font-anton text-4xl text-[#DD5A2E]">{row.num}</div>
+                <div className="md:col-span-4 font-anton text-xl sm:text-2xl text-[#0a0a0a] uppercase tracking-wide">{row.title}</div>
+                <div className="md:col-span-7 font-roboto text-sm text-[#5a5a5a] leading-relaxed">{row.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CAPABILITIES SECTION */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#E8E1CF] dotgrid border-y-[2.5px] border-[#0a0a0a]" id="capabilities">
+        <div className="max-w-7xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-3">— WHAT YOU GET —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase max-w-xl">
+              CUSTOM WEBSITES<br />
+              BUILT FOR <span className="text-[#DD5A2E]">GROWTH</span>.
+            </h2>
+            <p className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-xl mt-4">
+              We don't use cookie-cutter templates. We build bespoke digital assets designed to dominate your market and drive revenue.
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { tag: "01 / BUILT TO SELL", title: "CONVERSION-FOCUSED.", desc: "Structured with clear calls-to-action and psychological triggers that guide users to buy.", featured: false },
+              { tag: "02 / SPEED", title: "LIGHTNING FAST.", desc: "Optimized for speed. Because every second of delay costs you conversions and search rankings.", featured: true },
+              { tag: "03 / EVERY DEVICE", title: "MOBILE-FIRST.", desc: "Flawless experience on every device. We design for where your customers actually are.", featured: false },
+              { tag: "04 / GET FOUND", title: "SEO-READY.", desc: "Built with clean code and proper structure so Google loves your site from day one.", featured: false },
+              { tag: "05 / PEACE OF MIND", title: "SECURE & SCALABLE.", desc: "Enterprise-grade security and architecture that grows as your business scales.", featured: false },
+              { tag: "06 / KNOW YOUR NUMBERS", title: "DATA-DRIVEN.", desc: "Integrated with advanced analytics so you know exactly how your site is performing.", featured: false }
+            ].map((card) => (
+              <div 
+                key={card.title} 
+                className={`border-[2.5px] border-[#0a0a0a] p-8 shadow-[6px_6px_0px_#0a0a0a] flex flex-col text-left transition-all ${
+                  card.featured ? "bg-[#F5C842]" : "bg-white"
+                }`}
+              >
+                <div className="font-anton text-[10px] tracking-[2px] text-[#DD5A2E] uppercase mb-3">{card.tag}</div>
+                <h3 className="font-anton text-xl sm:text-2xl text-[#0a0a0a] uppercase mb-3">{card.title}</h3>
+                <p className="font-roboto text-sm text-[#5a5a5a] leading-relaxed">{card.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CASE STUDIES SECTION */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#F2EBDA] border-b-[2.5px] border-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-3">— PROVEN OUTCOMES —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase">
+              SITES THAT ACTUALLY <span className="text-[#DD5A2E]">CONVERT</span>.
+            </h2>
+          </div>
+
+          {/* Case Bands */}
+          <div className="flex flex-col gap-8">
+            {/* Harmonic Case Band */}
+            <div className="border-3 border-[#0a0a0a] bg-white shadow-[10px_10px_0px_#0a0a0a] p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
+              <div className="lg:col-span-8 flex flex-col">
+                <div className="font-anton text-[11px] tracking-[2px] text-[#5a5a5a] uppercase mb-2">04.15 // WEB DESIGN & SEO · CLEVELAND, TN</div>
+                <h3 className="font-anton text-2xl sm:text-3xl text-[#0a0a0a] uppercase mb-4">HARMONIC PRODUCTION</h3>
+                <ul className="list-disc pl-5 font-roboto text-sm text-[#5a5a5a] leading-relaxed space-y-2">
+                  <li>Delivered a full brand overhaul and localized SEO strategy.</li>
+                  <li>Boosted year-over-year customer retention by 200%.</li>
+                  <li>Cut server downtime to zero during the domain transition.</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-4 text-center border-t-2 lg:border-t-0 lg:border-l-2 border-neutral-100 pt-6 lg:pt-0 lg:pl-6">
+                <div className="font-anton text-6xl md:text-7xl text-[#DD5A2E] leading-none">300%</div>
+                <div className="font-anton text-xs sm:text-sm tracking-[2px] text-[#0a0a0a] mt-2 uppercase">CUSTOMER ENGAGEMENT ↑</div>
+              </div>
+            </div>
+
+            {/* McKinley Case Band */}
+            <div className="border-3 border-[#0a0a0a] bg-white shadow-[10px_10px_0px_#0a0a0a] p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
+              <div className="lg:col-span-8 flex flex-col">
+                <div className="font-anton text-[11px] tracking-[2px] text-[#5a5a5a] uppercase mb-2">06.15 // WEB & LOCAL SEO · DOUGLASVILLE, GA</div>
+                <h3 className="font-anton text-2xl sm:text-3xl text-[#0a0a0a] uppercase mb-4">MCKINLEY ROOFING</h3>
+                <ul className="list-disc pl-5 font-roboto text-sm text-[#5a5a5a] leading-relaxed space-y-2">
+                  <li>Built dynamic neighborhood service-area landing pages.</li>
+                  <li>Top-tier Google Business Profile optimization so they show up on the map.</li>
+                  <li>Custom storm-damage intake forms that feed straight to insurance leads.</li>
+                </ul>
+              </div>
+              <div className="lg:col-span-4 text-center border-t-2 lg:border-t-0 lg:border-l-2 border-neutral-100 pt-6 lg:pt-0 lg:pl-6">
+                <div className="font-anton text-6xl md:text-7xl text-[#DD5A2E] leading-none">+1000%</div>
+                <div className="font-anton text-xs sm:text-sm tracking-[2px] text-[#0a0a0a] mt-2 uppercase">SITE TRAFFIC ↑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS TIMELINE SECTION (DARK) */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#0e0e0e] text-[#F2EBDA] border-b-[2.5px] border-[#0a0a0a]" id="process">
+        <div className="max-w-7xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-16">
+            <div className="font-anton text-xs text-[#F5C842] tracking-[2.5px] uppercase mb-3">— OUR PROCESS —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-white uppercase max-w-xl">
+              STRATEGY FIRST.<br />
+              DESIGN SECOND.
+            </h2>
+            <p className="font-roboto text-sm md:text-base text-[#a0998a] leading-relaxed max-w-xl mt-4">
+              We don't just start pushing pixels. We follow a battle-tested process to make sure your website actually achieves your business goals. <span className="font-lobster text-xl md:text-2xl text-[#F5C842] inline-block rotate-[-3deg] ml-1.5">four steps —</span>
+            </p>
+          </div>
+
+          {/* Steps Timeline Grid */}
+          <div className="relative">
+            {/* Connecting line on desktop */}
+            <div className="absolute top-[88px] left-[10%] right-[10%] h-[3px] bg-gradient-to-r from-[#F5C842] via-[#DD5A2E] to-[#F5C842] hidden lg:block z-0" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+              {[
+                { step: "STEP 01", circleNum: "1", title: "DISCOVERY.", desc: "We dive deep into your business, audience, and competitors to find your unique edge.", featured: false },
+                { step: "STEP 02", circleNum: "2", title: "STRUCTURE.", desc: "We map out the user journey and craft compelling copy that sells your value.", featured: false },
+                { step: "STEP 03", circleNum: "3", title: "DESIGN + BUILD.", desc: "We bring the strategy to life with stunning, high-performance custom design.", featured: true },
+                { step: "STEP 04", circleNum: "4", title: "LAUNCH + OPTIMIZE.", desc: "We deploy, test, and integrate analytics to ensure maximum return from day one.", featured: false }
+              ].map((item) => (
+                <div key={item.step} className="flex flex-col items-center text-center">
+                  <div className="font-anton text-xs text-[#F5C842] tracking-[1.8px] mb-4 uppercase">{item.step}</div>
+                  
+                  {/* Circle wrapper */}
+                  <div className="h-20 flex items-center justify-center mb-4">
+                    <div className={`rounded-full flex items-center justify-center font-anton border-4 border-[#0e0e0e] transition-all ${
+                      item.featured 
+                        ? "w-[70px] h-[70px] bg-[#DD5A2E] text-white text-2xl shadow-[0_0_0_4px_#F5C842]" 
+                        : "w-14 h-14 bg-[#F5C842] text-[#0a0a0a] text-xl"
+                    }`}>
+                      {item.circleNum}
+                    </div>
+                  </div>
+
+                  <h4 className="font-anton text-lg text-white mb-2 uppercase">{item.title}</h4>
+                  <p className="font-roboto text-[12px] text-[#a0998a] leading-relaxed px-4">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* WHO WE WORK WITH SECTION */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#F2EBDA] dotgrid border-b-[2.5px] border-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-3">— WHO WE WORK WITH —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase max-w-xl">
+              BUILT FOR BUSINESSES<br />
+              THAT WANT TO <span className="text-[#DD5A2E]">GROW</span>.
+            </h2>
+            <p className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-xl mt-4">
+              We partner with ambitious companies that understand the value of a premium digital presence.
+            </p>
+          </div>
+
+          {/* Vertical Tags */}
+          <div className="flex flex-wrap gap-4 text-left">
+            {[
+              { title: "LOCAL BUSINESSES", desc: "Service businesses and brick-and-mortar shops ready to dominate their local market online." },
+              { title: "CONTRACTORS & TRADES", desc: "Builders, HVAC, electricians — companies that need leads flowing consistently." },
+              { title: "PROFESSIONAL FIRMS", desc: "Law firms, accountants, consultants who need a site that commands authority." },
+              { title: "E-COMMERCE BRANDS", desc: "Stores that need a high-converting storefront, not just another off-the-shelf theme." },
+              { title: "SCALING STARTUPS", desc: "Early-stage companies that need to establish credibility fast." },
+              { title: "B2B SERVICES", desc: "Companies selling to other businesses where trust and clarity drive every deal." }
+            ].map((tag) => (
+              <div 
+                key={tag.title} 
+                className="border-[2.5px] border-[#0a0a0a] bg-white p-6 md:p-8 flex flex-col flex-1 min-w-[280px] max-w-[380px] shadow-[4px_4px_0px_#0a0a0a]"
+              >
+                <div className="font-anton text-base text-[#0a0a0a] tracking-wide mb-2 uppercase">{tag.title}</div>
+                <div className="font-roboto text-xs text-[#5a5a5a] leading-relaxed">{tag.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#E8E1CF] border-b-[2.5px] border-[#0a0a0a]" id="faq">
+        <div className="max-w-4xl mx-auto">
+          {/* Head */}
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-3">— FAQ —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase">
+              COMMON <span className="text-[#DD5A2E]">QUESTIONS</span>.
+            </h2>
+          </div>
+
+          {/* Accordion list */}
+          <div className="flex flex-col border-t-[2.5px] border-[#0a0a0a] text-left">
+            <details className="faq-item" open={true}>
+              <summary>HOW MUCH DOES A WEBSITE COST?</summary>
+              <div className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
+                Two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and local SEO. One-time builds start at $3,500 flat — you own everything outright. We publish these numbers because we'd rather start the conversation with money on the table than have you guess.
+              </div>
+            </details>
+            <details className="faq-item">
+              <summary>HOW LONG DOES A SITE TAKE?</summary>
+              <div className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
+                Most sites launch in 4–6 weeks. Smaller monthly-plan sites can launch in as little as 2 weeks. You'll see a staging link early and can review progress anytime — no black box.
+              </div>
+            </details>
+            <details className="faq-item">
+              <summary>DO YOU USE TEMPLATES?</summary>
+              <div className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
+                No. Every site is custom-designed around your business, your customers, and your goals. Templates are why most small-business websites all look the same — and why they don't convert.
+              </div>
+            </details>
+            <details className="faq-item">
+              <summary>WHO OWNS THE SITE WHEN WE'RE DONE?</summary>
+              <div className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
+                You do. The domain, the hosting, the files, the design. When the project's done, everything transfers to you. If you ever leave us, you take it all.
+              </div>
+            </details>
+            <details className="faq-item">
+              <summary>CAN YOU REDESIGN MY EXISTING SITE?</summary>
+              <div className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
+                Yes — Squarespace, Wix, GoDaddy, WordPress, whatever you've got. We'll audit what's working, keep the equity you've built, and rebuild the rest.
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA SECTION */}
+      <section className="final-cta py-24 md:py-32 px-6 md:px-12 bg-[#F2EBDA] dotgrid border-b-[2.5px] border-[#0a0a0a] text-center" id="contact">
+        <div className="max-w-4xl mx-auto flex flex-col items-center">
+          <div className="font-anton text-xs text-[#DD5A2E] tracking-[2.5px] uppercase mb-4">— READY WHEN YOU ARE —</div>
+          <h2 className="font-anton text-4xl sm:text-5xl md:text-6xl leading-[0.9] text-[#0a0a0a] uppercase mb-6">
+            STOP LOSING CUSTOMERS TO A<br />
+            <span className="text-[#DD5A2E]">CONFUSING</span> WEBSITE.
+          </h2>
+          <p className="font-roboto text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-md mb-8">
+            Free strategy call. No long-term contracts. No BS. Just a clear plan to turn your website into your hardest-working salesperson.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link 
+              href="/contact"
+              onClick={() => trackCTA("web_design_final_start")}
+              className="bg-[#DD5A2E] text-white font-anton text-sm md:text-base uppercase tracking-wider py-4 px-8 border-[2.5px] border-[#0a0a0a] shadow-[4px_4px_0px_#0a0a0a] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#0a0a0a] transition-all"
+            >
+              START YOUR PROJECT ↗
+            </Link>
+            <Link 
+              href="/contact"
+              onClick={() => trackCTA("web_design_final_strategy")}
+              className="bg-white text-[#0a0a0a] font-anton text-sm md:text-base uppercase tracking-wider py-4 px-8 border-[2.5px] border-[#0a0a0a] hover:bg-neutral-50 transition-colors"
+            >
+              BOOK A FREE STRATEGY CALL
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Reusable Global Footer */}
+      <Footer />
+
+      {/* MOBILE STICKY BOTTOM CTA BAR */}
+      {stickyVisible && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0a] border-t-2 border-[#DD5A2E] py-3 px-4 flex justify-between items-center md:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.25)]">
+          <div className="flex gap-2 w-full max-w-sm mx-auto justify-between items-center">
+            <a 
+              href="tel:4702437517" 
+              onClick={() => trackCTA("web_design_sticky_call")}
+              className="flex-1 text-center bg-[#F5C842] text-[#0a0a0a] font-anton uppercase text-xs tracking-wider py-2.5 border border-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a] mr-2"
+            >
+              CALL NOW
+            </a>
+            <a 
+              href="/contact" 
+              onClick={() => trackCTA("web_design_sticky_proposal")}
+              className="flex-1 text-center bg-[#DD5A2E] text-white font-anton uppercase text-xs tracking-wider py-2.5 border border-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a]"
+            >
+              GET A PROPOSAL
+            </a>
+          </div>
+          <button 
+            onClick={() => setStickyVisible(false)} 
+            className="text-white hover:text-[#DD5A2E] ml-4 cursor-pointer focus:outline-none"
+            aria-label="Dismiss sticky CTA bar"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
