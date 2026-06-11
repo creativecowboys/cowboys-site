@@ -21,18 +21,18 @@ export default function Footer() {
               <Clock size={16} className="text-[#F5C842]" />
               <span>Mon - Fri: 9:00 AM - 5:00 PM</span>
             </div>
-            <a href="mailto:howdy@creativecowboys.co" className="flex items-center gap-3 hover:text-[#DD5A2E] transition-colors duration-200">
+            <a href="mailto:howdy@creativecowboys.co" className="flex items-center gap-3 hover:text-[#B5330E] transition-colors duration-200">
               <Mail size={16} className="text-[#F5C842]" />
               <span>howdy@creativecowboys.co</span>
             </a>
-            <a href="tel:4702437517" className="flex items-center gap-3 hover:text-[#DD5A2E] transition-colors duration-200">
+            <a href="tel:4702437517" className="flex items-center gap-3 hover:text-[#B5330E] transition-colors duration-200">
               <Phone size={16} className="text-[#F5C842]" />
               <span>(470) 243-7517</span>
             </a>
             <div className="flex items-center gap-3">
               <MapPin size={16} className="text-[#F5C842]" />
               <span>
-                VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span className="text-[#DD5A2E] font-extrabold">(NEW OFFICE)</span>
+                VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span className="text-[#F5C842] font-extrabold">(NEW OFFICE)</span>
               </span>
             </div>
           </div>
@@ -40,10 +40,10 @@ export default function Footer() {
 
         {/* Footer Logo Wordmark */}
         <div className="md:col-span-4 flex flex-col items-center justify-center py-6 md:pt-0 md:pb-6 border-y-2 md:border-y-0 md:border-x-2 border-[#F2EBDA]/10">
-          <div className="font-h3-display text-3xl uppercase tracking-widest text-[#DD5A2E] mb-2">
+          <div className="font-h3-display text-3xl uppercase tracking-widest text-[#B5330E] mb-2">
             COWBOYS
           </div>
-          <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-[#F2EBDA]/40">
+          <div className="font-h3-secondary text-[9px] uppercase tracking-[0.2em] font-bold text-[#F2EBDA]/60">
             © 2026 ALL RIGHTS RESERVED
           </div>
           
@@ -70,14 +70,14 @@ export default function Footer() {
 
         {/* Quick links & Brand tag */}
         <div className="md:col-span-3 flex flex-col gap-6 text-left">
-          <h4 className="font-h3-display text-3xl uppercase tracking-widest text-[#DD5A2E]">DIRECT LINKS</h4>
+          <h4 className="font-h3-display text-3xl uppercase tracking-widest text-[#B5330E]">DIRECT LINKS</h4>
           <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-[#F2EBDA]/70">
-            <Link href="/seo" className="hover:text-[#DD5A2E] transition-colors">SEO Programs</Link>
-            <Link href="/web-design" className="hover:text-[#DD5A2E] transition-colors">Web Design</Link>
-            <Link href="/ppc" className="hover:text-[#DD5A2E] transition-colors">PPC Campaigns</Link>
-            <Link href="/brand-strategy" className="hover:text-[#DD5A2E] transition-colors">Brand Strategy</Link>
-            <Link href="/franklin-tn/web-design" className="hover:text-[#F5C842] text-[#DD5A2E] transition-colors mt-1 font-extrabold">Franklin, TN Hub</Link>
-            <Link href="/contact" className="hover:text-[#DD5A2E] transition-colors mt-2">Privacy Policy</Link>
+            <Link prefetch={false} href="/seo" className="hover:text-[#B5330E] transition-colors">SEO Programs</Link>
+            <Link prefetch={false} href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</Link>
+            <Link prefetch={false} href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
+            <Link prefetch={false} href="/brand-strategy" className="hover:text-[#B5330E] transition-colors">Brand Strategy</Link>
+            <Link prefetch={false} href="/franklin-tn/web-design" className="text-[#F5C842] hover:text-white transition-colors mt-1 font-extrabold">Franklin, TN Hub</Link>
+            <Link prefetch={false} href="/contact" className="hover:text-[#B5330E] transition-colors mt-2">Privacy Policy</Link>
           </div>
         </div>
 
