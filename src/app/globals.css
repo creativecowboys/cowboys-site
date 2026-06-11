@@ -1,3 +1,5 @@
+
+
 @import "tailwindcss";
 
 :root {
@@ -65,7 +67,11 @@
   --color-h3-yellow: #F5C842;
 
   --font-h3-display: var(--font-anton), sans-serif;
-  --font-h3-secondary: var(--font-roboto-condensed), sans-serif;
+  --font-h3-secondary: var(--font-inter), sans-serif;
+}
+
+.font-anton {
+  font-family: var(--font-anton), Impact, 'Arial Black', sans-serif;
 }
 
 html {

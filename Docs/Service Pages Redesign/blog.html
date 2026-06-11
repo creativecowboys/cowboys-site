@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cowboys Blog | Creative Cowboys — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EBDA; --cream-dark: #E8E1CF; --ink: #0a0a0a; --coral: #DD5A2E;
+    --yellow: #F5C842; --dark: #0e0e0e; --dark-body: #d4ccb8; --dark-muted: #a0998a; --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .accent { color: var(--coral); }
+  .script-note { font-family: 'Lobster', cursive; font-size: 24px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+
+  /* hero */
+  .blog-hero { padding: 90px 60px 50px; text-align: center; }
+  .blog-hero h1 { font-family: 'Anton', sans-serif; font-size: 78px; line-height: 0.88; margin: 0 0 20px; }
+  .blog-hero p { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 540px; margin: 0 auto; }
+
+  /* filters */
+  .filters { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 34px 60px 70px; }
+  .filter { font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.5px; padding: 11px 20px; border: 2.5px solid var(--ink); background: #fff; cursor: pointer; }
+  .filter.active { background: var(--ink); color: var(--cream); box-shadow: 4px 4px 0 var(--coral); }
+  .filter:hover { background: var(--yellow); color: var(--ink); }
+  .filter.active:hover { background: var(--ink); color: var(--cream); }
+
+  /* featured post */
+  .featured-wrap { padding: 0 60px 70px; }
+  .featured { border: 3px solid var(--ink); background: var(--ink); color: var(--cream); box-shadow: 12px 12px 0 var(--coral); display: grid; grid-template-columns: 1.2fr 1fr; }
+  .featured .content { padding: 46px 44px; }
+  .featured .chips { display: flex; gap: 10px; margin-bottom: 18px; align-items: center; }
+  .chip { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 1.8px; padding: 5px 11px; border: 2px solid var(--ink); background: var(--yellow); color: var(--ink); }
+  .chip.coral { background: var(--coral); color: #fff; }
+  .chip.ghost { background: transparent; border-color: var(--dark-muted); color: var(--dark-muted); }
+  .featured h2 { font-family: 'Anton', sans-serif; font-size: 40px; line-height: 0.95; margin: 0 0 16px; color: #fff; }
+  .featured h2 .hl { color: var(--yellow); }
+  .featured p { font-size: 14.5px; color: var(--dark-body); line-height: 1.65; margin: 0 0 26px; max-width: 480px; }
+  .read-btn { display: inline-block; background: var(--coral); color: #fff; padding: 13px 22px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.5px; border: 2.5px solid var(--cream); box-shadow: 4px 4px 0 var(--cream); }
+  .featured .visual { background: linear-gradient(135deg, #1a1410 0%, #2a1a15 100%); border-left: 3px solid var(--cream); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 30px; }
+  .featured .visual .big-num { font-family: 'Anton', sans-serif; font-size: 120px; color: var(--yellow); line-height: 1; transform: rotate(-4deg); }
+  .featured .visual .sub { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); }
+
+  /* post grid */
+  .grid-wrap { padding: 0 60px 90px; }
+  .grid-head { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 2.5px; color: var(--body-gray); border-bottom: 2.5px solid var(--ink); padding-bottom: 12px; margin-bottom: 34px; display: flex; justify-content: space-between; }
+  .post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .post-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); display: flex; flex-direction: column; transition: transform 0.12s ease; }
+  .post-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--coral); }
+  .post-card .card-top { padding: 22px 24px 0; display: flex; justify-content: space-between; align-items: center; }
+  .post-card .read-time { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 1.5px; color: var(--body-gray); }
+  .post-card h3 { font-family: 'Anton', sans-serif; font-size: 21px; line-height: 1.04; margin: 14px 0 10px; padding: 0 24px; }
+  .post-card p { font-size: 13px; color: var(--body-gray); line-height: 1.6; margin: 0; padding: 0 24px; flex: 1; }
+  .post-card .card-foot { padding: 18px 24px 22px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.5px; color: var(--coral); }
+
+  /* CTA band */
+  .cta-band-wrap { padding: 0 60px 100px; }
+  .cta-band { border: 3px solid var(--ink); background: var(--yellow); box-shadow: 10px 10px 0 var(--ink); padding: 44px; display: grid; grid-template-columns: 1.5fr auto; gap: 30px; align-items: center; }
+  .cta-band h3 { font-family: 'Anton', sans-serif; font-size: 32px; margin: 0 0 10px; }
+  .cta-band p { font-size: 14px; line-height: 1.6; margin: 0; color: #333; }
+  .cta-band .btn { background: var(--ink); color: var(--yellow); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .blog-hero, .filters, .featured-wrap, .grid-wrap, .cta-band-wrap, footer { padding-left: 24px; padding-right: 24px; }
+    .blog-hero h1 { font-size: 50px; }
+    .featured, .footer-grid, .cta-band { grid-template-columns: 1fr; }
+    .featured .visual { border-left: none; border-top: 3px solid var(--cream); min-height: 180px; }
+    .post-grid { grid-template-columns: 1fr; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#">GET A PROPOSAL</a>
+</nav>
+
+<!-- HERO -->
+<section class="blog-hero dotgrid">
+  <div class="eyebrow">— THE CREATIVE COWBOYS BLOG —</div>
+  <h1 class="impact">STRAIGHT TALK ON<br>DIGITAL <span class="accent">MARKETING</span>.</h1>
+  <p>No-fluff marketing knowledge for small businesses in West Georgia and beyond. Written by practitioners, not content farms. <span class="script-note">y'all come back now</span></p>
+</section>
+
+<!-- FILTERS -->
+<div class="filters dotgrid">
+  <button class="filter active" data-cat="all">ALL POSTS</button>
+  <button class="filter" data-cat="seo">SEO TIPS</button>
+  <button class="filter" data-cat="ppc">PPC &amp; GOOGLE ADS</button>
+  <button class="filter" data-cat="web">WEB DESIGN</button>
+  <button class="filter" data-cat="social">SOCIAL MEDIA</button>
+  <button class="filter" data-cat="agency">AGENCY ADVICE</button>
+</div>
+
+<!-- FEATURED POST -->
+<div class="featured-wrap">
+  <div class="inner">
+    <div class="featured">
+      <div class="content">
+        <div class="chips">
+          <span class="chip coral">FEATURED</span>
+          <span class="chip">SEO TIPS</span>
+          <span class="chip ghost">12 MIN READ</span>
+        </div>
+        <h2>THE COMPLETE LOCAL SEO GUIDE FOR <span class="hl">WEST GEORGIA</span> SMALL BUSINESSES.</h2>
+        <p>Everything you need to rank in local search — keywords, your Google Business Profile, on-page work, and link building — in one comprehensive guide.</p>
+        <a class="read-btn" href="#">READ THE GUIDE →</a>
+      </div>
+      <div class="visual">
+        <div class="big-num">#1</div>
+        <div class="sub">RANK WHERE YOUR CUSTOMERS SEARCH</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POST GRID -->
+<div class="grid-wrap">
+  <div class="inner">
+    <div class="grid-head"><span>LATEST POSTS</span><span id="count">09 ARTICLES</span></div>
+    <div class="post-grid" id="grid">
+      <a class="post-card" href="#" data-cat="seo">
+        <div class="card-top"><span class="chip">SEO TIPS</span><span class="read-time">7 MIN</span></div>
+        <h3>HOW LONG DOES SEO TAKE? A REALISTIC TIMELINE.</h3>
+        <p>Honest answer: most businesses see meaningful movement in 3–6 months. Here's exactly what to expect and when.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="ppc">
+        <div class="card-top"><span class="chip coral">PPC &amp; GOOGLE ADS</span><span class="read-time">8 MIN</span></div>
+        <h3>GOOGLE ADS VS. SEO: WHICH IS BETTER FOR YOUR BUSINESS?</h3>
+        <p>Both work. The right answer depends on your timeline, budget, and goals. Here's how to decide.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="ppc">
+        <div class="card-top"><span class="chip coral">PPC &amp; GOOGLE ADS</span><span class="read-time">6 MIN</span></div>
+        <h3>HOW MUCH DO GOOGLE ADS COST? A TRANSPARENT BREAKDOWN.</h3>
+        <p>No fluff. Here's a real breakdown of what Google Ads costs — ad spend, management fees, and what to expect.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="web">
+        <div class="card-top"><span class="chip" style="background:#fff;">WEB DESIGN</span><span class="read-time">9 MIN</span></div>
+        <h3>WEBSITE REDESIGN CHECKLIST: 15 THINGS YOUR NEW SITE MUST HAVE.</h3>
+        <p>Before you launch a new website, run through this checklist. Missing any of these is leaving money on the table.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="seo">
+        <div class="card-top"><span class="chip">SEO TIPS</span><span class="read-time">8 MIN</span></div>
+        <h3>HOW TO OPTIMIZE YOUR GOOGLE BUSINESS PROFILE FOR MORE LOCAL LEADS.</h3>
+        <p>Your profile is your most powerful free local marketing tool. Here's exactly how to optimize every element.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="social">
+        <div class="card-top"><span class="chip" style="background:var(--cream-dark);">SOCIAL MEDIA</span><span class="read-time">7 MIN</span></div>
+        <h3>DO FACEBOOK ADS WORK FOR SMALL BUSINESSES? (HONEST ANSWER)</h3>
+        <p>Yes — but only when done right. Here's what works, what doesn't, and what to expect from your first campaign.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="seo">
+        <div class="card-top"><span class="chip">SEO TIPS</span><span class="read-time">10 MIN</span></div>
+        <h3>SEO FOR LAW FIRMS IN GEORGIA: RANKING IN A COMPETITIVE MARKET.</h3>
+        <p>Law firm SEO is one of the most competitive markets in Georgia. Here's the strategy behind our #1 rankings.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="agency">
+        <div class="card-top"><span class="chip" style="background:#fff;">AGENCY ADVICE</span><span class="read-time">7 MIN</span></div>
+        <h3>WHAT TO LOOK FOR WHEN HIRING A MARKETING AGENCY.</h3>
+        <p>Red flags, green flags, and the exact questions to ask before signing with any marketing agency.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+      <a class="post-card" href="#" data-cat="ppc">
+        <div class="card-top"><span class="chip coral">PPC &amp; GOOGLE ADS</span><span class="read-time">9 MIN</span></div>
+        <h3>10 GOOGLE ADS MISTAKES SMALL BUSINESSES MAKE.</h3>
+        <p>We've audited hundreds of ad accounts. Here are the most common mistakes killing your return — and how to fix them.</p>
+        <div class="card-foot">READ ARTICLE →</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAND -->
+<div class="cta-band-wrap">
+  <div class="inner">
+    <div class="cta-band">
+      <div>
+        <h3>READY TO PUT THIS INTO ACTION?</h3>
+        <p>Reading about marketing is a great start. Having Creative Cowboys execute it for you is even better.</p>
+      </div>
+      <a class="btn" href="#">GET YOUR FREE CONSULTATION →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+<script>
+  const filters = document.querySelectorAll('.filter');
+  const cards = document.querySelectorAll('.post-card');
+  const count = document.getElementById('count');
+  filters.forEach(f => f.addEventListener('click', () => {
+    filters.forEach(x => x.classList.remove('active'));
+    f.classList.add('active');
+    const cat = f.dataset.cat;
+    let shown = 0;
+    cards.forEach(c => {
+      const show = cat === 'all' || c.dataset.cat === cat;
+      c.style.display = show ? 'flex' : 'none';
+      if (show) shown++;
+    });
+    count.textContent = String(shown).padStart(2, '0') + (shown === 1 ? ' ARTICLE' : ' ARTICLES');
+  }));
+</script>
+
+</body>
+</html>

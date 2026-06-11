@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Ads With Zero Wasted Spend | Creative Cowboys — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EBDA; --cream-dark: #E8E1CF; --ink: #0a0a0a; --coral: #DD5A2E;
+    --yellow: #F5C842; --dark: #0e0e0e; --dark-body: #d4ccb8; --dark-muted: #a0998a; --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .hero { padding: 90px 60px 100px; }
+  .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Anton', sans-serif; font-size: 74px; line-height: 0.88; margin: 0 0 22px; }
+  .accent { color: var(--coral); }
+  .hero-body { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 480px; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-primary { background: var(--coral); color: #fff; padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); display: inline-block; }
+  .cta-secondary { background: #fff; color: var(--ink); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  /* hero dashboard mockup */
+  .dash-card { background: #fff; border: 3px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); transform: rotate(-1.5deg); }
+  .dash-chrome { background: var(--ink); padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .dash-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dash-chrome .dot.r { background: var(--coral); } .dash-chrome .dot.y { background: var(--yellow); } .dash-chrome .dot.g { background: #4CAF50; }
+  .dash-chrome .url-bar { flex: 1; background: #2a2a2a; height: 14px; margin-left: 10px; border-radius: 3px; font-family: monospace; font-size: 9px; color: #888; padding: 0 8px; line-height: 14px; }
+  .dash-body { padding: 22px; }
+  .dash-title { font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--body-gray); margin-bottom: 14px; }
+  .dash-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi { border: 2px solid var(--ink); padding: 12px 10px; }
+  .kpi .v { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--ink); }
+  .kpi .v.good { color: var(--coral); }
+  .kpi .k { font-family: 'Anton', sans-serif; font-size: 8.5px; letter-spacing: 1.2px; color: var(--body-gray); margin-top: 4px; }
+  .dash-bars { display: flex; align-items: flex-end; gap: 8px; height: 90px; border-bottom: 2px solid var(--ink); padding: 0 4px; }
+  .dash-bars .bar { flex: 1; background: var(--cream-dark); border: 1.5px solid var(--ink); }
+  .dash-bars .bar.hot { background: var(--coral); }
+  .dash-bars .bar.warm { background: var(--yellow); }
+  .dash-foot { display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 1.5px; color: var(--body-gray); padding-top: 8px; }
+  .lead-ticker { margin-top: 14px; border: 2px solid var(--ink); }
+  .lead-row { display: flex; justify-content: space-between; padding: 8px 12px; font-size: 11.5px; border-bottom: 1.5px solid rgba(0,0,0,0.12); }
+  .lead-row:last-child { border-bottom: none; }
+  .lead-row .src { color: var(--body-gray); }
+  .lead-row .val { font-weight: 700; color: var(--coral); }
+
+  .marquee { background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; }
+  .marquee-track { display: flex; white-space: nowrap; animation: scroll 30s linear infinite; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 2px; }
+  .marquee-track span { padding: 0 14px; }
+  .marquee-track .star { color: var(--coral); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  section.block { padding: 90px 60px; }
+  .section-head { margin-bottom: 50px; }
+  .section-head h2 { font-family: 'Anton', sans-serif; font-size: 52px; line-height: 0.92; margin: 6px 0 0; }
+  .section-head .lede { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 600px; margin-top: 18px; }
+  .script-note { font-family: 'Lobster', cursive; font-size: 22px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+  .dark-section { background: var(--dark); color: var(--cream); }
+  .dark-section .eyebrow { color: var(--yellow); }
+  .dark-section .section-head .lede { color: var(--dark-body); }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .split p { font-size: 14.5px; color: var(--body-gray); line-height: 1.75; margin: 0 0 16px; }
+  .pull-quote { border-left: 6px solid var(--coral); background: #fff; border-top: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 24px 26px; font-size: 15px; line-height: 1.65; }
+  .pull-quote strong { color: var(--coral); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .cap-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 28px 26px; }
+  .cap-card .tag { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--coral); margin-bottom: 12px; }
+  .cap-card h3 { font-family: 'Anton', sans-serif; font-size: 21px; margin: 0 0 10px; }
+  .cap-card p { font-size: 13.5px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+  .cap-card.featured { background: var(--yellow); }
+
+  /* cost section (dark) */
+  .cost-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-bottom: 26px; }
+  .cost-card { border: 2.5px solid var(--yellow); padding: 32px; }
+  .cost-card .who { font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--yellow); margin-bottom: 12px; }
+  .cost-card .amount { font-family: 'Anton', sans-serif; font-size: 44px; color: #fff; line-height: 1; }
+  .cost-card .amount small { font-size: 18px; color: var(--dark-body); }
+  .cost-card p { font-size: 13.5px; color: var(--dark-body); line-height: 1.65; margin: 14px 0 0; }
+  .cost-note { border: 2.5px solid var(--coral); background: rgba(221,90,46,0.08); padding: 22px 26px; font-size: 14px; color: var(--dark-body); line-height: 1.65; }
+  .cost-note strong { color: #fff; }
+
+  .cross-band { border: 3px solid var(--ink); background: var(--yellow); box-shadow: 10px 10px 0 var(--ink); padding: 40px; display: grid; grid-template-columns: 1.5fr auto; gap: 30px; align-items: center; }
+  .cross-band h3 { font-family: 'Anton', sans-serif; font-size: 30px; margin: 0 0 10px; }
+  .cross-band p { font-size: 14px; line-height: 1.6; margin: 0; color: #333; }
+
+  .faq-list { max-width: 860px; }
+  .faq-item { border-bottom: 2.5px solid var(--ink); }
+  .faq-item summary { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 0.5px; padding: 22px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 26px; color: var(--coral); }
+  .faq-item[open] summary::after { content: '—'; font-size: 18px; }
+  .faq-item .answer { font-size: 14.5px; color: var(--body-gray); line-height: 1.7; padding: 0 0 24px; max-width: 720px; }
+
+  .final-cta { text-align: center; padding: 100px 60px; }
+  .final-cta h2 { font-family: 'Anton', sans-serif; font-size: 58px; line-height: 0.9; margin: 10px 0 18px; }
+  .final-cta p { color: var(--body-gray); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .hero, section.block, .final-cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-inner, .split, .footer-grid, .cost-grid, .cross-band { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 50px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#contact">GET A FREE PPC AUDIT</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero dotgrid">
+  <div class="inner hero-inner">
+    <div>
+      <div class="eyebrow">— GOOGLE ADS &amp; PPC · WEST GEORGIA —</div>
+      <h1 class="impact">GOOGLE ADS.<br>ZERO WASTED<br><span class="accent">SPEND</span>.</h1>
+      <p class="hero-body">We manage Google Ads campaigns that bring qualified buyers to your business — not just impressions. Every dollar tracked, every click optimized. Real results for West Georgia small businesses.</p>
+      <div class="ctas">
+        <a class="cta-primary" href="#contact">GET A FREE PPC AUDIT ↗</a>
+        <a class="cta-secondary" href="#">SEE PPC RESULTS</a>
+      </div>
+    </div>
+    <div>
+      <!-- Ads dashboard mockup -->
+      <div class="dash-card">
+        <div class="dash-chrome">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="url-bar">ads.google.com — your campaign</div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-title">LAST 30 DAYS · ALL CAMPAIGNS</div>
+          <div class="dash-kpis">
+            <div class="kpi"><div class="v">47</div><div class="k">QUALIFIED LEADS</div></div>
+            <div class="kpi"><div class="v good">−31%</div><div class="k">COST PER LEAD</div></div>
+            <div class="kpi"><div class="v good">4.2×</div><div class="k">RETURN ON SPEND</div></div>
+          </div>
+          <div class="dash-bars">
+            <div class="bar" style="height:30%"></div>
+            <div class="bar" style="height:42%"></div>
+            <div class="bar warm" style="height:55%"></div>
+            <div class="bar" style="height:48%"></div>
+            <div class="bar warm" style="height:66%"></div>
+            <div class="bar hot" style="height:82%"></div>
+            <div class="bar hot" style="height:95%"></div>
+          </div>
+          <div class="dash-foot"><span>WEEK 1</span><span>LEADS PER WEEK</span><span>WEEK 7</span></div>
+          <div class="lead-ticker">
+            <div class="lead-row"><span><strong>📞 Phone call</strong> · 4 min 12 sec</span><span class="src">storm damage repair</span><span class="val">LEAD</span></div>
+            <div class="lead-row"><span><strong>📝 Form fill</strong> · quote request</span><span class="src">commercial insurance</span><span class="val">LEAD</span></div>
+            <div class="lead-row"><span><strong>📞 Phone call</strong> · 7 min 03 sec</span><span class="src">injury lawyer near me</span><span class="val">LEAD</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>EVERY DOLLAR TRACKED</span><span class="star">★</span><span>GOOGLE SEARCH ADS</span><span class="star">★</span><span>REMARKETING</span><span class="star">★</span><span>CALL TRACKING</span><span class="star">★</span><span>NO LOCK-IN CONTRACTS</span><span class="star">★</span><span>PLAIN-ENGLISH REPORTS</span><span class="star">★</span>
+    <span>EVERY DOLLAR TRACKED</span><span class="star">★</span><span>GOOGLE SEARCH ADS</span><span class="star">★</span><span>REMARKETING</span><span class="star">★</span><span>CALL TRACKING</span><span class="star">★</span><span>NO LOCK-IN CONTRACTS</span><span class="star">★</span><span>PLAIN-ENGLISH REPORTS</span><span class="star">★</span>
+  </div>
+</div>
+
+<!-- WHY GOOGLE ADS -->
+<section class="block" id="why">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHY GOOGLE ADS —</div>
+      <h2 class="impact">REACH BUYERS AT THE EXACT<br>MOMENT THEY'RE <span class="accent">READY</span>.</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p>Google Ads puts your business in front of people who are actively searching for what you offer — right now. Unlike social media ads that interrupt the scroll, Google Search Ads appear when someone types in your service with intent to buy or hire.</p>
+        <p>For West Georgia businesses, this means reaching buyers in Villa Rica, Carrollton, Douglasville, and the greater Atlanta area at the exact moment they're ready to make a decision. Managed correctly, Google Ads delivers some of the highest measurable return in digital marketing.</p>
+      </div>
+      <div class="pull-quote">
+        One of our clients — a commercial insurance agency — has sustained <strong>2 years of profitable Google Ads</strong> under our management, with <strong>every lead tracked back to ad spend</strong>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="block dotgrid" id="process" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— PPC MANAGEMENT PROCESS —</div>
+      <h2 class="impact">BUILT TO MAXIMIZE<br>YOUR <span class="accent">RETURN</span>.</h2>
+      <p class="lede">From day one. <span class="script-note">no spray and pray</span></p>
+    </div>
+    <div class="card-grid">
+      <div class="cap-card">
+        <div class="tag">01</div>
+        <h3>CAMPAIGN STRATEGY.</h3>
+        <p>We map your target keywords, competitor landscape, and campaign structure before spending a single dollar.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">02</div>
+        <h3>SEARCH ADS SETUP.</h3>
+        <p>Ads that appear when prospects are actively searching for your services — the highest-intent traffic available.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">03</div>
+        <h3>DISPLAY &amp; REMARKETING.</h3>
+        <p>Stay in front of visitors who didn't convert the first time with smart remarketing across the web.</p>
+      </div>
+      <div class="cap-card featured">
+        <div class="tag">04 / KNOW YOUR NUMBERS</div>
+        <h3>CONVERSION TRACKING.</h3>
+        <p>We track every call, form fill, and purchase — so you know your exact return on every dollar spent.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">05</div>
+        <h3>BID OPTIMIZATION.</h3>
+        <p>Ongoing bid adjustments to reduce cost-per-click and stretch your budget as campaign data accumulates.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">06</div>
+        <h3>ROI REPORTING.</h3>
+        <p>Plain-English monthly reports: what we spent, what you got, and what we're doing next to improve results.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COST (DARK) -->
+<section class="block dark-section" id="cost">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— PRICING, UPFRONT —</div>
+      <h2 class="impact" style="color:#fff;">HOW MUCH DOES<br>PPC <span style="color:var(--yellow);">COST</span>?</h2>
+      <p class="lede">PPC costs have two components. Most agencies hide this. We don't.</p>
+    </div>
+    <div class="cost-grid">
+      <div class="cost-card">
+        <div class="who">PAID TO GOOGLE</div>
+        <div class="amount">$500–$1,500<small>/mo</small></div>
+        <p>Your ad spend, paid directly to Google. Most West Georgia small businesses start in this range depending on their market and goals.</p>
+      </div>
+      <div class="cost-card">
+        <div class="who">PAID TO US</div>
+        <div class="amount">FROM $497<small>/mo</small></div>
+        <p>Our management fee. Strategy, ad creation, bid optimization, conversion tracking, and plain-English reporting — all included.</p>
+      </div>
+    </div>
+    <div class="cost-note">
+      <strong>No inflated recommendations.</strong> We'll recommend a budget that makes sense after reviewing your market — just what's needed to compete effectively. If Google Ads isn't right for your business, we'll tell you that too.
+    </div>
+  </div>
+</section>
+
+<!-- PPC + SEO / LANDING PAGES -->
+<section class="block">
+  <div class="inner">
+    <div class="cross-band" style="margin-bottom: 26px;">
+      <div>
+        <h3>PPC VS. SEO — WHICH IS RIGHT FOR YOU?</h3>
+        <p>PPC delivers immediate traffic; SEO builds long-term organic visibility. The best strategy for most West Georgia businesses is running both: PPC to generate leads now while SEO builds compounding results for the future.</p>
+      </div>
+      <a class="cta-secondary" href="#" style="background:var(--ink); color:var(--yellow); border-color:var(--ink);">COMPARE WITH SEO →</a>
+    </div>
+    <div class="cross-band" style="background:#fff;">
+      <div>
+        <h3>LANDING PAGES THAT CONVERT.</h3>
+        <p>A great Google Ads campaign needs a great landing page to convert that traffic into leads. We build landing pages designed specifically to maximize PPC conversion rates — so your ad spend works harder.</p>
+      </div>
+      <a class="cta-secondary" href="#" style="background:var(--coral); color:#fff;">SEE WEB DESIGN →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block" id="faq" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— FAQ —</div>
+      <h2 class="impact">COMMON <span class="accent">QUESTIONS</span>.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>HOW MUCH DO GOOGLE ADS COST FOR A SMALL BUSINESS?</summary>
+        <div class="answer">Ad spend varies by market and goals — most West Georgia small businesses start with $500–$1,500/month in ad budget. Our management fee starts at $497/month. We'll recommend a budget that makes sense for your goals after a free consultation.</div>
+      </details>
+      <details class="faq-item">
+        <summary>HOW QUICKLY CAN I SEE RESULTS FROM GOOGLE ADS?</summary>
+        <div class="answer">Unlike SEO, Google Ads can drive traffic within hours of launch. Most campaigns start showing meaningful lead volume in the first 2–4 weeks as we optimize targeting and bids.</div>
+      </details>
+      <details class="faq-item">
+        <summary>DO YOU REQUIRE LONG-TERM CONTRACTS?</summary>
+        <div class="answer">No contracts that trap you. We work month-to-month and earn your business by delivering results. If it's not working, you're not locked in.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta dotgrid" id="contact">
+  <div class="eyebrow">— READY WHEN YOU ARE —</div>
+  <h2 class="impact">READY TO PUT YOUR<br>ADS TO <span class="accent">WORK</span>?</h2>
+  <p>Free consultation. No contracts. No fluff. Just a clear plan to get you qualified leads.</p>
+  <div class="ctas" style="justify-content:center;">
+    <a class="cta-primary" href="#">START A CONVERSATION ↗</a>
+    <a class="cta-secondary" href="#">SEE PPC RESULTS</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+</body>
+</html>

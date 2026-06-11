@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SEO That Gets You Found | Creative Cowboys — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EBDA; --cream-dark: #E8E1CF; --ink: #0a0a0a; --coral: #DD5A2E;
+    --yellow: #F5C842; --dark: #0e0e0e; --dark-body: #d4ccb8; --dark-muted: #a0998a; --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .hero { padding: 90px 60px 100px; }
+  .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Anton', sans-serif; font-size: 74px; line-height: 0.88; margin: 0 0 22px; }
+  .accent { color: var(--coral); }
+  .hero-body { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 480px; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-primary { background: var(--coral); color: #fff; padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); display: inline-block; }
+  .cta-secondary { background: #fff; color: var(--ink); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  /* hero SERP mockup */
+  .serp-card { background: #fff; border: 3px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); transform: rotate(-1.5deg); padding: 0; }
+  .serp-chrome { background: var(--ink); padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .serp-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .serp-chrome .dot.r { background: var(--coral); } .serp-chrome .dot.y { background: var(--yellow); } .serp-chrome .dot.g { background: #4CAF50; }
+  .serp-chrome .url-bar { flex: 1; background: #2a2a2a; height: 14px; margin-left: 10px; border-radius: 3px; font-family: monospace; font-size: 9px; color: #888; padding: 0 8px; line-height: 14px; }
+  .serp-body { padding: 22px; }
+  .serp-query { border: 2px solid var(--ink); border-radius: 999px; padding: 9px 16px; font-size: 13px; color: var(--ink); margin-bottom: 18px; font-weight: 500; }
+  .serp-query .q-icon { color: var(--coral); font-weight: 700; }
+  .map-pack { border: 2px solid var(--ink); margin-bottom: 14px; }
+  .map-pack .map-strip { background: linear-gradient(135deg, #cfe3d2 0%, #e8e1cf 60%, #cfd9e3 100%); height: 54px; position: relative; }
+  .map-pack .pin { position: absolute; font-size: 18px; }
+  .map-result { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-top: 2px solid var(--ink); font-size: 12.5px; }
+  .map-result .name { font-weight: 700; }
+  .map-result .stars { color: var(--coral); font-size: 11px; }
+  .map-result.you { background: var(--yellow); }
+  .map-result .badge { font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 1px; background: var(--ink); color: var(--yellow); padding: 3px 7px; }
+  .serp-organic { font-size: 11.5px; color: #777; line-height: 1.5; padding: 8px 2px 0; }
+  .serp-organic .lnk { color: #1a0dab; font-size: 13px; font-weight: 500; }
+
+  .marquee { background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; }
+  .marquee-track { display: flex; white-space: nowrap; animation: scroll 30s linear infinite; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 2px; }
+  .marquee-track span { padding: 0 14px; }
+  .marquee-track .star { color: var(--coral); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  section.block { padding: 90px 60px; }
+  .section-head { margin-bottom: 50px; }
+  .section-head h2 { font-family: 'Anton', sans-serif; font-size: 52px; line-height: 0.92; margin: 6px 0 0; }
+  .section-head .lede { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 600px; margin-top: 18px; }
+  .script-note { font-family: 'Lobster', cursive; font-size: 22px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+  .dark-section { background: var(--dark); color: var(--cream); }
+  .dark-section .eyebrow { color: var(--yellow); }
+  .dark-section .section-head .lede { color: var(--dark-body); }
+  .dark-section .script-note { color: var(--yellow); }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .split p { font-size: 14.5px; color: var(--body-gray); line-height: 1.75; margin: 0 0 16px; }
+  .pull-quote { border-left: 6px solid var(--coral); background: #fff; border-top: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 24px 26px; font-size: 15px; line-height: 1.65; }
+  .pull-quote strong { color: var(--coral); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .cap-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 28px 26px; }
+  .cap-card .tag { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--coral); margin-bottom: 12px; }
+  .cap-card h3 { font-family: 'Anton', sans-serif; font-size: 21px; margin: 0 0 10px; }
+  .cap-card p { font-size: 13.5px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+  .cap-card.featured { background: var(--yellow); }
+
+  /* ranking table (dark section) */
+  .rank-table { border: 2.5px solid var(--yellow); }
+  .rank-row { display: grid; grid-template-columns: 1.6fr 0.5fr 0.6fr 0.5fr; align-items: center; padding: 16px 22px; border-bottom: 1px solid rgba(245,200,66,0.25); font-size: 14px; }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row.head { font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--yellow); background: rgba(245,200,66,0.08); }
+  .rank-row .kw { font-weight: 500; color: var(--cream); }
+  .rank-row .before { color: var(--dark-muted); font-family: 'Anton', sans-serif; font-size: 18px; text-align: center; }
+  .rank-row .arrow { color: var(--coral); text-align: center; font-size: 18px; }
+  .rank-row .after { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--yellow); text-align: center; }
+  .growth-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; }
+  .growth-card { border: 2.5px solid var(--yellow); padding: 26px; }
+  .growth-card .num { font-family: 'Anton', sans-serif; font-size: 46px; color: var(--yellow); line-height: 1; }
+  .growth-card .lbl { font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--cream); margin-top: 8px; }
+  .growth-card .sub { font-size: 12.5px; color: var(--dark-muted); margin-top: 8px; line-height: 1.5; }
+
+  /* reporting checklist */
+  .check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .check-item { border: 2.5px solid var(--ink); background: #fff; padding: 16px 18px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+  .check-item .tick { color: var(--coral); font-size: 16px; }
+
+  /* cross-sell band */
+  .cross-band { border: 3px solid var(--ink); background: var(--yellow); box-shadow: 10px 10px 0 var(--ink); padding: 40px; display: grid; grid-template-columns: 1.5fr auto; gap: 30px; align-items: center; }
+  .cross-band h3 { font-family: 'Anton', sans-serif; font-size: 30px; margin: 0 0 10px; }
+  .cross-band p { font-size: 14px; line-height: 1.6; margin: 0; color: #333; }
+
+  .faq-list { max-width: 860px; }
+  .faq-item { border-bottom: 2.5px solid var(--ink); }
+  .faq-item summary { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 0.5px; padding: 22px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 26px; color: var(--coral); }
+  .faq-item[open] summary::after { content: '—'; font-size: 18px; }
+  .faq-item .answer { font-size: 14.5px; color: var(--body-gray); line-height: 1.7; padding: 0 0 24px; max-width: 720px; }
+
+  .final-cta { text-align: center; padding: 100px 60px; }
+  .final-cta h2 { font-family: 'Anton', sans-serif; font-size: 58px; line-height: 0.9; margin: 10px 0 18px; }
+  .final-cta p { color: var(--body-gray); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .hero, section.block, .final-cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-inner, .split, .footer-grid, .growth-stats, .cross-band { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 50px; }
+    .card-grid, .check-grid { grid-template-columns: 1fr; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+    .rank-row { grid-template-columns: 1.2fr 0.5fr 0.4fr 0.5fr; font-size: 12px; padding: 12px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#contact">GET A FREE SEO AUDIT</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero dotgrid">
+  <div class="inner hero-inner">
+    <div>
+      <div class="eyebrow">— SEO SERVICES · WEST GEORGIA —</div>
+      <h1 class="impact">GET FOUND.<br>GET LEADS.<br>GET <span class="accent">RESULTS</span>.</h1>
+      <p class="hero-body">We help West Georgia small businesses rank higher on Google, drive consistent organic traffic, and turn searchers into paying customers — with zero fluff and full transparency.</p>
+      <div class="ctas">
+        <a class="cta-primary" href="#contact">GET A FREE SEO AUDIT ↗</a>
+        <a class="cta-secondary" href="#proof">SEE SEO RESULTS</a>
+      </div>
+    </div>
+    <div>
+      <!-- SERP mockup: the result we deliver -->
+      <div class="serp-card">
+        <div class="serp-chrome">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="url-bar">google.com/search</div>
+        </div>
+        <div class="serp-body">
+          <div class="serp-query"><span class="q-icon">⌕</span>&nbsp; roofing company near me</div>
+          <div class="map-pack">
+            <div class="map-strip">
+              <span class="pin" style="top:8px; left:22%;">📍</span>
+              <span class="pin" style="top:22px; left:58%;">📍</span>
+            </div>
+            <div class="map-result you">
+              <div><div class="name">Your Business</div><div class="stars">★★★★★ 5.0 (47)</div></div>
+              <div class="badge">#1 MAP PACK</div>
+            </div>
+            <div class="map-result">
+              <div><div class="name">Competitor A</div><div class="stars">★★★★ 4.2 (19)</div></div>
+            </div>
+            <div class="map-result">
+              <div><div class="name">Competitor B</div><div class="stars">★★★ 3.8 (8)</div></div>
+            </div>
+          </div>
+          <div class="serp-organic">
+            <div class="lnk">Your Business — West Georgia's Trusted...</div>
+            Ranked #1 organic, right below the map pack you also own.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>LOCAL KEYWORDS</span><span class="star">★</span><span>MAP PACK RANKINGS</span><span class="star">★</span><span>GOOGLE BUSINESS PROFILE</span><span class="star">★</span><span>AUTHORITY LINKS</span><span class="star">★</span><span>PLAIN-ENGLISH REPORTS</span><span class="star">★</span><span>NO VANITY METRICS</span><span class="star">★</span>
+    <span>LOCAL KEYWORDS</span><span class="star">★</span><span>MAP PACK RANKINGS</span><span class="star">★</span><span>GOOGLE BUSINESS PROFILE</span><span class="star">★</span><span>AUTHORITY LINKS</span><span class="star">★</span><span>PLAIN-ENGLISH REPORTS</span><span class="star">★</span><span>NO VANITY METRICS</span><span class="star">★</span>
+  </div>
+</div>
+
+<!-- WHAT IS LOCAL SEO -->
+<section class="block" id="what">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHY IT MATTERS —</div>
+      <h2 class="impact">WHEN THEY SEARCH,<br>DO <span class="accent">YOU</span> SHOW UP?</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p>Local SEO is the process of optimizing your online presence so your business appears when people in your area search for your services on Google. When someone types "marketing agency near me" or "web design Villa Rica GA" — local SEO determines whether you show up or your competitor does.</p>
+        <p>For most small businesses in West Georgia, local search is the single highest-ROI marketing channel available. It brings in buyers who are already looking for exactly what you offer — no chasing, no cold outreach.</p>
+      </div>
+      <div class="pull-quote">
+        Our local SEO work helped John B. Jackson Law achieve <strong>22 #1 rankings</strong> in personal injury search terms — driving consistent, qualified leads month after month, <strong>without a dollar spent on ads</strong>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="block dotgrid" id="process" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— OUR SEO PROCESS —</div>
+      <h2 class="impact">HOW WE GET YOU <span class="accent">RANKED</span>.</h2>
+      <p class="lede">Every step is built to produce measurable rankings — not vanity metrics. <span class="script-note">six moves, partner</span></p>
+    </div>
+    <div class="card-grid">
+      <div class="cap-card">
+        <div class="tag">01</div>
+        <h3>KEYWORD RESEARCH.</h3>
+        <p>We identify the exact terms your ideal customers are searching — high-intent, local, and ready to convert.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">02</div>
+        <h3>ON-PAGE OPTIMIZATION.</h3>
+        <p>Headlines, meta tags, content structure, image text — every page tuned to send clear signals to Google.</p>
+      </div>
+      <div class="cap-card featured">
+        <div class="tag">03 / #1 LOCAL RANKING FACTOR</div>
+        <h3>GOOGLE BUSINESS PROFILE.</h3>
+        <p>Your profile is your #1 local ranking factor. We optimize every element to get you into the map pack.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">04</div>
+        <h3>LINK BUILDING.</h3>
+        <p>Quality backlinks from relevant local and industry sources that grow your site's authority.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">05</div>
+        <h3>TECHNICAL SEO.</h3>
+        <p>Site speed, structured data, sitemaps — the technical foundation Google demands, handled for you.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">06</div>
+        <h3>REPORTING &amp; TRANSPARENCY.</h3>
+        <p>Monthly reports in plain English. Keyword rankings, traffic trends, and what we're doing next.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF (DARK) -->
+<section class="block dark-section" id="proof">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— PROOF IT WORKS —</div>
+      <h2 class="impact" style="color:#fff;">REAL RANKINGS.<br>REAL <span style="color:var(--yellow);">TRAFFIC</span>.</h2>
+      <p class="lede">Keyword positions and organic traffic growth from real client accounts — Google position before → after our SEO campaign.</p>
+    </div>
+    <div class="rank-table">
+      <div class="rank-row head"><div>KEYWORD</div><div style="text-align:center;">BEFORE</div><div></div><div style="text-align:center;">AFTER</div></div>
+      <div class="rank-row"><div class="kw">personal injury lawyer georgia</div><div class="before">#24</div><div class="arrow">→</div><div class="after">#1</div></div>
+      <div class="rank-row"><div class="kw">car accident attorney villa rica</div><div class="before">#18</div><div class="arrow">→</div><div class="after">#1</div></div>
+      <div class="rank-row"><div class="kw">slip and fall lawyer west georgia</div><div class="before">#31</div><div class="arrow">→</div><div class="after">#2</div></div>
+      <div class="rank-row"><div class="kw">wrongful death attorney ga</div><div class="before">#27</div><div class="arrow">→</div><div class="after">#3</div></div>
+      <div class="rank-row"><div class="kw">truck accident lawyer georgia</div><div class="before">#22</div><div class="arrow">→</div><div class="after">#1</div></div>
+    </div>
+    <div class="growth-stats">
+      <div class="growth-card">
+        <div class="num">+340%</div>
+        <div class="lbl">ORGANIC SESSIONS</div>
+        <div class="sub">Jackson Law — year-over-year organic traffic growth from the same campaign.</div>
+      </div>
+      <div class="growth-card">
+        <div class="num">+180%</div>
+        <div class="lbl">GOOGLE BUSINESS PROFILE CLICKS</div>
+        <div class="sub">More map views, more calls, more direction requests — tracked monthly.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCAL VS NATIONAL + REPORTING -->
+<section class="block">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— THE RIGHT STRATEGY —</div>
+      <h2 class="impact">LOCAL SEO VS. NATIONAL SEO —<br>WHAT <span class="accent">YOU</span> NEED.</h2>
+    </div>
+    <div class="split" style="margin-bottom: 60px;">
+      <div>
+        <p>If you serve customers in Villa Rica, Carrollton, Douglasville, or anywhere in West Georgia — local SEO is your primary focus. It gets you into the Google Map Pack (the 3 businesses that appear above organic results with a map) and targets people searching in your service area.</p>
+        <p>National SEO competes for broad terms without location modifiers. It's valuable for e-commerce and brands serving customers nationwide — but for most West Georgia businesses, local SEO delivers a far faster return on investment. We build a strategy that prioritizes the approach that fits your business.</p>
+      </div>
+      <div>
+        <p style="font-family:'Anton',sans-serif; font-size:18px; color:var(--ink); letter-spacing:0.5px; margin-bottom:14px;">EVERY MONTH, YOU SEE:</p>
+        <div class="check-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="check-item"><span class="tick">✓</span> KEYWORD RANKINGS</div>
+          <div class="check-item"><span class="tick">✓</span> ORGANIC TRAFFIC</div>
+          <div class="check-item"><span class="tick">✓</span> SEARCH CONSOLE DATA</div>
+          <div class="check-item"><span class="tick">✓</span> BACKLINK GROWTH</div>
+          <div class="check-item"><span class="tick">✓</span> TECHNICAL HEALTH</div>
+          <div class="check-item"><span class="tick">✓</span> ACTION SUMMARY</div>
+        </div>
+      </div>
+    </div>
+    <div class="cross-band">
+      <div>
+        <h3>SEO VS. PPC — WHY NOT BOTH?</h3>
+        <p>SEO builds long-term organic visibility that compounds over time. PPC delivers immediate traffic while your SEO gains traction. Many West Georgia businesses get the best results running both together.</p>
+      </div>
+      <a class="cta-secondary" href="#" style="background:var(--ink); color:var(--yellow); border-color:var(--ink);">SEE PPC MANAGEMENT →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block" id="faq" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— FAQ —</div>
+      <h2 class="impact">COMMON <span class="accent">QUESTIONS</span>.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>HOW LONG DOES SEO TAKE TO SHOW RESULTS?</summary>
+        <div class="answer">Most businesses see meaningful movement in rankings within 3–6 months. Highly competitive markets may take 6–12 months. SEO is a long-term investment — but unlike paid ads, the results compound over time.</div>
+      </details>
+      <details class="faq-item">
+        <summary>DO I NEED LOCAL SEO OR NATIONAL SEO?</summary>
+        <div class="answer">If your customers are primarily in West Georgia and the surrounding area, local SEO is the priority. It targets location-based searches like "marketing agency Villa Rica GA" and helps you appear in Google Maps results.</div>
+      </details>
+      <details class="faq-item">
+        <summary>HOW MUCH DOES SEO COST?</summary>
+        <div class="answer">Our SEO packages start at $497/month. The right investment depends on your market competitiveness and goals. We'll give you a transparent quote after a free consultation.</div>
+      </details>
+      <details class="faq-item">
+        <summary>WHAT WILL I SEE IN MY MONTHLY REPORT?</summary>
+        <div class="answer">Keyword ranking changes, organic traffic trends, and the specific work we completed — no jargon, no vanity metrics. You'll always know exactly what we're doing and why.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta dotgrid" id="contact">
+  <div class="eyebrow">— READY WHEN YOU ARE —</div>
+  <h2 class="impact">READY TO OWN<br>YOUR <span class="accent">MARKET</span>?</h2>
+  <p>Free consultation. No contracts. No fluff. Just a clear plan to get you ranking.</p>
+  <div class="ctas" style="justify-content:center;">
+    <a class="cta-primary" href="#">GET YOUR FREE SEO AUDIT ↗</a>
+    <a class="cta-secondary" href="#">SEE OUR RESULTS</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+</body>
+</html>

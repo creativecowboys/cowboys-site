@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function TopBar() {
     return (
         <>
@@ -28,7 +30,9 @@ export default function TopBar() {
                     style={{ width: "100%" }}
                 >
                     {/* Address */}
-                    <span
+                    <Link
+                        href="/franklin-tn/web-design"
+                        prefetch={false}
                         style={{
                             fontFamily: "var(--font-body), sans-serif",
                             fontSize: "12px",
@@ -36,10 +40,18 @@ export default function TopBar() {
                             fontWeight: "bold",
                             letterSpacing: "0.05em",
                             textTransform: "uppercase",
+                            textDecoration: "none",
+                            transition: "color 0.2s ease",
                         }}
+                        onMouseEnter={(e) =>
+                            ((e.currentTarget as HTMLAnchorElement).style.color = "#e94e33")
+                        }
+                        onMouseLeave={(e) =>
+                            ((e.currentTarget as HTMLAnchorElement).style.color = "#1a1a1a")
+                        }
                     >
-                        Now serving Franklin, TN
-                    </span>
+                        COMING SOON: OUR FRANKLIN, TN OFFICE →
+                    </Link>
 
                     {/* Phone — turns red-orange on hover */}
                     <a

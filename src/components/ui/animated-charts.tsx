@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-const ORANGE = "#F15F2A";
+const ORANGE = "#B5330E";
 const PINK = "#EA51FF";
 const BLUE = "#56CCF2";
 

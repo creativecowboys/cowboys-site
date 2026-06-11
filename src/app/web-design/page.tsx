@@ -1,49 +1,15 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-
-import { X, ArrowRight } from "lucide-react";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
-
-
+import ClientScripts from "@/components/web-design/ClientScripts";
 
 export default function WebDesignPage() {
-  const [stickyVisible, setStickyVisible] = useState(true);
-
-  // Conversion event tracking helper
-  const trackCTA = (eventName: string) => {
-    if (typeof window !== "undefined") {
-      (window as any).dataLayer = (window as any).dataLayer || [];
-      (window as any).dataLayer.push({
-        event: eventName,
-      });
-      console.log(`GA4 Event tracked: ${eventName}`);
-    }
-  };
-
   return (
-    <div className="bg-[#F2EBDA] text-[#0a0a0a] font-sans selection:bg-[#B5330E] selection:text-white min-h-screen relative overflow-hidden flex flex-col">
+    <div className="bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-white min-h-screen relative overflow-hidden flex flex-col">
       <style>{`
-        .font-h3-secondary {
-          font-family: var(--font-inter), 'Inter', sans-serif;
-        }
-        .font-roboto {
-          font-family: var(--font-inter), 'Inter', sans-serif;
-        }
         .dotgrid { 
           background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); 
           background-size: 18px 18px; 
-        }
-        .font-anton {
-          font-family: var(--font-anton), 'Anton', Impact, 'Arial Black', sans-serif;
-        }
-        .font-inter {
-          font-family: var(--font-inter), 'Inter', sans-serif;
-        }
-        .font-lobster {
-          font-family: var(--font-lobster), 'Lobster', 'Brush Script MT', cursive;
         }
         
         /* FAQ Accordion Styling */
@@ -208,22 +174,27 @@ export default function WebDesignPage() {
               THAT ACTUALLY<br />
               <span className="text-[#B5330E]">CONVERTS</span>.
             </h1>
-            <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-lg mb-8">
-              Your website shouldn't just look pretty. It should generate leads, close sales, and move your business forward. We build high-performance, revenue-generating websites for brands serious about growth — serving Villa Rica, Carrollton, Douglasville, and the Southeast.
+            <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-lg mb-4">
+              Your website shouldn't just look pretty. It should generate leads, close sales, and move your business forward.
+            </p>
+            <p className="font-inter text-xs md:text-sm text-[#5a5a5a]/80 leading-relaxed max-w-lg mb-8">
+              We build high-performance, revenue-generating websites for brands serious about growth — serving Villa Rica, Carrollton, Douglasville, and the Southeast.
             </p>
             
             {/* CTAs */}
             <div className="flex flex-wrap gap-4 mb-10">
               <Link 
+                prefetch={false}
                 href="/contact"
-                onClick={() => trackCTA("web_design_hero_start")}
+                data-track="web_design_hero_start"
                 className="bg-[#B5330E] text-white font-anton text-sm md:text-base uppercase tracking-wider py-4 px-6 md:px-8 border-[2.5px] border-[#0a0a0a] shadow-[4px_4px_0px_#0a0a0a] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#0a0a0a] transition-all"
               >
                 START YOUR PROJECT ↗
               </Link>
               <Link 
+                prefetch={false}
                 href="/contact"
-                onClick={() => trackCTA("web_design_hero_strategy")}
+                data-track="web_design_hero_strategy"
                 className="bg-white text-[#0a0a0a] font-anton text-sm md:text-base uppercase tracking-wider py-4 px-6 md:px-8 border-[2.5px] border-[#0a0a0a] hover:bg-neutral-50 transition-colors"
               >
                 BOOK A FREE STRATEGY CALL
@@ -256,7 +227,10 @@ export default function WebDesignPage() {
                 <span className="w-2 h-2 rounded-full bg-[#B5330E]" />
                 <span className="w-2 h-2 rounded-full bg-[#F5C842]" />
                 <span className="w-2 h-2 rounded-full bg-[#4CAF50]" />
-                <div className="flex-1 bg-[#2a2a2a] h-4.5 ml-2.5 rounded text-[9px] text-neutral-400 px-2 flex items-center font-mono select-none">
+                <div 
+                  className="flex-1 bg-[#2a2a2a] h-4.5 ml-2.5 rounded text-[9px] text-neutral-400 px-2 flex items-center select-none"
+                  style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}
+                >
                   harmonicproduction.co
                 </div>
               </div>
@@ -582,15 +556,17 @@ export default function WebDesignPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
+              prefetch={false}
               href="/contact"
-              onClick={() => trackCTA("web_design_final_start")}
+              data-track="web_design_final_start"
               className="bg-[#B5330E] text-white font-anton text-sm md:text-base uppercase tracking-wider py-4 px-8 border-[2.5px] border-[#0a0a0a] shadow-[4px_4px_0px_#0a0a0a] hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#0a0a0a] transition-all"
             >
               START YOUR PROJECT ↗
             </Link>
             <Link 
+              prefetch={false}
               href="/contact"
-              onClick={() => trackCTA("web_design_final_strategy")}
+              data-track="web_design_final_strategy"
               className="bg-white text-[#0a0a0a] font-anton text-sm md:text-base uppercase tracking-wider py-4 px-8 border-[2.5px] border-[#0a0a0a] hover:bg-neutral-50 transition-colors"
             >
               BOOK A FREE STRATEGY CALL
@@ -604,34 +580,8 @@ export default function WebDesignPage() {
 
       <Footer />
 
-      {/* MOBILE STICKY BOTTOM CTA BAR */}
-      {stickyVisible && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0a0a0a] border-t-2 border-[#B5330E] py-3 px-4 flex justify-between items-center md:hidden shadow-[0_-4px_16px_rgba(0,0,0,0.25)]">
-          <div className="flex gap-2 w-full max-w-sm mx-auto justify-between items-center">
-            <a 
-              href="tel:4702437517" 
-              onClick={() => trackCTA("web_design_sticky_call")}
-              className="flex-1 text-center bg-[#F5C842] text-[#0a0a0a] font-anton uppercase text-xs tracking-wider py-2.5 border border-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a] mr-2"
-            >
-              CALL NOW
-            </a>
-            <a 
-              href="/contact" 
-              onClick={() => trackCTA("web_design_sticky_proposal")}
-              className="flex-1 text-center bg-[#B5330E] text-white font-anton uppercase text-xs tracking-wider py-2.5 border border-[#0a0a0a] shadow-[2px_2px_0px_#0a0a0a]"
-            >
-              GET A PROPOSAL
-            </a>
-          </div>
-          <button 
-            onClick={() => setStickyVisible(false)} 
-            className="text-white hover:text-[#B5330E] ml-4 cursor-pointer focus:outline-none"
-            aria-label="Dismiss sticky CTA bar"
-          >
-            <X size={18} />
-          </button>
-        </div>
-      )}
+      {/* MOBILE STICKY BOTTOM CTA BAR & EVENT LISTENER */}
+      <ClientScripts />
     </div>
   );
 }

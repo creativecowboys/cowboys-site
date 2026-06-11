@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Strategy That Stands Out | Creative Cowboys — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EBDA; --cream-dark: #E8E1CF; --ink: #0a0a0a; --coral: #DD5A2E;
+    --yellow: #F5C842; --dark: #0e0e0e; --dark-body: #d4ccb8; --dark-muted: #a0998a; --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .hero { padding: 90px 60px 100px; }
+  .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Anton', sans-serif; font-size: 72px; line-height: 0.88; margin: 0 0 22px; }
+  .accent { color: var(--coral); }
+  .hero-body { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 480px; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-primary { background: var(--coral); color: #fff; padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); display: inline-block; }
+  .cta-secondary { background: #fff; color: var(--ink); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  /* hero brand-board mockup */
+  .board-wrap { position: relative; min-height: 460px; }
+  .board-card { position: absolute; background: #fff; border: 3px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+  .board-logo { top: 0; left: 0; right: 110px; padding: 30px 26px; transform: rotate(-2deg); z-index: 1; }
+  .board-logo .lbl { font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--body-gray); margin-bottom: 12px; }
+  .board-logo .mark { font-family: 'Lobster', cursive; font-size: 44px; line-height: 1.1; }
+  .board-logo .mark span { color: var(--coral); }
+  .board-logo .tagline { font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 3px; margin-top: 8px; color: var(--ink); }
+  .board-colors { top: 150px; right: 0; width: 200px; padding: 18px; transform: rotate(2.5deg); z-index: 2; box-shadow: 7px 7px 0 var(--coral); }
+  .board-colors .lbl { font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--body-gray); margin-bottom: 10px; }
+  .swatch { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .swatch .chip { width: 30px; height: 30px; border: 2px solid var(--ink); }
+  .swatch .hex { font-family: monospace; font-size: 11px; color: var(--body-gray); }
+  .board-type { bottom: 0; left: 30px; right: 150px; padding: 24px 26px; transform: rotate(-1deg); z-index: 3; }
+  .board-type .lbl { font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--body-gray); margin-bottom: 10px; }
+  .board-type .spec-display { font-family: 'Anton', sans-serif; font-size: 30px; }
+  .board-type .spec-body { font-size: 13px; color: var(--body-gray); margin-top: 6px; }
+  .board-voice { bottom: 40px; right: 0; width: 170px; padding: 16px 18px; transform: rotate(3deg); z-index: 4; background: var(--yellow); }
+  .board-voice .lbl { font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--ink); margin-bottom: 8px; }
+  .board-voice .vox { font-family: 'Lobster', cursive; font-size: 19px; line-height: 1.25; }
+
+  .marquee { background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; }
+  .marquee-track { display: flex; white-space: nowrap; animation: scroll 30s linear infinite; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 2px; }
+  .marquee-track span { padding: 0 14px; }
+  .marquee-track .star { color: var(--coral); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  section.block { padding: 90px 60px; }
+  .section-head { margin-bottom: 50px; }
+  .section-head h2 { font-family: 'Anton', sans-serif; font-size: 52px; line-height: 0.92; margin: 6px 0 0; }
+  .section-head .lede { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 600px; margin-top: 18px; }
+  .script-note { font-family: 'Lobster', cursive; font-size: 22px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+  .dark-section { background: var(--dark); color: var(--cream); }
+  .dark-section .eyebrow { color: var(--yellow); }
+  .dark-section .section-head .lede { color: var(--dark-body); }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .split p { font-size: 14.5px; color: var(--body-gray); line-height: 1.75; margin: 0 0 16px; }
+  .pull-quote { border-left: 6px solid var(--coral); background: #fff; border-top: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 24px 26px; font-size: 15px; line-height: 1.65; }
+  .pull-quote strong { color: var(--coral); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .cap-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 28px 26px; }
+  .cap-card .tag { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--coral); margin-bottom: 12px; }
+  .cap-card h3 { font-family: 'Anton', sans-serif; font-size: 21px; margin: 0 0 10px; }
+  .cap-card p { font-size: 13.5px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+  .cap-card.featured { background: var(--yellow); }
+
+  /* touchpoints (dark) */
+  .touch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .touch-item { border: 2.5px solid var(--yellow); padding: 24px 20px; text-align: center; }
+  .touch-item .icon { font-size: 28px; margin-bottom: 12px; }
+  .touch-item .name { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1.5px; color: var(--cream); }
+  .touch-item .sub { font-size: 12px; color: var(--dark-muted); margin-top: 6px; line-height: 1.5; }
+
+  .faq-list { max-width: 860px; }
+  .faq-item { border-bottom: 2.5px solid var(--ink); }
+  .faq-item summary { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 0.5px; padding: 22px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 26px; color: var(--coral); }
+  .faq-item[open] summary::after { content: '—'; font-size: 18px; }
+  .faq-item .answer { font-size: 14.5px; color: var(--body-gray); line-height: 1.7; padding: 0 0 24px; max-width: 720px; }
+
+  .final-cta { text-align: center; padding: 100px 60px; }
+  .final-cta h2 { font-family: 'Anton', sans-serif; font-size: 58px; line-height: 0.9; margin: 10px 0 18px; }
+  .final-cta p { color: var(--body-gray); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .hero, section.block, .final-cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-inner, .split, .footer-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 48px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .touch-grid { grid-template-columns: 1fr 1fr; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#contact">START YOUR BRAND PROJECT</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero dotgrid">
+  <div class="inner hero-inner">
+    <div>
+      <div class="eyebrow">— BRAND STRATEGY · WEST GEORGIA —</div>
+      <h1 class="impact">BRANDS BUILT<br>TO STAND<br><span class="accent">OUT</span>.</h1>
+      <p class="hero-body">From logo design to brand voice, we build the visual and strategic foundation that makes your business look professional, feel trustworthy, and stand out from the competition.</p>
+      <div class="ctas">
+        <a class="cta-primary" href="#contact">START YOUR BRAND PROJECT ↗</a>
+        <a class="cta-secondary" href="#">SEE OUR WORK</a>
+      </div>
+    </div>
+    <div class="board-wrap">
+      <!-- brand board mockup -->
+      <div class="board-card board-logo">
+        <div class="lbl">01 / LOGO &amp; MARK</div>
+        <div class="mark">Your <span>Brand</span> Co.</div>
+        <div class="tagline">EST. 2026 · WEST GEORGIA</div>
+      </div>
+      <div class="board-card board-colors">
+        <div class="lbl">02 / PALETTE</div>
+        <div class="swatch"><div class="chip" style="background:#DD5A2E;"></div><div class="hex">#DD5A2E</div></div>
+        <div class="swatch"><div class="chip" style="background:#F5C842;"></div><div class="hex">#F5C842</div></div>
+        <div class="swatch"><div class="chip" style="background:#0a0a0a;"></div><div class="hex">#0A0A0A</div></div>
+        <div class="swatch" style="margin-bottom:0;"><div class="chip" style="background:#F2EBDA;"></div><div class="hex">#F2EBDA</div></div>
+      </div>
+      <div class="board-card board-type">
+        <div class="lbl">03 / TYPOGRAPHY</div>
+        <div class="spec-display">HEADLINES HIT HARD.</div>
+        <div class="spec-body">Body copy stays clear, warm, and easy to read — on every screen and every page.</div>
+      </div>
+      <div class="board-card board-voice">
+        <div class="lbl">04 / VOICE</div>
+        <div class="vox">"plain-spoken, confident, no fluff"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>LOGO DESIGN</span><span class="star">★</span><span>BRAND VOICE</span><span class="star">★</span><span>VISUAL IDENTITY</span><span class="star">★</span><span>BRAND GUIDELINES</span><span class="star">★</span><span>POSITIONING</span><span class="star">★</span><span>PRINT + VECTOR</span><span class="star">★</span><span>REBRANDS</span><span class="star">★</span>
+    <span>LOGO DESIGN</span><span class="star">★</span><span>BRAND VOICE</span><span class="star">★</span><span>VISUAL IDENTITY</span><span class="star">★</span><span>BRAND GUIDELINES</span><span class="star">★</span><span>POSITIONING</span><span class="star">★</span><span>PRINT + VECTOR</span><span class="star">★</span><span>REBRANDS</span><span class="star">★</span>
+  </div>
+</div>
+
+<!-- WHY BRAND STRATEGY -->
+<section class="block" id="why">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHY IT MATTERS —</div>
+      <h2 class="impact">EVERY TOUCHPOINT,<br>ONE <span class="accent">MESSAGE</span>.</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p>Brand strategy is the plan behind how your business presents itself to the world. It covers who you are, what you stand for, who you serve, and how you communicate — consistently, across every touchpoint.</p>
+        <p>Without a clear brand strategy, your marketing efforts pull in different directions. With one, every ad, every social post, and every client interaction reinforces the same message — building recognition, trust, and loyalty over time.</p>
+      </div>
+      <div class="pull-quote">
+        For West Georgia small businesses competing against larger brands and agencies, <strong>a strong brand identity is one of the most powerful advantages you can build.</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INCLUDED -->
+<section class="block dotgrid" id="included" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHAT'S INCLUDED —</div>
+      <h2 class="impact">EVERYTHING YOU NEED TO<br>COMMAND <span class="accent">ATTENTION</span>.</h2>
+      <p class="lede"><span class="script-note">the whole kit, partner</span></p>
+    </div>
+    <div class="card-grid">
+      <div class="cap-card featured">
+        <div class="tag">01 / THE MARK</div>
+        <h3>LOGO DESIGN &amp; VISUAL IDENTITY.</h3>
+        <p>A logo that captures your brand's personality and works across every touchpoint — print, digital, signage, and social.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">02 / THE SOUND</div>
+        <h3>BRAND VOICE &amp; MESSAGING.</h3>
+        <p>How you sound is just as important as how you look. We define your brand's tone, tagline, and core messaging.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">03 / THE EDGE</div>
+        <h3>COMPETITIVE POSITIONING.</h3>
+        <p>We research your market and competitors to find the positioning that makes you the obvious choice for your ideal customer.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">04 / THE RULEBOOK</div>
+        <h3>BRAND GUIDELINES.</h3>
+        <p>A complete brand standards guide so your team, contractors, and partners always represent your brand consistently.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">05 / THE SYSTEM</div>
+        <h3>VISUAL DESIGN SYSTEM.</h3>
+        <p>Color palette, typography, iconography, and layout patterns that create a cohesive, professional look across all materials.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">06 / THE RESET</div>
+        <h3>REBRANDING SERVICES.</h3>
+        <p>If your current brand no longer reflects your business, we'll rethink and rebuild it — while preserving the equity you've built.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOUCHPOINTS (DARK) -->
+<section class="block dark-section" id="touchpoints">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHERE YOUR BRAND LIVES —</div>
+      <h2 class="impact" style="color:#fff;">ONE BRAND.<br>EVERY <span style="color:var(--yellow);">SURFACE</span>.</h2>
+      <p class="lede">Your identity system is built to work everywhere your customers meet you — not just on a slide in a brand deck.</p>
+    </div>
+    <div class="touch-grid">
+      <div class="touch-item"><div class="icon">🖥️</div><div class="name">WEBSITE</div><div class="sub">Hero to footer, pixel-consistent</div></div>
+      <div class="touch-item"><div class="icon">📱</div><div class="name">SOCIAL MEDIA</div><div class="sub">Profiles, posts, and ad creative</div></div>
+      <div class="touch-item"><div class="icon">🪧</div><div class="name">SIGNAGE &amp; PRINT</div><div class="sub">Trucks, storefronts, business cards</div></div>
+      <div class="touch-item"><div class="icon">📧</div><div class="name">EMAIL &amp; PROPOSALS</div><div class="sub">Every client-facing document</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block" id="faq" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— FAQ —</div>
+      <h2 class="impact">COMMON <span class="accent">QUESTIONS</span>.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>HOW MUCH DOES BRAND STRATEGY COST?</summary>
+        <div class="answer">Every project is different, so we don't do one-size-fits-all pricing. We'll talk through what you need — a logo refresh, a full identity system, or a complete rebrand — and put together a custom proposal that fits your goals and budget.</div>
+      </details>
+      <details class="faq-item">
+        <summary>I ALREADY HAVE A LOGO. DO I NEED THIS?</summary>
+        <div class="answer">Maybe not all of it. If your logo works but your messaging, materials, and online presence don't match, we can build the strategy and system around what you have. We'll tell you honestly what's worth keeping.</div>
+      </details>
+      <details class="faq-item">
+        <summary>WHAT DO I ACTUALLY RECEIVE AT THE END?</summary>
+        <div class="answer">Final logo files in every format you'll need (print and vector included), your color palette and typography system, brand voice and messaging guidelines, and a brand standards guide your whole team can use. You own all of it.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta dotgrid" id="contact">
+  <div class="eyebrow">— READY WHEN YOU ARE —</div>
+  <h2 class="impact">READY TO BUILD A BRAND THAT<br>ACTUALLY <span class="accent">STANDS OUT</span>?</h2>
+  <p>Free consultation. We'll review your current brand and tell you exactly what we'd do differently.</p>
+  <div class="ctas" style="justify-content:center;">
+    <a class="cta-primary" href="#">START A CONVERSATION ↗</a>
+    <a class="cta-secondary" href="#">SEE OUR WORK</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+</body>
+</html>

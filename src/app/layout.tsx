@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Space_Grotesk, Manrope } from "next/font/google";
+import { Space_Grotesk, Manrope, Anton } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
@@ -29,6 +29,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   preload: false,
 });
+
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "optional",
+});
+
 
 export const metadata: Metadata = {
   title: {
@@ -150,43 +158,18 @@ export default function RootLayout({
   return (
     <html lang="en" style={{ background: "#0D0D0F" }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} antialiased bg-[#0D0D0F]`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} antialiased bg-[#0D0D0F]`}
       >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-CSND3EQCNS"
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-CSND3EQCNS');
-          `}
-        </Script>
-        {/* Meta Pixel */}
-        <Script id="meta-pixel" strategy="lazyOnload">
-          {`
-            !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)}(window, document,'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '1804089387217105');
-            fbq('track', 'PageView');
-          `}
-        </Script>
-        <noscript dangerouslySetInnerHTML={{
-          __html: `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1804089387217105&ev=PageView&noscript=1"/>`
-        }} />
+        
+
+
+        
+
+
         <ScrollToTop />
         <TopBar />
         {children}

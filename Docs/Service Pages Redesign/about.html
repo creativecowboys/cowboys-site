@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Creative Cowboys | Howdy Partner — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F2EBDA; --cream-dark: #E8E1CF; --ink: #0a0a0a; --coral: #DD5A2E;
+    --yellow: #F5C842; --dark: #0e0e0e; --dark-body: #d4ccb8; --dark-muted: #a0998a; --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .hero { padding: 90px 60px 110px; }
+  .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Anton', sans-serif; font-size: 72px; line-height: 0.88; margin: 0 0 22px; }
+  .accent { color: var(--coral); }
+  .hero-body { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 480px; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-primary { background: var(--coral); color: #fff; padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); display: inline-block; }
+  .cta-secondary { background: #fff; color: var(--ink); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+
+  /* polaroid team photos */
+  .polaroid-wrap { position: relative; min-height: 460px; }
+  .polaroid { position: absolute; background: #fff; border: 3px solid var(--ink); padding: 14px 14px 18px; width: 270px; }
+  .polaroid .photo { aspect-ratio: 4/5; background: repeating-linear-gradient(45deg, var(--cream-dark), var(--cream-dark) 12px, #ddd5c0 12px, #ddd5c0 24px); border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--body-gray); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-align: center; padding: 10px; }
+  .polaroid .caption { font-family: 'Lobster', cursive; font-size: 22px; margin-top: 12px; text-align: center; }
+  .polaroid .role { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--coral); text-align: center; margin-top: 4px; }
+  .polaroid.p1 { top: 0; left: 0; transform: rotate(-3deg); box-shadow: 9px 9px 0 var(--ink); z-index: 1; }
+  .polaroid.p2 { top: 90px; right: 0; transform: rotate(2.5deg); box-shadow: 9px 9px 0 var(--coral); z-index: 2; }
+  .stamp { position: absolute; bottom: 10px; left: 90px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--coral); border: 2.5px solid var(--coral); padding: 8px 14px; transform: rotate(-8deg); z-index: 3; background: rgba(242,235,218,0.9); }
+
+  .marquee { background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; }
+  .marquee-track { display: flex; white-space: nowrap; animation: scroll 30s linear infinite; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 2px; }
+  .marquee-track span { padding: 0 14px; }
+  .marquee-track .star { color: var(--coral); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  section.block { padding: 90px 60px; }
+  .section-head { margin-bottom: 50px; }
+  .section-head h2 { font-family: 'Anton', sans-serif; font-size: 52px; line-height: 0.92; margin: 6px 0 0; }
+  .section-head .lede { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 600px; margin-top: 18px; }
+  .script-note { font-family: 'Lobster', cursive; font-size: 22px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+  .dark-section { background: var(--dark); color: var(--cream); }
+  .dark-section .eyebrow { color: var(--yellow); }
+  .dark-section .section-head .lede { color: var(--dark-body); }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .split p { font-size: 14.5px; color: var(--body-gray); line-height: 1.75; margin: 0 0 16px; }
+  .pull-quote { border-left: 6px solid var(--coral); background: #fff; border-top: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 24px 26px; font-size: 15px; line-height: 1.65; }
+  .pull-quote strong { color: var(--coral); }
+
+  /* stats band */
+  .stats-band { display: grid; grid-template-columns: repeat(3, 1fr); border: 3px solid var(--ink); background: #fff; box-shadow: 10px 10px 0 var(--ink); }
+  .stat-cell { padding: 38px 30px; border-right: 3px solid var(--ink); text-align: center; }
+  .stat-cell:last-child { border-right: none; }
+  .stat-cell .num { font-family: 'Anton', sans-serif; font-size: 54px; color: var(--coral); line-height: 1; }
+  .stat-cell .lbl { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 2px; margin-top: 10px; }
+
+  /* values rows */
+  .why-rows { border-top: 2.5px solid var(--ink); }
+  .why-row { display: grid; grid-template-columns: 90px 1fr 1.4fr; gap: 30px; align-items: center; padding: 30px 0; border-bottom: 2.5px solid var(--ink); }
+  .why-row .num { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--coral); }
+  .why-row h3 { font-family: 'Anton', sans-serif; font-size: 24px; margin: 0; letter-spacing: 0.5px; }
+  .why-row p { font-size: 14px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+
+  /* team cards */
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 900px; }
+  .team-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); }
+  .team-card .photo { aspect-ratio: 4/3; background: repeating-linear-gradient(45deg, var(--cream-dark), var(--cream-dark) 12px, #ddd5c0 12px, #ddd5c0 24px); border-bottom: 2.5px solid var(--ink); display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 1.5px; color: var(--body-gray); text-align: center; padding: 10px; }
+  .team-card .info { padding: 22px 24px; }
+  .team-card h3 { font-family: 'Anton', sans-serif; font-size: 24px; margin: 0; }
+  .team-card .role { font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--coral); margin: 6px 0 12px; }
+  .team-card p { font-size: 13.5px; color: var(--body-gray); line-height: 1.65; margin: 0; }
+
+  /* service area (dark) */
+  .area-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .area-tag { background: rgba(245,200,66,0.12); color: var(--yellow); padding: 9px 18px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 1.5px solid var(--yellow); }
+  .area-tag.hq { background: var(--coral); color: #fff; border-color: var(--coral); }
+
+  .final-cta { text-align: center; padding: 100px 60px; }
+  .final-cta h2 { font-family: 'Anton', sans-serif; font-size: 58px; line-height: 0.9; margin: 10px 0 18px; }
+  .final-cta p { color: var(--body-gray); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .hero, section.block, .final-cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-inner, .split, .footer-grid, .team-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 48px; }
+    .stats-band { grid-template-columns: 1fr; }
+    .stat-cell { border-right: none; border-bottom: 3px solid var(--ink); }
+    .stat-cell:last-child { border-bottom: none; }
+    .why-row { grid-template-columns: 60px 1fr; }
+    .why-row p { grid-column: 2; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+    .polaroid { position: relative; margin: 0 auto 30px; }
+    .polaroid.p1, .polaroid.p2 { top: auto; left: auto; right: auto; }
+    .stamp { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#contact">GET A PROPOSAL</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero dotgrid">
+  <div class="inner hero-inner">
+    <div>
+      <div class="eyebrow">— ABOUT US · VILLA RICA, GA —</div>
+      <h1 class="impact">HOWDY,<br>PARTNER. WE'RE<br>THE <span class="accent">COWBOYS</span>.</h1>
+      <p class="hero-body">We're Josh and Dave — a two-man digital marketing outfit based in Villa Rica, Georgia. We build fast websites, run advertising that pays for itself, and get small businesses found on Google. No account managers, no hand-offs, no fluff. You work directly with the people doing the work.</p>
+      <div class="ctas">
+        <a class="cta-primary" href="#contact">WORK WITH US ↗</a>
+        <a class="cta-secondary" href="#team">MEET THE TEAM</a>
+      </div>
+    </div>
+    <div class="polaroid-wrap">
+      <div class="polaroid p1">
+        <div class="photo">// TODO: REAL PHOTO<br>JOSH — NO STOCK<br>PHOTOGRAPHY</div>
+        <div class="caption">Josh</div>
+        <div class="role">FOUNDER &amp; CREATIVE DIRECTOR</div>
+      </div>
+      <div class="polaroid p2">
+        <div class="photo">// TODO: REAL PHOTO<br>DAVE — NO STOCK<br>PHOTOGRAPHY</div>
+        <div class="caption">Dave</div>
+        <div class="role">PARTNER</div>
+      </div>
+      <div class="stamp">EST. 2025 · VILLA RICA, GA</div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>EST. 2025</span><span class="star">★</span><span>VILLA RICA, GA</span><span class="star">★</span><span>ZERO WASTED SPEND</span><span class="star">★</span><span>NO ACCOUNT MANAGERS</span><span class="star">★</span><span>NO FLUFF</span><span class="star">★</span><span>100+ BRANDS SHIPPED</span><span class="star">★</span><span>SERVING THE SOUTHEAST</span><span class="star">★</span>
+    <span>EST. 2025</span><span class="star">★</span><span>VILLA RICA, GA</span><span class="star">★</span><span>ZERO WASTED SPEND</span><span class="star">★</span><span>NO ACCOUNT MANAGERS</span><span class="star">★</span><span>NO FLUFF</span><span class="star">★</span><span>100+ BRANDS SHIPPED</span><span class="star">★</span><span>SERVING THE SOUTHEAST</span><span class="star">★</span>
+  </div>
+</div>
+
+<!-- STORY -->
+<section class="block" id="story">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— OUR STORY —</div>
+      <h2 class="impact">WHY WE <span class="accent">EXIST</span>.</h2>
+    </div>
+    <div class="split">
+      <div>
+        <p>Small businesses get a raw deal in marketing. Big agencies hand you off to a junior account manager and bill you for meetings. Cheap freelancers disappear mid-project. And everybody hides their pricing until you're three sales calls deep.</p>
+        <p>We started Creative Cowboys to do it differently. Two people who actually do the work, talking straight to the businesses we work with. Every dollar you spend with us has one job: make your phone ring. If a tactic doesn't move your revenue, we won't sell it to you.</p>
+        <p>We're based in Villa Rica, Georgia — and we're putting down roots in Franklin, Tennessee. Not a satellite market on a service-area list: a second home. We're opening a Creative Cowboys office in Franklin, because Williamson County businesses deserve a marketing partner that's actually part of the community.</p>
+      </div>
+      <div class="pull-quote">
+        Our mission is simple: <strong>ZERO WASTED SPEND.</strong> No vanity metrics, no padded retainers, no work that doesn't pay for itself. We focus on the numbers that shift your balance sheet — and we show them to you every month.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="block dotgrid" style="background: var(--cream-dark); padding-top: 70px; padding-bottom: 70px;">
+  <div class="inner">
+    <div class="stats-band">
+      <div class="stat-cell"><div class="num">300%</div><div class="lbl">AVG SITE TRAFFIC ↑</div></div>
+      <div class="stat-cell"><div class="num">90-DAY</div><div class="lbl">PAYBACK TARGET</div></div>
+      <div class="stat-cell"><div class="num">100+</div><div class="lbl">BRANDS SHIPPED</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="block" id="values">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— HOW WE OPERATE —</div>
+      <h2 class="impact">THE COWBOY <span class="accent">CODE</span>.</h2>
+      <p class="lede">Four things we want you to know upfront — before you ever sign anything. <span class="script-note">our word is good</span></p>
+    </div>
+    <div class="why-rows">
+      <div class="why-row">
+        <div class="num">01</div>
+        <h3>YOU OWN EVERYTHING.</h3>
+        <p>The domain. The hosting. The files. The design. When the project's done, everything transfers to you. If you ever leave us, you take it all.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">02</div>
+        <h3>FLAT FEE. NO SURPRISES.</h3>
+        <p>The number on the proposal is the number on the final invoice. If scope changes, you see the new estimate before any work happens.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">03</div>
+        <h3>WE SAY NO A LOT.</h3>
+        <p>If your project isn't a fit for us, we'll tell you and point you somewhere better. We'd rather not work with you than do bad work.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">04</div>
+        <h3>NO VANITY METRICS.</h3>
+        <p>Impressions don't pay your bills. We report on the numbers that matter — leads, calls, and revenue — in plain English, every month.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="block dotgrid" id="team" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— THE TEAM —</div>
+      <h2 class="impact">TWO COWBOYS.<br>NO <span class="accent">MIDDLEMEN</span>.</h2>
+      <p class="lede">When you call, one of us answers. When we build, one of us builds it. That's the whole org chart.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="photo">// TODO: REAL PHOTO OF JOSH — NO STOCK PHOTOGRAPHY</div>
+        <div class="info">
+          <h3>JOSH PACK</h3>
+          <div class="role">FOUNDER &amp; CREATIVE DIRECTOR</div>
+          <p>// TODO: 2–3 sentence bio from Josh — background, what he handles (design, build, strategy), one human detail.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="photo">// TODO: REAL PHOTO OF DAVE — NO STOCK PHOTOGRAPHY</div>
+        <div class="info">
+          <h3>DAVE</h3>
+          <div class="role">// TODO: CONFIRM TITLE</div>
+          <p>// TODO: 2–3 sentence bio from Dave — background, what he handles, one human detail.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FRANKLIN EXPANSION BAND -->
+<section class="block dotgrid" style="padding-top: 70px; padding-bottom: 70px;">
+  <div class="inner">
+    <div style="border: 3px solid var(--ink); background: var(--yellow); box-shadow: 12px 12px 0 var(--ink); padding: 44px; display: grid; grid-template-columns: 1.6fr auto; gap: 30px; align-items: center;">
+      <div>
+        <div class="eyebrow" style="color: var(--ink);">— BIG NEWS, Y'ALL —</div>
+        <h3 class="impact" style="font-size: 36px; margin: 0 0 12px; line-height: 0.95;">WE'RE NOT JUST SERVING FRANKLIN.<br>WE'RE <span style="color: var(--coral);">MOVING IN</span>.</h3>
+        <p style="font-size: 14.5px; line-height: 1.65; margin: 0; color: #333;">Creative Cowboys is opening an office in Franklin, Tennessee. Same two cowboys, same no-fluff work — now with boots on the ground in Williamson County. // TODO: address + opening date when confirmed.</p>
+      </div>
+      <a href="#" style="background: var(--ink); color: var(--yellow); padding: 16px 26px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; border: 2.5px solid var(--ink); display: inline-block;">FRANKLIN, TN HUB →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICE AREA (DARK) -->
+<section class="block dark-section" id="area">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHERE WE RIDE —</div>
+      <h2 class="impact" style="color:#fff;">TWO HOMES.<br>GEORGIA <span style="color:var(--yellow);">&amp;</span> TENNESSEE.</h2>
+      <p class="lede">Villa Rica, GA is where we started. Franklin, TN is where we're expanding — new office opening, boots on the ground in Williamson County. Strategy calls in person at either, or remote anywhere in the Southeast.</p>
+    </div>
+    <div class="area-tags">
+      <div class="area-tag hq">VILLA RICA, GA · HQ</div>
+      <div class="area-tag">CARROLLTON, GA</div>
+      <div class="area-tag">DOUGLASVILLE, GA</div>
+      <div class="area-tag">NEWNAN, GA</div>
+      <div class="area-tag">WEST GEORGIA</div>
+      <div class="area-tag">CLEVELAND, TN</div>
+      <div class="area-tag hq" style="background:var(--yellow); color:var(--ink); border-color:var(--yellow);">FRANKLIN, TN · NEW OFFICE</div>
+      <div class="area-tag">+ THE SOUTHEAST</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta dotgrid" id="contact">
+  <div class="eyebrow">— READY WHEN YOU ARE —</div>
+  <h2 class="impact">LET'S MAKE YOUR<br>PHONE <span class="accent">RING</span>.</h2>
+  <p>Tell us what you're trying to do. We'll send you a plan — and if we're not the right fit, we'll tell you that too.</p>
+  <div class="ctas" style="justify-content:center;">
+    <a class="cta-primary" href="#">GET A PROPOSAL ↗</a>
+    <a class="cta-secondary" href="#">BOOK A STRATEGY CALL</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+</body>
+</html>

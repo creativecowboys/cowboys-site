@@ -1,18 +1,11 @@
 import type { Metadata } from "next";
-import { Anton, Inter, Lobster } from "next/font/google";
-
-const anton = Anton({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-anton",
-  display: "optional",
-});
+import { Inter, Lobster, Anton } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   variable: "--font-inter",
-  display: "optional",
+  display: "swap",
 });
 
 const lobster = Lobster({
@@ -20,6 +13,14 @@ const lobster = Lobster({
   weight: ["400"],
   variable: "--font-lobster",
   display: "swap",
+  preload: false,
+});
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-anton",
+  display: "optional",
 });
 
 export const metadata: Metadata = {
@@ -36,9 +37,10 @@ export const metadata: Metadata = {
 
 export default function WebDesignLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className={`${anton.variable} ${inter.variable} ${lobster.variable}`}>
+        <div className={`${inter.variable} ${lobster.variable} ${anton.variable}`}>
             {children}
         </div>
     );
 }
+
 

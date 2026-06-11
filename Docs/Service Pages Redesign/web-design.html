@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web Design That Actually Converts | Creative Cowboys — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ CREATIVE COWBOYS DESIGN SYSTEM v2 — vintage indie brutalist ============ */
+  :root {
+    --cream: #F2EBDA;
+    --cream-dark: #E8E1CF;
+    --ink: #0a0a0a;
+    --coral: #DD5A2E;
+    --yellow: #F5C842;
+    --dark: #0e0e0e;
+    --dark-body: #d4ccb8;
+    --dark-muted: #a0998a;
+    --body-gray: #5a5a5a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, sans-serif; background: var(--cream); color: var(--ink); }
+  .impact { font-family: 'Anton', Impact, 'Arial Black', sans-serif; letter-spacing: 0.5px; }
+  .script { font-family: 'Lobster', 'Brush Script MT', cursive; }
+  a { color: inherit; text-decoration: none; }
+  .dotgrid { background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 18px 18px; }
+  .inner { max-width: 1280px; margin: 0 auto; }
+
+  /* ---- top utility bar ---- */
+  .utility-bar { background: var(--ink); color: var(--cream); font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; padding: 9px 60px; display: flex; justify-content: space-between; }
+  .utility-bar .phone { color: var(--yellow); }
+
+  /* ---- nav ---- */
+  .nav { background: var(--cream); border-bottom: 2.5px solid var(--ink); padding: 18px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .nav .logo { font-family: 'Lobster', cursive; font-size: 28px; }
+  .nav .links { display: flex; gap: 28px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; }
+  .nav .nav-cta { background: var(--coral); color: #fff; padding: 11px 20px; font-family: 'Anton', sans-serif; font-size: 12px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+
+  /* ---- hero ---- */
+  .hero { padding: 90px 60px 100px; }
+  .hero-inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: center; }
+  .eyebrow { font-family: 'Anton', sans-serif; font-size: 13px; color: var(--coral); letter-spacing: 2.5px; margin-bottom: 14px; }
+  .hero h1 { font-family: 'Anton', sans-serif; font-size: 76px; line-height: 0.88; margin: 0 0 22px; }
+  .accent { color: var(--coral); }
+  .hero-body { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 480px; margin: 0 0 28px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .cta-primary { background: var(--coral); color: #fff; padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); display: inline-block; }
+  .cta-secondary { background: #fff; color: var(--ink); padding: 15px 24px; font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.2px; border: 2.5px solid var(--ink); display: inline-block; }
+  .hero-stats { display: flex; gap: 0; margin-top: 38px; border: 2.5px solid var(--ink); background: #fff; box-shadow: 6px 6px 0 var(--ink); max-width: 480px; }
+  .hero-stat { flex: 1; padding: 16px 14px; border-right: 2.5px solid var(--ink); }
+  .hero-stat:last-child { border-right: none; }
+  .hero-stat .num { font-family: 'Anton', sans-serif; font-size: 24px; color: var(--coral); }
+  .hero-stat .lbl { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 1.5px; color: var(--ink); margin-top: 3px; }
+
+  /* ---- hero device mockup pair ---- */
+  .hero-mockup-wrap { position: relative; min-height: 440px; padding: 20px; }
+  .mockup-desktop { position: absolute; top: 30px; left: 0; right: 70px; background: #fff; border: 3px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); transform: rotate(-1.5deg); z-index: 1; }
+  .browser-chrome { background: var(--ink); padding: 8px 12px; display: flex; gap: 6px; align-items: center; }
+  .browser-chrome .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-chrome .dot.r { background: var(--coral); } .browser-chrome .dot.y { background: var(--yellow); } .browser-chrome .dot.g { background: #4CAF50; }
+  .browser-chrome .url-bar { flex: 1; background: #2a2a2a; height: 14px; margin-left: 10px; border-radius: 3px; font-family: monospace; font-size: 9px; color: #888; padding: 0 8px; line-height: 14px; }
+  .browser-screen { aspect-ratio: 16/10; background: linear-gradient(135deg, #0a0a0a 0%, #2a1a15 100%); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
+  .screen-nav { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+  .screen-nav .brand { font-family: 'Anton', sans-serif; letter-spacing: 2px; }
+  .screen-nav .nav-pill { background: var(--coral); color: #fff; padding: 4px 9px; font-size: 9px; font-family: 'Anton', sans-serif; letter-spacing: 1px; }
+  .screen-hero .location { font-family: 'Anton', sans-serif; font-size: 9px; color: var(--coral); letter-spacing: 2px; }
+  .screen-hero .big-headline { font-family: 'Anton', sans-serif; font-size: 28px; line-height: 0.88; margin-top: 6px; }
+  .mockup-phone { position: absolute; bottom: -10px; right: 0; width: 130px; background: var(--ink); border-radius: 22px; padding: 9px; transform: rotate(5deg); box-shadow: 7px 7px 0 var(--coral); z-index: 2; }
+  .phone-screen { background: linear-gradient(135deg, #0a0a0a 0%, #2a1a15 100%); border-radius: 14px; overflow: hidden; aspect-ratio: 9/16; padding: 14px 12px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
+  .phone-nav { font-family: 'Anton', sans-serif; font-size: 8px; letter-spacing: 1.2px; text-align: center; opacity: 0.9; }
+  .phone-headline { font-family: 'Anton', sans-serif; font-size: 18px; line-height: 0.88; }
+  .phone-cta { background: var(--coral); color: #fff; padding: 5px 0; font-size: 9px; text-align: center; font-family: 'Anton', sans-serif; letter-spacing: 1px; margin-top: 8px; }
+
+  /* ---- marquee ---- */
+  .marquee { background: var(--ink); color: var(--cream); overflow: hidden; padding: 14px 0; border-top: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); }
+  .marquee-track { display: flex; white-space: nowrap; animation: scroll 30s linear infinite; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 2px; }
+  .marquee-track span { padding: 0 14px; }
+  .marquee-track .star { color: var(--coral); }
+  @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ---- section scaffolding ---- */
+  section.block { padding: 90px 60px; }
+  .section-head { margin-bottom: 50px; }
+  .section-head h2 { font-family: 'Anton', sans-serif; font-size: 52px; line-height: 0.92; margin: 6px 0 0; }
+  .section-head .lede { font-size: 15px; color: var(--body-gray); line-height: 1.6; max-width: 560px; margin-top: 18px; }
+  .script-note { font-family: 'Lobster', cursive; font-size: 22px; color: var(--coral); transform: rotate(-3deg); display: inline-block; }
+  .dark-section { background: var(--dark); color: var(--cream); }
+  .dark-section .eyebrow { color: var(--yellow); }
+  .dark-section .section-head .lede { color: var(--dark-body); }
+  .dark-section .script-note { color: var(--yellow); }
+
+  /* ---- numbered "why" rows ---- */
+  .why-rows { border-top: 2.5px solid var(--ink); }
+  .why-row { display: grid; grid-template-columns: 90px 1fr 1.4fr; gap: 30px; align-items: center; padding: 30px 0; border-bottom: 2.5px solid var(--ink); }
+  .why-row .num { font-family: 'Anton', sans-serif; font-size: 40px; color: var(--coral); }
+  .why-row h3 { font-family: 'Anton', sans-serif; font-size: 24px; margin: 0; letter-spacing: 0.5px; }
+  .why-row p { font-size: 14px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+
+  /* ---- capability cards ---- */
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .cap-card { background: #fff; border: 2.5px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); padding: 28px 26px; }
+  .cap-card .tag { font-family: 'Anton', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--coral); margin-bottom: 12px; }
+  .cap-card h3 { font-family: 'Anton', sans-serif; font-size: 22px; margin: 0 0 10px; }
+  .cap-card p { font-size: 13.5px; color: var(--body-gray); line-height: 1.6; margin: 0; }
+  .cap-card.featured { background: var(--yellow); }
+
+  /* ---- process timeline (dark) ---- */
+  .timeline { position: relative; padding: 30px 0 10px; }
+  .timeline-line { position: absolute; top: 95px; left: 8%; right: 8%; height: 3px; background: linear-gradient(90deg, var(--yellow) 0%, var(--coral) 50%, var(--yellow) 100%); z-index: 1; }
+  .timeline-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative; z-index: 2; }
+  .timeline-step { text-align: center; }
+  .timeline-step .week-label { font-family: 'Anton', sans-serif; font-size: 11px; color: var(--yellow); letter-spacing: 1.8px; margin-bottom: 18px; }
+  .timeline-step .circle-wrap { display: flex; align-items: center; justify-content: center; height: 64px; margin-bottom: 18px; }
+  .timeline-step .circle { width: 56px; height: 56px; background: var(--yellow); color: var(--ink); border: 4px solid var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 24px; position: relative; z-index: 3; }
+  .timeline-step.featured .circle { width: 70px; height: 70px; background: var(--coral); color: #fff; font-size: 28px; box-shadow: 0 0 0 4px var(--yellow); }
+  .timeline-step .step-title { font-family: 'Anton', sans-serif; font-size: 18px; color: var(--cream); }
+  .timeline-step .step-desc { font-size: 12px; color: var(--dark-muted); line-height: 1.55; margin: 8px 0 0; padding: 0 6px; }
+
+  /* ---- who we work with tags ---- */
+  .verticals { display: flex; flex-wrap: wrap; gap: 12px; }
+  .vertical-tag { border: 2.5px solid var(--ink); background: #fff; padding: 14px 22px; font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1.2px; }
+  .vertical-tag em { display: block; font-family: 'Inter', sans-serif; font-style: normal; font-size: 12px; color: var(--body-gray); letter-spacing: 0; margin-top: 5px; font-weight: 400; max-width: 280px; }
+
+  /* ---- case study band ---- */
+  .case-band { border: 3px solid var(--ink); background: #fff; box-shadow: 10px 10px 0 var(--ink); padding: 40px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+  .case-band .meta { font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--body-gray); margin-bottom: 10px; }
+  .case-band h3 { font-family: 'Anton', sans-serif; font-size: 34px; margin: 0 0 14px; }
+  .case-band ul { margin: 0; padding-left: 18px; font-size: 14px; color: var(--body-gray); line-height: 1.8; }
+  .case-band .big-metric { font-family: 'Anton', sans-serif; font-size: 64px; color: var(--coral); line-height: 1; }
+  .case-band .metric-label { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 2px; margin-top: 8px; }
+
+  /* ---- FAQ ---- */
+  .faq-list { max-width: 860px; }
+  .faq-item { border-bottom: 2.5px solid var(--ink); }
+  .faq-item summary { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 0.5px; padding: 22px 0; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: '+'; font-size: 26px; color: var(--coral); }
+  .faq-item[open] summary::after { content: '—'; font-size: 18px; }
+  .faq-item .answer { font-size: 14.5px; color: var(--body-gray); line-height: 1.7; padding: 0 0 24px; max-width: 720px; }
+
+  /* ---- final CTA ---- */
+  .final-cta { text-align: center; padding: 100px 60px; }
+  .final-cta h2 { font-family: 'Anton', sans-serif; font-size: 60px; line-height: 0.9; margin: 10px 0 18px; }
+  .final-cta p { color: var(--body-gray); font-size: 15px; max-width: 520px; margin: 0 auto 30px; line-height: 1.6; }
+
+  /* ---- footer ---- */
+  footer { background: var(--dark); color: var(--cream); padding: 70px 60px 40px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 60px; max-width: 1280px; margin: 0 auto; }
+  footer h4 { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 1px; margin: 0 0 14px; }
+  footer .howdy-body { font-size: 14px; color: var(--dark-body); line-height: 1.7; max-width: 420px; }
+  footer .contact-line { font-family: 'Anton', sans-serif; font-size: 14px; letter-spacing: 1px; margin-top: 18px; }
+  footer .contact-line span { color: var(--yellow); }
+  .footer-links { font-family: 'Anton', sans-serif; font-size: 13px; letter-spacing: 1.5px; line-height: 2.4; text-align: right; }
+  .footer-links .head { color: var(--coral); font-size: 11px; letter-spacing: 2.5px; }
+  .footer-bottom { border-top: 1px solid rgba(242,235,218,0.2); margin-top: 50px; padding-top: 24px; display: flex; justify-content: space-between; font-family: 'Anton', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--dark-muted); max-width: 1280px; margin-left: auto; margin-right: auto; }
+
+  @media (max-width: 980px) {
+    .utility-bar, .nav, .hero, section.block, .final-cta, footer { padding-left: 24px; padding-right: 24px; }
+    .hero-inner, .case-band, .footer-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 52px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .timeline-steps { grid-template-columns: 1fr 1fr; }
+    .timeline-line { display: none; }
+    .why-row { grid-template-columns: 60px 1fr; }
+    .why-row p { grid-column: 2; }
+    .nav .links { display: none; }
+    .footer-links { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP UTILITY BAR -->
+<div class="utility-bar">
+  <div>COMING SOON: OUR FRANKLIN, TN OFFICE <span style="color: var(--coral);">→</span></div>
+  <div class="phone">(470) 243-7517</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">Creative Cowboys</div>
+  <div class="links">
+    <a href="#">SERVICES</a>
+    <a href="#">WORK</a>
+    <a href="#">ABOUT</a>
+    <a href="#">BLOG</a>
+    <a href="#" style="color: var(--coral);">FRANKLIN, TN</a>
+  </div>
+  <a class="nav-cta" href="#contact">GET A PROPOSAL</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero dotgrid">
+  <div class="inner hero-inner">
+    <div>
+      <div class="eyebrow">— CUSTOM WEB DESIGN · WEST GEORGIA —</div>
+      <h1 class="impact">WEB DESIGN<br>THAT ACTUALLY<br><span class="accent">CONVERTS</span>.</h1>
+      <p class="hero-body">Your website shouldn't just look pretty. It should generate leads, close sales, and move your business forward. We build high-performance, revenue-generating websites for brands serious about growth — serving Villa Rica, Carrollton, Douglasville, and the Southeast.</p>
+      <div class="ctas">
+        <a class="cta-primary" href="#contact">START YOUR PROJECT ↗</a>
+        <a class="cta-secondary" href="#contact">BOOK A FREE STRATEGY CALL</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num">100+</div><div class="lbl">SITES SHIPPED</div></div>
+        <div class="hero-stat"><div class="num">1.4s</div><div class="lbl">AVG PAGE LOAD</div></div>
+        <div class="hero-stat"><div class="num">$2M+</div><div class="lbl">CLIENT REVENUE</div></div>
+      </div>
+    </div>
+    <div class="hero-mockup-wrap">
+      <div class="mockup-desktop">
+        <div class="browser-chrome">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="url-bar">harmonicproduction.co</div>
+        </div>
+        <div class="browser-screen">
+          <div class="screen-nav">
+            <div class="brand">HARMONIC ◆</div>
+            <div class="nav-pill">GET A QUOTE</div>
+          </div>
+          <div class="screen-hero">
+            <div class="location">CLEVELAND, TN · EST. 2014</div>
+            <div class="big-headline">WE MAKE<br><span class="accent">PRODUCTION</span><br>LEGENDARY.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-phone">
+        <div class="phone-screen">
+          <div class="phone-nav">HARMONIC ◆</div>
+          <div>
+            <div class="phone-headline">WE MAKE<br><span class="accent">PRODUCTION</span><br>LEGENDARY.</div>
+            <div class="phone-cta">GET A QUOTE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <span>CONVERSION-FOCUSED</span><span class="star">★</span><span>1.4S PAGE LOADS</span><span class="star">★</span><span>NO TEMPLATES</span><span class="star">★</span><span>SEO BUILT-IN</span><span class="star">★</span><span>MOBILE-FIRST</span><span class="star">★</span><span>NO OFFSHORE WORK</span><span class="star">★</span><span>REVENUE TRACKING</span><span class="star">★</span>
+    <span>CONVERSION-FOCUSED</span><span class="star">★</span><span>1.4S PAGE LOADS</span><span class="star">★</span><span>NO TEMPLATES</span><span class="star">★</span><span>SEO BUILT-IN</span><span class="star">★</span><span>MOBILE-FIRST</span><span class="star">★</span><span>NO OFFSHORE WORK</span><span class="star">★</span><span>REVENUE TRACKING</span><span class="star">★</span>
+  </div>
+</div>
+
+<!-- WHY US -->
+<section class="block" id="why">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHY CREATIVE COWBOYS —</div>
+      <h2 class="impact">WE DON'T BUILD WEBSITES.<br>WE BUILD <span class="accent">REVENUE MACHINES</span>.</h2>
+      <p class="lede">Most web designers are artists. We are marketers. Every pixel we place has one job — turn your visitors into paying customers. <span class="script-note">no fluff, partner</span></p>
+    </div>
+    <div class="why-rows">
+      <div class="why-row">
+        <div class="num">01</div>
+        <h3>CONVERSION-FOCUSED DESIGN.</h3>
+        <p>Psychological triggers, clear calls-to-action, and strategic layout that guide visitors to a decision.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">02</div>
+        <h3>SEO BUILT-IN FROM DAY ONE.</h3>
+        <p>Your site launches ranking-ready. Clean code, proper structure, fast load times — so Google finds you from the start.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">03</div>
+        <h3>AD CAMPAIGN INTEGRATION.</h3>
+        <p>Landing pages engineered for your paid traffic so every dollar you spend works harder.</p>
+      </div>
+      <div class="why-row">
+        <div class="num">04</div>
+        <h3>ANALYTICS &amp; REVENUE TRACKING.</h3>
+        <p>Know exactly what's working. We set up advanced tracking tied directly to your revenue.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="block dotgrid" id="capabilities" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHAT YOU GET —</div>
+      <h2 class="impact">CUSTOM WEBSITES<br>BUILT FOR <span class="accent">GROWTH</span>.</h2>
+      <p class="lede">We don't use cookie-cutter templates. We build bespoke digital assets designed to dominate your market and drive revenue.</p>
+    </div>
+    <div class="card-grid">
+      <div class="cap-card">
+        <div class="tag">01 / BUILT TO SELL</div>
+        <h3>CONVERSION-FOCUSED.</h3>
+        <p>Structured with clear calls-to-action and psychological triggers that guide users to buy.</p>
+      </div>
+      <div class="cap-card featured">
+        <div class="tag">02 / SPEED</div>
+        <h3>LIGHTNING FAST.</h3>
+        <p>Optimized for speed. Because every second of delay costs you conversions and search rankings.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">03 / EVERY DEVICE</div>
+        <h3>MOBILE-FIRST.</h3>
+        <p>Flawless experience on every device. We design for where your customers actually are.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">04 / GET FOUND</div>
+        <h3>SEO-READY.</h3>
+        <p>Built with clean code and proper structure so Google loves your site from day one.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">05 / PEACE OF MIND</div>
+        <h3>SECURE &amp; SCALABLE.</h3>
+        <p>Enterprise-grade security and architecture that grows as your business scales.</p>
+      </div>
+      <div class="cap-card">
+        <div class="tag">06 / KNOW YOUR NUMBERS</div>
+        <h3>DATA-DRIVEN.</h3>
+        <p>Integrated with advanced analytics so you know exactly how your site is performing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY BAND -->
+<section class="block">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— PROVEN OUTCOMES —</div>
+      <h2 class="impact">SITES THAT ACTUALLY <span class="accent">CONVERT</span>.</h2>
+    </div>
+    <div class="case-band">
+      <div>
+        <div class="meta">04.15 // WEB DESIGN &amp; SEO · CLEVELAND, TN</div>
+        <h3>HARMONIC PRODUCTION</h3>
+        <ul>
+          <li>Delivered a full brand overhaul and localized SEO strategy.</li>
+          <li>Boosted year-over-year customer retention by 200%.</li>
+          <li>Cut server downtime to zero during the domain transition.</li>
+        </ul>
+      </div>
+      <div style="text-align:center;">
+        <div class="big-metric">300%</div>
+        <div class="metric-label">CUSTOMER ENGAGEMENT ↑</div>
+      </div>
+    </div>
+    <div style="height:26px;"></div>
+    <div class="case-band">
+      <div>
+        <div class="meta">06.15 // WEB &amp; LOCAL SEO · DOUGLASVILLE, GA</div>
+        <h3>MCKINLEY ROOFING</h3>
+        <ul>
+          <li>Built dynamic neighborhood service-area landing pages.</li>
+          <li>Top-tier Google Business Profile optimization so they show up on the map.</li>
+          <li>Custom storm-damage intake forms that feed straight to insurance leads.</li>
+        </ul>
+      </div>
+      <div style="text-align:center;">
+        <div class="big-metric">+1000%</div>
+        <div class="metric-label">SITE TRAFFIC ↑</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS (DARK) -->
+<section class="block dark-section" id="process">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— OUR PROCESS —</div>
+      <h2 class="impact" style="color:#fff;">STRATEGY FIRST.<br>DESIGN SECOND.</h2>
+      <p class="lede">We don't just start pushing pixels. We follow a battle-tested process to make sure your website actually achieves your business goals. <span class="script-note">four steps —</span></p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div class="timeline-steps">
+        <div class="timeline-step">
+          <div class="week-label">STEP 01</div>
+          <div class="circle-wrap"><div class="circle">1</div></div>
+          <div class="step-title">DISCOVERY.</div>
+          <p class="step-desc">We dive deep into your business, audience, and competitors to find your unique edge.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="week-label">STEP 02</div>
+          <div class="circle-wrap"><div class="circle">2</div></div>
+          <div class="step-title">STRUCTURE.</div>
+          <p class="step-desc">We map out the user journey and craft compelling copy that sells your value.</p>
+        </div>
+        <div class="timeline-step featured">
+          <div class="week-label">STEP 03</div>
+          <div class="circle-wrap"><div class="circle">3</div></div>
+          <div class="step-title">DESIGN + BUILD.</div>
+          <p class="step-desc">We bring the strategy to life with stunning, high-performance custom design.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="week-label">STEP 04</div>
+          <div class="circle-wrap"><div class="circle">4</div></div>
+          <div class="step-title">LAUNCH + OPTIMIZE.</div>
+          <p class="step-desc">We deploy, test, and integrate analytics to ensure maximum return from day one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO WE WORK WITH -->
+<section class="block dotgrid">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— WHO WE WORK WITH —</div>
+      <h2 class="impact">BUILT FOR BUSINESSES<br>THAT WANT TO <span class="accent">GROW</span>.</h2>
+      <p class="lede">We partner with ambitious companies that understand the value of a premium digital presence.</p>
+    </div>
+    <div class="verticals">
+      <div class="vertical-tag">LOCAL BUSINESSES<em>Service businesses and brick-and-mortar shops ready to dominate their local market online.</em></div>
+      <div class="vertical-tag">CONTRACTORS &amp; TRADES<em>Builders, HVAC, electricians — companies that need leads flowing consistently.</em></div>
+      <div class="vertical-tag">PROFESSIONAL FIRMS<em>Law firms, accountants, consultants who need a site that commands authority.</em></div>
+      <div class="vertical-tag">E-COMMERCE BRANDS<em>Stores that need a high-converting storefront, not just another off-the-shelf theme.</em></div>
+      <div class="vertical-tag">SCALING STARTUPS<em>Early-stage companies that need to establish credibility fast.</em></div>
+      <div class="vertical-tag">B2B SERVICES<em>Companies selling to other businesses where trust and clarity drive every deal.</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block" id="faq" style="background: var(--cream-dark);">
+  <div class="inner">
+    <div class="section-head">
+      <div class="eyebrow">— FAQ —</div>
+      <h2 class="impact">COMMON <span class="accent">QUESTIONS</span>.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>HOW MUCH DOES A WEBSITE COST?</summary>
+        <div class="answer">Two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and local SEO. One-time builds start at $3,500 flat — you own everything outright. We publish these numbers because we'd rather start the conversation with money on the table than have you guess.</div>
+      </details>
+      <details class="faq-item">
+        <summary>HOW LONG DOES A SITE TAKE?</summary>
+        <div class="answer">Most sites launch in 4–6 weeks. Smaller monthly-plan sites can launch in as little as 2 weeks. You'll see a staging link early and can review progress anytime — no black box.</div>
+      </details>
+      <details class="faq-item">
+        <summary>DO YOU USE TEMPLATES?</summary>
+        <div class="answer">No. Every site is custom-designed around your business, your customers, and your goals. Templates are why most small-business websites all look the same — and why they don't convert.</div>
+      </details>
+      <details class="faq-item">
+        <summary>WHO OWNS THE SITE WHEN WE'RE DONE?</summary>
+        <div class="answer">You do. The domain, the hosting, the files, the design. When the project's done, everything transfers to you. If you ever leave us, you take it all.</div>
+      </details>
+      <details class="faq-item">
+        <summary>CAN YOU REDESIGN MY EXISTING SITE?</summary>
+        <div class="answer">Yes — Squarespace, Wix, GoDaddy, WordPress, whatever you've got. We'll audit what's working, keep the equity you've built, and rebuild the rest.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta dotgrid" id="contact">
+  <div class="eyebrow">— READY WHEN YOU ARE —</div>
+  <h2 class="impact">STOP LOSING CUSTOMERS TO A<br><span class="accent">CONFUSING</span> WEBSITE.</h2>
+  <p>Free strategy call. No long-term contracts. No BS. Just a clear plan to turn your website into your hardest-working salesperson.</p>
+  <div class="ctas" style="justify-content:center;">
+    <a class="cta-primary" href="#">START YOUR PROJECT ↗</a>
+    <a class="cta-secondary" href="#">BOOK A FREE STRATEGY CALL</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>HOWDY PARTNER</h4>
+      <p class="howdy-body">We're Josh and Dave — Villa Rica, GA born, and now settin' up shop in Franklin, TN. No vanity metrics. Just websites, ads, and SEO built to make your phone ring.</p>
+      <div class="contact-line">MON – FRI: 9:00 AM – 5:00 PM</div>
+      <div class="contact-line"><span>howdy@creativecowboys.co</span> · (470) 243-7517</div>
+      <div class="contact-line">VILLA RICA, GA &nbsp;·&nbsp; FRANKLIN, TN <span style="color: var(--coral);">(NEW OFFICE)</span></div>
+    </div>
+    <div class="footer-links">
+      <div class="head">DIRECT LINKS</div>
+      <a href="#">SEO PROGRAMS</a><br>
+      <a href="#">WEB DESIGN</a><br>
+      <a href="#">PPC CAMPAIGNS</a><br>
+      <a href="#">BRAND STRATEGY</a><br>
+      <a href="#" style="color: var(--yellow);">FRANKLIN, TN</a><br>
+      <a href="#">PRIVACY POLICY</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>COWBOYS</div>
+    <div>© 2026 ALL RIGHTS RESERVED</div>
+  </div>
+</footer>
+
+</body>
+</html>

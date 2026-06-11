@@ -4,20 +4,57 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Where all form leads get emailed
-// NOTE: Change to "howdy@creativecowboys.co" after verifying domain at resend.com/domains
-const TO_EMAIL = "josh@creativecowboys.co";
+const TO_EMAIL = "howdy@creativecowboys.co";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, company, business, message, service, industry, source } = body;
+    const { 
+      name, 
+      email, 
+      phone, 
+      company, 
+      business, 
+      message, 
+      service, 
+      industry, 
+      source,
+      website_url // Honeypot
+    } = body;
 
-    // Build the email body based on which form it came from
-    const isLanding = !!industry;
-    const subject = isLanding
-      ? `🔥 New ${industry} AI Lead — ${name}`
-      : `New Contact Form Submission — ${name}`;
+    // 1. Honeypot check (Spam prevention)
+    if (website_url && website_url.trim() !== "") {
+      console.log("Spam submission blocked via honeypot field:", website_url);
+      // Silently return success so the spam bot thinks it worked
+      return NextResponse.json({ success: true });
+    }
 
+    // 2. Server-side validation
+    if (!name || !name.trim() || !email || !email.trim()) {
+      return NextResponse.json(
+        { error: "Required fields missing: Name and Email are required." },
+        { status: 400 }
+      );
+    }
+
+    // If it's a proposal modal form, also require service
+    const isProposal = source && source.includes("Homepage Popup");
+    if (isProposal && (!service || service.trim() === "" || service === "Select a service...")) {
+      return NextResponse.json(
+        { error: "Required fields missing: Service selection is required." },
+        { status: 400 }
+      );
+    }
+
+    // 3. Subject line formatting
+    let subject = `New Contact Form Submission — ${name}`;
+    if (isProposal) {
+      subject = `New proposal request — ${name} (${service})`;
+    } else if (industry) {
+      subject = `🔥 New ${industry} AI Lead — ${name}`;
+    }
+
+    // 4. Build HTML table
     const htmlLines: string[] = [
       `<h2 style="margin:0 0 16px;color:#F15F2A;">${subject}</h2>`,
       `<table style="border-collapse:collapse;width:100%;max-width:560px;">`,
@@ -36,11 +73,11 @@ export async function POST(request: NextRequest) {
     addRow("Name", name);
     addRow("Email", email);
     addRow("Phone", phone);
-    addRow("Company", company || business);
-    addRow("Service", service);
-    addRow("Industry", industry);
-    addRow("Source", source);
-    addRow("Message", message);
+    addRow("Company/Business", company || business);
+    addRow("Service Requested", service);
+    addRow("Industry context", industry);
+    addRow("Traffic Source", source);
+    addRow("Message details", message);
 
     htmlLines.push("</table>");
     htmlLines.push(
