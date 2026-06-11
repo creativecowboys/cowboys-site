@@ -196,7 +196,7 @@ const testimonials = [
     date: "04.15",
     tag: "WEB DESIGN + SEO",
     subtitle: "CONCERT AV · CLEVELAND, TN",
-    quote: '"Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime. Would recommend them to anyone looking for SEO and market engagement."',
+    quote: '"Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime."',
     attribution: "— Ryan Coffey",
     domain: "harmonicproduction.co",
     themeBg: "bg-h3-blue",
@@ -205,13 +205,7 @@ const testimonials = [
     accentColor: "text-h3-yellow",
     barColor: "bg-h3-yellow",
     scriptColor: "text-h3-yellow",
-    mockup: {
-      title: "HARMONIC",
-      subtitle: "CLEVELAND, TN · EST. 2014",
-      headline: "WE MAKE PRODUCTION LEGENDARY.",
-      btnText: "GET A QUOTE",
-      btnBg: "bg-[#F26522] text-white"
-    }
+    mockup: "/franklin-tn/harmonic-desktop-hero.png"
   },
   {
     name: "COMMERCIAL INSURANCE AGENCY.",
@@ -228,36 +222,24 @@ const testimonials = [
     accentColor: "text-h3-yellow",
     barColor: "bg-h3-yellow",
     scriptColor: "text-h3-yellow",
-    mockup: {
-      title: "COMMERCIAL INSURANCE",
-      subtitle: "BREMEN, GA",
-      headline: "COMMERCIAL & PERSONAL INSURANCE",
-      btnText: "GET A PROPOSAL",
-      btnBg: "bg-h3-red text-white"
-    }
+    mockup: "/franklin-tn/bremencia-desktop-hero.png"
   },
   {
-    name: "DAY ACCOUNTING.",
-    shortName: "DAY ACCOUNTING",
+    name: "MCKINLEY ROOFING.",
+    shortName: "McKINLEY ROOFING",
     date: "06.15",
-    tag: "WEB DESIGN",
-    subtitle: "CPA · NEWNAN, GA · LOCAL GUIDE / 23 REVIEWS",
-    quote: '"If you need some help with your web work, these guys can get it all together for you. No worries, just solutions."',
-    attribution: "— Lance Day",
-    domain: "dayacct.com",
+    tag: "WEB + LOCAL SEO",
+    subtitle: "ROOFING + RESTORATION · DOUGLASVILLE, GA",
+    quote: '"Creative Cowboys Media knows exactly what they\'re doing! They get the job done right and it shows in the projects that they get their hands on. These guys have so much experience between the two of them and all of that wisdom and experience can be trusted!"',
+    attribution: "— ALEXANDRA McKINLEY",
+    domain: "mckinleyroofing.net",
     themeBg: "bg-h3-black",
     activeBtnBg: "bg-h3-red",
     activeBtnText: "text-white",
     accentColor: "text-h3-red",
     barColor: "bg-h3-red",
     scriptColor: "text-h3-red",
-    mockup: {
-      title: "DAY ACCOUNTING",
-      subtitle: "NEWNAN, GA",
-      headline: "ACCOUNTING & CPA SERVICES",
-      btnText: "GET IN TOUCH",
-      btnBg: "bg-white text-h3-black"
-    }
+    mockup: "/franklin-tn/mckinley-roofing-desktop.png"
   }
 ];
 
@@ -1045,24 +1027,21 @@ export default function Home3Page() {
         onMouseLeave={() => setIsHovered(false)}
         className={`w-full py-12 md:py-20 px-6 md:px-12 border-b-4 border-h3-black z-10 relative flex flex-col items-center justify-between transition-colors duration-500 overflow-hidden ${testimonials[activeTestimonial].themeBg}`}
       >
-        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[500px] md:min-h-[600px] relative z-10">
+        <div className="max-w-7xl mx-auto w-full flex flex-col justify-between h-full min-h-[980px] sm:min-h-[850px] lg:min-h-[750px] relative z-10">
           
           {/* Top Header Row */}
           <div className="w-full flex items-center justify-between font-h3-secondary text-xs md:text-sm font-bold tracking-widest text-white/95 uppercase border-b border-white/20 pb-4 mb-12">
             <span>Client Testimonials</span>
             <div className="flex-grow h-[1px] bg-white/20 mx-6 hidden sm:block" />
-            <span>{`0${activeTestimonial + 1} / 03`}</span>
+            <span>{`0${activeTestimonial + 1} / 0${testimonials.length}`}</span>
           </div>
 
           {/* Grid Layout for Content */}
           <div className={`grid grid-cols-1 lg:grid-cols-12 gap-12 items-center transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             {/* Left Column: Review text and rating */}
-            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4">
+            <div className="lg:col-span-7 flex flex-col items-start text-left gap-4 min-h-[480px] sm:min-h-[380px] lg:min-h-[480px] xl:min-h-[420px]">
               {/* Badges */}
               <div className="flex gap-3">
-                <span className="bg-black/30 backdrop-blur-sm border border-white/10 text-white font-h3-secondary font-bold text-xs tracking-wider px-3 py-1 rounded">
-                  {testimonials[activeTestimonial].date}
-                </span>
                 <span className="bg-black/30 backdrop-blur-sm border border-white/10 text-white font-h3-secondary font-bold text-xs tracking-wider px-3 py-1 rounded">
                   {testimonials[activeTestimonial].tag}
                 </span>
@@ -1099,11 +1078,6 @@ export default function Home3Page() {
             {/* Right Column: Browser mockup */}
             <div className="lg:col-span-5 flex items-center justify-center relative">
               <div className="relative w-full max-w-[460px] mx-auto">
-                {/* McKinley offset background shadow card */}
-                {activeTestimonial === 2 && (
-                  <div className="absolute inset-0 bg-[#e94e33] rounded-[18px] translate-x-3 translate-y-3 z-0" />
-                )}
-
                 {/* Browser Container */}
                 <div className="relative z-10 bg-[#121417] rounded-[18px] border border-white/15 overflow-hidden shadow-2xl flex flex-col w-full aspect-[4/3] transition-all duration-300">
                   {/* Browser Header Bar */}
@@ -1118,19 +1092,13 @@ export default function Home3Page() {
                     <div className="bg-[#0f1113] rounded-md text-[11px] text-white/50 px-3 py-1 flex items-center justify-center font-mono w-3/5 max-w-[240px] truncate select-none border border-white/5">
                       {testimonials[activeTestimonial].domain}
                     </div>
-                    {/* Spacer */}
                     <div className="w-12" />
                   </div>
 
                   {/* Browser Window Body Content */}
                   <div className="flex-grow relative overflow-hidden bg-[#1a1a1a]">
                     <Image
-                      src={activeTestimonial === 0 
-                        ? "/franklin-tn/harmonic-desktop-hero.png" 
-                        : activeTestimonial === 1 
-                          ? "/franklin-tn/jbjackson-desktop-hero.png" 
-                          : "/franklin-tn/mckinley-desktop-hero.png"
-                      }
+                      src={testimonials[activeTestimonial].mockup}
                       alt={testimonials[activeTestimonial].name}
                       fill
                       className="object-cover object-top"
@@ -1147,7 +1115,6 @@ export default function Home3Page() {
           <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/20 pt-8 mt-12">
             {/* Prev/Next Navigation Controls */}
             <div className="flex items-center gap-4">
-              {/* Prev Button */}
               <button 
                 onClick={prevSlide}
                 className="border border-white/40 hover:bg-white/10 text-white rounded-xl w-14 h-12 flex items-center justify-center transition-colors cursor-pointer select-none"
@@ -1155,7 +1122,7 @@ export default function Home3Page() {
               >
                 <ArrowLeft size={20} />
               </button>
-              {/* Next Button */}
+              
               <button 
                 onClick={nextSlide}
                 className={`rounded-xl w-14 h-12 flex items-center justify-center transition-colors cursor-pointer font-bold select-none text-h3-black ${testimonials[activeTestimonial].activeBtnBg}`}
@@ -1166,7 +1133,7 @@ export default function Home3Page() {
             </div>
 
             {/* Central Tabbed Indicators */}
-            <div className="flex items-center gap-8 md:gap-12">
+            <div className="flex items-center gap-6 md:gap-10">
               {testimonials.map((item, idx) => {
                 const isActive = idx === activeTestimonial;
                 return (
@@ -1175,20 +1142,17 @@ export default function Home3Page() {
                     onClick={() => handleSlideChange(idx)}
                     className="flex flex-col items-center cursor-pointer select-none text-white focus:outline-none"
                   >
-                    {/* Number indicator */}
                     <span className={`text-[10px] md:text-xs font-bold tracking-wider transition-colors duration-200 ${isActive ? "text-white" : "text-white/40"}`}>
                       {`0${idx + 1}`}
                     </span>
                     
-                    {/* Underline segment bar */}
-                    <div className="w-12 h-1.5 my-1.5 relative rounded bg-white/10 overflow-hidden">
+                    <div className="w-10 h-1.5 my-1.5 relative rounded bg-white/10 overflow-hidden">
                       <div className={`absolute inset-y-0 left-0 right-0 transition-transform duration-300 origin-left ${
                         isActive ? "scale-x-100" : "scale-x-0"
                       } ${testimonials[activeTestimonial].barColor}`} />
                     </div>
 
-                    {/* Short client label */}
-                    <span className={`text-[10px] md:text-xs font-bold font-h3-secondary tracking-widest uppercase transition-colors duration-200 ${
+                    <span className={`text-[9px] font-bold font-h3-secondary tracking-widest uppercase transition-colors duration-200 ${
                       isActive ? "text-white" : "text-white/40"
                     } hidden md:inline`}>
                       {item.shortName}
@@ -1198,7 +1162,6 @@ export default function Home3Page() {
               })}
             </div>
 
-            {/* Script brand text */}
             <div className={`hidden sm:block text-right transition-colors duration-300 font-sign-painter text-2xl md:text-3xl tracking-wide select-none ${
               testimonials[activeTestimonial].scriptColor
             }`}>
