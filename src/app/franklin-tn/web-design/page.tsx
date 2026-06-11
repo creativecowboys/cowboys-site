@@ -21,7 +21,7 @@ import {
   ArrowRight,
   Shield
 } from "lucide-react";
-import IntegrationsSection from "@/components/ui/integrations-section";
+
 
 const anton = Anton({
   subsets: ["latin"],
@@ -268,7 +268,7 @@ const faqs = [
   },
   {
     question: "HOW LONG DOES IT TAKE TO BUILD A WEBSITE?",
-    answer: "As little as 2 weeks for most Ongoing builds, 3–5 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 6–10 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
+    answer: "4–6 weeks for most Ongoing builds, 6–10 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
   },
   {
     question: "DO YOU BUILD ON WORDPRESS, WEBFLOW, OR SOMETHING ELSE?",
@@ -283,7 +283,7 @@ const faqs = [
     answer: "If you chose Ongoing, all of this is already included — hosting, updates, backups, security monitoring, uptime monitoring, minor content edits, and a Local SEO package, all rolled into the $497/month. If you chose One Time, you own and run the site yourself on your own cloud server — and we can quote a separate care plan starting at $150/month if you want us handling maintenance, security, and small edits for you. Many Franklin clients run their One Time sites themselves after launch and only call us when they want a redesign — that's fine too."
   },
   {
-    question: "CAN YOU REDESIGN MY Squarespace / Wix / GoDaddy SITE?",
+    question: "CAN YOU REDESIGN MY SQUARESPACE / WIX / GODADDY SITE?",
     answer: "Most of our projects are redesigns, not new builds. We'll usually rebuild from scratch on our modern architecture rather than try to fix a Squarespace site that has fundamental limitations. You'll end up with a faster, better-ranking site that you own outright. If your current site is actually fine and you just need a refresh, we'll tell you — and recommend a designer who does Squarespace refreshes for less than we'd charge."
   },
   {
@@ -291,7 +291,7 @@ const faqs = [
     answer: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. With Ongoing, the site lives on cloud hosting we manage as part of your subscription — and if you ever leave us, you can transfer or buy out the site outright. With One Time, the site is set up on your own secure cloud server from day one, in your name, with you holding the keys. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
   },
   {
-    question: "DO YOU handle copywriting and photography?",
+    question: "DO YOU HANDLE COPYWRITING AND PHOTOGRAPHY?",
     answer: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included by default in One Time builds; available as an add-on for Ongoing subscribers."
   },
   {
@@ -853,8 +853,72 @@ export default function WebDesignFranklinPage() {
         </div>
       </section>
 
-      {/* Integrations Section */}
-      <IntegrationsSection />
+      {/* Recent Clients Logo Wall Grid */}
+      <section className="w-full py-[60px] px-6 md:px-[60px] bg-h3-cream border-b-4 border-h3-black z-10">
+        <div className="max-w-7xl mx-auto">
+          {/* Eyebrow */}
+          <div className="font-h3-display text-xs text-[#DD5A2E] tracking-[2.5px] text-center mb-8 uppercase select-none">
+            &mdash; RECENT CLIENTS &middot; SOUTHEAST PORTFOLIO &mdash;
+          </div>
+          
+          {/* Logo grid */}
+          <div className="grid grid-cols-6 gap-0 border-y-[1.5px] border-black/15">
+            {/* Cell 1: HARMONIC */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/Harmonic Logo (Black).png" 
+                alt="Harmonic Logo" 
+                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+            
+            {/* Cell 2: John B. Jackson */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/johnbjackson-dark-Blue.png" 
+                alt="John B. Jackson Logo" 
+                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+
+            {/* Cell 3: McKINLEY */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/McKinley (Black).png" 
+                alt="McKinley Logo" 
+                className="max-h-[34px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+
+            {/* Cell 4: LEUCO */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/Leuco transparent 2.png" 
+                alt="Leuco Logo" 
+                className="max-h-[26px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+
+            {/* Cell 5: MetLane */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center border-r-[1.5px] border-black/15">
+              <img 
+                src="/Client Logos/big-MetLane_logo_full.png" 
+                alt="MetLane Logo" 
+                className="max-h-[36px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+
+            {/* Cell 6: FireBible */}
+            <div className="py-[38px] px-1 sm:px-5 text-center min-h-[120px] flex items-center justify-center">
+              <img 
+                src="/Client Logos/FireBible logo Black.webp" 
+                alt="FireBible Logo" 
+                className="max-h-[38px] max-w-[85%] object-contain filter grayscale opacity-75 hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Capabilities Section */}
       <section id="capabilities" className="w-full py-12 md:py-20 px-6 md:px-12 bg-h3-black border-b-4 border-h3-black z-10 text-white">

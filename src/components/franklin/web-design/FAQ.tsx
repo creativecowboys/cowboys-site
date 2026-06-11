@@ -10,15 +10,15 @@ export default function FAQ() {
   const faqs = [
     {
       q: "How much does a website cost in Franklin, TN?",
-      a: "Our flat-fee tiers start at $6,500 for a Starter site (5 pages, 5–6 week build). Growth is $14,500. Scale is $28,500+. Most Franklin small businesses land in Starter or Growth. We publish these numbers on this page because we'd rather start the conversation with money on the table than have you guess. If you find a Franklin agency quoting $1,500 for a 'custom' site, the work is being done offshore — that's not a value judgment, it's just useful information."
+      a: "We offer two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and a Local SEO package. One Time builds start at $3,500 flat — you own everything outright on your own cloud server with no ongoing commitment. Most Franklin small businesses pick the model that matches their cash flow, not their site size. We publish these numbers because we'd rather start the conversation with money on the table than have you guess. If you find a Franklin agency quoting $1,500 for a 'custom' site, the work is being done offshore — that's not a value judgment, it's just useful information."
     },
     {
       q: "How long does it take to build a website for a Franklin business?",
-      a: "5–6 weeks for Starter, 6–8 weeks for Growth, 10–14 weeks for Scale. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
+      a: "4–6 weeks for most Ongoing builds, 6–10 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
     },
     {
-      q: "Do you work with WordPress, Webflow, or both?",
-      a: "Both. WordPress for clients who want full ownership and an enormous plugin ecosystem (most home services, professional services, eCom). Webflow for clients who want a faster build, easier ongoing edits, and a designer-friendly CMS (most boutique retail, restaurants, creative businesses). We'll recommend the right one for your team — never the one that's easier for us."
+      q: "Do you build on WordPress, Webflow, or something else?",
+      a: "We can work in WordPress or Webflow if you've already invested in one — we'll meet you where you are. For new builds from scratch, we've refined a faster, more modern architecture that delivers sub-1.5-second load times, better Google performance, and lower long-term hosting costs than typical WordPress sites. The stack we use is enterprise-grade — the same kind of cloud infrastructure that powers some of the fastest sites on the internet — but the technical details are our problem, not yours. You get a fast site, you own it, and you can move it anywhere you want later."
     },
     {
       q: "Will my new site actually rank in Cool Springs / Westhaven / Downtown Franklin search results?",
@@ -26,31 +26,31 @@ export default function FAQ() {
     },
     {
       q: "What happens after launch? Do you offer maintenance?",
-      a: "Yes. Our Care Plans handle hosting, updates, backups, security monitoring, uptime monitoring, monthly content edits, and quarterly design refreshes. Starts at $150/mo for Starter sites. Optional, not required. Many Franklin clients run their sites themselves after launch and only call us when they want a redesign — that's fine."
+      a: "If you chose Ongoing, all of this is already included — hosting, updates, backups, security monitoring, uptime monitoring, minor content edits, and a Local SEO package, all rolled into the $497/month. If you chose One Time, you own and run the site yourself on your own cloud server — and we can quote a separate care plan starting at $150/month if you want us handling maintenance, security, and small edits for you. Many Franklin clients run their One Time sites themselves after launch and only call us when they want a redesign — that's fine too."
     },
     {
       q: "Can you redesign my existing Squarespace / Wix / GoDaddy site?",
-      a: "Most of our projects are redesigns, not new builds. We'll usually rebuild on WordPress or Webflow rather than try to fix a Squarespace site that has fundamental limitations. If your current site is actually fine and you just need a refresh, we'll tell you — and recommend a designer who does Squarespace refreshes for less than we'd charge."
+      a: "Most of our projects are redesigns, not new builds. We'll usually rebuild from scratch on our modern architecture rather than try to fix a Squarespace site that has fundamental limitations. You'll end up with a faster, better-ranking site that you own outright. If your current site is actually fine and you just need a refresh, we'll tell you — and recommend a designer who does Squarespace refreshes for less than we'd charge."
     },
     {
       q: "Who owns the site, the domain, and the hosting when we're done?",
-      a: "You do. All of it. We don't host other agencies' work as a lock-in. The domain stays in your account. The hosting account (typically WP Engine, Kinsta, or Webflow Cloud) goes in your name. The files are yours. If you ever fire us, you walk away with everything."
+      a: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. With Ongoing, the site lives on cloud hosting we manage as part of your subscription — and if you ever leave us, you can transfer or buy out the site outright. With One Time, the site is set up on your own secure cloud server from day one, in your name, with you holding the keys. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
     },
     {
       q: "Do you handle copywriting and photography?",
-      a: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included in Growth and Scale tiers; optional add-on for Starter."
+      a: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included by default in One Time builds; available as an add-on for Ongoing subscribers."
     },
     {
       q: "What if I'm not happy with the design?",
-      a: "First design review usually happens in week 3 of a Growth project. If the direction's wrong, we'll do one full pivot — new concept, new layout, new mood — at no extra cost. That's happened twice across our portfolio. After the pivot we'll talk about whether the brief was wrong, the work was wrong, or whether we're not a fit."
+      a: "First design review usually happens in week 3. If the direction's wrong, we'll do one full pivot — new concept, new layout, new mood — at no extra cost. That's happened twice across our portfolio. After the pivot we'll talk about whether the brief was wrong, the work was wrong, or whether we're not a fit."
     },
     {
       q: "Do you build ecommerce sites for Franklin retailers?",
-      a: "Yes. Shopify, WooCommerce, or BigCommerce depending on the catalog size and integrations. We've built ecom for Williamson County boutique retail, food/CPG brands, and home goods. Pricing usually lands in our Growth or Scale tier depending on product count and integrations."
+      a: "Yes. We build on Shopify for most catalog-driven retail, or on our modern architecture for headless and custom commerce setups. We've built e-commerce for Williamson County boutique retail, food/CPG brands, and home goods. E-commerce projects price as One Time builds starting at $7,500+ depending on product count, custom integrations, and complexity."
     },
     {
       q: "Can you make my site ADA / WCAG compliant?",
-      a: "WCAG 2.1 AA is our default standard on every Growth and Scale build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. Starter tier covers WCAG basics; full audit + compliance is an add-on or upgrade to Growth."
+      a: "WCAG 2.1 AA is our default standard on every One Time build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. Ongoing subscribers get WCAG basics by default; a full compliance audit can be added as a one-time service."
     },
     {
       q: "Why should I hire Creative Cowboys instead of JLB or Horton Group?",
