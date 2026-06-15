@@ -56,7 +56,7 @@ export default function Footer() {
               <span className="-rotate-45 font-bold text-xs">fb</span>
             </a>
             <a 
-              href="https://www.instagram.com/creativecowboyco" 
+              href="https://www.instagram.com/creativecowboysmedia" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-8 h-8 border border-[#F2EBDA] rotate-45 flex items-center justify-center hover:bg-[#F2EBDA] hover:text-[#0e0e0e] transition-colors duration-200 group"

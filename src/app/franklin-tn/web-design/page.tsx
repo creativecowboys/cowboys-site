@@ -1685,7 +1685,7 @@ export default function WebDesignFranklinPage() {
               <a href="https://www.facebook.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">fb</span>
               </a>
-              <a href="https://www.instagram.com/creativecowboyco" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
+              <a href="https://www.instagram.com/creativecowboysmedia" target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-h3-cream rotate-45 flex items-center justify-center hover:bg-h3-cream hover:text-h3-black transition-colors duration-200 group">
                 <span className="-rotate-45 font-bold text-xs">ig</span>
               </a>
             </div>

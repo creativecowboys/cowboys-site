@@ -1013,7 +1013,7 @@ export default function Home2Page() {
                 </li>
                 <li>
                   <a
-                    href="https://www.instagram.com/creativecowboys"
+                    href="https://www.instagram.com/creativecowboysmedia"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-h2-brand-primary transition-colors flex items-center gap-2"

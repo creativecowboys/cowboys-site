@@ -60,7 +60,7 @@ const defaultSections: Footer7Props["sections"] = [
 ];
 
 const defaultSocialLinks: Footer7Props["socialLinks"] = [
-    { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/creativecowboys", label: "Instagram" },
+    { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/creativecowboysmedia", label: "Instagram" },
     { icon: <FaFacebook size={18} />, href: "https://www.facebook.com/creativecowboys", label: "Facebook" },
     { icon: <FaTwitter size={18} />, href: "https://twitter.com/creativecowboys", label: "Twitter" },
     { icon: <FaLinkedin size={18} />, href: "https://www.linkedin.com/company/creativecowboys", label: "LinkedIn" },
