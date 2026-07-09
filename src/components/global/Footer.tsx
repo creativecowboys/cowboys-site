@@ -48,7 +48,7 @@ export default function Footer() {
           {/* Social Icons Badge Grid */}
           <div className="flex gap-4 mt-6">
             <a 
-              href="https://www.facebook.com/creativecowboyco" 
+              href="https://www.facebook.com/creativecowboys"
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-8 h-8 border border-[#F2EBDA] rotate-45 flex items-center justify-center hover:bg-[#F2EBDA] hover:text-[#0e0e0e] transition-colors duration-200 group"
