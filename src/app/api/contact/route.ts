@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     );
 
     const { error } = await resend.emails.send({
-      from: "Creative Cowboys <onboarding@resend.dev>",
+      from: "Creative Cowboys <howdy@creativecowboys.co>",
       to: [TO_EMAIL],
       replyTo: email || undefined,
       subject,
