@@ -1,189 +1,129 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, MapPin, CheckCircle2 } from "lucide-react";
-import FloatingNav from "@/components/FloatingNav";
-import { Footer7 } from "@/components/ui/footer-7";
+import CarrolltonClient from "@/components/CarrolltonClient";
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Agency in Carrollton, GA",
+  title: "Digital Marketing Agency in Carrollton, GA",
+  description:
+    "Creative Cowboys is a Carrollton, GA digital marketing agency. Local SEO, Google Ads, web design & social media advertising for Carroll County small businesses. Free consultation.",
+  alternates: { canonical: "/digital-marketing-carrollton-ga" },
+  keywords: [
+    "digital marketing agency Carrollton GA",
+    "SEO company Carrollton GA",
+    "Google Ads agency Carrollton",
+    "web design Carrollton GA",
+    "local SEO Carroll County",
+    "small business marketing West Georgia",
+  ],
+  openGraph: {
+    title: "Digital Marketing Agency in Carrollton, GA | Creative Cowboys",
     description:
-        "Creative Cowboys helps Carrollton, GA small businesses grow with local SEO, Google Ads, web design & social media advertising. Based in West Georgia. Free consultation available.",
-    alternates: { canonical: "/digital-marketing-carrollton-ga" },
-    openGraph: {
-        title: "Digital Marketing Agency in Carrollton, GA | Creative Cowboys",
-        description: "Local SEO, Google Ads, and web design for Carrollton, GA small businesses. Creative Cowboys — West Georgia's digital marketing agency.",
+      "Local SEO, Google Ads, and web design for Carrollton, GA small businesses. Creative Cowboys — West Georgia's no-fluff digital marketing agency.",
+    url: "https://www.creativecowboys.co/digital-marketing-carrollton-ga",
+    siteName: "Creative Cowboys",
+    type: "website",
+    images: [
+      {
+        url: "/Main%20logo%202.png",
+        width: 1200,
+        height: 630,
+        alt: "Creative Cowboys — Digital Marketing Agency in Carrollton, GA",
+      },
+    ],
+  },
+};
+
+const faqEntries = [
+  {
+    q: "How much does digital marketing cost in Carrollton, GA?",
+    a: "Most Carrollton small businesses start one of two ways: ongoing from $497/mo with $0 upfront, or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
+  },
+  {
+    q: "How long until I see SEO results in Carrollton?",
+    a: "Local SEO typically starts moving in 60–90 days, with meaningful Map Pack gains by months 3–6. Paid ads can generate leads within the first week. We target a 90-day payback.",
+  },
+  {
+    q: "Do you actually work with businesses in Carrollton?",
+    a: "Yes. We're based in Villa Rica, 15 minutes away, and work across Carroll County. We'll meet you in person — we're your neighbors, not a call center.",
+  },
+  {
+    q: "What makes you different from other Carrollton marketing agencies?",
+    a: "You work directly with the people doing the work — no offshore teams, no sales-rep hand-off. We publish our pricing, manage to revenue instead of vanity metrics, and say no when a project isn't a fit.",
+  },
+  {
+    q: "Can you get my business into the Google Map Pack?",
+    a: "That's our core local-SEO focus: Carrollton keyword targeting, Google Business Profile optimization, service-area pages, citations, and reviews — the exact signals that decide the Map Pack.",
+  },
+  {
+    q: "Do I own my website when you're done?",
+    a: "Always. Domain, files, design, and code all transfer to you. No hostage situations.",
+  },
+  {
+    q: "Do you build e-commerce stores?",
+    a: "Yes — Shopify, Stripe, and WooCommerce builds with checkout, cart recovery, and analytics.",
+  },
+  {
+    q: "How fast will my new site load?",
+    a: "We average 1.4 seconds. Speed is a ranking factor and a conversion factor, so we optimize every build for it.",
+  },
+  {
+    q: "Do you handle Google Ads as well as SEO?",
+    a: "Yes. Many Carrollton clients run both — ads for immediate leads while SEO compounds. We manage both to ROI with call tracking so you see exactly what's working.",
+  },
+  {
+    q: "What if I already have a website?",
+    a: "We'll audit it free. Sometimes a redesign makes sense; sometimes we just fix speed, SEO, and conversion issues on what you have. We'll tell you the truth either way.",
+  },
+];
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Digital Marketing in Carrollton, GA",
+  serviceType: "Digital Marketing Agency",
+  url: "https://www.creativecowboys.co/digital-marketing-carrollton-ga",
+  provider: {
+    "@type": "LocalBusiness",
+    name: "Creative Cowboys Media",
+    telephone: "+1-470-243-7517",
+    email: "howdy@creativecowboys.co",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "222 West Montgomery St",
+      addressLocality: "Villa Rica",
+      addressRegion: "GA",
+      postalCode: "30180",
+      addressCountry: "US",
     },
+  },
+  areaServed: {
+    "@type": "City",
+    name: "Carrollton",
+    containedInPlace: { "@type": "AdministrativeArea", name: "Carroll County, Georgia" },
+  },
 };
 
-const ORANGE = "#F15F2A";
-const DARK = "#0D0D0F";
-const CARD = "#15181e";
-
-const localSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "@id": "https://www.creativecowboys.co/#organization",
-    name: "Digital Marketing in Carrollton, GA | Creative Cowboys",
-    url: "https://www.creativecowboys.co",
-    telephone: "+14702437517",
-    address: { "@type": "PostalAddress", streetAddress: "222 West Montgomery St", addressLocality: "Villa Rica", addressRegion: "GA", postalCode: "30180", addressCountry: "US" },
-    areaServed: { "@type": "City", name: "Carrollton", containedIn: { "@type": "State", name: "Georgia" } },
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqEntries.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
 };
-
-const services = [
-    { label: "Local SEO for Carrollton Businesses", link: "/seo" },
-    { label: "Google Ads & PPC Management", link: "/ppc" },
-    { label: "Website Design & Development", link: "/web-design" },
-    { label: "Social Media Advertising", link: "/social-media-ads" },
-    { label: "Brand Strategy & Identity", link: "/brand-strategy" },
-    { label: "Video & Photography Production", link: "/media-creation" },
-];
-
-const localSEOItems = [
-    "Carrollton-specific keyword targeting",
-    "Google Business Profile optimization",
-    "On-page SEO for all service pages",
-    "Schema markup & technical SEO",
-    "Local citation building",
-    "Review generation system",
-];
-
-const otherCities = [
-    { label: "Villa Rica, GA", link: "/digital-marketing-villa-rica-ga" },
-    { label: "Douglasville, GA", link: "/digital-marketing-douglasville-ga" },
-    { label: "Newnan, GA", link: "/digital-marketing-newnan-ga" },
-];
 
 export default function CarrolltonPage() {
-    return (
-        <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localSchema) }} />
-            <style>{`
-        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-        .fu-1 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
-        .fu-2 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
-        .fu-3 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.30s both; }
-        @media (prefers-reduced-motion: reduce) { .fu-1,.fu-2,.fu-3 { animation: none; } }
-        .svc-link { display:flex; align-items:center; gap:10px; padding:18px 22px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; text-decoration:none; color:rgba(255,255,255,0.65); font-size:15px; font-weight:600; transition:background 200ms ease,border-color 200ms ease,color 200ms ease; }
-        .svc-link:hover { background:rgba(241,95,42,0.10); border-color:rgba(241,95,42,0.35); color:#fff; }
-        .cta-primary { background:${ORANGE}; transition:background 180ms ease,transform 180ms ease; }
-        .cta-primary:hover { background:#d04c1c; transform:translateY(-1px); }
-        .cta-ghost { transition:background 180ms ease; }
-        .cta-ghost:hover { background:rgba(255,255,255,0.09); }
-        .svc-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-        @media (max-width:640px) { .svc-grid { grid-template-columns:1fr; } }
-        .city-pill { padding:10px 20px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:999px; font-size:14px; color:rgba(255,255,255,0.55); text-decoration:none; font-weight:600; transition:background 180ms ease,border-color 180ms ease,color 180ms ease; }
-        .city-pill:hover { background:rgba(241,95,42,0.10); border-color:rgba(241,95,42,0.30); color:#fff; }
-      `}</style>
-
-            <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-                <Link href="/" style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
-                    <Image src="/Main%20logo%202.png" alt="Creative Cowboys Media" width={160} height={42} priority style={{ width: "160px", height: "auto" }} />
-                </Link>
-
-                {/* ── Hero (centered) ── */}
-                <section style={{ maxWidth: "900px", margin: "0 auto", padding: "160px 24px 100px", textAlign: "center", position: "relative" }}>
-                    <div aria-hidden style={{ position: "absolute", top: "60px", left: "50%", transform: "translateX(-50%)", width: "600px", height: "300px", background: "radial-gradient(ellipse, rgba(241,95,42,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
-                    <div className="fu-1" style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px", background: "rgba(241,95,42,0.12)", border: "1px solid rgba(241,95,42,0.25)", borderRadius: "999px", marginBottom: "24px" }}>
-                        <MapPin size={13} color={ORANGE} />
-                        <span style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: ORANGE }}>Carrollton, GA</span>
-                    </div>
-                    <h1 className="fu-2" style={{ fontSize: "clamp(36px, 6vw, 68px)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.03em", color: "#ffffff", margin: "0 0 24px" }}>
-                        Digital Marketing Agency{" "}
-                        <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, #EA51FF 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>in Carrollton, GA.</span>
-                    </h1>
-                    <p className="fu-3" style={{ fontSize: "clamp(16px, 2vw, 19px)", lineHeight: 1.7, color: "rgba(255,255,255,0.48)", marginBottom: "44px", maxWidth: "640px", marginInline: "auto" }}>
-                        Creative Cowboys helps Carrollton small businesses get found on Google, run ads that generate real leads, and build websites that convert visitors into customers. West Georgia-based. Zero fluff.
-                    </p>
-                    <div className="fu-3" style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
-                        <Link href="/contact" className="cta-primary" style={{ padding: "14px 32px", color: "#fff", fontWeight: 700, fontSize: "15px", borderRadius: "10px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                            Get a Free Consultation <ArrowRight size={17} />
-                        </Link>
-                        <Link href="/results" className="cta-ghost" style={{ padding: "14px 32px", color: "#fff", fontWeight: 600, fontSize: "15px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", textDecoration: "none" }}>
-                            See Our Results
-                        </Link>
-                    </div>
-                </section>
-
-                {/* ── About (left-aligned) ── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "840px", margin: "0 auto", textAlign: "center" }}>
-                        <h2 style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 20px" }}>Digital Marketing for Carrollton, GA Small Businesses</h2>
-                        <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(255,255,255,0.50)", marginBottom: "16px" }}>
-                            Carrollton is one of West Georgia&rsquo;s most active small business markets — a university town with a growing professional and consumer base. Competition for local search visibility is real, and the businesses that invest in their digital presence are capturing the majority of local search traffic.
-                        </p>
-                        <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(255,255,255,0.50)", marginBottom: "16px" }}>
-                            We work with Carrollton businesses across industries — from professional services and retail to contractors and healthcare — to build the kind of digital presence that drives consistent, qualified leads from local search.
-                        </p>
-                        <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(255,255,255,0.50)" }}>
-                            Our team is based just down the road in Villa Rica — we&rsquo;re your neighbors, not an out-of-town agency. <Link href="/results" style={{ color: ORANGE, textDecoration: "none", fontWeight: 600 }}>See our results for real West Georgia clients →</Link>
-                        </p>
-                    </div>
-                </section>
-
-                {/* ── Services (left-aligned) ── */}
-                <section style={{ padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "840px", margin: "0 auto", textAlign: "center" }}>
-                        <h2 style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", margin: "0 0 12px" }}>Our Digital Marketing Services for Carrollton Businesses</h2>
-                        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.45)", marginBottom: "40px", lineHeight: 1.7 }}>From local SEO to paid advertising to web design — integrated marketing systems that drive measurable growth.</p>
-                        <div className="svc-grid">
-                            {services.map(({ label, link }) => (
-                                <Link key={label} href={link} className="svc-link">
-                                    <ArrowRight size={15} color={ORANGE} style={{ flexShrink: 0 }} />
-                                    {label}
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── Local SEO (left-aligned) ── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "840px", margin: "0 auto", textAlign: "center" }}>
-                        <p style={{ fontSize: "17px", lineHeight: 1.8, color: "rgba(255,255,255,0.50)", marginBottom: "32px" }}>
-                            When someone in Carrollton searches for your service, are you in the Map Pack? If not, you&rsquo;re invisible to the buyers most likely to convert. Our local SEO work focuses on getting Carrollton small businesses into those top positions — and keeping them there.
-                        </p>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
-                            {localSEOItems.map(item => (
-                                <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                                    <CheckCircle2 size={16} color={ORANGE} style={{ flexShrink: 0, marginTop: "3px" }} />
-                                    <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.60)" }}>{item}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── Other Local Pages (left-aligned) ── */}
-                <section style={{ padding: "80px 24px" }}>
-                    <div style={{ maxWidth: "840px", margin: "0 auto", textAlign: "center" }}>
-                        <h2 style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 800, color: "#fff", margin: "0 0 12px" }}>Also Serving West Georgia</h2>
-                        <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.45)", marginBottom: "24px" }}>We work with businesses across the entire West Georgia area:</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
-                            {otherCities.map(({ label, link }) => (
-                                <Link key={label} href={link} className="city-pill">{label}</Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── CTA (centered) ── */}
-                <section style={{ background: CARD, borderTop: "1px solid rgba(255,255,255,0.05)", padding: "120px 24px", textAlign: "center" }}>
-                    <div style={{ maxWidth: "640px", margin: "0 auto" }}>
-                        <h2 style={{ fontSize: "clamp(32px, 5vw, 54px)", fontWeight: 900, letterSpacing: "-0.035em", color: "#fff", margin: "0 0 20px" }}>
-                            Ready to grow your Carrollton business?
-                        </h2>
-                        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.45)", marginBottom: "40px", lineHeight: 1.7 }}>Free consultation from your West Georgia neighbors.</p>
-                        <Link href="/contact" className="cta-primary" style={{ padding: "16px 40px", color: "#fff", fontWeight: 700, fontSize: "16px", borderRadius: "10px", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px" }}>
-                            Get Your Free Consultation <ArrowRight size={18} />
-                        </Link>
-                    </div>
-                </section>
-
-                <Footer7 />
-            </div>
-            <FloatingNav />
-        </>
-    );
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <CarrolltonClient />
+    </>
+  );
 }
