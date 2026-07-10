@@ -214,7 +214,7 @@ export default function PrivacyPolicyPage() {
 
                     <p style={{ ...bodyStyle, marginBottom: "48px" }}>
                         <strong style={{ color: "rgba(255,255,255,0.40)", fontWeight: 500 }}>
-                            Last Updated: March 25, 2026
+                            Last Updated: July 10, 2026
                         </strong>
                     </p>
 
@@ -362,8 +362,68 @@ export default function PrivacyPolicyPage() {
 
                     <Divider />
 
-                    {/* ── 5. Third-Party Services ── */}
-                    <SectionHeading>5. Third-Party Services</SectionHeading>
+                    {/* ── 5. Mobile Information & SMS Messaging ── */}
+                    <SectionHeading>5. Mobile Information &amp; SMS Messaging</SectionHeading>
+                    <p style={bodyStyle}>
+                        When you provide your mobile phone number and opt in, we use it only to send the messages you
+                        requested and related service messages (such as follow-ups, confirmations, and appointment or
+                        demo reminders).
+                    </p>
+                    <p style={bodyStyle}>
+                        <strong style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
+                            No mobile information will be shared with third parties or affiliates for marketing or
+                            promotional purposes. Text messaging originator opt-in data and consent will not be shared
+                            with any third parties.
+                        </strong>
+                    </p>
+                    <p style={bodyStyle}>
+                        Message frequency varies. Message and data rates may apply. Reply{" "}
+                        <strong style={{ color: "#ffffff" }}>STOP</strong> to opt out or{" "}
+                        <strong style={{ color: "#ffffff" }}>HELP</strong> for help.
+                    </p>
+                    <p style={bodyStyle}>
+                        For more detail, see our{" "}
+                        <Link
+                            href="/sms-terms"
+                            style={{ color: "#F15F2A", textDecoration: "underline", textDecorationColor: "rgba(241,95,42,0.4)" }}
+                        >
+                            SMS Terms &amp; Conditions
+                        </Link>
+                        . For questions, contact:
+                    </p>
+                    <div
+                        style={{
+                            background: "rgba(255,255,255,0.03)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                            borderRadius: "12px",
+                            padding: "24px",
+                        }}
+                    >
+                        <p style={{ fontSize: "15px", fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
+                            Creative Cowboys Media, LLC
+                        </p>
+                        <p style={{ ...bodyStyle, margin: "0 0 4px" }}>222 W Montgomery St, Villa Rica, GA 30180</p>
+                        <p style={{ ...bodyStyle, margin: "0 0 4px" }}>
+                            Email:{" "}
+                            <a
+                                href="mailto:support@creativecowboys.co"
+                                style={{ color: "#F15F2A", textDecoration: "none" }}
+                            >
+                                support@creativecowboys.co
+                            </a>
+                        </p>
+                        <p style={{ ...bodyStyle, margin: 0 }}>
+                            Phone:{" "}
+                            <a href="tel:+14702437517" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                                470-243-7517
+                            </a>
+                        </p>
+                    </div>
+
+                    <Divider />
+
+                    {/* ── 6. Third-Party Services ── */}
+                    <SectionHeading>6. Third-Party Services</SectionHeading>
                     <p style={bodyStyle}>
                         We use a small set of trusted third-party tools to run our business. Here&rsquo;s who they are
                         and what they do:
@@ -418,7 +478,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 6. Data Retention ── */}
-                    <SectionHeading>6. Data Retention</SectionHeading>
+                    <SectionHeading>7. Data Retention</SectionHeading>
                     <p style={bodyStyle}>
                         We retain your personal information only as long as necessary to fulfill the purposes described
                         in this policy or as required by law.
@@ -435,7 +495,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 7. Your Rights ── */}
-                    <SectionHeading>7. Your Rights</SectionHeading>
+                    <SectionHeading>8. Your Rights</SectionHeading>
                     <p style={bodyStyle}>You have rights over your personal data:</p>
                     <BulletList
                         items={[
@@ -464,7 +524,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 8. Cookies ── */}
-                    <SectionHeading>8. Cookies Policy</SectionHeading>
+                    <SectionHeading>9. Cookies Policy</SectionHeading>
                     <p style={bodyStyle}>
                         Our website uses cookies to improve your experience and enable key features.
                     </p>
@@ -527,7 +587,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 9. Security ── */}
-                    <SectionHeading>9. Security</SectionHeading>
+                    <SectionHeading>10. Security</SectionHeading>
                     <p style={bodyStyle}>
                         We take reasonable technical and organizational measures to protect your data from unauthorized
                         access, loss, or misuse. No method of transmission over the internet is 100% secure. If you
@@ -537,7 +597,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 10. Changes ── */}
-                    <SectionHeading>10. Changes to This Policy</SectionHeading>
+                    <SectionHeading>11. Changes to This Policy</SectionHeading>
                     <p style={bodyStyle}>
                         We may update this Privacy Policy from time to time. When we do, we&rsquo;ll update the
                         &ldquo;Last Updated&rdquo; date at the top of this page. Continued use of our website after
@@ -547,7 +607,7 @@ export default function PrivacyPolicyPage() {
                     <Divider />
 
                     {/* ── 11. Contact ── */}
-                    <SectionHeading>11. Contact Us</SectionHeading>
+                    <SectionHeading>12. Contact Us</SectionHeading>
                     <div
                         style={{
                             background: "rgba(241,95,42,0.06)",
