@@ -622,14 +622,16 @@ export default function SquirrelMadeProposal() {
         ).join("\n");
 
         const payload = {
-            name: contactName,
+            access_key: "aeffe4bc-f0e5-45ed-a62b-b2f1f7ea9a07",
+            subject: `[Squirrel Made Proposal] New Service Selection — ${new Date().toLocaleDateString()}`,
+            from_name: contactName,
             email: contactEmail,
-            source: "Squirrel Made — Proposal Page",
+            replyto: contactEmail,
             message: `New proposal selection submitted by ${contactName} (${contactEmail}).\n\nSELECTED SERVICES:\n${servicesList}\n\nMonthly Total: $${monthlyTotal.toLocaleString()}/mo${oneTimeTotal > 0 ? `\nOne-Time Total: $${oneTimeTotal.toLocaleString()}` : ""}`,
         };
 
         try {
-            const r = await fetch("/api/contact", {
+            const r = await fetch("https://api.web3forms.com/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Accept: "application/json" },
                 body: JSON.stringify(payload),
