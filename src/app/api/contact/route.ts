@@ -4,7 +4,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Where all form leads get emailed
-const TO_EMAIL = "dave@creativecowboys.co";
+const TO_EMAILS = ["dave@creativecowboys.co", "keaton@creativecowboys.co"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const { error } = await resend.emails.send({
       from: "Creative Cowboys <howdy@creativecowboys.co>",
-      to: [TO_EMAIL],
+      to: TO_EMAILS,
       replyTo: email || undefined,
       subject,
       html: htmlLines.join("\n"),
