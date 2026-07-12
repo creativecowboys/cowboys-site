@@ -604,16 +604,14 @@ export default function PilgrimLawProposal() {
     ).join("\n");
 
     const payload = {
-      access_key: "aeffe4bc-f0e5-45ed-a62b-b2f1f7ea9a07",
-      subject: `[Pilgrim Law Proposal] New Service Selection — ${new Date().toLocaleDateString()}`,
-      from_name: contactName,
+      name: contactName,
       email: contactEmail,
-      replyto: contactEmail,
+      source: "Pilgrim Law — Proposal Page",
       message: `New proposal selection submitted by ${contactName} (${contactEmail}).\n\nSELECTED SERVICES:\n${servicesList}\n\nMonthly Total: $${monthlyTotal.toLocaleString()}/mo${oneTimeTotal > 0 ? `\nOne-Time Total: $${oneTimeTotal.toLocaleString()}` : ""}`,
     };
 
     try {
-      const r1 = await fetch("https://api.web3forms.com/submit", {
+      const r1 = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
