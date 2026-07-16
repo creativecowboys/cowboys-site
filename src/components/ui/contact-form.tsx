@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ArrowUpRight, Check } from 'lucide-react';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
+
+const SELECT_ARROW =
+    "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230a0a0a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")";
 
 export default function ContactForm() {
     const [status, setStatus] = useState<FormState>('idle');
@@ -28,57 +32,19 @@ export default function ContactForm() {
         }
     };
 
-    const inputStyle: React.CSSProperties = {
-        width: '100%',
-        padding: '14px 16px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.10)',
-        borderRadius: '12px',
-        color: '#ffffff',
-        fontSize: '15px',
-        fontFamily: 'inherit',
-        outline: 'none',
-        transition: 'border-color 250ms ease, background 250ms ease',
-        boxSizing: 'border-box',
-    };
-
-    const labelStyle: React.CSSProperties = {
-        display: 'block',
-        fontSize: '12px',
-        fontWeight: 600,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        color: 'rgba(255,255,255,0.45)',
-        marginBottom: '8px',
-    };
+    const labelCls =
+        "block font-anton text-[10px] tracking-[1.5px] text-[#0a0a0a] uppercase mb-1.5";
+    const inputCls =
+        "w-full border-[2.5px] border-[#0a0a0a] bg-[#F2EBDA] p-3 font-inter text-sm text-[#0a0a0a] outline-none focus:bg-white transition-colors placeholder:text-[#0a0a0a]/40";
 
     if (status === 'success') {
         return (
-            <div style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(241,95,42,0.30)',
-                borderRadius: '24px',
-                padding: '64px 40px',
-                textAlign: 'center',
-            }}>
-                <div style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #F15F2A, #EA51FF)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 24px',
-                }}>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                        <path d="M20 6L9 17l-5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+            <div className="bg-white border-4 border-[#0a0a0a] shadow-[6px_6px_0px_#1a1a1a] p-8 md:p-10 text-center flex flex-col items-center gap-4">
+                <div className="w-14 h-14 bg-[#008f4c] border-[3px] border-[#0a0a0a] flex items-center justify-center shadow-[3px_3px_0px_#1a1a1a]">
+                    <Check size={26} className="text-white" strokeWidth={3} />
                 </div>
-                <h3 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 800, margin: '0 0 12px' }}>
-                    Message Sent!
-                </h3>
-                <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: '15px', margin: 0, lineHeight: 1.6 }}>
+                <h3 className="font-anton text-3xl md:text-4xl uppercase text-[#0a0a0a] leading-none">Message Sent!</h3>
+                <p className="font-inter text-sm text-[#0a0a0a]/70 max-w-xs leading-relaxed">
                     We&rsquo;ll be in touch within one business day. Talk soon, partner.
                 </p>
             </div>
@@ -87,31 +53,15 @@ export default function ContactForm() {
 
     if (status === 'error') {
         return (
-            <div style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,60,60,0.30)',
-                borderRadius: '24px',
-                padding: '64px 40px',
-                textAlign: 'center',
-            }}>
-                <h3 style={{ color: '#ffffff', fontSize: '24px', fontWeight: 800, margin: '0 0 12px' }}>
-                    Something went wrong
-                </h3>
-                <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: '15px', margin: '0 0 24px', lineHeight: 1.6 }}>
-                    Your message couldn&rsquo;t be sent. Please try again or email us directly at howdy@creativecowboys.co
+            <div className="bg-white border-4 border-[#0a0a0a] shadow-[6px_6px_0px_#1a1a1a] p-8 md:p-10 text-center flex flex-col items-center gap-4">
+                <h3 className="font-anton text-3xl md:text-4xl uppercase text-[#B5330E] leading-none">Something Went Wrong</h3>
+                <p className="font-inter text-sm text-[#0a0a0a]/70 max-w-xs leading-relaxed">
+                    Your message couldn&rsquo;t be sent. Please try again, or email us directly at{' '}
+                    <a href="mailto:howdy@creativecowboys.co" className="font-bold text-[#B5330E] underline">howdy@creativecowboys.co</a>.
                 </p>
                 <button
                     onClick={() => setStatus('idle')}
-                    style={{
-                        padding: '12px 28px',
-                        background: '#F15F2A',
-                        border: 'none',
-                        borderRadius: '10px',
-                        color: '#fff',
-                        fontSize: '14px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                    }}
+                    className="mt-1 border-[3px] border-[#0a0a0a] bg-[#B5330E] text-[#F2EBDA] font-bold uppercase tracking-wider text-xs px-6 py-3 shadow-[4px_4px_0px_#1a1a1a] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#1a1a1a] transition-all cursor-pointer"
                 >
                     Try Again
                 </button>
@@ -120,167 +70,69 @@ export default function ContactForm() {
     }
 
     return (
-        <>
-            <style>{`
-        .contact-input:focus {
-          border-color: rgba(241,95,42,0.60) !important;
-          background: rgba(255,255,255,0.08) !important;
-        }
-        .contact-input::placeholder { color: rgba(255,255,255,0.20); }
-        .contact-select option { background: #1a1210; color: #fff; }
-        .contact-submit:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 12px 40px rgba(241,95,42,0.35);
-        }
-        .contact-submit:active:not(:disabled) { transform: translateY(0); }
-        .contact-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-      `}</style>
-
-            <form
-                onSubmit={handleSubmit}
-                style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '24px',
-                    padding: '40px',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '24px',
-                }}
-            >
-                {/* Row: Name + Email */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="form-row">
-                    <div>
-                        <label style={labelStyle} htmlFor="name">Name</label>
-                        <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            required
-                            placeholder="Jake Rivera"
-                            value={form.name}
-                            onChange={handleChange}
-                            className="contact-input"
-                            style={inputStyle}
-                        />
-                    </div>
-                    <div>
-                        <label style={labelStyle} htmlFor="email">Email</label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            required
-                            placeholder="jake@company.com"
-                            value={form.email}
-                            onChange={handleChange}
-                            className="contact-input"
-                            style={inputStyle}
-                        />
-                    </div>
-                </div>
-
-                {/* Company */}
+        <form onSubmit={handleSubmit} className="bg-white border-4 border-[#0a0a0a] shadow-[6px_6px_0px_#1a1a1a] p-6 md:p-8 flex flex-col gap-5">
+            {/* Name + Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label style={labelStyle} htmlFor="company">Company / Business Name</label>
-                    <input
-                        id="company"
-                        name="company"
-                        type="text"
-                        placeholder="Lone Star HVAC"
-                        value={form.company}
-                        onChange={handleChange}
-                        className="contact-input"
-                        style={inputStyle}
-                    />
+                    <label className={labelCls} htmlFor="name">Name *</label>
+                    <input id="name" name="name" type="text" required placeholder="Jake Rivera"
+                        value={form.name} onChange={handleChange} className={inputCls} />
                 </div>
-
-                {/* Phone (optional) */}
                 <div>
-                    <label style={labelStyle} htmlFor="phone">Phone (optional)</label>
-                    <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        placeholder="(555) 555-5555"
-                        value={form.phone}
-                        onChange={handleChange}
-                        className="contact-input"
-                        style={inputStyle}
-                    />
+                    <label className={labelCls} htmlFor="email">Email *</label>
+                    <input id="email" name="email" type="email" required placeholder="jake@company.com"
+                        value={form.email} onChange={handleChange} className={inputCls} />
                 </div>
+            </div>
 
-                {/* Service */}
+            {/* Phone + Company */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label style={labelStyle} htmlFor="service">What do you need?</label>
-                    <select
-                        id="service"
-                        name="service"
-                        value={form.service}
-                        onChange={handleChange}
-                        className="contact-input contact-select"
-                        style={{ ...inputStyle, cursor: 'pointer' }}
-                    >
-                        <option value="">Select a service...</option>
-                        <option value="web-design">Web Design</option>
-                        <option value="branding">Branding & Identity</option>
-                        <option value="digital-marketing">Digital Marketing</option>
-                        <option value="seo">SEO</option>
-                        <option value="full-package">Full Package</option>
-                        <option value="other">Something Else</option>
-                    </select>
+                    <label className={labelCls} htmlFor="phone">Phone (optional)</label>
+                    <input id="phone" name="phone" type="tel" placeholder="(555) 555-5555"
+                        value={form.phone} onChange={handleChange} className={inputCls} />
                 </div>
-
-                {/* Message */}
                 <div>
-                    <label style={labelStyle} htmlFor="message">Tell us about your project</label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        required
-                        rows={5}
-                        placeholder="Give us the quick rundown — what you do, what you're trying to fix or build, and any details that help."
-                        value={form.message}
-                        onChange={handleChange}
-                        className="contact-input"
-                        style={{ ...inputStyle, resize: 'vertical', minHeight: '120px' }}
-                    />
+                    <label className={labelCls} htmlFor="company">Company / Business</label>
+                    <input id="company" name="company" type="text" placeholder="Lone Star HVAC"
+                        value={form.company} onChange={handleChange} className={inputCls} />
                 </div>
+            </div>
 
-                {/* Submit */}
-                <button
-                    type="submit"
-                    disabled={status === 'loading'}
-                    className="contact-submit"
-                    style={{
-                        padding: '16px 32px',
-                        background: 'linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)',
-                        border: 'none',
-                        borderRadius: '12px',
-                        color: '#ffffff',
-                        fontSize: '15px',
-                        fontWeight: 700,
-                        fontFamily: 'inherit',
-                        cursor: 'pointer',
-                        transition: 'transform 250ms ease, box-shadow 250ms ease, opacity 250ms ease',
-                        letterSpacing: '0.02em',
-                    }}
-                >
-                    {status === 'loading' ? 'Sending...' : 'Send Message \u2192'}
-                </button>
+            {/* Service */}
+            <div>
+                <label className={labelCls} htmlFor="service">What do you need?</label>
+                <select id="service" name="service" value={form.service} onChange={handleChange}
+                    className={`${inputCls} cursor-pointer appearance-none bg-no-repeat`}
+                    style={{ backgroundImage: SELECT_ARROW, backgroundPosition: 'right 12px center', backgroundSize: '18px' }}>
+                    <option value="">Select a service...</option>
+                    <option value="web-design">Web Design</option>
+                    <option value="branding">Branding &amp; Identity</option>
+                    <option value="digital-marketing">Digital Marketing</option>
+                    <option value="seo">SEO</option>
+                    <option value="full-package">Full Package</option>
+                    <option value="other">Something Else</option>
+                </select>
+            </div>
 
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', textAlign: 'center', margin: 0 }}>
-                    We typically respond within one business day.
-                </p>
-            </form>
+            {/* Message */}
+            <div>
+                <label className={labelCls} htmlFor="message">Tell us about your project</label>
+                <textarea id="message" name="message" required rows={5}
+                    placeholder="Give us the quick rundown — what you do, what you're trying to fix or build, and any details that help."
+                    value={form.message} onChange={handleChange}
+                    className={`${inputCls} resize-y min-h-[120px]`} />
+            </div>
 
-            <style>{`
-        @media (max-width: 480px) {
-          .form-row { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-        </>
+            {/* Submit */}
+            <button type="submit" disabled={status === 'loading'}
+                className="w-full border-[3px] border-[#0a0a0a] bg-[#B5330E] text-[#F2EBDA] font-bold uppercase tracking-wider text-sm px-8 py-4 shadow-[4px_4px_0px_#1a1a1a] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#1a1a1a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
+                {status === 'loading' ? 'Sending…' : <>Send Message <ArrowUpRight size={18} /></>}
+            </button>
+
+            <p className="font-inter text-[11px] text-[#0a0a0a]/50 text-center">
+                We typically respond within one business day.
+            </p>
+        </form>
     );
 }
