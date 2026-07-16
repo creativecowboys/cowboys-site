@@ -367,7 +367,8 @@ export default function PrivacyPolicyPage() {
                     <p style={bodyStyle}>
                         When you provide your mobile phone number and opt in, we use it only to send the messages you
                         requested and related service messages (such as follow-ups, confirmations, and appointment or
-                        demo reminders).
+                        demo reminders). If you are a Creative Cowboys client and opt in, we also use your mobile number
+                        to alert you when a lead submits a web form on your website.
                     </p>
                     <p style={bodyStyle}>
                         <strong style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600 }}>
@@ -617,9 +618,9 @@ export default function PrivacyPolicyPage() {
                         }}
                     >
                         <p style={{ fontSize: "15px", fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
-                            Creative Cowboys
+                            Creative Cowboys Media, LLC
                         </p>
-                        <p style={{ ...bodyStyle, margin: "0 0 4px" }}>West Georgia, USA</p>
+                        <p style={{ ...bodyStyle, margin: "0 0 4px" }}>222 W Montgomery St, Villa Rica, GA 30180</p>
                         <p style={{ ...bodyStyle, margin: "0 0 4px" }}>
                             Email:{" "}
                             <a
@@ -627,6 +628,12 @@ export default function PrivacyPolicyPage() {
                                 style={{ color: "#F15F2A", textDecoration: "none" }}
                             >
                                 support@creativecowboys.co
+                            </a>
+                        </p>
+                        <p style={{ ...bodyStyle, margin: "0 0 4px" }}>
+                            Phone:{" "}
+                            <a href="tel:+14702437517" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                                470-243-7517
                             </a>
                         </p>
                         <p style={{ ...bodyStyle, margin: 0 }}>

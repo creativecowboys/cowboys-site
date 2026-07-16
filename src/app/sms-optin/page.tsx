@@ -5,14 +5,14 @@ import { Footer7 } from "@/components/ui/footer-7";
 import FloatingNav from "@/components/FloatingNav";
 
 export const metadata: Metadata = {
-    title: "SMS Terms & Conditions",
+    title: "SMS Opt-In",
     description:
-        "SMS Terms & Conditions for Creative Cowboys Media, LLC — how our text messaging program works, including opt-in, opt-out, message frequency, and support.",
-    alternates: { canonical: "/sms-terms" },
+        "How consumers and Creative Cowboys clients opt in to receive text messages from Creative Cowboys Media, LLC — the opt-in flow, consent language, and program details.",
+    alternates: { canonical: "/sms-optin" },
     openGraph: {
-        title: "SMS Terms & Conditions | Creative Cowboys",
+        title: "SMS Opt-In | Creative Cowboys",
         description:
-            "How Creative Cowboys Media, LLC's text messaging program works — opt-in, opt-out, frequency, and support.",
+            "How you opt in to receive text messages from Creative Cowboys Media, LLC — opt-in flow, consent language, and program details.",
     },
 };
 
@@ -46,6 +46,23 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     );
 }
 
+/* ─── Sub-heading ───────────────────────────────────────────────── */
+function SubHeading({ children }: { children: React.ReactNode }) {
+    return (
+        <h3
+            style={{
+                fontSize: "16px",
+                fontWeight: 600,
+                color: "#F15F2A",
+                margin: "32px 0 12px",
+                letterSpacing: "0.01em",
+            }}
+        >
+            {children}
+        </h3>
+    );
+}
+
 /* ─── Body text ─────────────────────────────────────────────────── */
 const bodyStyle: React.CSSProperties = {
     fontSize: "clamp(14px, 1.4vw, 16px)",
@@ -54,24 +71,54 @@ const bodyStyle: React.CSSProperties = {
     margin: "0 0 16px",
 };
 
-/* ─── External link ─────────────────────────────────────────────── */
-function XLink({ href, children }: { href: string; children: React.ReactNode }) {
+/* ─── Internal link ─────────────────────────────────────────────── */
+function ILink({ href, children }: { href: string; children: React.ReactNode }) {
     return (
-        <a
+        <Link
             href={href}
-            target="_blank"
-            rel="noopener noreferrer"
             style={{ color: "#F15F2A", textDecoration: "underline", textDecorationColor: "rgba(241,95,42,0.4)" }}
         >
             {children}
-        </a>
+        </Link>
+    );
+}
+
+/* ─── Placeholder: opt-in screenshot slot (pending Josh) ───────── */
+function ScreenshotPlaceholder({ label }: { label: string }) {
+    return (
+        <div
+            style={{
+                border: "1px dashed rgba(241,95,42,0.45)",
+                borderRadius: "12px",
+                background: "rgba(241,95,42,0.04)",
+                padding: "40px 24px",
+                textAlign: "center",
+                margin: "16px 0 8px",
+            }}
+        >
+            <p
+                style={{
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#F15F2A",
+                    margin: "0 0 6px",
+                }}
+            >
+                Screenshot placeholder
+            </p>
+            <p style={{ ...bodyStyle, margin: 0, fontSize: "13px", color: "rgba(255,255,255,0.45)" }}>{label}</p>
+        </div>
     );
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   PAGE
+   PAGE  —  SCAFFOLD
+   Final opt-in copy + screenshots pending from Josh. Placeholder blocks
+   below are marked and should be replaced once the opt-in flow is finalized.
 ══════════════════════════════════════════════════════════════════ */
-export default function SmsTermsPage() {
+export default function SmsOptInPage() {
     return (
         <>
             <main
@@ -169,7 +216,7 @@ export default function SmsTermsPage() {
                             margin: "0 0 16px",
                         }}
                     >
-                        SMS Terms &amp;{" "}
+                        SMS{" "}
                         <span
                             style={{
                                 background: "linear-gradient(135deg, #F15F2A 0%, #EA51FF 100%)",
@@ -178,7 +225,7 @@ export default function SmsTermsPage() {
                                 backgroundClip: "text",
                             }}
                         >
-                            Conditions
+                            Opt-In
                         </span>
                     </h1>
 
@@ -188,103 +235,86 @@ export default function SmsTermsPage() {
                         </strong>
                     </p>
 
-                    {/* ── 1. Programs ── */}
-                    <SectionHeading>1. Programs</SectionHeading>
+                    {/* ── Overview ── */}
+                    <SectionHeading>How Opt-In Works</SectionHeading>
                     <p style={bodyStyle}>
-                        Creative Cowboys Media, LLC operates two text message programs:
-                    </p>
-                    <p style={bodyStyle}>
-                        <strong style={{ color: "#ffffff" }}>(a) Client Lead Alerts.</strong> If you are a Creative Cowboys
-                        client, we text you when someone submits a web form on your website, so you know a lead has come in
-                        and can follow up. Message frequency depends on how many submissions your site receives.
-                    </p>
-                    <p style={bodyStyle}>
-                        <strong style={{ color: "#ffffff" }}>(b) Inquiry Messages.</strong> When you provide your mobile
-                        number and opt in through our website, our AI chat/voice agent, or a form, we send the
-                        informational messages you request — links, follow-ups, confirmations, and appointment or demo
-                        reminders related to your inquiry.
+                        Creative Cowboys Media, LLC operates two text message programs. Opt-in is always affirmative —
+                        you provide your mobile number and give consent before we ever text you. This page documents how
+                        each opt-in flow works.
                     </p>
 
                     <Divider />
 
-                    {/* ── 2. Opt-in / consent ── */}
-                    <SectionHeading>2. Opt-in / Consent</SectionHeading>
+                    {/* ── Program (a): Client Lead Alerts ── */}
+                    <SectionHeading>Client Lead Alerts (for Creative Cowboys clients)</SectionHeading>
                     <p style={bodyStyle}>
-                        You opt in by providing your mobile number and giving affirmative consent (for example, checking
-                        a non-pre-checked box or confirming in our chat). SMS consent is optional and is not a condition
-                        of purchasing any goods or services.
+                        If you are a Creative Cowboys client, you can opt in to receive a text alert whenever a lead
+                        submits a web form on your website, so you can follow up quickly.
+                    </p>
+
+                    <SubHeading>Opt-in steps</SubHeading>
+                    <p style={bodyStyle}>
+                        {/* TODO(Josh): replace with the finalized step-by-step opt-in flow */}
+                        [Placeholder — pending the finalized opt-in flow from Josh. This will list the exact steps a
+                        client takes to opt in, e.g. where they enter their mobile number and check the consent box.]
+                    </p>
+                    <ScreenshotPlaceholder label="Screenshot of the client opt-in form / consent checkbox — pending from Josh" />
+
+                    <SubHeading>Consent language shown at opt-in</SubHeading>
+                    <p style={bodyStyle}>
+                        &ldquo;By providing your mobile number and checking the box, you agree to receive text messages
+                        from Creative Cowboys Media, LLC alerting you when a lead submits a web form on your website.
+                        Message frequency depends on your form volume. Message and data rates may apply. Reply STOP to opt
+                        out, HELP for help. Consent is not a condition of any purchase or service.&rdquo;
                     </p>
 
                     <Divider />
 
-                    {/* ── 3. Message frequency ── */}
-                    <SectionHeading>3. Message Frequency</SectionHeading>
-                    <p style={bodyStyle}>Message frequency varies based on your interactions with us.</p>
-
-                    <Divider />
-
-                    {/* ── 4. Cost ── */}
-                    <SectionHeading>4. Cost</SectionHeading>
-                    <p style={bodyStyle}>Message and data rates may apply.</p>
-
-                    <Divider />
-
-                    {/* ── 5. Opt-out ── */}
-                    <SectionHeading>5. Opt-out</SectionHeading>
+                    {/* ── Program (b): Inquiry Messages ── */}
+                    <SectionHeading>Inquiry Messages (for website visitors)</SectionHeading>
                     <p style={bodyStyle}>
-                        Reply <strong style={{ color: "#ffffff" }}>STOP</strong> at any time to unsubscribe. You will
-                        receive a one-time confirmation and no further messages.
+                        When you provide your mobile number and opt in through our website, our AI chat/voice agent, or a
+                        form, we send the informational messages you request — links, follow-ups, confirmations, and
+                        appointment or demo reminders related to your inquiry.
+                    </p>
+
+                    <SubHeading>Opt-in steps</SubHeading>
+                    <p style={bodyStyle}>
+                        {/* TODO(Josh): replace with the finalized step-by-step opt-in flow */}
+                        [Placeholder — pending the finalized opt-in flow from Josh. This will list the exact steps a
+                        visitor takes to opt in via the website form or chat/voice agent.]
+                    </p>
+                    <ScreenshotPlaceholder label="Screenshot of the website form / chat opt-in with consent checkbox — pending from Josh" />
+
+                    <SubHeading>Consent language shown at opt-in</SubHeading>
+                    <p style={bodyStyle}>
+                        &ldquo;By providing your mobile number and checking this box (or confirming in our chat), you
+                        agree to receive text messages from Creative Cowboys Media, LLC related to your request or
+                        inquiry. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP
+                        for help. Consent is not a condition of any purchase.&rdquo;
                     </p>
 
                     <Divider />
 
-                    {/* ── 6. Help ── */}
-                    <SectionHeading>6. Help</SectionHeading>
+                    {/* ── Frequency, rates, opt-out ── */}
+                    <SectionHeading>Frequency, Rates &amp; Opt-Out</SectionHeading>
                     <p style={bodyStyle}>
-                        Reply <strong style={{ color: "#ffffff" }}>HELP</strong> for help, or contact us at{" "}
-                        <a
-                            href="mailto:support@creativecowboys.co"
-                            style={{ color: "#F15F2A", textDecoration: "none" }}
-                        >
+                        Message frequency varies by program and your activity. Message and data rates may apply. You can
+                        opt out at any time by replying <strong style={{ color: "#ffffff" }}>STOP</strong>, or get help by
+                        replying <strong style={{ color: "#ffffff" }}>HELP</strong> — or contact us at{" "}
+                        <a href="mailto:support@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
                             support@creativecowboys.co
                         </a>{" "}
-                        or{" "}
+                        /{" "}
                         <a href="tel:+14702437517" style={{ color: "#F15F2A", textDecoration: "none" }}>
                             470-243-7517
                         </a>
                         .
                     </p>
-
-                    <Divider />
-
-                    {/* ── 7. Carriers ── */}
-                    <SectionHeading>7. Carriers</SectionHeading>
-                    <p style={bodyStyle}>Carriers are not liable for delayed or undelivered messages.</p>
-
-                    <Divider />
-
-                    {/* ── 8. Privacy ── */}
-                    <SectionHeading>8. Privacy</SectionHeading>
                     <p style={bodyStyle}>
-                        See our{" "}
-                        <Link
-                            href="/privacy-policy"
-                            style={{ color: "#F15F2A", textDecoration: "underline", textDecorationColor: "rgba(241,95,42,0.4)" }}
-                        >
-                            Privacy Policy
-                        </Link>{" "}
-                        for how we handle your information:{" "}
-                        <XLink href="https://www.creativecowboys.co/privacy-policy">
-                            creativecowboys.co/privacy-policy
-                        </XLink>
-                    </p>
-
-                    <Divider />
-
-                    {/* ── 9. Changes ── */}
-                    <SectionHeading>9. Changes</SectionHeading>
-                    <p style={bodyStyle}>
-                        We may update these terms; the current version is always posted on this page.
+                        For full details, see our <ILink href="/sms-terms">SMS Terms &amp; Conditions</ILink>,{" "}
+                        <ILink href="/sms-consent">SMS Consent</ILink>, and{" "}
+                        <ILink href="/privacy-policy">Privacy Policy</ILink>.
                     </p>
 
                     <Divider />

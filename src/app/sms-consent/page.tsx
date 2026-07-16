@@ -212,6 +212,31 @@ export default function SmsConsentPage() {
 
                     <Divider />
 
+                    {/* ── Consent to Receive Client Lead Alerts ── */}
+                    <SectionHeading>Consent to Receive Client Lead Alerts</SectionHeading>
+                    <p style={bodyStyle}>
+                        By providing your mobile number and checking the box, you agree to receive text messages from
+                        Creative Cowboys Media, LLC alerting you when a lead submits a web form on your website. Message
+                        frequency depends on your form volume. Message and data rates may apply. Reply{" "}
+                        <strong style={{ color: "#ffffff" }}>STOP</strong> to opt out,{" "}
+                        <strong style={{ color: "#ffffff" }}>HELP</strong> for help (or contact{" "}
+                        <a
+                            href="mailto:support@creativecowboys.co"
+                            style={{ color: "#F15F2A", textDecoration: "none" }}
+                        >
+                            support@creativecowboys.co
+                        </a>{" "}
+                        /{" "}
+                        <a href="tel:+14702437517" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                            470-243-7517
+                        </a>
+                        ). Consent is not a condition of any purchase or service. See our{" "}
+                        <ILink href="/privacy-policy">Privacy Policy</ILink> and{" "}
+                        <ILink href="/sms-terms">SMS Terms</ILink>.
+                    </p>
+
+                    <Divider />
+
                     {/* ── Contact / Business Information ── */}
                     <SectionHeading>Contact &amp; Business Information</SectionHeading>
                     <div
