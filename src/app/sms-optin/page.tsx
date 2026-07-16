@@ -279,7 +279,7 @@ export default function SmsOptInPage() {
                         src="/images/sms/optin-onboarding-form.jpeg"
                         alt="Creative Cowboys client onboarding form with a lead-alert phone field and an unchecked SMS consent checkbox"
                         width={1600}
-                        height={911}
+                        height={900}
                         caption="Onboarding form — the client provides their lead-alert phone number and checks the SMS consent box (unchecked by default). Consent text: “I agree to receive SMS text messages from Creative Cowboys about new leads and updates to my account. Message and data rates may apply. Message frequency varies. Consent is not a condition of any purchase or service. Reply STOP to unsubscribe, HELP for help.”"
                     />
 
