@@ -1,444 +1,168 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowRight, CheckCircle2, Globe, Megaphone, Search, Mail, BarChart3, Palette } from "lucide-react";
-import FloatingNav from "@/components/FloatingNav";
-import { Footer7 } from "@/components/ui/footer-7";
+import { Anton } from "next/font/google";
+import { ArrowUpRight, Check } from "lucide-react";
+import Header from "@/components/global/Header";
+import Footer from "@/components/global/Footer";
 
-const ORANGE = "#F15F2A";
-const PINK = "#EA51FF";
-const DARK = "#0D0D0F";
-const CARD = "#15181e";
+const anton = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton" });
+
+export const metadata: Metadata = {
+    title: "Digital Marketing Services in West Georgia",
+    description:
+        "Web design, SEO, Google Ads, social media, branding, and content — everything a West Georgia small business needs to get found and grow. Creative Cowboys, Villa Rica, GA.",
+    alternates: { canonical: "/services" },
+    openGraph: {
+        title: "Digital Marketing Services in West Georgia | Creative Cowboys",
+        description: "Web design, SEO, PPC, social media, branding & content for West Georgia small businesses.",
+    },
+};
 
 const services = [
     {
-        icon: Globe,
         label: "Web Design",
-        color: ORANGE,
-        glow: "rgba(241,95,42,0.15)",
-        border: "rgba(241,95,42,0.25)",
         href: "/web-design",
+        tile: "#B5330E",
         tagline: "Sites that sell",
-        description:
-            "Custom-designed, conversion-focused websites built to turn visitors into customers. Fast, mobile-first, and SEO-ready from day one.",
+        description: "Custom-designed, conversion-focused websites built to turn visitors into customers. Fast, mobile-first, and SEO-ready from day one.",
         bullets: ["Custom design — no templates", "Mobile-first & lightning fast", "Built to convert, not just look good"],
     },
     {
-        icon: Megaphone,
-        label: "Digital Marketing",
-        color: PINK,
-        glow: "rgba(234,81,255,0.12)",
-        border: "rgba(234,81,255,0.25)",
+        label: "Google Ads & PPC",
         href: "/ppc",
+        tile: "#005eb8",
         tagline: "More leads, more revenue",
-        description:
-            "Google Ads, social media campaigns, and paid traffic strategies designed to bring qualified buyers to your business — not just clicks.",
+        description: "Google Ads and paid traffic strategies designed to bring qualified buyers to your business — not just clicks. Every dollar tracked.",
         bullets: ["Google & Meta Ads management", "ROI-focused strategy", "Transparent reporting"],
     },
     {
-        icon: Search,
         label: "SEO",
-        color: "#56CCF2",
-        glow: "rgba(86,204,242,0.12)",
-        border: "rgba(86,204,242,0.25)",
         href: "/seo",
+        tile: "#008f4c",
         tagline: "Own your market",
-        description:
-            "Rank higher on Google and drive consistent organic traffic. We handle technical SEO, content strategy, and local search optimization.",
+        description: "Rank higher on Google and drive consistent organic traffic. We handle technical SEO, content strategy, and local search optimization.",
         bullets: ["Local SEO for Villa Rica & beyond", "Technical & on-page optimization", "Long-term sustainable growth"],
     },
     {
-        icon: Palette,
         label: "Branding",
-        color: "#F7B731",
-        glow: "rgba(247,183,49,0.12)",
-        border: "rgba(247,183,49,0.25)",
         href: "/brand-strategy",
+        tile: "#F5C842",
         tagline: "Look the part",
-        description:
-            "Logo design, brand identity, and visual systems that make your business look professional and memorable from the first click.",
+        description: "Logo design, brand identity, and visual systems that make your business look professional and memorable from the first click.",
         bullets: ["Logo & identity design", "Brand guidelines & assets", "Cohesive look across all channels"],
     },
     {
-        icon: Mail,
-        label: "Social Media",
-        color: "#2ED573",
-        glow: "rgba(46,213,115,0.12)",
-        border: "rgba(46,213,115,0.25)",
+        label: "Social Media Ads",
         href: "/social-media-ads",
+        tile: "#B5330E",
         tagline: "Stay top of mind",
-        description:
-            "Targeted social media advertising and organic content strategies that keep your brand in front of prospects and turn followers into customers.",
-        bullets: ["Facebook & Instagram Ads", "Content strategy & scheduling", "Audience growth & engagement"],
+        description: "Targeted social media advertising and content strategies that keep your brand in front of prospects and turn followers into customers.",
+        bullets: ["Facebook, Instagram & TikTok", "Content strategy & scheduling", "Audience growth & engagement"],
     },
     {
-        icon: BarChart3,
-        label: "Analytics & Strategy",
-        color: "#FF6B6B",
-        glow: "rgba(255,107,107,0.12)",
-        border: "rgba(255,107,107,0.25)",
-        href: "/results",
-        tagline: "Know your numbers",
-        description:
-            "Clear reporting dashboards and strategy sessions that translate data into decisions — so you always know what's working and what to do next.",
-        bullets: ["Google Analytics setup & audit", "Monthly strategy reports", "Clear KPIs tied to revenue"],
+        label: "Video, Photo & Design",
+        href: "/media-creation",
+        tile: "#005eb8",
+        tagline: "Tell your story",
+        description: "Scroll-stopping video, photography, and graphic design — the local proof that turns lookers into buyers across every channel.",
+        bullets: ["Business video & photography", "Graphic design for marketing", "Reels & short-form content"],
     },
 ];
 
-
 const stats = [
-    { value: "2–4 wks", label: "Average launch time" },
-    { value: "100%", label: "Custom builds, no templates" },
-    { value: "Local", label: "Villa Rica based, nationally reaching" },
-    { value: "Real", label: "Results tied to your revenue" },
+    { value: "2–4 wks", label: "Average launch time", color: "#005eb8" },
+    { value: "100%", label: "Custom builds, no templates", color: "#008f4c" },
+    { value: "Local", label: "Villa Rica based, nationally reaching", color: "#B5330E" },
+    { value: "Real", label: "Results tied to your revenue", color: "#F5C842" },
 ];
 
 export default function ServicesPage() {
     return (
-        <>
-            <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .fu-1 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.05s both; }
-        .fu-2 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.18s both; }
-        .fu-3 { animation: fadeUp 0.5s cubic-bezier(0.4,0,0.2,1) 0.30s both; }
-        @media (prefers-reduced-motion: reduce) {
-          .fu-1,.fu-2,.fu-3 { animation: none; }
-        }
+        <div className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative flex flex-col`}>
+            <style
+                dangerouslySetInnerHTML={{
+                    __html: `
+        .svc-dotgrid{background-image:radial-gradient(rgba(26,26,26,0.12) 1.5px,transparent 1.5px);background-size:24px 24px;}
+        .svc-card{border:4px solid #0a0a0a;box-shadow:6px 6px 0px #1a1a1a;transition:transform .18s ease,box-shadow .18s ease;}
+        .svc-card:hover{transform:translate(-4px,-4px);box-shadow:10px 10px 0px #1a1a1a;}
+        .svc-btn{border:3px solid #0a0a0a;box-shadow:4px 4px 0px #1a1a1a;transition:all .18s ease;}
+        .svc-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0px #1a1a1a;}
+      `,
+                }}
+            />
 
-        .svc-card {
-          transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
-          cursor: default;
-        }
-        .svc-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.40);
-        }
-        .svc-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          font-weight: 600;
-          text-decoration: none;
-          transition: gap 200ms ease, opacity 200ms ease;
-          margin-top: 20px;
-        }
-        .svc-link:hover { gap: 10px; opacity: 0.85; }
+            <Header />
 
-        .cta-primary {
-          background: ${ORANGE};
-          transition: background 180ms ease, transform 180ms ease;
-        }
-        .cta-primary:hover { background: #d04c1c; transform: translateY(-1px); }
-        .cta-ghost {
-          transition: background 180ms ease;
-        }
-        .cta-ghost:hover { background: rgba(255,255,255,0.09); }
-
-        .services-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-        }
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
-        }
-        @media (max-width: 1024px) {
-          .services-grid { grid-template-columns: repeat(2, 1fr); }
-          .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 640px) {
-          .services-grid { grid-template-columns: 1fr; }
-          .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-      `}</style>
-
-            <div style={{ background: DARK, minHeight: "100vh", color: "#d1d5db", fontFamily: "var(--font-geist-sans, sans-serif)" }}>
-
-                {/* ── Logo ── */}
-                <Link href="/" className="site-logo" style={{ position: "absolute", top: "52px", left: "24px", zIndex: 50 }}>
-                    <Image
-                        src="/Main%20logo%202.png"
-                        alt="Creative Cowboys Media"
-                        width={160}
-                        height={42}
-                        priority
-                        style={{ width: "160px", height: "auto" }}
-                    />
-                </Link>
-
-                {/* ── Hero ── */}
-                <section style={{
-                    maxWidth: "900px",
-                    margin: "0 auto",
-                    padding: "160px 24px 100px",
-                    textAlign: "center",
-                    position: "relative",
-                }}>
-                    {/* Glow orb */}
-                    <div aria-hidden style={{
-                        position: "absolute", top: "60px", left: "50%", transform: "translateX(-50%)",
-                        width: "600px", height: "300px",
-                        background: "radial-gradient(ellipse, rgba(241,95,42,0.12) 0%, transparent 70%)",
-                        pointerEvents: "none",
-                    }} />
-
-                    <p className="fu-1" style={{
-                        fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em",
-                        textTransform: "uppercase", color: ORANGE, marginBottom: "20px",
-                    }}>
-                        What We Do
-                    </p>
-
-                    <h1 className="fu-2" style={{
-                        fontSize: "clamp(38px, 6vw, 72px)", fontWeight: 800,
-                        lineHeight: 1.06, letterSpacing: "-0.03em",
-                        color: "#ffffff", margin: "0 0 24px",
-                    }}>
-                        Everything your business needs{" "}
-                        <span style={{
-                            background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                        }}>
-                            to grow online.
-                        </span>
+            {/* Hero */}
+            <section className="relative w-full py-16 md:py-24 px-6 md:px-12 overflow-hidden">
+                <div className="absolute inset-0 svc-dotgrid pointer-events-none opacity-80" />
+                <div className="relative max-w-4xl mx-auto flex flex-col gap-6">
+                    <span className="text-[#B5330E] font-bold text-xs uppercase tracking-widest">Everything We Do</span>
+                    <h1 className="font-anton text-5xl sm:text-6xl md:text-7xl leading-[0.9] uppercase tracking-tight">
+                        SERVICES THAT MAKE YOUR <span className="text-[#B5330E]">PHONE RING.</span>
                     </h1>
-
-                    <p className="fu-3" style={{
-                        fontSize: "clamp(16px, 2vw, 19px)", lineHeight: 1.7,
-                        color: "rgba(255,255,255,0.48)", marginBottom: "44px", maxWidth: "640px", marginInline: "auto",
-                    }}>
-                        We&rsquo;re a full-service digital agency based in Villa Rica, GA. From your first website to a fully automated marketing engine — we build what your business needs to compete and win.
+                    <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 max-w-2xl leading-relaxed">
+                        One team for the whole stack — websites, SEO, ads, branding, and content. No offshore work, no
+                        vanity metrics. Just the systems that get West Georgia small businesses found and growing.
                     </p>
+                </div>
+            </section>
 
-                    <div className="fu-3" style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
-                        <Link href="/contact"
-                            className="cta-primary"
-                            style={{
-                                padding: "14px 32px", color: "#fff", fontWeight: 700,
-                                fontSize: "15px", borderRadius: "10px", border: "none",
-                                textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px",
-                            }}
-                        >
-                            Start a Project <ArrowRight size={17} />
-                        </Link>
-                        <Link href="/contact"
-                            className="cta-ghost"
-                            style={{
-                                padding: "14px 32px", color: "#fff", fontWeight: 600,
-                                fontSize: "15px", borderRadius: "10px",
-                                border: "1px solid rgba(255,255,255,0.12)",
-                                background: "rgba(255,255,255,0.04)",
-                                textDecoration: "none",
-                            }}
-                        >
-                            Get a Free Consultation
-                        </Link>
-                    </div>
-                </section>
-
-                {/* ── Stats strip ── */}
-                <section style={{ borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "48px 24px", background: CARD }}>
-                    <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-                        <div className="stats-grid">
-                            {stats.map(({ value, label }) => (
-                                <div key={label} style={{ textAlign: "center", padding: "12px" }}>
-                                    <p style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 900, color: "#ffffff", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
-                                        {value}
-                                    </p>
-                                    <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.38)", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                                        {label}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── Services Grid ── */}
-                <section style={{ padding: "96px 24px" }}>
-                    <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
-                        <div style={{ textAlign: "center", marginBottom: "64px" }}>
-                            <h2 style={{
-                                fontSize: "clamp(28px, 4vw, 48px)", fontWeight: 800,
-                                letterSpacing: "-0.03em", color: "#fff", margin: "0 0 16px",
-                            }}>
-                                Our Services
-                            </h2>
-                            <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.42)", maxWidth: "520px", marginInline: "auto", lineHeight: 1.7 }}>
-                                Pick one or build out a full strategy — we can handle it all.
-                            </p>
-                        </div>
-
-                        <div className="services-grid">
-                            {services.map(({ icon: Icon, label, color, glow, border, href, tagline, description, bullets }) => (
-                                <Link
-                                    key={label}
-                                    href={href}
-                                    className="svc-card"
-                                    style={{
-                                        display: "block",
-                                        background: CARD,
-                                        border: `1px solid ${border}`,
-                                        borderRadius: "20px",
-                                        padding: "32px",
-                                        position: "relative",
-                                        overflow: "hidden",
-                                        textDecoration: "none"
-                                    }}
-                                >
-                                    {/* Glow */}
-                                    <div aria-hidden style={{
-                                        position: "absolute", top: "-30px", right: "-30px",
-                                        width: "160px", height: "160px",
-                                        background: glow, filter: "blur(40px)",
-                                        borderRadius: "50%", pointerEvents: "none",
-                                    }} />
-
-                                    <div style={{ position: "relative", zIndex: 1 }}>
-                                        {/* Icon */}
-                                        <div style={{
-                                            width: "52px", height: "52px", borderRadius: "14px",
-                                            background: `${glow}`, border: `1px solid ${border}`,
-                                            display: "flex", alignItems: "center", justifyContent: "center",
-                                            marginBottom: "20px",
-                                        }}>
-                                            <Icon size={24} color={color} />
-                                        </div>
-
-                                        {/* Label + tagline */}
-                                        <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color, margin: "0 0 6px" }}>
-                                            {label}
-                                        </p>
-                                        <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#ffffff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
-                                            {tagline}
-                                        </h3>
-                                        <p style={{ fontSize: "14px", lineHeight: 1.75, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>
-                                            {description}
-                                        </p>
-
-                                        {/* Bullets */}
-                                        <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                                            {bullets.map(b => (
-                                                <li key={b} style={{ display: "flex", alignItems: "flex-start", gap: "10px", fontSize: "13px", color: "rgba(255,255,255,0.55)" }}>
-                                                    <CheckCircle2 size={14} color={color} style={{ flexShrink: 0, marginTop: "2px" }} />
-                                                    {b}
-                                                </li>
-                                            ))}
-                                        </ul>
-
-                                        {/* CTA link (now just a visual span) */}
-                                        <div className="svc-link" style={{ color, display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 700, fontSize: "13px" }}>
-                                            Learn more <ArrowRight size={14} />
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── Why Cowboys ── */}
-                <section style={{
-                    background: "#f0ddd4",
-                    borderTop: "1px solid rgba(26,21,20,0.08)",
-                    borderBottom: "1px solid rgba(26,21,20,0.08)",
-                    padding: "96px 24px",
-                }}>
-                    <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
-                        <h2 style={{
-                            fontSize: "clamp(28px, 4.5vw, 50px)", fontWeight: 800,
-                            letterSpacing: "-0.03em", color: "#1a1514", margin: "0 0 20px",
-                        }}>
-                            You talk directly with the people doing the work.
-                        </h2>
-                        <p style={{ fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.75, marginBottom: "20px", maxWidth: "640px", marginInline: "auto" }}>
-                            No account managers playing telephone. No offshore teams you&rsquo;ll never meet. We&rsquo;re a small, focused crew based in Villa Rica, GA — fast-moving and obsessed with results you can actually measure.
-                        </p>
-                        <p style={{ fontSize: "17px", color: "rgba(26,21,20,0.55)", lineHeight: 1.75, marginBottom: "48px", maxWidth: "640px", marginInline: "auto" }}>
-                            When you work with Creative Cowboys, you get a team that treats your business like their own — because your growth is how we grow.
-                        </p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
-                            {["Small & local businesses", "Contractors & trades", "Professional services", "E-commerce brands", "Scaling startups"].map(t => (
-                                <span key={t} style={{
-                                    padding: "8px 18px",
-                                    background: "rgba(255,255,255,0.70)",
-                                    border: "1px solid rgba(26,21,20,0.10)",
-                                    borderRadius: "999px", color: "rgba(26,21,20,0.65)",
-                                    fontSize: "13px", fontWeight: 500,
-                                }}>
-                                    {t}
+            {/* Service cards */}
+            <section className="w-full pb-6 px-6 md:px-12 relative">
+                <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {services.map((s) => (
+                        <Link key={s.label} href={s.href} className="svc-card bg-white p-6 flex flex-col gap-3 group">
+                            <div className="flex items-center justify-between">
+                                <span className="w-10 h-10 border-[2.5px] border-[#0a0a0a] flex items-center justify-center" style={{ background: s.tile }}>
+                                    <span className="w-3 h-3 bg-white" />
                                 </span>
-                            ))}
+                                <ArrowUpRight size={18} className="text-[#0a0a0a]/30 group-hover:text-[#B5330E] transition-colors" />
+                            </div>
+                            <div>
+                                <h2 className="font-anton text-2xl md:text-3xl uppercase tracking-wide leading-none">{s.label}</h2>
+                                <span className="font-inter text-xs font-bold uppercase tracking-widest text-[#B5330E]">{s.tagline}</span>
+                            </div>
+                            <p className="font-inter text-sm text-[#0a0a0a]/75 leading-relaxed">{s.description}</p>
+                            <div className="flex flex-col gap-2 pt-3 border-t border-[#0a0a0a]/10 mt-auto">
+                                {s.bullets.map((b) => (
+                                    <span key={b} className="flex items-start gap-2 font-inter text-xs text-[#0a0a0a]/80">
+                                        <Check size={15} className="text-[#008f4c] flex-none mt-0.5" /> {b}
+                                    </span>
+                                ))}
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </section>
+
+            {/* Stats */}
+            <section className="w-full py-14 md:py-16 px-6 md:px-12">
+                <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {stats.map((s) => (
+                        <div key={s.label} className="border-t-4 border-[#0a0a0a] pt-4">
+                            <span className="font-anton text-4xl md:text-5xl block leading-none" style={{ color: s.color }}>{s.value}</span>
+                            <span className="font-inter text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#0a0a0a]/60 mt-2 block">{s.label}</span>
                         </div>
-                    </div>
-                </section>
+                    ))}
+                </div>
+            </section>
 
+            {/* CTA band */}
+            <section className="w-full py-16 md:py-24 px-6 md:px-12 bg-[#0a0a0a] text-[#F2EBDA] border-y-4 border-[#0a0a0a]">
+                <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-6">
+                    <h2 className="font-anton text-5xl md:text-6xl uppercase leading-none text-white">NOT SURE WHERE TO START?</h2>
+                    <p className="font-inter text-base md:text-lg text-[#F2EBDA]/80 max-w-xl">
+                        Book a free consultation. We&rsquo;ll look at your business and tell you the truth about what will
+                        move the needle — even if it&rsquo;s not us.
+                    </p>
+                    <Link href="/contact" className="svc-btn border-[#F2EBDA] bg-[#B5330E] text-[#F2EBDA] font-bold px-8 py-4 uppercase tracking-wider text-sm inline-flex items-center gap-2 shadow-[4px_4px_0px_#f3efe0] mt-2">
+                        Get A Free Proposal <ArrowUpRight size={18} />
+                    </Link>
+                </div>
+            </section>
 
-                {/* ── Final CTA ── */}
-                <section style={{
-                    padding: "120px 24px", textAlign: "center",
-                    position: "relative", overflow: "hidden",
-                }}>
-                    <div aria-hidden style={{
-                        position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)",
-                        width: "600px", height: "280px",
-                        background: "rgba(241,95,42,0.15)", filter: "blur(90px)",
-                        borderRadius: "50%", pointerEvents: "none",
-                    }} />
-                    <div style={{ maxWidth: "760px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-                        <h2 style={{
-                            fontSize: "clamp(32px, 6vw, 64px)", fontWeight: 900,
-                            letterSpacing: "-0.035em", color: "#fff", lineHeight: 1.06, margin: "0 0 24px",
-                        }}>
-                            Ready to get started?{" "}
-                            <span style={{
-                                background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`,
-                                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                            }}>
-                                Let&rsquo;s talk.
-                            </span>
-                        </h2>
-                        <p style={{ fontSize: "18px", color: "rgba(255,255,255,0.45)", marginBottom: "48px", lineHeight: 1.7 }}>
-                            Tell us about your business and we&rsquo;ll put together a custom plan that fits your goals and your budget.
-                        </p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", justifyContent: "center" }}>
-                            <Link href="/contact"
-                                className="cta-primary"
-                                style={{
-                                    padding: "16px 40px", color: "#fff", fontWeight: 700,
-                                    fontSize: "16px", borderRadius: "10px",
-                                    textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "8px",
-                                }}
-                            >
-                                Start a Conversation <ArrowRight size={18} />
-                            </Link>
-                            <Link href="/contact"
-                                className="cta-ghost"
-                                style={{
-                                    padding: "16px 36px", color: "#fff", fontWeight: 600,
-                                    fontSize: "16px", borderRadius: "10px",
-                                    border: "1px solid rgba(255,255,255,0.12)",
-                                    background: "rgba(255,255,255,0.04)",
-                                    textDecoration: "none",
-                                }}
-                            >
-                                Free Consultation
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-
-                <Footer7 />
-            </div >
-
-            <FloatingNav />
-        </>
+            <Footer />
+        </div>
     );
 }
