@@ -6,7 +6,7 @@ type FormState = 'idle' | 'loading' | 'success' | 'error';
 
 export default function ContactForm() {
     const [status, setStatus] = useState<FormState>('idle');
-    const [form, setForm] = useState({ name: '', email: '', company: '', message: '', service: '' });
+    const [form, setForm] = useState({ name: '', email: '', company: '', phone: '', message: '', service: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -191,6 +191,21 @@ export default function ContactForm() {
                         type="text"
                         placeholder="Lone Star HVAC"
                         value={form.company}
+                        onChange={handleChange}
+                        className="contact-input"
+                        style={inputStyle}
+                    />
+                </div>
+
+                {/* Phone (optional) */}
+                <div>
+                    <label style={labelStyle} htmlFor="phone">Phone (optional)</label>
+                    <input
+                        id="phone"
+                        name="phone"
+                        type="tel"
+                        placeholder="(555) 555-5555"
+                        value={form.phone}
                         onChange={handleChange}
                         className="contact-input"
                         style={inputStyle}

@@ -70,6 +70,7 @@ const defaultLegalLinks: Footer7Props["legalLinks"] = [
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "SMS Terms", href: "/sms-terms" },
     { name: "SMS Consent", href: "/sms-consent" },
+    { name: "SMS Opt-In", href: "/sms-optin" },
     { name: "Free Consultation", href: "/contact" },
 ];
 

@@ -13,6 +13,7 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
   const [service, setService] = useState("");
   const [message, setMessage] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState(""); // Honeypot
@@ -112,6 +113,7 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
           name,
           email,
           company,
+          phone,
           service,
           message,
           website_url: websiteUrl, // Honeypot
@@ -302,6 +304,20 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
                   placeholder="Your business"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
+                  className="w-full border-[2.5px] border-[#0a0a0a] bg-[#F2EBDA] p-3 font-inter text-sm outline-none focus:bg-white transition-colors"
+                />
+              </div>
+
+              {/* Phone (optional) */}
+              <div className="mb-4">
+                <label className="block font-anton text-[10px] tracking-[1.5px] text-[#0a0a0a] uppercase mb-1.5">
+                  PHONE (OPTIONAL)
+                </label>
+                <input
+                  type="tel"
+                  placeholder="(555) 555-5555"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="w-full border-[2.5px] border-[#0a0a0a] bg-[#F2EBDA] p-3 font-inter text-sm outline-none focus:bg-white transition-colors"
                 />
               </div>
