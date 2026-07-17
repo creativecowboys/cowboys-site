@@ -19,17 +19,41 @@ export async function POST(request: NextRequest) {
       service, 
       industry, 
       source,
-      website_url // Honeypot
+      website_url, // Honeypot
+      elapsed_ms // How long the form was open before submitting
     } = body;
+
+    // Spam bots get a fake success so they don't retry or adapt.
+    const blockAsSpam = (reason: string, detail?: unknown) => {
+      console.log(`Spam submission blocked (${reason}):`, detail ?? "");
+      return NextResponse.json({ success: true });
+    };
 
     // 1. Honeypot check (Spam prevention)
     if (website_url && website_url.trim() !== "") {
-      console.log("Spam submission blocked via honeypot field:", website_url);
-      // Silently return success so the spam bot thinks it worked
-      return NextResponse.json({ success: true });
+      return blockAsSpam("honeypot", website_url);
     }
 
-    // 2. Server-side validation
+    // 2. Time trap — bots submit near-instantly; a real person can't fill this out in under 3s.
+    if (typeof elapsed_ms === "number" && elapsed_ms >= 0 && elapsed_ms < 3000) {
+      return blockAsSpam("too fast", `${elapsed_ms}ms`);
+    }
+
+    // 3. Gibberish check — bots fill every field with random strings like "SyphXBHZLCUKIflRNIGgH".
+    // Real names/words alternate vowels; long vowel-less or heavily mixed-case random strings do not.
+    const looksLikeGibberish = (value: unknown) => {
+      if (typeof value !== "string") return false;
+      const v = value.trim();
+      if (v.length < 8 || v.includes(" ")) return false; // only judge long single tokens
+      const vowelRatio = (v.match(/[aeiou]/gi)?.length ?? 0) / v.length;
+      const caseFlips = (v.match(/[a-z][A-Z]/g)?.length ?? 0);
+      return vowelRatio < 0.2 || caseFlips >= 4;
+    };
+    if (looksLikeGibberish(name) && (looksLikeGibberish(company) || looksLikeGibberish(business) || looksLikeGibberish(message))) {
+      return blockAsSpam("gibberish", name);
+    }
+
+    // 4. Server-side validation
     if (!name || !name.trim() || !email || !email.trim()) {
       return NextResponse.json(
         { error: "Required fields missing: Name and Email are required." },

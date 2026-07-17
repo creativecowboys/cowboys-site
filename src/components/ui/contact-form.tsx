@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check } from 'lucide-react';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
@@ -11,6 +11,12 @@ const SELECT_ARROW =
 export default function ContactForm() {
     const [status, setStatus] = useState<FormState>('idle');
     const [form, setForm] = useState({ name: '', email: '', company: '', phone: '', message: '', service: '' });
+    // Spam traps: a honeypot field real people never see, and how long the form was open.
+    const [websiteUrl, setWebsiteUrl] = useState('');
+    const loadedAt = useRef<number>(0);
+    useEffect(() => {
+        loadedAt.current = Date.now();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,7 +29,12 @@ export default function ContactForm() {
             const res = await fetch('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...form, source: 'Contact Page' }),
+                body: JSON.stringify({
+                    ...form,
+                    website_url: websiteUrl, // Honeypot
+                    elapsed_ms: loadedAt.current ? Date.now() - loadedAt.current : undefined,
+                    source: 'Contact Page',
+                }),
             });
             if (!res.ok) throw new Error('Send failed');
             setStatus('success');
@@ -71,6 +82,19 @@ export default function ContactForm() {
 
     return (
         <form onSubmit={handleSubmit} className="bg-white border-4 border-[#0a0a0a] shadow-[6px_6px_0px_#1a1a1a] p-6 md:p-8 flex flex-col gap-5">
+            {/* Spam honeypot — hidden from real users, bots fill it in */}
+            <div style={{ position: 'absolute', opacity: 0, zIndex: -1, pointerEvents: 'none' }} aria-hidden="true">
+                <input
+                    type="text"
+                    name="website_url"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={websiteUrl}
+                    onChange={(e) => setWebsiteUrl(e.target.value)}
+                    placeholder="Do not fill this"
+                />
+            </div>
+
             {/* Name + Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

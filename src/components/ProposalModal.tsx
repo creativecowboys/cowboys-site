@@ -17,6 +17,7 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
   const [service, setService] = useState("");
   const [message, setMessage] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState(""); // Honeypot
+  const openedAt = useRef<number>(0); // Time trap — set when the modal opens; bots submit instantly
   
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,6 +30,7 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      openedAt.current = Date.now();
       // Focus on first input
       setTimeout(() => {
         firstInputRef.current?.focus();
@@ -117,6 +119,7 @@ export default function ProposalModal({ isOpen, onClose, source }: ProposalModal
           service,
           message,
           website_url: websiteUrl, // Honeypot
+          elapsed_ms: openedAt.current ? Date.now() - openedAt.current : undefined,
           source: `Homepage Popup (${source})`
         })
       });
