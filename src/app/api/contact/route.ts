@@ -4,7 +4,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Where all form leads get emailed
-const TO_EMAILS = ["dave@creativecowboys.co", "keaton@creativecowboys.co"];
+const TO_EMAILS = ["dave@creativecowboys.co", "keaton@creativecowboys.co", "josh@creativecowboys.co"];
 
 export async function POST(request: NextRequest) {
   try {
