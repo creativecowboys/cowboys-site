@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Space_Grotesk, Manrope, Anton } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -157,6 +156,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" style={{ background: "#0D0D0F" }}>
+      <head>
+        {/*
+          Search Atlas / OTTO dynamic optimization.
+          Must stay a synchronous script in <head>: OTTO rewrites page content
+          before render, so async/defer would let unoptimized markup paint first.
+        */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script
+          {...{ nowprocket: "", "nitro-exclude": "" }}
+          type="text/javascript"
+          id="sa-dynamic-optimization"
+          data-uuid="0f559ccd-afd9-4c44-983e-2998e29d8993"
+          src="https://dashboard.searchatlas.com/scripts/dynamic_optimization.js"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} antialiased bg-[#0D0D0F]`}
       >
