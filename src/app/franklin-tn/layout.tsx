@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 
+// Title omits the brand — the root layout's template already appends
+// "| Creative Cowboys". Including it here rendered it twice.
 export const metadata: Metadata = {
-  title: "Franklin, TN - Creative Cowboys",
-  description: "Web Design, SEO, and Digital Marketing for Franklin, TN businesses.",
+  title: "Web Design & Digital Marketing in Franklin, TN",
+  description:
+    "Creative Cowboys builds websites, SEO, and ad campaigns for Franklin and Williamson County businesses. Villa Rica, GA roots — now with a Franklin, TN office.",
 };
 
 export default function FranklinLayout({

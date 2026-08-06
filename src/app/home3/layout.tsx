@@ -1,9 +1,16 @@
 import { Metadata } from "next";
 
+// Internal design reference — this design now ships as the live homepage ("/").
+// Must never be indexed: it is a near-duplicate of "/" and was competing with
+// the real homepage in search.
 export const metadata: Metadata = {
-  title: "Creative Cowboys | Indie Brutalist Digital Marketing Agency",
-  description:
-    "Creative Cowboys is a West Georgia digital marketing agency. Custom web design, local SEO, PPC, and brand strategy, wrapped in a vintage indie-brutalist style.",
+  title: "Home v3 (internal)",
+  description: "Internal design reference. Not a public page.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export default function Home3Layout({

@@ -1,9 +1,15 @@
 import { Metadata } from "next";
 
+// Internal design reference. Must never be indexed — the content is a
+// near-duplicate of "/" and was competing with the real homepage in search.
 export const metadata: Metadata = {
-  title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
-  description:
-    "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
+  title: "Home v2 (internal)",
+  description: "Internal design reference. Not a public page.",
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: { index: false, follow: false },
+  },
 };
 
 export default function Home2Layout({

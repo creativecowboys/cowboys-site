@@ -20,7 +20,9 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: '/about', destination: '/', permanent: true },
+      // NOTE: /about is now a real page (src/app/about/page.tsx). It used to
+      // redirect here, which left the site with no About page at all — a gap
+      // for both E-E-A-T and AI engines trying to resolve us as an entity.
       { source: '/home-new', destination: '/', permanent: true },
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
