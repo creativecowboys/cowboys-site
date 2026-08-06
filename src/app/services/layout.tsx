@@ -1,16 +1,6 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Digital Marketing Services for Small Businesses in West Georgia",
-    description:
-        "Explore Creative Cowboys' full suite of digital marketing services — SEO, PPC, web design, social media ads & branding — tailored for small businesses across West Georgia and Atlanta.",
-    alternates: { canonical: "/services" },
-    openGraph: {
-        title: "Digital Marketing Services for Small Businesses in West Georgia | Creative Cowboys",
-        description:
-            "SEO, PPC, web design, social media ads & brand strategy for small businesses in West Georgia. Based in Villa Rica, GA.",
-    },
-};
+// No metadata here on purpose: services/page.tsx sits in the same segment and
+// its own export wins, so anything declared here is dead config that just
+// invites the two copies to drift apart. Edit the page instead.
 
 export default function ServicesLayout({ children }: { children: React.ReactNode }) {
     return children;

@@ -4,6 +4,7 @@ import { Space_Grotesk, Manrope, Anton } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
+import { NAP, POSTAL_ADDRESS, SERVICE_AREA, SITE_URL, SOCIAL_PROFILES } from "@/lib/seo";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -39,11 +40,11 @@ const anton = Anton({
 
 export const metadata: Metadata = {
   title: {
-    default: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+    default: "Digital Marketing Agency for the Southeast | Creative Cowboys",
     template: "%s | Creative Cowboys",
   },
   description:
-    "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA. Free consultation.",
+    "Creative Cowboys is a no-fluff digital marketing agency serving small businesses across the Southeast. SEO, Google Ads, web design & branding. Villa Rica, GA roots. Free consultation.",
   metadataBase: new URL("https://www.creativecowboys.co"),
   alternates: {
     canonical: "/",
@@ -53,9 +54,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://www.creativecowboys.co",
     siteName: "Creative Cowboys",
-    title: "Digital Marketing Agency in West Georgia That Actually Drives Results | Creative Cowboys",
+    title: "Digital Marketing Agency for the Southeast | Creative Cowboys",
     description:
-      "Creative Cowboys is West Georgia's no-fluff digital marketing agency. We help small businesses grow with SEO, PPC, web design & branding. Based in Villa Rica, GA.",
+      "A no-fluff digital marketing agency serving small businesses across the Southeast. SEO, Google Ads, web design & branding. Villa Rica, GA roots.",
     images: [
       {
         url: "/Main%20logo%202.png",
@@ -67,9 +68,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Digital Marketing Agency in West Georgia | Creative Cowboys",
+    title: "Digital Marketing Agency for the Southeast | Creative Cowboys",
     description:
-      "No-fluff digital marketing for West Georgia small businesses. SEO, PPC, web design & branding from Villa Rica, GA.",
+      "No-fluff digital marketing for Southeast small businesses. SEO, Google Ads, web design & branding from Villa Rica, GA.",
     images: ["/Main%20logo%202.png"],
   },
   robots: {
@@ -84,12 +85,14 @@ export const metadata: Metadata = {
     },
   },
   keywords: [
-    "digital marketing agency West Georgia",
+    "digital marketing agency Southeast",
+    "digital marketing agency Georgia",
+    "SEO company Georgia",
+    "Google Ads agency Georgia",
+    "web design agency Southeast",
+    "marketing agency for contractors",
+    "law firm marketing agency Georgia",
     "digital marketing agency Villa Rica GA",
-    "SEO company West Georgia",
-    "Google Ads agency West Georgia",
-    "web design West Georgia",
-    "small business marketing West Georgia",
   ],
 };
 
@@ -98,39 +101,27 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+// Built from src/lib/seo.ts so the NAP and service area can't drift out of sync
+// with the other pages the way they did before.
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "ProfessionalService"],
-  name: "Creative Cowboys Media",
-  url: "https://www.creativecowboys.co",
-  telephone: "+1-470-243-7517",
-  email: "howdy@creativecowboys.co",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "222 West Montgomery St",
-    addressLocality: "Villa Rica",
-    addressRegion: "GA",
-    postalCode: "30180",
-    addressCountry: "US",
-  },
+  name: NAP.name,
+  alternateName: NAP.alternateName,
+  url: SITE_URL,
+  telephone: NAP.telephone,
+  email: NAP.email,
+  address: { ...POSTAL_ADDRESS },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: 33.7327,
-    longitude: -84.9182,
+    latitude: NAP.latitude,
+    longitude: NAP.longitude,
   },
   description:
-    "No-fluff digital marketing agency serving small businesses in West Georgia. Specializing in SEO, Google Ads (PPC), web design, social media advertising, and brand strategy.",
+    "No-fluff digital marketing agency serving small businesses across the Southeast, with roots in West Georgia. Specializing in SEO, Google Ads (PPC), web design, social media advertising, and brand strategy for contractors, law firms, and industrial B2B.",
   priceRange: "$$",
-  serviceArea: [
-    { "@type": "City", name: "Villa Rica" },
-    { "@type": "City", name: "Carrollton" },
-    { "@type": "City", name: "Douglasville" },
-    { "@type": "City", name: "Newnan" },
-    { "@type": "City", name: "Bremen" },
-    { "@type": "City", name: "Dallas" },
-    { "@type": "AdministrativeArea", name: "West Georgia" },
-    { "@type": "City", name: "Atlanta" },
-  ],
+  serviceArea: SERVICE_AREA.map((a) => ({ ...a })),
+  areaServed: SERVICE_AREA.map((a) => ({ ...a })),
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Digital Marketing Services",
@@ -143,10 +134,7 @@ const localBusinessSchema = {
       { "@type": "Offer", itemOffered: { "@type": "Service", name: "Media Creation" } },
     ],
   },
-  sameAs: [
-    "https://www.facebook.com/creativecowboys",
-    "https://www.instagram.com/creativecowboysmedia",
-  ],
+  sameAs: [...SOCIAL_PROFILES],
 };
 
 export default function RootLayout({

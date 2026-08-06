@@ -44,10 +44,18 @@ const nextConfig: NextConfig = {
       { source: '/blog/leveraging-seo-for-saas-success', destination: '/blog', permanent: true },
       { source: '/blog/small-business-ai-practical-tools-strategies-for-local-business-growth', destination: '/blog', permanent: true },
       { source: '/blog/5-key-trends-in-saas-growth-for-2025', destination: '/blog', permanent: true },
-      { source: '/national-seo', destination: '/seo', permanent: true },
+      // /local-seo and /national-seo are real pages again — they're distinct
+      // buyer intents (proximity/map-pack vs. architecture/authority) and each
+      // has actual client work behind it, so collapsing both into /seo was
+      // throwing away two commercial-intent URLs.
+      //
+      // These two stay redirected on purpose:
+      //   /ppc-management — same intent as /ppc. Two pages chasing one query
+      //     just split the signal between them.
+      //   /ecommerce-seo  — no ecommerce client work to point at yet. Revisit
+      //     when there's a case study to put on it.
       { source: '/ecommerce-seo', destination: '/seo', permanent: true },
       { source: '/ppc-management', destination: '/ppc', permanent: true },
-      { source: '/local-seo', destination: '/seo', permanent: true },
       { source: '/thank-you', destination: '/', permanent: true },
       { source: '/single-service', destination: '/services', permanent: true },
     ];

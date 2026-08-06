@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import ServiceClient, { type ServiceData } from "@/components/ServiceClient";
+import { breadcrumb, graph, serviceSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-    title: "Google Ads & PPC Management in West Georgia",
+    title: "Google Ads & PPC Management for the Southeast",
     description:
-        "Creative Cowboys manages ROI-focused Google Ads & PPC campaigns for small businesses in West Georgia. No wasted spend — just qualified leads. Villa Rica, GA digital marketing agency.",
+        "ROI-focused Google Ads and PPC management for contractors, law firms, and B2B across the Southeast. No wasted spend — just qualified leads. Month-to-month, no contracts.",
     alternates: { canonical: "/ppc" },
     openGraph: {
-        title: "Google Ads & PPC Management in West Georgia | Creative Cowboys",
-        description: "Every dollar tracked, every click optimized. Creative Cowboys manages Google Ads campaigns that drive real leads for West Georgia small businesses.",
+        title: "Google Ads & PPC Management for the Southeast | Creative Cowboys",
+        description: "Every dollar tracked, every click optimized. Google Ads campaigns that drive real leads, not vanity clicks.",
     },
 };
 
@@ -39,27 +40,29 @@ const data: ServiceData = {
     ctaSub: "Get a free consultation and a straight recommendation on the budget that makes sense for your goals.",
 };
 
-const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Google Ads & PPC Management",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
-    areaServed: "West Georgia",
-    description: "ROI-focused Google Ads and PPC campaign management for small businesses in West Georgia. Campaign setup, keyword targeting, conversion tracking, and transparent reporting.",
-    url: "https://www.creativecowboys.co/ppc",
-};
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+const pageSchema = graph(
+    breadcrumb("Google Ads & PPC Management", "/ppc"),
+    serviceSchema({
+        name: "Google Ads & PPC Management",
+        serviceType: "Pay-Per-Click Advertising Management",
+        description:
+            "ROI-focused Google Ads and PPC campaign management for small businesses across the Southeast. Campaign setup, keyword targeting, conversion tracking, and transparent reporting.",
+        path: "/ppc",
+    }),
+    {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+    },
+);
 
 export default function PPCPage() {
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
             <ServiceClient data={data} />
         </>
     );

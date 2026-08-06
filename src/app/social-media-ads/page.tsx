@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import ServiceClient, { type ServiceData } from "@/components/ServiceClient";
+import { breadcrumb, graph, serviceSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-    title: "Social Media Advertising in West Georgia",
+    title: "Social Media Advertising for Southeast Businesses",
     description:
-        "Creative Cowboys creates and manages Facebook, Instagram & TikTok ad campaigns for small businesses across West Georgia. Real engagement, real leads, real ROI.",
+        "Facebook, Instagram, and TikTok ad campaigns built and managed for small businesses across the Southeast. Real engagement, real leads, real ROI — not just likes.",
     alternates: { canonical: "/social-media-ads" },
     openGraph: {
-        title: "Social Media Advertising in West Georgia | Creative Cowboys",
-        description: "Scroll-stopping social media ads that drive real results for West Georgia small businesses. Facebook, Instagram & TikTok advertising management.",
+        title: "Social Media Advertising for Southeast Businesses | Creative Cowboys",
+        description: "Scroll-stopping social ads that drive real leads. Facebook, Instagram & TikTok campaign management.",
     },
 };
 
@@ -39,27 +40,29 @@ const data: ServiceData = {
     ctaSub: "Free consultation — we'll map the platforms, budget, and creative that fit your business.",
 };
 
-const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Social Media Advertising",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
-    areaServed: "West Georgia",
-    description: "Facebook, Instagram and TikTok ad campaign management for small businesses in West Georgia. Audience targeting, creative strategy, and ROI reporting.",
-    url: "https://www.creativecowboys.co/social-media-ads",
-};
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+const pageSchema = graph(
+    breadcrumb("Social Media Advertising", "/social-media-ads"),
+    serviceSchema({
+        name: "Social Media Advertising",
+        serviceType: "Social Media Advertising Management",
+        description:
+            "Facebook, Instagram and TikTok ad campaign management for small businesses across the Southeast. Audience targeting, creative strategy, and ROI reporting.",
+        path: "/social-media-ads",
+    }),
+    {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+    },
+);
 
 export default function SocialMediaAdsPage() {
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
             <ServiceClient data={data} />
         </>
     );

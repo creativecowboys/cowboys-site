@@ -24,14 +24,14 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-    title: "Web Design in West Georgia",
+    title: "Web Design for Southeast Small Businesses",
     description:
-        "Creative Cowboys builds custom, SEO-optimized websites for small businesses in West Georgia. Fast, mobile-friendly & built to convert visitors into customers. Free consultation.",
+        "Custom, SEO-optimized websites for contractors, law firms, and manufacturers across the Southeast. Fast, mobile-friendly, and built to convert visitors into customers. Free consultation.",
     alternates: { canonical: "/web-design" },
     openGraph: {
-        title: "Web Design in West Georgia | Creative Cowboys",
+        title: "Web Design for Southeast Small Businesses | Creative Cowboys",
         description:
-            "Custom, SEO-optimized websites for West Georgia small businesses. Fast, mobile-friendly, conversion-focused. Free consultation from Creative Cowboys.",
+            "Custom, SEO-optimized websites built to convert. Fast, mobile-first, no templates. Free consultation from Creative Cowboys.",
     },
 };
 

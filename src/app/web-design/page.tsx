@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import ClientScripts from "@/components/web-design/ClientScripts";
+import { breadcrumb, serviceSchema } from "@/lib/seo";
 
 export default function WebDesignPage() {
   return (
@@ -59,52 +60,14 @@ export default function WebDesignPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@graph": [
-              {
-                "@type": "BreadcrumbList",
-                "itemListElement": [
-                  {
-                    "@type": "ListItem",
-                    "position": 1,
-                    "name": "Home",
-                    "item": "https://www.creativecowboys.co"
-                  },
-                  {
-                    "@type": "ListItem",
-                    "position": 2,
-                    "name": "Web Design",
-                    "item": "https://www.creativecowboys.co/web-design"
-                  }
-                ]
-              },
-              {
-                "@type": "Service",
-                "name": "Web Design Services",
-                "provider": {
-                  "@type": "LocalBusiness",
-                  "name": "Creative Cowboys Media",
-                  "telephone": "+1-470-243-7517",
-                  "email": "howdy@creativecowboys.co",
-                  "address": {
-                    "@type": "PostalAddress",
-                    "streetAddress": "222 West Montgomery St",
-                    "addressLocality": "Villa Rica",
-                    "addressRegion": "GA",
-                    "postalCode": "30180",
-                    "addressCountry": "US"
-                  }
-                },
-                "description": "Bespoke, conversion-focused custom web design services built for revenue growth.",
-                "areaServed": [
-                  { "@type": "City", "name": "Villa Rica" },
-                  { "@type": "City", "name": "Carrollton" },
-                  { "@type": "City", "name": "Douglasville" },
-                  { "@type": "City", "name": "Newnan" },
-                  { "@type": "City", "name": "Bremen" },
-                  { "@type": "City", "name": "Dallas" },
-                  { "@type": "AdministrativeArea", "name": "West Georgia" },
-                  { "@type": "City", "name": "Franklin", "containedInPlace": { "@type": "State", "name": "TN" } }
-                ]
-              },
+              breadcrumb("Web Design", "/web-design"),
+              serviceSchema({
+                name: "Web Design Services",
+                serviceType: "Custom Website Design and Development",
+                description:
+                  "Bespoke, conversion-focused custom web design built for revenue growth. Fast, mobile-first, and SEO-ready from day one.",
+                path: "/web-design",
+              }),
               {
                 "@type": "FAQPage",
                 "mainEntity": [

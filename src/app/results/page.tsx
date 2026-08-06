@@ -7,13 +7,13 @@ import { Footer7 } from "@/components/ui/footer-7";
 import { AnimatedCounter, ResultsMetricsChart, DonutChart } from "@/components/ui/animated-charts";
 
 export const metadata: Metadata = {
-    title: "Real Results for Real West Georgia Businesses",
+    title: "Real Results for Real Businesses",
     description:
-        "See the real results Creative Cowboys has delivered for West Georgia small businesses. Case studies in SEO, PPC, and web design. Transparent reporting. Measurable growth.",
+        "See the results Creative Cowboys has delivered for law firms, contractors, and manufacturers. Case studies in SEO, PPC, and web design. Transparent reporting, measurable growth.",
     alternates: { canonical: "/results" },
     openGraph: {
-        title: "Real Results for Real West Georgia Businesses | Creative Cowboys",
-        description: "21 #1 Google rankings. 300% engagement increase. 2 years of consistent ROI. See what Creative Cowboys does for West Georgia small businesses.",
+        title: "Real Results for Real Businesses | Creative Cowboys",
+        description: "21 #1 Google rankings. 300% engagement increase. 2 years of consistent ROI. See what Creative Cowboys delivers.",
     },
 };
 
@@ -93,10 +93,10 @@ export default function ResultsPage() {
                 {/* ── Hero ── */}
                 <section style={{ maxWidth: "900px", margin: "0 auto", padding: "160px 24px 100px", textAlign: "center", position: "relative" }}>
                     <div aria-hidden style={{ position: "absolute", top: "60px", left: "50%", transform: "translateX(-50%)", width: "600px", height: "300px", background: "radial-gradient(ellipse, rgba(241,95,42,0.10) 0%, transparent 70%)", pointerEvents: "none" }} />
-                    <p className="fu-1" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "20px" }}>Proof — West Georgia</p>
+                    <p className="fu-1" style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ORANGE, marginBottom: "20px" }}>Proof — Real Clients, Real Numbers</p>
                     <h1 className="fu-2" style={{ fontSize: "clamp(36px, 6vw, 68px)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.03em", color: "#ffffff", margin: "0 0 24px" }}>
                         Real Results for Real{" "}
-                        <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>West Georgia Businesses.</span>
+                        <span style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${PINK} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Businesses.</span>
                     </h1>
                     <p className="fu-3" style={{ fontSize: "clamp(16px, 2vw, 19px)", lineHeight: 1.7, color: "rgba(255,255,255,0.48)", marginBottom: "44px", maxWidth: "640px", marginInline: "auto" }}>
                         We don&rsquo;t hide behind vague promises. Here&rsquo;s exactly what we&rsquo;ve done — with real numbers, real clients, and transparent reporting.

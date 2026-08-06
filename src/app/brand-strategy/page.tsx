@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import ServiceClient, { type ServiceData } from "@/components/ServiceClient";
+import { breadcrumb, graph, serviceSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-    title: "Brand Strategy & Identity for West Georgia Small Businesses",
+    title: "Brand Strategy & Identity for Small Businesses",
     description:
-        "Creative Cowboys builds cohesive brand identities for West Georgia small businesses — from logo to launch. Stand out, connect with customers & grow with confidence.",
+        "Cohesive brand identities for small businesses across the Southeast — from logo to launch. Positioning, visual identity, and brand voice that make you the obvious choice.",
     alternates: { canonical: "/brand-strategy" },
     openGraph: {
-        title: "Brand Strategy & Identity for West Georgia Small Businesses | Creative Cowboys",
-        description: "Logo design, brand voice, visual identity and competitive positioning for West Georgia small businesses.",
+        title: "Brand Strategy & Identity for Small Businesses | Creative Cowboys",
+        description: "Logo design, brand voice, visual identity, and competitive positioning for Southeast small businesses.",
     },
 };
 
@@ -39,27 +40,29 @@ const data: ServiceData = {
     ctaSub: "Free consultation — we'll talk through where you are now and what a stronger brand could do for you.",
 };
 
-const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Brand Strategy & Identity",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
-    areaServed: "West Georgia",
-    description: "Brand strategy, logo design, visual identity, brand voice, and competitive positioning for small businesses in West Georgia.",
-    url: "https://www.creativecowboys.co/brand-strategy",
-};
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+const pageSchema = graph(
+    breadcrumb("Brand Strategy & Identity", "/brand-strategy"),
+    serviceSchema({
+        name: "Brand Strategy & Identity",
+        serviceType: "Brand Strategy and Visual Identity Design",
+        description:
+            "Brand strategy, logo design, visual identity, brand voice, and competitive positioning for small businesses across the Southeast.",
+        path: "/brand-strategy",
+    }),
+    {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+    },
+);
 
 export default function BrandStrategyPage() {
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
             <ServiceClient data={data} />
         </>
     );

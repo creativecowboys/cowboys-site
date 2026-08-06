@@ -4,17 +4,18 @@ import { Anton } from "next/font/google";
 import { ArrowUpRight, Check } from "lucide-react";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
+import { breadcrumb, graph, providerBlock, SITE_URL } from "@/lib/seo";
 
 const anton = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton" });
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Services in West Georgia",
+    title: "Digital Marketing Services for the Southeast",
     description:
-        "Web design, SEO, Google Ads, social media, branding, and content — everything a West Georgia small business needs to get found and grow. Creative Cowboys, Villa Rica, GA.",
+        "Web design, SEO, Google Ads, social media, branding, and content — everything a Southeast small business needs to get found and grow. Creative Cowboys, Villa Rica, GA.",
     alternates: { canonical: "/services" },
     openGraph: {
-        title: "Digital Marketing Services in West Georgia | Creative Cowboys",
-        description: "Web design, SEO, PPC, social media, branding & content for West Georgia small businesses.",
+        title: "Digital Marketing Services for the Southeast | Creative Cowboys",
+        description: "Web design, SEO, PPC, social media, branding & content for small businesses across the Southeast.",
     },
 };
 
@@ -76,9 +77,35 @@ const stats = [
     { value: "Real", label: "Results tied to your revenue", color: "#F5C842" },
 ];
 
+// This hub page had no structured data at all. The ItemList mirrors the visible
+// service cards, which is what lets an AI engine answer "what does Creative
+// Cowboys do" with the actual list instead of guessing from prose.
+const pageSchema = graph(
+    breadcrumb("Services", "/services"),
+    {
+        "@type": "ItemList",
+        name: "Digital Marketing Services",
+        itemListElement: services.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+                "@type": "Service",
+                name: s.label,
+                description: s.description,
+                url: `${SITE_URL}${s.href}`,
+                provider: providerBlock(),
+            },
+        })),
+    },
+);
+
 export default function ServicesPage() {
     return (
         <div className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative flex flex-col`}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }}
+            />
             <style
                 dangerouslySetInnerHTML={{
                     __html: `

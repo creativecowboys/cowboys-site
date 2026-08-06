@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import ServiceClient, { type ServiceData } from "@/components/ServiceClient";
+import { breadcrumb, graph, serviceSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-    title: "Video, Photography & Graphic Design for West Georgia Businesses",
+    title: "Video, Photography & Graphic Design for Businesses",
     description:
-        "Creative Cowboys produces scroll-stopping video, photography & graphic design content for businesses across West Georgia. Tell your story. Build your brand.",
+        "Scroll-stopping video, photography, and graphic design for businesses across the Southeast. On-site shoots at your business, facility, or job site. Tell your story, build your brand.",
     alternates: { canonical: "/media-creation" },
     openGraph: {
-        title: "Video, Photography & Graphic Design for West Georgia Businesses | Creative Cowboys",
-        description: "Professional video production, business photography, and graphic design for West Georgia businesses.",
+        title: "Video, Photography & Graphic Design for Businesses | Creative Cowboys",
+        description: "Professional video production, business photography, and graphic design — shot on location.",
     },
 };
 
@@ -39,27 +40,29 @@ const data: ServiceData = {
     ctaSub: "Free consultation — tell us what you're building and we'll map the content that sells it.",
 };
 
-const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    name: "Media Creation",
-    provider: { "@type": "LocalBusiness", name: "Creative Cowboys Media", url: "https://www.creativecowboys.co" },
-    areaServed: "West Georgia",
-    description: "Video production, business photography, graphic design, and social media content creation for businesses in West Georgia.",
-    url: "https://www.creativecowboys.co/media-creation",
-};
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-};
+const pageSchema = graph(
+    breadcrumb("Video, Photography & Graphic Design", "/media-creation"),
+    serviceSchema({
+        name: "Media Creation",
+        serviceType: "Video Production, Photography and Graphic Design",
+        description:
+            "Video production, business photography, graphic design, and social media content creation for businesses across the Southeast. Shot on location at your business, facility, or job site.",
+        path: "/media-creation",
+    }),
+    {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+    },
+);
 
 export default function MediaCreationPage() {
     return (
         <>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pageSchema) }} />
             <ServiceClient data={data} />
         </>
     );

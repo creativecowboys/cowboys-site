@@ -3,6 +3,7 @@ import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import ClientScripts from "@/components/seo/ClientScripts";
 import dynamic from "next/dynamic";
+import { breadcrumb, serviceSchema } from "@/lib/seo";
 
 const SEOChartsSection = dynamic(() => import("@/components/seo/SEOChartsSection"), {
   loading: () => <div className="h-[400px] bg-[#0a0a0a]/20 animate-pulse border-[2.5px] border-[#F5C842]" />
@@ -65,52 +66,14 @@ export default function SEOPage() {
                     __html: JSON.stringify({
                         "@context": "https://schema.org",
                         "@graph": [
-                            {
-                                "@type": "BreadcrumbList",
-                                "itemListElement": [
-                                    {
-                                        "@type": "ListItem",
-                                        "position": 1,
-                                        "name": "Home",
-                                        "item": "https://www.creativecowboys.co"
-                                    },
-                                    {
-                                        "@type": "ListItem",
-                                        "position": 2,
-                                        "name": "SEO Services",
-                                        "item": "https://www.creativecowboys.co/seo"
-                                    }
-                                ]
-                            },
-                            {
-                                "@type": "Service",
-                                "name": "SEO Services",
-                                "provider": {
-                                    "@type": "LocalBusiness",
-                                    "name": "Creative Cowboys Media",
-                                    "telephone": "+1-470-243-7517",
-                                    "email": "howdy@creativecowboys.co",
-                                    "address": {
-                                        "@type": "PostalAddress",
-                                        "streetAddress": "222 West Montgomery St",
-                                        "addressLocality": "Villa Rica",
-                                        "addressRegion": "GA",
-                                        "postalCode": "30180",
-                                        "addressCountry": "US"
-                                    }
-                                },
-                                "description": "Results-driven SEO services for small businesses in West Georgia including local SEO, keyword strategy, Google Business Profile optimization, and transparent reporting.",
-                                "areaServed": [
-                                    { "@type": "City", "name": "Villa Rica" },
-                                    { "@type": "City", "name": "Carrollton" },
-                                    { "@type": "City", "name": "Douglasville" },
-                                    { "@type": "City", "name": "Newnan" },
-                                    { "@type": "City", "name": "Bremen" },
-                                    { "@type": "City", "name": "Dallas" },
-                                    { "@type": "AdministrativeArea", "name": "West Georgia" },
-                                    { "@type": "City", "name": "Franklin", "containedInPlace": { "@type": "State", "name": "TN" } }
-                                ]
-                            },
+                            breadcrumb("SEO Services", "/seo"),
+                            serviceSchema({
+                                name: "SEO Services",
+                                serviceType: "Search Engine Optimization",
+                                description:
+                                    "Results-driven SEO for small businesses across the Southeast — local SEO, keyword strategy, Google Business Profile optimization, and transparent reporting.",
+                                path: "/seo",
+                            }),
                             {
                                 "@type": "FAQPage",
                                 "mainEntity": [
@@ -418,11 +381,26 @@ export default function SEOPage() {
                                 WHAT <span className="text-[#B5330E]">YOU</span> NEED.
                             </h2>
                             <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed mb-4">
-                                If you serve customers in Villa Rica, Carrollton, Douglasville, or anywhere in West Georgia — local SEO is your primary focus. It gets you into the Google Map Pack (the 3 businesses that appear above organic results with a map) and targets people searching in your service area.
+                                If your customers are within driving distance — anywhere from Villa Rica and Carrollton out through Atlanta and across the Southeast — local SEO is your primary focus. It gets you into the Google Map Pack (the 3 businesses shown above organic results with a map) and captures people searching in the towns you actually serve.
                             </p>
-                            <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed">
-                                National SEO competes for broad terms without location modifiers. It's valuable for e-commerce and brands serving customers nationwide — but for most West Georgia businesses, local SEO delivers a far faster return on investment. We build a strategy that prioritizes the approach that fits your business.
+                            <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed mb-6">
+                                National SEO competes for broad terms with no location attached. That&rsquo;s the right call for manufacturers, distributors, and B2B suppliers whose buyers are three states away — proximity does nothing for them, so the work shifts to site architecture, content depth, and authority. Most service businesses see a faster return from local. We build toward whichever one actually fits.
                             </p>
+
+                            <div className="flex flex-wrap gap-4">
+                                <Link
+                                    href="/local-seo"
+                                    className="font-anton text-xs md:text-sm uppercase tracking-[1.5px] bg-[#B5330E] text-white px-6 py-3 border-[3px] border-[#0a0a0a] shadow-[4px_4px_0px_#1a1a1a] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#1a1a1a] transition-all"
+                                >
+                                    Local SEO →
+                                </Link>
+                                <Link
+                                    href="/national-seo"
+                                    className="font-anton text-xs md:text-sm uppercase tracking-[1.5px] bg-white text-[#0a0a0a] px-6 py-3 border-[3px] border-[#0a0a0a] shadow-[4px_4px_0px_#1a1a1a] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#1a1a1a] transition-all"
+                                >
+                                    National SEO →
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Checklist Side */}

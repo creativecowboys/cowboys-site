@@ -24,13 +24,13 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-    title: "SEO Services in West Georgia",
+    title: "SEO Services for Southeast Businesses",
     description:
-        "Creative Cowboys offers results-driven SEO services for small businesses in West Georgia. Local SEO, keyword strategy & Google Business Profile optimization. Based in Villa Rica, GA.",
+        "Results-driven SEO for contractors, law firms, and industrial B2B across Georgia, Alabama, Tennessee and the Carolinas. Local SEO, keyword strategy, and Google Business Profile optimization from a Villa Rica, GA shop.",
     alternates: { canonical: "/seo" },
     openGraph: {
-        title: "SEO Services in West Georgia | Creative Cowboys",
-        description: "Get found on Google. Creative Cowboys delivers local SEO, on-page optimization, and keyword strategy for West Georgia small businesses.",
+        title: "SEO Services for Southeast Businesses | Creative Cowboys",
+        description: "Get found on Google. Local and organic SEO for trades, law firms, and manufacturers across the Southeast.",
     },
 };
 
