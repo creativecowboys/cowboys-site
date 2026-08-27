@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Space_Grotesk, Manrope, Anton } from "next/font/google";
+import { Space_Grotesk, Manrope, Anton, Inter } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -35,6 +35,14 @@ const anton = Anton({
   subsets: ["latin"],
   weight: ["400"],
   display: "optional",
+});
+
+// Body/UI face — used site-wide via the `font-inter` utility, so it is preloaded.
+// Named --font-inter-sans, not --font-inter: the latter is the Tailwind theme key
+// in globals.css, and reusing it here would make @theme inline self-referential.
+const inter = Inter({
+  variable: "--font-inter-sans",
+  subsets: ["latin"],
 });
 
 
@@ -160,7 +168,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} antialiased bg-[#0D0D0F]`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} ${inter.variable} antialiased bg-[#0D0D0F]`}
       >
         <script
           type="application/ld+json"

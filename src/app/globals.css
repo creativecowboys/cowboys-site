@@ -14,8 +14,11 @@
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-space-grotesk);
   --font-body: var(--font-manrope);
+  /* Generates the `font-inter` utility used site-wide for body/UI text. */
+  --font-inter: var(--font-inter-sans), 'Inter', system-ui, sans-serif;
 
-  /* Tailwind v4 font-family utilities — generates font-display and font-body classes */
+  /* Note: the utilities come from the --font-* keys above; these --font-family-* entries
+     are inert under Tailwind v4's --font-* namespace and are kept only for reference. */
   --font-family-display: var(--font-space-grotesk), 'Space Grotesk', system-ui, sans-serif;
   --font-family-body: var(--font-manrope), 'Manrope', system-ui, sans-serif;
 
