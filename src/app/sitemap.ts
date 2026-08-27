@@ -21,8 +21,14 @@ const APP_DIR = path.join(process.cwd(), "src", "app");
 /** Any route whose path contains one of these segments is never public. */
 const PRIVATE_SEGMENTS = ["admin", "clients", "proposals", "api"];
 
-/** Individually excluded routes — internal design references, mostly. */
-const NOINDEX_ROUTES = new Set(["/home2", "/home3"]);
+/** Individually excluded routes — internal design references and ad landing pages. */
+const NOINDEX_ROUTES = new Set([
+  "/home2",
+  "/home3",
+  // Paid-social landing page for the free-website promotion. Kept out of the
+  // index so it can't compete with /local-seo; remove when the promo ends.
+  "/free-website",
+]);
 
 /**
  * Priority and change frequency by route. Anything unlisted falls back to
