@@ -4,6 +4,7 @@ import { Space_Grotesk, Manrope, Anton, Inter } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
+import MetaPixel from "@/components/MetaPixel";
 import { NAP, POSTAL_ADDRESS, SERVICE_AREA, SITE_URL, SOCIAL_PROFILES } from "@/lib/seo";
 
 const spaceGrotesk = Space_Grotesk({
@@ -180,6 +181,7 @@ export default function RootLayout({
         
 
 
+        <MetaPixel />
         <ScrollToTop />
         <TopBar />
         {children}

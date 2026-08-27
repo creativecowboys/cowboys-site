@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
+import { trackFb } from "@/lib/fbq";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -108,6 +109,16 @@ export default function OfferForm({ slots }: { slots: number }) {
                 }),
             });
             if (!res.ok) throw new Error("Send failed");
+
+            // Meta conversion event. Without this the ad can only optimise for
+            // landing page views; with it, Meta can optimise for people who
+            // actually fill the form in. Fired only on a confirmed 200 so the
+            // pixel never reports a lead the inbox didn't get.
+            trackFb("Lead", {
+                content_name: "Free Website Offer",
+                content_category: form.business || "Local SEO",
+            });
+
             setStatus("success");
         } catch {
             setStatus("error");
