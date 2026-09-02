@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
       // NOTE: /about is now a real page (src/app/about/page.tsx). It used to
       // redirect here, which left the site with no About page at all — a gap
       // for both E-E-A-T and AI engines trying to resolve us as an entity.
+      // Short link printed on the giveaway video + social assets. Next preserves
+      // the query string automatically, so per-channel UTMs survive the hop (§8).
+      // statusCode 301 rather than `permanent: true` (which emits 308) — the spec
+      // asks for a 301 and some social crawlers still treat it more predictably.
+      { source: '/giveaway', destination: '/christmas-in-september', statusCode: 301 },
       { source: '/home-new', destination: '/', permanent: true },
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
