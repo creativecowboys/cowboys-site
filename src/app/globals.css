@@ -77,6 +77,10 @@
   font-family: var(--font-anton), Impact, 'Arial Black', sans-serif;
 }
 
+.font-lobster {
+  font-family: var(--font-lobster), 'Brush Script MT', cursive;
+}
+
 html {
   /* Dark neutral — fills iOS safe-area for dark pages (web-design, services).
      The homepage mesh gradient covers full viewport so this is invisible there. */

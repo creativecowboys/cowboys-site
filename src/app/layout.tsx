@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Space_Grotesk, Manrope, Anton, Inter } from "next/font/google";
+import { Space_Grotesk, Manrope, Anton, Inter, Lobster } from "next/font/google";
 import "./globals.css";
 import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -44,6 +44,17 @@ const anton = Anton({
 const inter = Inter({
   variable: "--font-inter-sans",
   subsets: ["latin"],
+});
+
+
+// Script face for the giveaway campaign page's hand-written side-notes.
+// display:optional so a slow font fetch can never hold up first paint on a
+// page it only decorates.
+const lobster = Lobster({
+  variable: "--font-lobster",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "optional",
 });
 
 
@@ -169,7 +180,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} ${inter.variable} antialiased bg-[#0D0D0F]`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${manrope.variable} ${anton.variable} ${inter.variable} ${lobster.variable} antialiased bg-[#0D0D0F]`}
       >
         <script
           type="application/ld+json"
