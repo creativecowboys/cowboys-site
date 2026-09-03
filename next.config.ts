@@ -27,7 +27,10 @@ const nextConfig: NextConfig = {
       // the query string automatically, so per-channel UTMs survive the hop (§8).
       // statusCode 301 rather than `permanent: true` (which emits 308) — the spec
       // asks for a 301 and some social crawlers still treat it more predictably.
-      { source: '/giveaway', destination: '/christmas-in-september', statusCode: 301 },
+      { source: '/giveaway', destination: '/thebiggiveaway', statusCode: 301 },
+      // The campaign page shipped briefly at its old path; keep that alive so
+      // anything already linking or crawling it doesn't hit a 404.
+      { source: '/christmas-in-september', destination: '/thebiggiveaway', statusCode: 301 },
       { source: '/home-new', destination: '/', permanent: true },
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },

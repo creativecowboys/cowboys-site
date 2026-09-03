@@ -345,7 +345,7 @@ export default function EntryForm({ phase, instagramUrl }: { phase: Phase; insta
                     </p>
                     <div className="flex gap-3 justify-center flex-wrap">
                         <a
-                            href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.creativecowboys.co%2Fchristmas-in-september"
+                            href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.creativecowboys.co%2Fthebiggiveaway"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="bg-[#F5C842] text-[#0a0a0a] px-4 py-[11px] font-anton text-xs tracking-[1.2px] border-[2.5px] border-[#0a0a0a] shadow-[3px_3px_0px_#0a0a0a]"

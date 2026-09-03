@@ -44,10 +44,10 @@ export const metadata: Metadata = {
     title: "Christmas in September: Win a $44,000 Website + Marketing Package",
     description:
         "Creative Cowboys is giving one U.S. small business a brand-new website, a full year of marketing, and a business growth strategy — valued at $44,000. Enter free by September 24. Winner announced September 25, 2026.",
-    alternates: { canonical: "/christmas-in-september" },
+    alternates: { canonical: "/thebiggiveaway" },
     openGraph: {
         type: "website",
-        url: `${SITE_URL}/christmas-in-september`,
+        url: `${SITE_URL}/thebiggiveaway`,
         title: "Christmas in September: Win a $44,000 Website + Marketing Package | Creative Cowboys",
         description:
             "One U.S. small business wins a brand-new website, a full year of marketing, and a growth strategy — a $44,000 package. Free to enter through September 24, 2026.",
@@ -75,8 +75,8 @@ const faqSchema = {
     "@graph": [
         {
             "@type": "WebPage",
-            "@id": `${SITE_URL}/christmas-in-september`,
-            url: `${SITE_URL}/christmas-in-september`,
+            "@id": `${SITE_URL}/thebiggiveaway`,
+            url: `${SITE_URL}/thebiggiveaway`,
             name: "Christmas in September Giveaway",
             description:
                 "Creative Cowboys is giving one U.S. small business a brand-new website, a full year of marketing, and a business growth strategy — valued at $44,000.",
