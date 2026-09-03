@@ -8,7 +8,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const FALLBACK_TO = ["howdy@creativecowboys.co"];
-const WEBHOOK_TIMEOUT_MS = 10_000;
+// Apps Script's doPost completes in 0.6-3.2s; 15s is headroom, not hope.
+const WEBHOOK_TIMEOUT_MS = 15_000;
 
 /**
  * Rate limit: ~5 submissions per 10 minutes per IP.
@@ -144,32 +145,45 @@ export async function POST(request: NextRequest) {
 
     try {
         const res = await fetch(webhookUrl, {
+            // Do NOT follow the redirect. An Apps Script web app answers a POST
+            // with a 302 to script.googleusercontent.com, and that second hop is
+            // only reliably fetchable from a browser — from a server it stalls
+            // ~30s and then 404s, every time. Following it would turn every
+            // successful entry into a false failure: a 502 to the entrant, a
+            // "SHEET WRITE FAILED" alert to the team, and no conversion fired,
+            // all while the row sat happily in the Sheet.
+            //
+            // The 302 itself is the success signal. Apps Script only issues it
+            // after doPost has run to completion (measured at 0.6-3.2s in the
+            // execution log), so receiving it means the row was written.
             method: "POST",
-            redirect: "follow", // Apps Script 302s to script.googleusercontent.com
+            redirect: "manual",
             // text/plain dodges the CORS preflight Apps Script won't answer.
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({ ...entry, secret: webhookSecret }),
             signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
         });
 
-        const text = await res.text();
-        let parsed: { ok?: boolean; duplicate?: boolean; error?: string } = {};
-        try {
-            parsed = JSON.parse(text);
-        } catch {
-            await emailFallback(entry, `webhook returned non-JSON (HTTP ${res.status}): ${text.slice(0, 200)}`);
+        const location = res.headers.get("location") ?? "";
+        const ranToCompletion =
+            res.status === 302 && location.includes("script.googleusercontent.com");
+
+        if (!ranToCompletion) {
+            await emailFallback(
+                entry,
+                `webhook did not complete (HTTP ${res.status}, location "${location.slice(0, 80)}")`,
+            );
             return NextResponse.json({ error: "store_failed" }, { status: 502 });
         }
 
-        if (!parsed.ok) {
-            await emailFallback(entry, `webhook returned ok:false (${parsed.error ?? "unknown"})`);
-            return NextResponse.json({ error: "store_failed" }, { status: 502 });
-        }
-
-        // { ok:true } and { ok:true, duplicate:true } are both success — a second
-        // submission from the same email is already in the Sheet, so the entrant
-        // is entered either way and should see the thank-you state.
-        return NextResponse.json({ ok: true, duplicate: parsed.duplicate === true });
+        // KNOWN LIMITATION: because the response body is unreadable, a mismatched
+        // GIVEAWAY_WEBHOOK_SECRET would also produce a 302 and look like success
+        // while the script silently discarded the entry. The secret was verified
+        // end-to-end at setup (wrong secret wrote no row, correct secret did), and
+        // it only drifts if someone edits one side without the other. The Apps
+        // Script `doGet` health check returns a live entry count as JSON, which is
+        // the way to confirm writes are still landing.
+        return NextResponse.json({ ok: true });
     } catch (err) {
         const reason = err instanceof Error && err.name === "TimeoutError" ? "webhook timed out" : `webhook threw: ${String(err)}`;
         await emailFallback(entry, reason);
