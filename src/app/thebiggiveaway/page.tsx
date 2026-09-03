@@ -38,7 +38,13 @@ import {
  */
 export const revalidate = 300;
 
-const OG_IMAGE = "/Main%20logo%202.png"; // TODO: Josh to supply 1200×630 campaign art (§11)
+/**
+ * Social share card. 1200x630 is what Meta and X expect; anything else gets
+ * cropped unpredictably in-feed. Taken from the campaign neon artwork and
+ * cropped tight on the sign so it stays legible at thumbnail size, which is
+ * the size it is actually seen at.
+ */
+const OG_IMAGE = "/giveaway/og-thebiggiveaway.jpg";
 
 export const metadata: Metadata = {
     title: "Christmas in September: Win a $44,000 Website + Marketing Package",
@@ -51,7 +57,7 @@ export const metadata: Metadata = {
         title: "Christmas in September: Win a $44,000 Website + Marketing Package | Creative Cowboys",
         description:
             "One U.S. small business wins a brand-new website, a full year of marketing, and a growth strategy — a $44,000 package. Free to enter through September 24, 2026.",
-        images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Christmas in September — Creative Cowboys giveaway" }],
+        images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "The Big Giveaway — Creative Cowboys" }],
     },
     twitter: {
         card: "summary_large_image",
