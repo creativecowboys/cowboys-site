@@ -169,11 +169,11 @@ export const RULES: Array<{ title: string; body: string }> = [
     },
     {
         title: "Eligibility.",
-        body: "Open to legal residents of the 50 United States and D.C. who are 18 years of age or older at the time of entry and who own or are authorized to act on behalf of a small business operating in the United States. Employees of Sponsor, their immediate families, and current Creative Cowboys clients are not eligible. [[TODO: confirm whether current/past clients are excluded]]",
+        body: "Open to legal residents of the 50 United States and D.C. who are 18 years of age or older at the time of entry and who own or are authorized to act on behalf of a small business operating in the United States. Employees of Sponsor, their immediate families, and current or former Creative Cowboys clients are not eligible.",
     },
     {
         title: "Entry period.",
-        body: "Begins [[TODO: launch date]], 2026 and ends September 24, 2026 at 11:59 PM Eastern Time. Limit one (1) entry per business. Duplicate or automated entries will be disqualified.",
+        body: "Begins September 3, 2026 and ends September 24, 2026 at 11:59 PM Eastern Time. Limit one (1) entry per business. Duplicate or automated entries will be disqualified.",
     },
     {
         title: "How to enter.",
@@ -189,7 +189,7 @@ export const RULES: Array<{ title: string; body: string }> = [
     },
     {
         title: "Conditions.",
-        body: "The winner agrees to participate reasonably in the project (providing content, feedback, and approvals in a timely manner) and consents to Sponsor's use of the winner's business name, likeness, and project results in Sponsor's marketing and case studies without additional compensation, except where prohibited by law. The winner is responsible for any applicable taxes; Sponsor will issue an IRS Form 1099 where required. [[TODO: confirm with accountant]]",
+        body: "The winner agrees to participate reasonably in the project (providing content, feedback, and approvals in a timely manner) and consents to Sponsor's use of the winner's business name, likeness, and project results in Sponsor's marketing and case studies without additional compensation, except where prohibited by law. The winner is responsible for any taxes that may apply to the prize.",
     },
     {
         title: "Privacy.",

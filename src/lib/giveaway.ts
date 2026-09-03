@@ -10,8 +10,8 @@
 /** Sept 24, 2026 11:59:59 PM ET. */
 export const ENTRY_DEADLINE = new Date("2026-09-25T03:59:59Z");
 
-/** Sept 25, 2026 9:00 AM ET. TODO: Josh to confirm the announcement time. */
-export const WINNER_ANNOUNCE = new Date("2026-09-25T13:00:00Z");
+/** Sept 25, 2026, 12:00 PM ET (EDT, UTC-4) — when the winner is announced. */
+export const WINNER_ANNOUNCE = new Date("2026-09-25T16:00:00Z");
 
 export const SOURCE = "christmas-in-september";
 
