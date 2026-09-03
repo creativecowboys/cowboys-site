@@ -4,7 +4,7 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-const PIXEL_ID = "483676105466176";
+const PIXEL_ID = "1804089387217105"; // Creative Cowboys Media Pixel (was 483676105466176 = Excel Church client pixel)
 
 /**
  * Meta (Facebook) Pixel.
