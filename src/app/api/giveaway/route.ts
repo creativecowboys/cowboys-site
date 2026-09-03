@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 // Never cache an entry submission.
 export const dynamic = "force-dynamic";
 
-const FALLBACK_TO = ["howdy@creativecowboys.co"];
+const FALLBACK_TO = ["josh@creativecowboys.co", "dave@creativecowboys.co"];
 // Apps Script's doPost completes in 0.6-3.2s; 15s is headroom, not hope.
 const WEBHOOK_TIMEOUT_MS = 15_000;
 
