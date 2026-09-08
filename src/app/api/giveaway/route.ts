@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { Resend } from "resend";
 import { ENTRY_DEADLINE, SOURCE, resolvePhase, validateEntry, BUSINESS_TYPES } from "@/lib/giveaway";
+import { pushGiveawayEntryToGHL } from "@/lib/ghl-giveaway";
 
 export const runtime = "nodejs";
 // Never cache an entry submission.
@@ -183,6 +184,12 @@ export async function POST(request: NextRequest) {
         // it only drifts if someone edits one side without the other. The Apps
         // Script `doGet` health check returns a live entry count as JSON, which is
         // the way to confirm writes are still landing.
+
+        // 6. Mirror the entrant into GoHighLevel (tag `giveaway-entrant` starts
+        //    Josh's welcome email). Awaited so the lambda doesn't get frozen
+        //    mid-request, but it can never fail the entry — see the helper.
+        await pushGiveawayEntryToGHL(entry);
+
         return NextResponse.json({ ok: true });
     } catch (err) {
         const reason = err instanceof Error && err.name === "TimeoutError" ? "webhook timed out" : `webhook threw: ${String(err)}`;
