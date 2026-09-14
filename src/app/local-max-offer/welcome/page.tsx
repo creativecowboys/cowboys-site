@@ -20,7 +20,7 @@ const ACCENT = "#B5330E";
 const YELLOW = "#F5C842";
 
 const NEXT = [
-    "Pick a 15-minute slot below. Josh or Dave will be on it.",
+    "Pick a 15-minute slot below. It's a Google Meet, and the link lands in your confirmation email and on your calendar.",
     "Check your inbox in a few minutes for your welcome email and onboarding link.",
     "Onboarding takes about 15 minutes online and saves as you go.",
     "Your build starts as soon as it's complete. Live in about three weeks.",

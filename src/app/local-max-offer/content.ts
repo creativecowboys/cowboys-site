@@ -80,7 +80,7 @@ export const STEPS = [
     {
         n: "02",
         title: "Book your 15-minute call",
-        body: "Right after checkout you pick a slot with our team. We confirm what you want the site to do, who your customers are, and what's already working.",
+        body: "Right after checkout you pick a slot with our team. It's a quick Google Meet to confirm what you want the site to do, who your customers are, and what's already working.",
     },
     {
         n: "03",
