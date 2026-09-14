@@ -9,8 +9,8 @@
 /** GHL payment link for "Local Max — 12-month commitment" ($297/mo). */
 export const CHECKOUT_URL = "https://link.fastpaydirect.com/payment-link/6a9d9346a7f78e147447f2e8";
 
-/** 15-minute onboarding call. TODO(Josh): replace with the real Calendly event link. */
-export const CALENDLY_URL = "https://calendly.com/creativecowboys/onboarding";
+/** 15-minute onboarding call (Calendly event "Local Max Onboarding Call"). */
+export const CALENDLY_URL = "https://calendly.com/creativecowboys/local-max-onboarding-call";
 
 /** Shown wherever the deadline is mentioned. */
 export const OFFER_CLOSES = "Friday, October 3";
