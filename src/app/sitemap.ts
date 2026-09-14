@@ -28,6 +28,10 @@ const NOINDEX_ROUTES = new Set([
   // Paid-social landing page for the free-website promotion. Kept out of the
   // index so it can't compete with /local-seo; remove when the promo ends.
   "/free-website",
+  // Post-giveaway entrant offer + its post-checkout booking page. Reached
+  // from email only; remove after the offer closes (Oct 3, 2026).
+  "/local-max-offer",
+  "/local-max-offer/welcome",
 ]);
 
 /**
