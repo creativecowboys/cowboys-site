@@ -14,11 +14,17 @@
   --good:#2f7d4f;
 }
 .shana *, .shana *::before, .shana *::after{box-sizing:border-box}
-/* The site's promo bar is position:fixed at top:0 and 36px tall on >=768px
-   (hidden below that). Without this offset it sits directly on top of the
-   proposal's own "Creative & Cowboys" header and hides it completely. Same
-   offset /contact uses. */
-@media (min-width:768px){ .shana{ padding-top:36px } }
+/* The site-wide "Coming soon: Franklin, TN" promo bar is hidden on this page.
+   It's a marketing banner and this is a private client proposal, so it has no
+   business here.
+   Scoped with :has() rather than a bare rule because this stylesheet is global
+   once loaded: the bar only disappears while .shana is actually in the DOM, so
+   no other route is affected. The 36px top offset that used to clear the bar
+   is gone with it, or it would leave an empty strip. */
+/* !important is required, not lazy: TopBar sets display:flex as an inline
+   style attribute, which outranks any stylesheet rule. Its own mobile rule
+   has to do the same thing for the same reason. */
+body:has(.shana) .topbar-hide-mobile{display:none !important}
 
 .shana{
   min-height:100vh; background:var(--cream); color:var(--ink);
