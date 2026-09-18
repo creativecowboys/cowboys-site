@@ -192,7 +192,11 @@ thead th{font-size:9.5px; letter-spacing:.15em; text-transform:uppercase;
    AgentFire's own light-on-dark SVG is used unaltered — no recolouring of
    someone else's trademark. Ours is the script mark in brand orange. */
 .cmp-logo{height:19px; width:auto; display:inline-block; vertical-align:middle}
-.cmp-logo-us{height:22px}
+/* Knocked out to white. The source PNG is the orange script mark, and orange
+   on the near-black table header sat back rather than popped. Same
+   brightness(0) invert(1) the site Header uses on this very file, so there's
+   no second asset to keep in sync. */
+.cmp-logo-us{height:22px; filter:brightness(0) invert(1)}
 th.c,td.c{text-align:right; white-space:nowrap}
 td.feat{font-weight:600; color:var(--cream)}
 td.feat em{display:block; font-style:normal; font-size:12.5px; color:#8e877a;
