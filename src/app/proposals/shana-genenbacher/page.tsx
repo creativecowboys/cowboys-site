@@ -685,7 +685,7 @@ export default function ShanaProposalPage() {
                                                 then a request queue
                                             </em>
                                         </td>
-                                        <td className="c win">Three named people</td>
+                                        <td className="c win">Just shoot us a message</td>
                                     </tr>
                                     <tr className="sum">
                                         <td className="feat">Year one</td>
