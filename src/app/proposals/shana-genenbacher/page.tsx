@@ -407,10 +407,9 @@ export default function ShanaProposalPage() {
                             <em>long before the moving truck.</em>
                         </h1>
                         <p>
-                            A family gets orders to Maxwell. Before they ever set foot in Alabama,
-                            they open Google and start typing. Right now someone answers them — it
-                            just isn&rsquo;t you, unless a friend already gave them your name.
-                            Here&rsquo;s how we fix that.
+                            Everything in this proposal is built around what you asked for: getting
+                            you on the map around Maxwell and in front of the families moving there.
+                            The packages below have been put together just for you.
                         </p>
                         <div className="forwho">
                             <div>
