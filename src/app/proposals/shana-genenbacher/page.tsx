@@ -399,7 +399,8 @@ export default function ShanaProposalPage() {
 
             <div className="herobg">
                 <div className="wrap">
-                    <div className="hero">
+                    <div className="hero hero-grid">
+                      <div className="hero-copy">
                         <div className="eyebrow">Prepared for Shana Genenbacher</div>
                         <h1>
                             Getting found by the families who{" "}
@@ -426,6 +427,27 @@ export default function ShanaProposalPage() {
                             </div>
                         </div>
                         <div className="sidenote">No pressure until after the 25th!</div>
+                      </div>
+
+                      {/* Intro clip. Click-to-play with native controls rather than
+                          autoplay: it's Josh talking, so it's worthless muted, and a
+                          proposal shouldn't start making noise on its own. preload
+                          is metadata so the 7.5MB isn't fetched until she presses
+                          play. */}
+                      <figure className="hero-video">
+                        <video
+                          controls
+                          preload="metadata"
+                          playsInline
+                          poster="/proposals/shana-genenbacher/intro-poster.jpg"
+                        >
+                          <source src="/proposals/shana-genenbacher/intro.webm" type="video/webm" />
+                          <source src="/proposals/shana-genenbacher/intro.mp4" type="video/mp4" />
+                          Your browser can&rsquo;t play this video.{" "}
+                          <a href="/proposals/shana-genenbacher/intro.mp4">Download it instead</a>.
+                        </video>
+                        <figcaption>Watch the intro · 0:54</figcaption>
+                      </figure>
                     </div>
                 </div>
             </div>
