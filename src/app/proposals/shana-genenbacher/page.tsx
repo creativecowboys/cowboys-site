@@ -403,8 +403,8 @@ export default function ShanaProposalPage() {
                       <div className="hero-copy">
                         <div className="eyebrow">Prepared for Shana Genenbacher</div>
                         <h1>
-                            Getting found by the families who{" "}
-                            <em>haven&rsquo;t gotten here yet.</em>
+                            The house hunt starts{" "}
+                            <em>long before the moving truck.</em>
                         </h1>
                         <p>
                             A family gets orders to Maxwell. Before they ever set foot in Alabama,
@@ -426,7 +426,6 @@ export default function ShanaProposalPage() {
                                 <strong>30 days</strong>
                             </div>
                         </div>
-                        <div className="sidenote">No pressure until after the 25th!</div>
                       </div>
 
                       {/* Intro clip. Click-to-play with native controls rather than

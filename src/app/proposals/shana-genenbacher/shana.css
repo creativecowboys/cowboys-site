@@ -55,9 +55,6 @@ h1,h2,h3,.anton{font-family:"Anton","Arial Black",sans-serif; font-weight:400;
 .forwho div span{display:block; font-size:9.5px; letter-spacing:.16em;
   text-transform:uppercase; color:var(--muted); margin-bottom:3px; font-weight:600}
 .forwho div strong{font-size:15px; font-weight:600}
-.sidenote{font-family:"Lobster",cursive; color:var(--coral); font-size:21px;
-  transform:rotate(-3deg); display:inline-block; margin-top:20px}
-
 /* Hero splits in two once there's room: copy left, intro clip right. The
    right half of this hero was empty background, and the headline is capped at
    15ch so it wraps to about the same number of lines either way. */
