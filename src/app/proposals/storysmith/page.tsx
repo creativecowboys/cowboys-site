@@ -157,32 +157,34 @@ export default function StorySmithProposalPage() {
                 </div>
             </div>
 
-            <div className="wrap">
-                <div className="hero">
-                    <div className="eyebrow">Prepared for Tyler Robinson · StorySmith</div>
-                    <h1>
-                        Here&rsquo;s what
-                        <br />
-                        we&rsquo;d <em>suggest.</em>
-                    </h1>
-                    <p className="intro">
-                        Thanks for taking the time to walk us through StorySmith &mdash; it&rsquo;s
-                        a good product, and a more thought-through one than most of what we get
-                        shown. Below is the plan we&rsquo;d put behind it and what it would cost.
-                        Nothing complicated.
-                    </p>
-                    <div className="forwho">
-                        <div>
-                            <span>Prepared by</span>
-                            <strong>Joshua Pack</strong>
-                        </div>
-                        <div>
-                            <span>Date</span>
-                            <strong>September 18, 2026</strong>
-                        </div>
-                        <div>
-                            <span>Good for</span>
-                            <strong>30 days</strong>
+            <div className="herobg">
+                <div className="wrap">
+                    <div className="hero">
+                        <div className="eyebrow">Prepared for Tyler Robinson · StorySmith</div>
+                        <h1>
+                            Here&rsquo;s what
+                            <br />
+                            we&rsquo;d <em>suggest.</em>
+                        </h1>
+                        <p className="intro">
+                            Thanks for taking the time to walk us through StorySmith &mdash;
+                            it&rsquo;s a good product, and a more thought-through one than most of
+                            what we get shown. Below is the plan we&rsquo;d put behind it and what
+                            it would cost. Nothing complicated.
+                        </p>
+                        <div className="forwho">
+                            <div>
+                                <span>Prepared by</span>
+                                <strong>Joshua Pack</strong>
+                            </div>
+                            <div>
+                                <span>Date</span>
+                                <strong>September 18, 2026</strong>
+                            </div>
+                            <div>
+                                <span>Good for</span>
+                                <strong>30 days</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
