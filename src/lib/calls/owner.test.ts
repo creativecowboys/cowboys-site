@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, test } from 'node:test';
 import { assignOwner, GIVEAWAY_BOARD_ID, saveCall, TEAM } from './monday';
-import { validateAssign } from './validation';
+import { CALL_OUTCOMES, mondayOutcome } from './outcomes';
+import { validateCallDraft, validateAssign } from './validation';
 import type { CallDraft } from '@/app/leads/types';
 
 const oldVersion = '2026-09-22T14:00:00Z';
@@ -63,19 +64,24 @@ test('an uncertain assignment mutation is not automatically retried', async () =
   await assert.rejects(assignOwner('12345', 'Dave', oldVersion), { status: 502 });
   assert.equal(requests.length, 2);
 });
-test('notes can save using the refreshed assignment version', async () => {
+for (const outcome of CALL_OUTCOMES) test(`notes save after assignment with outcome: ${outcome}`, async () => {
   const assigned = item(String(TEAM.Keaton), newVersion);
   queue.push({ items: [item()] }, { change_multiple_column_values: { id: '12345' } }, { items: [assigned] });
   const lead = await assignOwner('12345', 'Keaton', oldVersion);
   const draft: CallDraft = {
     callId: '78f205d3-abc0-4e10-812f-ccb149629725', leadId: '12345', expectedUpdatedAt: lead.updatedAt, rep: 'Keaton',
     goal: '', currentMarketing: '', challenge: '', budget: '', timing: '', recommendation: '', notes: 'Notes typed before assignment.',
-    nextStep: '', outcome: 'Call Held', interest: '', followupDate: '', quotedMonthly: '',
+    nextStep: '', outcome, interest: '', followupDate: '', quotedMonthly: '',
   };
   queue.push({ items: [assigned] }, { items: [assigned] }, { items: [assigned] }, { create_update: { id: '789' } }, { items: [assigned] }, { change_multiple_column_values: { id: '12345' } });
+  assert.equal(validateCallDraft(draft, '12345').outcome, outcome);
+  for (const stale of ['', 'Call Held', 'Contacted', 'Call Booked', 'Not Interested']) assert.throws(() => validateCallDraft({ ...draft, outcome: stale }, '12345'), { status: 400 });
   const result = await saveCall(draft);
   assert.equal(result.saved, true); assert.equal(result.warning, undefined);
   const note = requests.find(r => r.query.includes('mutation SaveCallNote'));
   assert.ok(String(note?.variables.body).includes('Notes typed before assignment.'));
   assert.ok(String(note?.variables.body).includes('Keaton'));
+  assert.ok(String(note?.variables.body).includes(outcome));
+  const fields = requests.find(r => r.query.includes('mutation SaveCallFields'));
+  assert.equal(JSON.parse(fields?.variables.values as string).outreach.label, mondayOutcome(outcome));
 });

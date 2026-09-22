@@ -1,6 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "@/app/leads/types";
 import { CallDeskError, validateLeadId } from "./validation";
+import { isCallOutcome, mondayOutcome } from "./outcomes";
 
 // Server routes only. Never expose the token through NEXT_PUBLIC_ variables or client code.
 // Ported from creativecowboys/local-seo-engine PR #1 (Codex, Sep 21 2026); assignment added.
@@ -173,7 +174,8 @@ async function findPriorCall(leadId: string, callId: string): Promise<Update | u
 
 /** Blank optional values mean leave Monday unchanged, never erase existing information. */
 export function callColumns(draft: CallDraft, today: string): Record<string, unknown> {
-  const columns: Record<string, unknown> = { outreach: { label: draft.outcome }, last_contact: { date: today } };
+  if (!isCallOutcome(draft.outcome)) throw new CallDeskError("Choose a valid call outcome.", 400);
+  const columns: Record<string, unknown> = { outreach: { label: mondayOutcome(draft.outcome) }, last_contact: { date: today } };
   if (draft.interest) columns.interest = { label: draft.interest };
   if (draft.followupDate) columns.next_followup = { date: draft.followupDate };
   if (draft.quotedMonthly) columns.quoted_monthly = draft.quotedMonthly;
