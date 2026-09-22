@@ -31,13 +31,13 @@ export async function POST(req: Request, context: Context) {
   } catch (error) { return failure(error); }
 }
 
-/** Assign the lead to Dave, Josh, or Keaton (or clear it). Body: { owner: "Josh" } */
+/** Assign the lead to Dave, Josh, or Keaton (or clear it). Body: { owner: "Josh", expectedUpdatedAt: "..." } */
 export async function PATCH(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return NextResponse.json({ error: "Please sign in to the team area." }, { status: 401, headers });
     assertSameOrigin(req);
     const id = validateLeadId((await context.params).id);
-    const owner = validateAssign(await readCallBody(req));
-    return NextResponse.json({ lead: await assignOwner(id, owner) }, { headers });
+    const { owner, expectedUpdatedAt } = validateAssign(await readCallBody(req));
+    return NextResponse.json({ lead: await assignOwner(id, owner, expectedUpdatedAt) }, { headers });
   } catch (error) { return failure(error); }
 }

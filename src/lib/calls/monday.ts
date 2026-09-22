@@ -116,16 +116,19 @@ export async function getCallLead(id: string): Promise<{ lead: CallLead; history
 }
 
 /** Assign (or clear) the Monday owner. Returns the refreshed lead so the desk can update in place. */
-export async function assignOwner(id: string, owner: "Dave" | "Josh" | "Keaton" | ""): Promise<CallLead> {
+export async function assignOwner(id: string, owner: "Dave" | "Josh" | "Keaton" | "", expectedUpdatedAt: string): Promise<CallLead> {
   validateLeadId(id);
-  await readItem(id); // 404s if the item isn't on the giveaway board
+  const initial = await readItem(id); // 404s outside the giveaway board.
+  if (initial.updated_at !== expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your notes are safe. Load the latest Monday record before assigning it.", 409);
   const value = owner ? { personsAndTeams: [{ id: TEAM[owner], kind: "person" }] } : { personsAndTeams: [] };
   const changed = await monday<{ change_multiple_column_values: { id: string } }>(
     "mutation AssignLead($board: ID!, $id: ID!, $values: JSON!) { change_multiple_column_values(board_id: $board, item_id: $id, column_values: $values) { id } }",
     { board: GIVEAWAY_BOARD_ID, id, values: JSON.stringify({ owner: value }) },
   );
   if (changed.change_multiple_column_values?.id !== id) throw new CallDeskError("Monday did not confirm the assignment. Check the lead in Monday.");
-  return mapLead(await readItem(id));
+  const confirmed = mapLead(await readItem(id));
+  if (confirmed.ownerId !== (owner ? String(TEAM[owner]) : "")) throw new CallDeskError("The Monday owner changed before confirmation. Your notes are safe. Load the latest record to check the assignment.", 409);
+  return confirmed;
 }
 
 function readableHistory(text: string): string {
