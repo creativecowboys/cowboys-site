@@ -40,6 +40,15 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
+    // ── Giveaway call desk (team only) ────────────────────────────────────────
+    if (pathname === "/leads" || pathname.startsWith("/leads/")) {
+        if (!(await isAdminAuthenticated(request))) {
+            const login = new URL("/admin/login", request.url);
+            login.searchParams.set("next", "/leads");
+            return NextResponse.redirect(login);
+        }
+        return NextResponse.next();
+    }
     // ── Admin routes ──────────────────────────────────────────────────────────
     if (pathname.startsWith("/admin")) {
         const isLoginPage = pathname === "/admin/login";

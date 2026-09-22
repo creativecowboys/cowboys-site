@@ -27,7 +27,9 @@ export default function AdminLoginPage() {
         if (!res.ok) {
             setError("Incorrect username or password.");
         } else {
-            router.push("/admin");
+            // The call desk sends people here with ?next=/leads; only that path is honored.
+            const next = new URLSearchParams(window.location.search).get("next");
+            router.push(next === "/leads" ? "/leads" : "/admin");
             router.refresh();
         }
     }

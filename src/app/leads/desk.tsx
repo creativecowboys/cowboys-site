@@ -9,10 +9,14 @@ type Entry = { draft: CallDraft; dirty: boolean; result?: SaveCallResult };
 type Entries = Record<string, Entry>;
 const steps = ["Connect", "Discover", "Recommend", "Wrap up"];
 const reps = ["Dave", "Josh", "Keaton"] as const;
+type AssignName = (typeof reps)[number] | "";
+// Monday user ids for the desk team — must match TEAM in src/lib/calls/monday.ts.
+const repIds: Record<string, AssignName> = { "39848115": "Dave", "39848217": "Josh", "116679004": "Keaton" };
+const ownerNameFor = (id: string): AssignName => repIds[id] || "";
 const outcomes: CallDraft["outcome"][] = ["Call Held", "Contacted", "Call Booked", "Not Interested"];
 const demoLeads: CallLead[] = [
-  { id: "demo-1", name: "Juniper & Co. Garden Care", contact: "Alex Example", email: "alex@example.com", phone: "", website: "https://example.com", city: "Sample City", owner: "Josh", outreach: "Not Contacted", interest: "Warm", notes: "Fictional submission: looking for a steadier stream of local customers. Asked about a website refresh.", lastContact: "", nextFollowup: "", quotedMonthly: "", interestedIn: "Website, local search", auditScore: "62", auditReport: "", group: "Giveaway entries", updatedAt: "demo-version-1", mondayUrl: "" },
-  { id: "demo-2", name: "North Star Home Services", contact: "Taylor Example", email: "taylor@example.com", phone: "", website: "", city: "Sample Town", owner: "Dave", outreach: "Call Booked", interest: "Hot", notes: "Fictional submission: referrals are strong; wants help following up with inquiries.", lastContact: "", nextFollowup: "", quotedMonthly: "97", interestedIn: "CRM", auditScore: "", auditReport: "", group: "Giveaway entries", updatedAt: "demo-version-2", mondayUrl: "" },
+  { id: "demo-1", name: "Juniper & Co. Garden Care", contact: "Alex Example", email: "alex@example.com", phone: "", website: "https://example.com", city: "Sample City", owner: "Josh", ownerId: "39848217", outreach: "Not Contacted", interest: "Warm", notes: "Fictional submission: looking for a steadier stream of local customers. Asked about a website refresh.", lastContact: "", nextFollowup: "", quotedMonthly: "", interestedIn: "Website, local search", auditScore: "62", auditReport: "", group: "Giveaway entries", updatedAt: "demo-version-1", mondayUrl: "" },
+  { id: "demo-2", name: "North Star Home Services", contact: "Taylor Example", email: "taylor@example.com", phone: "", website: "", city: "Sample Town", owner: "Dave", ownerId: "39848115", outreach: "Call Booked", interest: "Hot", notes: "Fictional submission: referrals are strong; wants help following up with inquiries.", lastContact: "", nextFollowup: "", quotedMonthly: "97", interestedIn: "CRM", auditScore: "", auditReport: "", group: "Giveaway entries", updatedAt: "demo-version-2", mondayUrl: "" },
 ];
 function fresh(lead: CallLead, rep: CallDraft["rep"]): Entry {
   return { dirty: false, draft: { callId: crypto.randomUUID(), leadId: lead.id, expectedUpdatedAt: lead.updatedAt, rep, goal: "", currentMarketing: "", challenge: "", budget: "", timing: "", recommendation: "", notes: "", nextStep: "", outcome: "Call Held", interest: "", followupDate: "", quotedMonthly: "" } };
@@ -48,6 +52,18 @@ export default function Desk({ demo = false }: { demo?: boolean }) {
   const [step, setStep] = useState(0);
   const [rep, setRep] = useState<CallDraft["rep"]>("Dave");
   const [saving, setSaving] = useState(false);
+  const [assigning, setAssigning] = useState(false);
+  const [assignError, setAssignError] = useState("");
+  const assign = async (owner: AssignName) => {
+    if (!detail || assigning) return;
+    setAssigning(true); setAssignError("");
+    try {
+      const data = await json<{ lead: CallLead }>(await fetch(`/api/team/calls/${encodeURIComponent(detail.id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ owner }) }));
+      setDetail(data.lead);
+      setLeads(prev => prev.map(l => l.id === data.lead.id ? { ...l, owner: data.lead.owner, ownerId: data.lead.ownerId } : l));
+    } catch (e) { setAssignError(e instanceof Error ? e.message : "Could not assign. Try again."); }
+    finally { setAssigning(false); }
+  };
   const saveLock = useRef(false);
   const listLock = useRef(false);
   const [saveError, setSaveError] = useState("");
@@ -157,7 +173,7 @@ export default function Desk({ demo = false }: { demo?: boolean }) {
       <div className="call-roster-foot"><span>01 — PEOPLE FIRST</span><p>Start with their business. A useful conversation is a win, even when the answer is “not right now.”</p></div>
     </aside><section className="call-workspace" aria-label="Guided conversation">
       {!selected ? <div className="call-welcome"><span className="call-eyebrow">A LITTLE CURIOSITY GOES A LONG WAY</span><h2>Pick a person.<br />Find out what’s next.</h2><p>Select an entrant to bring their business, past notes, and your conversation guide into one place.</p><div className="call-welcome-steps">{steps.map((s, i) => <span key={s}><b>0{i + 1}</b>{s}</span>)}</div><p className="call-muted">Your notes stay in this tab until you choose to save them to Monday.</p></div> : detailLoading ? <div className="call-empty" role="status">Loading this business and its Monday history…</div> : detailError ? <div className="call-empty"><div role="alert">{detailError}</div><button className="call-secondary" onClick={() => setRevision(x => x + 1)}>Try again</button><a href="/team/login?next=/team/calls">Team sign in</a></div> : detail && draft ? <>
-        <div className="call-contact"><div><span className="call-eyebrow">{detail.group || "GIVEAWAY ENTRY"}{detail.city && ` / ${detail.city}`}</span><h2>{detail.name}</h2><p>{detail.contact || "Contact name not supplied"}<span className="call-contact-owner">Monday owner: {detail.owner || "Unassigned"}</span></p></div><div className="call-contact-actions">{detail.phone && <a className="call-phone" href={`tel:${detail.phone.replace(/[^+\d]/g, "")}`}>{detail.phone}</a>}{!detail.phone && <span className="call-muted">No phone on file</span>}{detail.email && <span className="call-email">{detail.email}</span>}<div>{link(detail.website, "Website")}{link(detail.auditReport, "Audit")}{link(detail.mondayUrl, "Monday")}</div></div></div>
+        <div className="call-contact"><div><span className="call-eyebrow">{detail.group || "GIVEAWAY ENTRY"}{detail.city && ` / ${detail.city}`}</span><h2>{detail.name}</h2><p>{detail.contact || "Contact name not supplied"}<span className="call-contact-owner">Assigned to <select className="call-assign" value={ownerNameFor(detail.ownerId)} disabled={assigning || demo} onChange={e => assign(e.target.value as AssignName)} aria-label="Assign this lead"><option value="">Unassigned</option>{reps.map(r => <option key={r} value={r}>{r}</option>)}</select>{assigning && <em> saving…</em>}{assignError && <em className="call-assign-error"> {assignError}</em>}</span></p></div><div className="call-contact-actions">{detail.phone && <a className="call-phone" href={`tel:${detail.phone.replace(/[^+\d]/g, "")}`}>{detail.phone}</a>}{!detail.phone && <span className="call-muted">No phone on file</span>}{detail.email && <span className="call-email">{detail.email}</span>}<div>{link(detail.website, "Website")}{link(detail.auditReport, "Audit")}{link(detail.mondayUrl, "Monday")}</div></div></div>
         <div className="call-context"><div><span>INTERESTED IN</span><strong>{detail.interestedIn || "Discover together"}</strong></div><div><span>LAST CONTACT</span><strong>{detail.lastContact || "Not recorded"}</strong></div><div><span>FOLLOW-UP</span><strong>{detail.nextFollowup || "Not scheduled"}</strong></div><div><span>PRIOR MONTHLY QUOTE</span><strong>{detail.quotedMonthly ? `$${detail.quotedMonthly}` : "None recorded"}</strong></div></div>
         <details className="call-prior"><summary>Before you call <span>Submission, audit & prior conversations</span></summary><div className="call-prior-content">{detail.auditScore && <p><b>Audit score:</b> {detail.auditScore} · Use the audit as a starting point, not a promise.</p>}<h3>Existing Monday notes</h3><p className="call-preserve">{detail.notes || "No existing notes."}</p>{history.length > 0 && <h3>Recent Monday updates</h3>}{history.map(h => <article key={h.id}><small>{h.author || "Team"} · {h.createdAt}</small><p className="call-preserve">{h.text}</p></article>)}{!history.length && <p className="call-muted">No recent updates returned.</p>}</div></details>
         <div className="call-guide-head"><div><span className="call-eyebrow">CONVERSATION GUIDE</span><p>Make it your own. Listen more than you pitch.</p></div><label className="call-rep">Calling as <select value={draft.rep} disabled={saving || !!entry.result} onChange={e => { const r = e.target.value as CallDraft["rep"]; setRep(r); patch({ rep: r }); }}>{reps.map(r => <option key={r}>{r}</option>)}</select><small>Team-selected name</small></label></div>
