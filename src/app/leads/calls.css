@@ -6,3 +6,10 @@
 /* Assign-to control beside the contact name */
 .call-assign { margin-left: .35rem; font: inherit; font-size: .85em; padding: .15rem .4rem; border: 1px solid rgba(0,0,0,.18); border-radius: .35rem; background: #fff; }
 .call-assign-error { color: #b42318; font-style: normal; }
+
+/* Optional coaching stays compact during a live conversation. */
+.call-coaching{margin:0 0 24px;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+.call-coaching summary{padding:12px 16px;font-size:12px;font-weight:600;color:#7c351e}
+.call-coaching ul{margin:0;padding:0 20px 0 34px}
+.call-coaching li{padding:5px 0;font-size:13px;line-height:1.7}
+.call-coaching p{margin:10px 16px 15px;font-size:12px;color:#71665a;line-height:1.7}
