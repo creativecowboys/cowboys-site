@@ -34,3 +34,20 @@ routes check the same cookie via `src/lib/team-auth.ts`. One shared login; the r
 - Monday has no atomic compare-and-set; two people saving the same lead at the same instant can race. The desk detects
   stale records and reused call ids and refuses rather than double-writes.
 - `/leads` is noindex and not in navigation or the sitemap.
+
+## Founder Playbook call guidance (September 22, 2026)
+Dave requested incorporating the reference Josh shared into this guide and Burt’s business advice.
+The call copy adapts Mom Test’s emphasis on recent behavior and SPIN’s problem/impact/next-step structure
+to brief small-business calls. Optional Discover prompts explore a specific event, its effect, and the
+customer’s priority. Recommend confirms the need and concerns before suggesting a service. Wrap up
+records an agreed action, owner and date, including no-next-step outcomes.
+
+All existing draft keys, session-storage keys and Monday payloads stay compatible. Examples and impact
+go into `challenge`/`notes`, attempts into `currentMarketing`, and commitments into `nextStep`.
+Prices, offers, permissions and API behavior are unchanged. The scripts do not impose question quotas,
+invent urgency, guarantee returns, or equate politeness with buying intent.
+
+Reference: https://github.com/getagentseal/founder-playbook at
+`05e29d2ea1f8bf3c7dd97351f8c71e9b3da2a2fd`, `mom-test/SKILL.md` and `spin-selling/SKILL.md`.
+These are third-party study frameworks, used selectively; they are not validated predictions for a lead.
+Upstream MIT attribution is preserved in `Docs/Founder-Playbook-LICENSE.txt`.
