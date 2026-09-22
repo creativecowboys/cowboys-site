@@ -1,3 +1,5 @@
+import type { CallOutcome } from "@/lib/calls/outcomes";
+
 export type CallLead = {
   id: string; name: string; contact: string; email: string; phone: string;
   website: string; city: string; owner: string; ownerId: string; outreach: string; interest: string;
@@ -11,7 +13,7 @@ export type CallDraft = {
   rep: "Dave" | "Josh" | "Keaton";
   goal: string; currentMarketing: string; challenge: string; budget: string;
   timing: string; recommendation: string; notes: string; nextStep: string;
-  outcome: "Call Held" | "Contacted" | "Call Booked" | "Not Interested";
+  outcome: CallOutcome | "";
   interest: "" | "Cold" | "Warm" | "Hot";
   followupDate: string; quotedMonthly: string;
 };

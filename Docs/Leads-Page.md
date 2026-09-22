@@ -63,3 +63,11 @@ draft so a subsequent note save does not conflict with that assignment. A stale 
 must review the latest record before assigning. A failed assignment retains the prior caller/draft.
 Existing saved-call attribution is kept until Start another conversation. Monday does not provide
 atomic compare-and-set; the precheck and returned-owner check reduce, but cannot eliminate, races.
+
+## Call outcomes (September 22, 2026)
+The call-outcome selector offers No answer / left voicemail, Booked followup, Not interested,
+and Bad contact number. New drafts require an explicit selection. Restored drafts with retired
+outcomes keep their text but must choose a current outcome before saving; already-saved notes
+retain their historic attribution and outcome. No existing Monday records are relabeled.
+The three new labels are added to Outreach Status; Not interested reuses Monday’s existing
+Not Interested label. Saving records the selected outcome in the update and the board status.
