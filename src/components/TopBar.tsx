@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 
 export default function TopBar() {
     const pathname = usePathname();
-    if (pathname === "/leads" || pathname.startsWith("/leads/")) return null;
+    // Internal pages (call desk, admin panel + its login) don't get the marketing promo bar —
+    // it's position:fixed and sits on top of their own headers.
+    if (pathname === "/leads" || pathname.startsWith("/leads/") || pathname === "/admin" || pathname.startsWith("/admin/")) return null;
     return (
         <>
             <style>{`
