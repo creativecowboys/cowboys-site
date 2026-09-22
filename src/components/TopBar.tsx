@@ -34,9 +34,9 @@ export default function TopBar() {
                     className="w-full flex justify-between items-center"
                     style={{ width: "100%" }}
                 >
-                    {/* Address */}
+                    {/* Giveaway promo (swap back to the Franklin line after Sept 25) */}
                     <Link
-                        href="/franklin-tn/web-design"
+                        href="/thebiggiveaway"
                         prefetch={false}
                         style={{
                             fontFamily: "var(--font-body), sans-serif",
@@ -55,7 +55,7 @@ export default function TopBar() {
                             ((e.currentTarget as HTMLAnchorElement).style.color = "#1a1a1a")
                         }
                     >
-                        COMING SOON: OUR FRANKLIN, TN OFFICE →
+                        🎁 CHRISTMAS IN SEPTEMBER: WIN A $44,000 MARKETING PACKAGE — ENTER BY SEPT 24 →
                     </Link>
 
                     {/* Phone — turns red-orange on hover */}
