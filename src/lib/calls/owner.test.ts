@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { afterEach, beforeEach, test } from 'node:test';
-import { assignOwner, GIVEAWAY_BOARD_ID, saveCall, TEAM } from './monday';
+import { assignOwner, getCallLead, mapLead, GIVEAWAY_BOARD_ID, saveCall, TEAM } from './monday';
 import { CALL_OUTCOMES, mondayOutcome } from './outcomes';
 import { validateCallDraft, validateAssign } from './validation';
 import type { CallDraft } from '@/app/leads/types';
@@ -84,4 +84,24 @@ for (const outcome of CALL_OUTCOMES) test(`notes save after assignment with outc
   assert.ok(String(note?.variables.body).includes(outcome));
   const fields = requests.find(r => r.query.includes('mutation SaveCallFields'));
   assert.equal(JSON.parse(fields?.variables.values as string).outreach.label, mondayOutcome(outcome));
+});
+
+
+test('reopening a lead returns newest-first saved notes with call markers removed', async () => {
+  const record = { ...item(), updates: [
+    { id: '1', text_body: 'Older context', created_at: '2026-09-20T12:00:00Z', creator: { name: 'Keaton' } },
+    { id: '2', text_body: 'Conversation notes: Remember this detail. [CC-CALL:78f205d3-abc0-4e10-812f-ccb149629725]', created_at: '2026-09-22T12:00:00Z', creator: { name: 'Dave' } },
+  ] };
+  queue.push({ items: [record] });
+  const result = await getCallLead('12345');
+  assert.equal(result.history[0].id, '2');
+  assert.equal(result.history[0].text, 'Conversation notes: Remember this detail.');
+  assert.equal(result.history[0].isCallNote, true);
+  assert.equal(result.history[1].isCallNote, false);
+});
+test('all assigned people are available for owner filtering', () => {
+  const record = { ...item(), column_values: [{ id: 'owner', text: 'Dave Collum, Keaton Vanwey', value: JSON.stringify({ personsAndTeams: [{ id: TEAM.Dave, kind: 'person' }, { id: TEAM.Keaton, kind: 'person' }] }) }] };
+  const lead = mapLead(record);
+  assert.deepEqual(lead.ownerIds, [String(TEAM.Dave), String(TEAM.Keaton)]);
+  assert.equal(lead.ownerId, String(TEAM.Dave));
 });

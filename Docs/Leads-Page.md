@@ -71,3 +71,17 @@ outcomes keep their text but must choose a current outcome before saving; alread
 retain their historic attribution and outcome. No existing Monday records are relabeled.
 The three new labels are added to Outreach Status; Not interested reuses Monday’s existing
 Not Interested label. Saving records the selected outcome in the update and the board status.
+
+## Queue and saved context
+The roster puts never-contacted leads first, then active contacted leads (oldest contact first),
+then closed/bad-number leads. Refreshing or changing an owner does not promote a contacted lead.
+The stage filter offers All leads, Not contacted yet, Contacted / working on, and Closed / bad number.
+Owner filters always include Dave, Josh, Keaton and Unassigned, using Monday person IDs rather
+than display names. Every assigned person can match a multi-owner lead. Filters/sorting apply
+to loaded entries; the count and Load more control identify remaining Monday pages.
+
+The latest saved call update is visible above the guide, with author/date and original text.
+If no call update exists in the returned history, the latest Monday update or Notes column appears.
+Full returned history remains under Before you call. New-call fields stay separate from saved
+notes so earlier conversations are not silently overwritten or submitted twice. Successful live
+saves refresh detail/history and move the lead into the contacted queue.

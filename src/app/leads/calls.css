@@ -13,3 +13,14 @@
 .call-coaching ul{margin:0;padding:0 20px 0 34px}
 .call-coaching li{padding:5px 0;font-size:13px;line-height:1.7}
 .call-coaching p{margin:10px 16px 15px;font-size:12px;color:#71665a;line-height:1.7}
+
+/* A stable call queue and visible saved context before each conversation. */
+.call-queue-filter{display:flex;flex-direction:column;gap:5px;margin-top:12px;font-size:11px;color:#71665a}
+.call-queue-filter select{width:100%;min-height:38px;padding:7px;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;color:#1f1a17}
+.call-order-hint{font-size:11px;color:#71665a;line-height:1.6;margin:10px 0 0}
+.call-last-conversation{margin:18px 0;padding:18px 20px;border:1px solid #c9b89e;border-left:4px solid #b66a3f;background:#fffaf2;border-radius:4px}
+.call-last-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.call-last-heading h3{font-size:15px;margin:0;color:#4b3423}
+.call-last-heading span,.call-last-conversation small{font-size:11px;color:#71665a}
+.call-last-conversation p{font-size:13px;line-height:1.8;margin:12px 0}
+@media(max-width:760px){.call-queue-filter select{font-size:16px}.call-last-conversation{padding:16px}}

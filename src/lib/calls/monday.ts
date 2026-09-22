@@ -59,14 +59,15 @@ export function mapLead(item: Item): CallLead {
   // The owner column's display text is whatever Monday shows ("Dave Collum, Josh Pack").
   // ownerId is the first assigned person, so the desk can pre-select the dropdown.
   let ownerId = "";
+  let ownerIds: string[] = [];
   try {
     const raw = JSON.parse(item.column_values.find((c) => c.id === "owner")?.value || "null");
-    const first = raw?.personsAndTeams?.find((p: { kind?: string }) => p?.kind === "person");
-    if (first?.id != null) ownerId = String(first.id);
+    ownerIds = (raw?.personsAndTeams || []).filter((p: { kind?: string; id?: unknown }) => p?.kind === "person" && p.id != null).map((p: { id: unknown }) => String(p.id));
+    ownerId = ownerIds[0] || "";
   } catch { /* empty owner */ }
   return {
     id: item.id, name: item.name, contact: cols.contact || "", email: cols.email || "", phone: cols.phone || "",
-    website: link("website"), city: cols.city || "", owner: cols.owner || "", ownerId, outreach: cols.outreach || "",
+    website: link("website"), city: cols.city || "", owner: cols.owner || "", ownerId, ownerIds, outreach: cols.outreach || "",
     interest: cols.interest || "", notes: cols.notes || "", lastContact: cols.last_contact || "", nextFollowup: cols.next_followup || "",
     quotedMonthly: cols.quoted_monthly || "", interestedIn: cols.dropdown_mm77a9z5 || "", auditScore: cols.audit_score || "",
     auditReport: link("audit_report"), group: item.group?.title || "", updatedAt: item.updated_at,
@@ -113,7 +114,7 @@ async function readItem(id: string, withHistory = false): Promise<Item> {
 
 export async function getCallLead(id: string): Promise<{ lead: CallLead; history: CallHistory[] }> {
   const item = await readItem(id, true);
-  return { lead: mapLead(item), history: (item.updates || []).map((u) => ({ id: u.id, text: readableHistory(u.text_body || ""), createdAt: u.created_at, author: u.creator?.name || "Team" })) };
+  return { lead: mapLead(item), history: (item.updates || []).map((u) => ({ id: u.id, text: readableHistory(u.text_body || ""), createdAt: u.created_at, author: u.creator?.name || "Team", isCallNote: (u.text_body || "").includes("[CC-CALL:") })).sort((a, b) => b.createdAt.localeCompare(a.createdAt)) };
 }
 
 /** Assign (or clear) the Monday owner. Returns the refreshed lead so the desk can update in place. */
