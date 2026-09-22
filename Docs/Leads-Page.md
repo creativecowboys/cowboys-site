@@ -17,7 +17,7 @@ routes check the same cookie via `src/lib/team-auth.ts`. One shared login; the r
 ## Code
 - `src/app/leads/` — page + desk UI (desk.tsx now calls the real API; `demo` prop kept for local review).
 - `src/app/api/team/calls/route.ts` — GET list (paginated, signed cursor).
-- `src/app/api/team/calls/[id]/route.ts` — GET lead + history, POST save call, **PATCH assign** `{ owner: "Josh" }`.
+- `src/app/api/team/calls/[id]/route.ts` — GET lead + history, POST save call, **PATCH assign** `{ owner: "Josh", expectedUpdatedAt: "..." }`.
 - `src/lib/calls/monday.ts` — Monday client (API 2026-07), board-locked, append-only notes, retry/conflict guards,
   `assignOwner()`. Team user ids live in `TEAM` and must match `repIds` in desk.tsx.
 - `src/lib/calls/validation.ts` — input limits, same-origin + JSON checks.
@@ -51,3 +51,15 @@ Reference: https://github.com/getagentseal/founder-playbook at
 `05e29d2ea1f8bf3c7dd97351f8c71e9b3da2a2fd`, `mom-test/SKILL.md` and `spin-selling/SKILL.md`.
 These are third-party study frameworks, used selectively; they are not validated predictions for a lead.
 Upstream MIT attribution is preserved in `Docs/Founder-Playbook-LICENSE.txt`.
+
+## Caller / Monday owner synchronization
+Selecting Dave, Josh or Keaton under Calling as immediately assigns that person in Monday’s Owner
+column. The Assigned to selector uses the same action and synchronizes the caller. An unassigned
+lead shows Choose caller so selecting Dave is an explicit action, not an invisible default.
+
+Both controls wait for confirmation. During assignment, lead switching and note saving are blocked.
+Existing typed notes survive; a successful assignment carries its refreshed Monday version into the
+draft so a subsequent note save does not conflict with that assignment. A stale draft gets409 and
+must review the latest record before assigning. A failed assignment retains the prior caller/draft.
+Existing saved-call attribution is kept until Start another conversation. Monday does not provide
+atomic compare-and-set; the precheck and returned-owner check reduce, but cannot eliminate, races.
