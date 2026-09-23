@@ -100,6 +100,9 @@ export const PLAYBOOKS: Record<string, Playbook> = {
             "The one-page checklist and the ten-minute weekly routine that keeps the profile ranking after day seven.",
         ],
         searchExample: "AC repair near me",
+        cover: "/playbooks/covers/hvac.jpg",
+        mockup: "/playbooks/covers/hvac-mockup.jpg",
+        pdfUrl: "https://www.creativecowboys.co/playbooks/pdf/hvac-google-profile-fix.pdf",
     },
 };
 
