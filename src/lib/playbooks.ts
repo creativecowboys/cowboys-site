@@ -34,9 +34,14 @@ export type Playbook = {
     cover?: string;
     /** A finished photographic mockup (e.g. from Higgsfield). When set, it replaces the CSS book in the hero. */
     mockup?: string;
-    /** Public URL of the PDF. The delivery text links here; the delivery email uses the GHL custom value. */
+    /** Public URL of the PDF file itself (the Download button target). */
     pdfUrl?: string;
 };
+
+/** The read page: the PDF in the browser with a download bar. The delivery text and the GHL custom value link here. */
+export function readUrl(pb: Playbook): string {
+    return `https://www.creativecowboys.co/playbooks/${pb.slug}/read`;
+}
 
 export const PLAYBOOKS: Record<string, Playbook> = {
     "roofer-google-profile-fix": {

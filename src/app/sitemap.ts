@@ -34,6 +34,7 @@ const NOINDEX_ROUTES = new Set([
   // Free trade playbook landing pages, reached from paid ads and social only.
   "/playbooks",
   "/playbooks/[slug]",
+  "/playbooks/[slug]/read",
   "/local-max-offer/welcome",
 ]);
 

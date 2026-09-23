@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { PLAYBOOKS, normalizePhone, tierFor, validateSubmission, type Submission } from "@/lib/playbooks";
+import { PLAYBOOKS, normalizePhone, readUrl, tierFor, validateSubmission, type Submission } from "@/lib/playbooks";
 import { pushPlaybookLeadToGHL } from "@/lib/ghl-playbook";
 import { sendSms } from "@/lib/twilio-sms";
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         pb.pdfUrl
             ? sendSms(
                   normalizePhone(s.phone),
-                  `Hey ${s.first_name.trim()}, Joshua at Creative Cowboys. Here's the 7-Day Fix: ${pb.pdfUrl} Day one takes ten minutes. Reply STOP to opt out.`,
+                  `Hey ${s.first_name.trim()}, Joshua at Creative Cowboys. Here's the 7-Day Fix: ${readUrl(pb)} Day one takes ten minutes. Reply STOP to opt out.`,
               )
             : Promise.resolve(false),
     ]);
