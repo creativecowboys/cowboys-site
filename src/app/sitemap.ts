@@ -31,6 +31,9 @@ const NOINDEX_ROUTES = new Set([
   // Post-giveaway entrant offer + its post-checkout booking page. Reached
   // from email only; remove after the offer closes (Oct 3, 2026).
   "/local-max-offer",
+  // Free trade playbook landing pages, reached from paid ads and social only.
+  "/playbooks",
+  "/playbooks/[slug]",
   "/local-max-offer/welcome",
 ]);
 
