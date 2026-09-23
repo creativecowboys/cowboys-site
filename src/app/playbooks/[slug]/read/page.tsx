@@ -41,7 +41,7 @@ export default async function PlaybookReadPage({ params }: { params: Promise<{ s
     if (!pb || !pb.pdfUrl) notFound();
 
     const pdfPath = new URL(pb.pdfUrl).pathname;
-    const fileName = `${pb.title.replace(/[^A-Za-z0-9 ]/g, "")}.pdf`;
+    const fileName = `${pb.title.replace(/[^A-Za-z0-9 -]/g, "")}.pdf`;
 
     return (
         <div className="font-inter bg-[#F2EBDA] text-[#0a0a0a] h-[100dvh] flex flex-col">
