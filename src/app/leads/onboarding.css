@@ -1,0 +1,89 @@
+/* Team desk shell + Onboarding tab. Builds on the call desk palette in calls.css. */
+.team-shell{background:#f6efe3;min-height:100vh}
+.team-tabs{display:flex;gap:4px;padding:10px 4vw 0;background:#1f1a17;border-bottom:1px solid #3a2f28}
+.team-tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:#c7bba9;font:600 12px/1 Inter,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;cursor:pointer}
+.team-tabs button.is-active{color:#f6efe3;border-bottom-color:#e8603c}
+.call-handoff-button{margin-top:12px}
+
+.ob-desk{color:#1f1a17;font-family:var(--font-inter-sans),Inter,Arial,sans-serif;font-size:14px;line-height:1.5;max-width:1660px;margin:auto;padding:30px 4vw 60px;position:relative}
+.ob-desk *{box-sizing:border-box}
+.ob-desk button,.ob-desk input,.ob-desk select,.ob-desk textarea{font:inherit}
+.ob-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.ob-head h1{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:34px;font-weight:400;line-height:1.15;margin:6px 0 4px}
+.ob-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:22px 0 10px}
+.ob-toolbar input,.ob-toolbar select{height:42px;border:1px solid #cabcaa;background:#fffaf2;border-radius:4px;padding:0 10px;color:#1f1a17;font-size:13px;width:100%}
+.ob-count{font-size:10px;color:#746655;letter-spacing:.03em;margin:8px 0 10px}
+.ob-table{border:1px solid #d6cab8;border-radius:4px;background:#fffaf2;overflow:hidden}
+.ob-row{display:grid;grid-template-columns:1.6fr 1.3fr 1fr 1.1fr .9fr 1.4fr;gap:12px;width:100%;text-align:left;padding:14px 16px;border:0;border-bottom:1px solid #eadfcd;background:transparent;color:inherit;cursor:pointer;align-items:start}
+.ob-row:hover{background:#f8f1e7}
+.ob-row.is-active{background:#f3e9d9;box-shadow:inset 3px 0 0 #e8603c}
+.ob-row.is-overdue b:first-child{color:#a83a1c}
+.ob-row-head{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#756451;background:#eee5d6;cursor:default;padding:10px 16px}
+.ob-row-head:hover{background:#eee5d6}
+.ob-row span{display:block;min-width:0;overflow-wrap:anywhere;font-size:13px}
+.ob-row small{display:block;font-size:11px;color:#746655;margin-top:3px}
+.ob-row em{color:#9a7051;font-style:normal}
+.ob-stage{font-style:normal;font-size:11px;border:1px solid #d3c5b2;border-radius:3px;padding:2px 6px;background:#f6efe3}
+.ob-stage-ready{border-color:#96ab86;background:#e4ebde}.ob-stage-launched{border-color:#96ab86;background:#d5e5cb}.ob-stage-hold{border-color:#cca257;background:#fff1cf}.ob-stage-building{border-color:#9bb6d6;background:#e2ecf6}
+.ob-missing{color:#a83a1c}.ob-ok{color:#354c2c}.ob-overdue{color:#a83a1c;font-weight:600}
+.ob-panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100vw);background:#fffaf2;border-left:1px solid #d6cab8;box-shadow:-12px 0 40px #2a1c0f22;overflow-y:auto;padding:26px 28px 60px;z-index:60;font-size:13px}
+.ob-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.ob-panel-head h2{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:28px;font-weight:400;line-height:1.15;margin:4px 0 6px;overflow-wrap:anywhere}
+.ob-panel-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.ob-panel-actions a{color:#a8462b;font-size:11px}
+.ob-section{border-top:1px solid #e3d8c6;padding:18px 0}
+.ob-section h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#756451;margin:0 0 12px;display:flex;justify-content:space-between;align-items:baseline}
+.ob-section h3 small{text-transform:none;letter-spacing:0;font-weight:400;color:#9a7051}
+.ob-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.ob-grid span{display:block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:#756451;margin-bottom:4px}
+.ob-grid b{font-weight:500;overflow-wrap:anywhere;display:block}
+.ob-grid small{display:block;color:#746655;font-size:11px}
+.ob-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.ob-controls label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:500;min-width:0}
+.ob-controls select,.ob-controls input,.ob-next input,.ob-next textarea{width:100%;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:8px 10px;font-size:13px;color:#1f1a17;font-weight:400}
+.ob-hint{font-size:11px;margin:12px 0 0;line-height:1.6}
+.ob-next{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:start}
+.ob-next textarea{grid-column:1/3;resize:vertical}
+.ob-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ob-details{margin-top:12px;border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3}
+.ob-details summary{padding:10px 14px;font-weight:600;font-size:12px;cursor:pointer}
+.ob-details dl,.ob-review dl{margin:0;padding:4px 14px 14px;display:grid;grid-template-columns:130px 1fr;gap:6px 12px;font-size:12px}
+.ob-details dt,.ob-review dt{color:#756451;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.ob-details dd,.ob-review dd{margin:0;overflow-wrap:anywhere}
+.ob-files{list-style:none;margin:0;padding:0 14px 14px}
+.ob-files li{padding:5px 0;border-top:1px solid #e3d8c6;font-size:12px}
+.ob-files a{color:#a8462b}
+.ob-notes{font-size:12px;background:#f6efe3;padding:12px;border-radius:4px;margin:10px 0 0}
+.ob-checklist{list-style:none;margin:0;padding:0}
+.ob-checklist li{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #efe6d7;font-size:12px}
+.ob-checklist li.is-required label{font-weight:500}
+.ob-checklist li.is-done label{color:#71665a;text-decoration:line-through}
+.ob-checklist li span{font-size:10px;color:#9a7051;white-space:nowrap}
+.ob-checklist select{font-size:11px;padding:4px 6px;border:1px solid #cabcaa;border-radius:4px;background:#fffaf2}
+.ob-problems{margin:0 0 12px;padding-left:18px;font-size:12px;color:#7c351e}
+.ob-problems li{padding:2px 0}
+.ob-history{border-top:1px solid #efe6d7;padding:10px 0;font-size:12px}
+.ob-history small{color:#71665a}
+.ob-history p{margin:6px 0 0}
+.ob-panel .call-success input{width:100%;font-size:12px;padding:8px;border:1px solid #96ab86;border-radius:4px;background:#fff}
+
+/* Handoff modal */
+.ob-modal{position:fixed;inset:0;background:#1f1a17b8;z-index:70;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px}
+.ob-modal-card{background:#fffaf2;color:#1f1a17;border-radius:6px;width:min(860px,100%);padding:28px 32px 26px;font-family:var(--font-inter-sans),Inter,Arial,sans-serif;font-size:13px;line-height:1.5;box-shadow:0 30px 80px #0007}
+.ob-modal-card *{box-sizing:border-box}
+.ob-modal-card button,.ob-modal-card input,.ob-modal-card select,.ob-modal-card textarea{font:inherit}
+.ob-modal-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
+.ob-modal-head h2{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:30px;font-weight:400;line-height:1.15;margin:4px 0 6px}
+.ob-modal-head p{margin:0;font-size:12px}
+.ob-field{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:500;min-width:0}
+.ob-field>span{font-size:12px;font-weight:500}
+.ob-field input,.ob-field select,.ob-field textarea{width:100%;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:9px 11px;font-size:13px;line-height:1.5;color:#1f1a17;font-weight:400}
+.ob-field textarea{resize:vertical}
+.ob-field small{font-size:10px;line-height:1.5;color:#766955;font-weight:400}
+.ob-wide{grid-column:1/-1}
+.ob-packages{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 14px;border:1px solid #e3d8c6;border-radius:4px;padding:12px;background:#f6efe3}
+.ob-packages label{font-weight:400;font-size:12px;display:flex;gap:6px;align-items:center}
+.ob-review h3{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:22px;font-weight:400;margin:0 0 12px}
+.ob-review dl{border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
+
+@media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}}

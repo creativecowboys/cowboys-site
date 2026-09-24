@@ -49,6 +49,13 @@ export async function middleware(request: NextRequest) {
         }
         return NextResponse.next();
     }
+    // ── Client onboarding intake (the token in the URL is the credential; never indexed) ──
+    if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
+        const res = NextResponse.next();
+        res.headers.set("X-Robots-Tag", "noindex, nofollow");
+        res.headers.set("Referrer-Policy", "no-referrer");
+        return res;
+    }
     // ── Giveaway winner draw (unlisted, never indexed) ───────────────────────
     if (pathname === "/thebiggiveaway/draw") {
         const res = NextResponse.next();
