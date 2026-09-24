@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Confetti, Sfx } from "./fx";
-import { dedupe, fairIndex, isServiceType, toEntries, type Entry } from "./entries";
+import { dedupe, detectColumns, fairIndex, isServiceType, toEntries, toSheet, type Columns, type Entry, type Field, type Sheet } from "./entries";
 import "./draw.css";
 
 type Phase = "ready" | "spinning" | "winner";
 type Draw = { entry: Entry; at: Date; pool: number };
+
+/** Columns the panel lets you pick, in the order shown. */
+const PICKABLE: Array<[Field, string]> = [["business", "Business name (shown on screen)"], ["type", "Business type"], ["city", "City"]];
 
 const SAMPLE = [
     "Peach State Plumbing", "Carroll County HVAC", "Villa Rica Roofing Co.", "Southern Pride Lawn Care",
@@ -26,6 +29,8 @@ export default function DrawStage() {
     const [excluded, setExcluded] = useState<Set<Entry>>(new Set());
     const [draws, setDraws] = useState<Draw[]>([]);
     const [isSample, setIsSample] = useState(false);
+    const [sheet, setSheet] = useState<Sheet | null>(null);
+    const [cols, setCols] = useState<Columns | null>(null);
 
     const [phase, setPhase] = useState<Phase>("ready");
     const [reel, setReel] = useState<{ prev: string; cur: string; next: string; i: number; ms: number }>();
@@ -65,7 +70,29 @@ export default function DrawStage() {
     );
 
     function load(text: string, sample = false) {
-        const { kept, removed } = sample ? { kept: SAMPLE, removed: 0 } : dedupe(toEntries(text));
+        if (sample) {
+            setSheet(null);
+            setCols(null);
+            applyEntries(SAMPLE, 0, true);
+            return;
+        }
+        const next = toSheet(text);
+        const detected = detectColumns(next);
+        setSheet(next);
+        setCols(detected);
+        const { kept, removed } = dedupe(toEntries(next, detected));
+        applyEntries(kept, removed, false);
+    }
+
+    function pickColumn(field: Field, i: number) {
+        if (!sheet || !cols) return;
+        const next = { ...cols, [field]: i };
+        setCols(next);
+        const { kept, removed } = dedupe(toEntries(sheet, next));
+        applyEntries(kept, removed, false);
+    }
+
+    function applyEntries(kept: Entry[], removed: number, sample: boolean) {
         setAll(kept);
         setDupes(removed);
         setOff(new Set(kept.map((e) => e.type).filter((t) => t && !isServiceType(t))));
@@ -240,6 +267,33 @@ export default function DrawStage() {
                             <textarea value={paste} onChange={(e) => setPaste(e.target.value)} rows={6} />
                             <button onClick={() => load(paste)} disabled={!paste.trim()}>Use this list</button>
                         </details>
+
+                        {sheet && cols && sheet.header.length > 1 && (
+                            <div className="gd-cols">
+                                <p className="gd-help">
+                                    Check these columns before you draw. The business name column is what appears on screen.
+                                </p>
+                                {PICKABLE.map(([field, label]) => (
+                                    <label key={field} className="gd-col">
+                                        <span>{label}</span>
+                                        <select value={cols[field]} onChange={(e) => pickColumn(field, Number(e.target.value))}>
+                                            <option value={-1}>(none)</option>
+                                            {sheet.header.map((h, i) => (
+                                                <option key={i} value={i}>{h || `Column ${i + 1}`}</option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                ))}
+                                {all.length > 0 && (
+                                    <p className="gd-preview">
+                                        On screen it will look like: <b>{all.slice(0, 3).map((e) => e.business).join(" · ")}</b>
+                                    </p>
+                                )}
+                                {all.some((e) => e.business.length > 60) && (
+                                    <p className="gd-warn">Some names in this column are very long. Make sure it&apos;s the business name column, not notes.</p>
+                                )}
+                            </div>
+                        )}
 
                         {all.length > 0 && (
                             <div className="gd-stats">

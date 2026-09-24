@@ -49,6 +49,12 @@ export async function middleware(request: NextRequest) {
         }
         return NextResponse.next();
     }
+    // ── Giveaway winner draw (unlisted, never indexed) ───────────────────────
+    if (pathname === "/thebiggiveaway/draw") {
+        const res = NextResponse.next();
+        res.headers.set("X-Robots-Tag", "noindex, nofollow");
+        return res;
+    }
     // ── Admin routes ──────────────────────────────────────────────────────────
     if (pathname.startsWith("/admin")) {
         const isLoginPage = pathname === "/admin/login";

@@ -48,44 +48,73 @@ export function parseCsv(text: string): string[][] {
     return rows.filter((r) => r.some((f) => f.trim()));
 }
 
-const col = (header: string[], re: RegExp) => header.findIndex((h) => re.test(h.trim()));
+export type Sheet = { header: string[]; rows: string[][] };
+export type Field = "business" | "type" | "city" | "contact" | "email" | "phone";
+export type Columns = Record<Field, number>;
+
+/** Header patterns per field, best first. */
+const WANT: Record<Field, RegExp[]> = {
+    business: [/^business[ _-]?name$/, /^company[ _-]?name$/, /^(business|company)$/, /business.?name/, /company/],
+    type: [/^business[ _-]?type$/, /business.?type/, /industry|category/],
+    city: [/^city[ _-]?(state)?$/, /city/],
+    contact: [/^(full[ _-]?)?name$/, /contact/],
+    email: [/^e-?mail$/, /e-?mail/],
+    phone: [/^phone$/, /phone/],
+};
+// Columns that mention the right words but hold notes, not the value itself.
+const NOT_A_VALUE = /note|research|desc|summary|audit|comment|review|site|url|link|score|status/;
+
+/** Split a CSV export into its header row and data rows. */
+export function toSheet(text: string): Sheet {
+    const [header = [], ...rows] = parseCsv(text.replace(/^\uFEFF/, ""));
+    return { header: header.map((h) => h.trim()), rows };
+}
 
 /**
- * Turn a Sheet export (or a plain one-name-per-line list) into entries.
- *
- * Headers are matched loosely so a renamed column in the Sheet doesn't break
- * the draw on camera. With no recognisable header, every line is a business name.
+ * Guess which column holds each field. Exact header names win over loose
+ * matches, and a "name" column whose values run long is treated as notes.
+ * The panel shows the guess and lets it be changed before the draw.
  */
-export function toEntries(text: string): Entry[] {
-    const rows = parseCsv(text.replace(/^﻿/, ""));
-    if (rows.length === 0) return [];
+export function detectColumns({ header, rows }: Sheet): Columns {
+    const lower = header.map((h) => h.toLowerCase());
+    const avgLen = (i: number) => {
+        const vals = rows.slice(0, 50).map((r) => (r[i] ?? "").trim()).filter(Boolean);
+        return vals.length ? vals.reduce((n, v) => n + v.length, 0) / vals.length : 0;
+    };
+    const find = (f: Field) => {
+        for (const re of WANT[f]) {
+            const i = lower.findIndex((h, i) =>
+                re.test(h) && !(NOT_A_VALUE.test(h) && !WANT[f][0].test(h)) && !(f === "business" && avgLen(i) > 60));
+            if (i !== -1) return i;
+        }
+        return -1;
+    };
+    return {
+        business: find("business"), type: find("type"), city: find("city"),
+        contact: find("contact"), email: find("email"), phone: find("phone"),
+    };
+}
 
-    const header = rows[0].map((h) => h.toLowerCase());
-    const iBiz = col(header, /business.?name|company/);
-
-    if (iBiz === -1) {
-        return rows
+/**
+ * Turn a Sheet export into entries using the chosen columns. With no business
+ * column (a plain pasted list), every line, header included, is a business name.
+ */
+export function toEntries({ header, rows }: Sheet, cols: Columns): Entry[] {
+    if (cols.business === -1) {
+        return [header, ...rows]
             .map((r) => r.join(", ").trim())
             .filter(Boolean)
             .map((business) => ({ business, type: "", city: "", contact: "", email: "", phone: "" }));
     }
-
-    const iType = col(header, /business.?type|industry|category/);
-    const iCity = col(header, /city/);
-    const iName = col(header, /^(full.?)?name$|contact/);
-    const iEmail = col(header, /e-?mail/);
-    const iPhone = col(header, /phone/);
     const at = (r: string[], i: number) => (i >= 0 ? (r[i] ?? "").trim() : "");
-
     return rows
-        .slice(1)
         .map((r) => ({
-            business: at(r, iBiz),
-            type: at(r, iType),
-            city: at(r, iCity),
-            contact: at(r, iName),
-            email: at(r, iEmail).toLowerCase(),
-            phone: at(r, iPhone),
+            business: at(r, cols.business),
+            type: at(r, cols.type),
+            city: at(r, cols.city),
+            contact: at(r, cols.contact),
+            email: at(r, cols.email).toLowerCase(),
+            phone: at(r, cols.phone),
         }))
         .filter((e) => e.business);
 }
