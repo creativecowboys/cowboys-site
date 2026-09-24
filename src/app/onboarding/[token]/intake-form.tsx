@@ -4,9 +4,10 @@ import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FILE_CATEGORIES, GBP_AGENCY_EMAIL, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
 import type { IntakeForm as Form } from "@/lib/onboarding/types";
+import { uploadPath } from "@/lib/onboarding/validation";
 import "./intake.css";
 
-type View = { business: string; form: Form; files: { key: string; name: string; size: number; category: string; uploadedAt: string }[]; submittedAt: string | null; lastSavedAt: string | null; expiresAt: string | null };
+type View = { business: string; folder: string; form: Form; files: { key: string; name: string; size: number; category: string; uploadedAt: string }[]; submittedAt: string | null; lastSavedAt: string | null; expiresAt: string | null };
 const CATEGORY_HELP: Record<(typeof FILE_CATEGORIES)[number], string> = {
   Brand: "Logo files (SVG, AI, EPS or the largest PNG you have), brand guide, fonts.",
   Photos: "Your team, your work, your trucks, your storefront. Real photos beat stock.",
@@ -60,13 +61,14 @@ export default function IntakeForm({ token }: { token: string }) {
     catch (e) { setStatus("idle"); setError(e instanceof Error ? e.message : "Could not submit. Your answers are saved on this page; try again in a moment."); }
   };
   const addFiles = async (category: (typeof FILE_CATEGORIES)[number], list: FileList | null) => {
-    if (!list?.length) return;
+    const folder = view?.folder;
+    if (!list?.length || !folder) return;
     for (const file of Array.from(list)) {
       const id = `${category}/${file.name}/${Date.now()}`;
       if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB. Send it another way or compress it.`); continue; }
       setUploading((u) => ({ ...u, [id]: file.name }));
       try {
-        const blob = await upload(file.name, file, { access: "private", handleUploadUrl: `${base}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        const blob = await upload(uploadPath(folder, category, file.name), file, { access: "private", handleUploadUrl: `${base}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
         const v: View = await api(await fetch(`${base}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }));
         setView(v);
       } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload. Please try again.`); }

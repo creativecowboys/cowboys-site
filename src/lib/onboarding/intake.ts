@@ -6,7 +6,7 @@ import { emptyIntake } from "./handoff";
 import { readPipelineItem, setPipelineColumns, mapRow } from "./pipeline";
 import { deletePath, deleteTokenIndex, FILE_PREFIX, readHandoff, readIntake, readTokenIndex, writeIntake, writeTokenIndex } from "./store";
 import type { HandoffForm, IntakeFile, IntakeForm, IntakeRecord, OnboardingRow } from "./types";
-import { safeFilename } from "./validation";
+import { safeFilename, uploadPath } from "./validation";
 
 // Client intake links are opaque, revocable and expiring. The token itself is never stored:
 // only its SHA-256 lives in the store, and the Monday board only ever sees a staff URL.
@@ -75,7 +75,7 @@ export async function resolveToken(token: string): Promise<IntakeRecord> {
 
 export function clientView(record: IntakeRecord) {
   // The client only ever sees their own form and file list — never staff notes, prices or Monday ids.
-  return { business: record.business, form: record.form, files: record.files.map((f) => ({ key: f.key, name: f.name, size: f.size, category: f.category, uploadedAt: f.uploadedAt })), submittedAt: record.submittedAt, lastSavedAt: record.lastSavedAt, expiresAt: record.tokenExpiresAt };
+  return { business: record.business, folder: record.itemId, form: record.form, files: record.files.map((f) => ({ key: f.key, name: f.name, size: f.size, category: f.category, uploadedAt: f.uploadedAt })), submittedAt: record.submittedAt, lastSavedAt: record.lastSavedAt, expiresAt: record.tokenExpiresAt };
 }
 
 export async function saveIntakeForm(record: IntakeRecord, form: IntakeForm): Promise<IntakeRecord> {
@@ -91,9 +91,7 @@ export async function submitIntake(record: IntakeRecord): Promise<IntakeRecord> 
   return record;
 }
 
-export function filePathFor(itemId: string, category: string, name: string): string {
-  return `${FILE_PREFIX(itemId)}${category}/${safeFilename(name)}`;
-}
+export const filePathFor = (itemId: string, category: string, name: string): string => uploadPath(itemId, category, name);
 
 /** Record an uploaded blob in the client's file index. Idempotent by pathname; verifies the blob exists under the client's prefix. */
 export async function indexFile(itemId: string, pathname: string, category: IntakeFile["category"], declaredName: string): Promise<IntakeRecord> {

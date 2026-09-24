@@ -125,3 +125,8 @@ export function safeFilename(name: string): string {
   const base = name.replace(/^.*[\\/]/, "").replace(/[^\w.\- ()]+/g, "_").replace(/\s+/g, " ").trim().slice(0, 120);
   return base && base !== "." && base !== ".." ? base : "file";
 }
+
+/** Where a client upload lands: onboarding/files/<folder>/<Category>/<safe name>. Shared by the intake page and the token route. */
+export function uploadPath(folder: string, category: string, name: string): string {
+  return `onboarding/files/${folder}/${category}/${safeFilename(name)}`;
+}
