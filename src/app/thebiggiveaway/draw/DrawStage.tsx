@@ -31,6 +31,7 @@ export default function DrawStage() {
     const [isSample, setIsSample] = useState(false);
     const [sheet, setSheet] = useState<Sheet | null>(null);
     const [cols, setCols] = useState<Columns | null>(null);
+    const [saved, setSaved] = useState<{ state: "saving" | "saved" | "error"; at?: string }>();
 
     const [phase, setPhase] = useState<Phase>("ready");
     const [reel, setReel] = useState<{ prev: string; cur: string; next: string; i: number; ms: number }>();
@@ -58,6 +59,38 @@ export default function DrawStage() {
     }, []);
     useEffect(() => { sfx.current.muted = muted; }, [muted]);
 
+    // Pick up the list saved from another device, unless one is already loaded here.
+    useEffect(() => {
+        let live = true;
+        fetch("/api/giveaway/draw-list", { cache: "no-store" })
+            .then((r) => r.json())
+            .then((d: { entries: Entry[] | null; savedAt?: string }) => {
+                if (!live || !d.entries?.length) return;
+                const entries = d.entries.map((e) => ({ ...e, contact: "", email: "", phone: "" }));
+                setAll((cur) => {
+                    if (cur.length) return cur;
+                    setOff(new Set(entries.map((e) => e.type).filter((t) => t && !isServiceType(t))));
+                    setSaved({ state: "saved", at: d.savedAt });
+                    return entries;
+                });
+            })
+            .catch(() => {});
+        return () => { live = false; };
+    }, []);
+
+    /** Save the list so it opens on other devices. Contact details are not sent. */
+    function save(entries: Entry[]) {
+        setSaved({ state: "saving" });
+        fetch("/api/giveaway/draw-list", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ entries: entries.map(({ business, type, city }) => ({ business, type, city })) }),
+        })
+            .then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((d: { savedAt: string }) => setSaved({ state: "saved", at: d.savedAt }))
+            .catch(() => setSaved({ state: "error" }));
+    }
+
     const types = useMemo(() => {
         const counts = new Map<string, number>();
         for (const e of all) if (e.type) counts.set(e.type, (counts.get(e.type) ?? 0) + 1);
@@ -82,6 +115,7 @@ export default function DrawStage() {
         setCols(detected);
         const { kept, removed } = dedupe(toEntries(next, detected));
         applyEntries(kept, removed, false);
+        save(kept);
     }
 
     function pickColumn(field: Field, i: number) {
@@ -90,6 +124,7 @@ export default function DrawStage() {
         setCols(next);
         const { kept, removed } = dedupe(toEntries(sheet, next));
         applyEntries(kept, removed, false);
+        save(kept);
     }
 
     function applyEntries(kept: Entry[], removed: number, sample: boolean) {
@@ -250,7 +285,8 @@ export default function DrawStage() {
                         <h2>Load the entries</h2>
                         <p className="gd-help">
                             In the entries Google Sheet, choose <b>File → Download → Comma-separated values (.csv)</b>, then drop the file here.
-                            The list stays in this browser tab and isn&apos;t uploaded anywhere.
+                            Business names, types and cities are saved to the site so the list also opens on your phone.
+                            Contact details stay in this browser tab.
                         </p>
 
                         <label
@@ -303,6 +339,13 @@ export default function DrawStage() {
                                     {excluded.size > 0 && <> · {excluded.size} previous winner{excluded.size > 1 ? "s" : ""} removed</>}
                                     {" · "}<b>{pool.length}</b> in the draw
                                 </p>
+                                {saved && !isSample && (
+                                    <p className={saved.state === "error" ? "gd-warn" : "gd-muted"}>
+                                        {saved.state === "saving" && "Saving for your other devices…"}
+                                        {saved.state === "saved" && `Saved for your other devices${saved.at ? ` · ${new Date(saved.at).toLocaleString()}` : ""}`}
+                                        {saved.state === "error" && "Couldn't save this list for other devices. It still works in this tab."}
+                                    </p>
+                                )}
                                 {isSample && <p className="gd-warn">These are made-up rehearsal names. Load the real CSV before the real take.</p>}
 
                                 {types.length > 0 && (
