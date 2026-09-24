@@ -1,0 +1,411 @@
+/* Winner draw stage. Brand: cream #F2EBDA, ink #0a0a0a, red #B5330E, Anton. */
+
+.gd-root {
+    --cream: #F2EBDA;
+    --ink: #0a0a0a;
+    --red: #B5330E;
+    --gold: #DBC792;
+    --display: var(--font-anton), 'Anton', Impact, sans-serif;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #050505;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: var(--font-inter), system-ui, sans-serif;
+    color: var(--cream);
+}
+.gd-clean { cursor: none; }
+.gd-clean .gd-bar { display: none; }
+
+/* ---------- stage ---------- */
+.gd-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    container-type: size;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    background:
+        radial-gradient(ellipse at 50% 55%, #D2471A 0%, #A52B0B 38%, #5A1306 75%, #230602 100%);
+}
+.gd-vertical {
+    width: auto;
+    aspect-ratio: 9 / 16;
+    max-width: 100%;
+}
+
+.gd-snow {
+    position: absolute;
+    inset: -100% 0 0;
+    pointer-events: none;
+    opacity: .55;
+    background-image:
+        radial-gradient(2px 2px at 10% 20%, #fff 50%, transparent 51%),
+        radial-gradient(3px 3px at 30% 70%, #fff 50%, transparent 51%),
+        radial-gradient(2px 2px at 55% 35%, #fff 50%, transparent 51%),
+        radial-gradient(3px 3px at 75% 85%, #fff 50%, transparent 51%),
+        radial-gradient(2px 2px at 90% 10%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 45% 55%, #fff 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 65% 5%, #fff 50%, transparent 51%);
+    background-size: 340px 340px;
+    animation: gd-snow 14s linear infinite;
+}
+@keyframes gd-snow { to { transform: translateY(50%); } }
+
+.gd-rays {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    width: 250cqmax;
+    height: 250cqmax;
+    translate: -50% -50%;
+    pointer-events: none;
+    opacity: 0;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 230, 170, .16) 0 7deg, transparent 7deg 18deg);
+    mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+    transition: opacity .6s;
+}
+.gd-won .gd-rays { opacity: 1; animation: gd-spin 30s linear infinite; }
+@keyframes gd-spin { to { rotate: 360deg; } }
+
+/* ---------- header / footer ---------- */
+.gd-head {
+    position: relative;
+    text-align: center;
+    padding-top: 5cqh;
+}
+.gd-badge {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: var(--display);
+    letter-spacing: .18em;
+    font-size: clamp(11px, 1.6cqmin, 22px);
+    padding: .5em 1em;
+    rotate: -1.5deg;
+    border: 2px solid var(--cream);
+}
+.gd-title {
+    font-family: var(--display);
+    font-size: clamp(34px, 9cqmin, 150px);
+    line-height: .95;
+    margin: 2cqh 0 0;
+    color: var(--cream);
+    text-shadow: .05em .05em 0 var(--ink);
+    letter-spacing: .01em;
+}
+.gd-sub {
+    font-family: var(--display);
+    letter-spacing: .14em;
+    color: var(--gold);
+    font-size: clamp(11px, 1.9cqmin, 28px);
+    margin-top: 1.2cqh;
+}
+.gd-foot {
+    position: relative;
+    text-align: center;
+    font-family: var(--display);
+    letter-spacing: .3em;
+    font-size: clamp(11px, 1.6cqmin, 22px);
+    color: rgba(242, 235, 218, .7);
+    padding-bottom: 4cqh;
+}
+
+/* ---------- center ---------- */
+.gd-center {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5cqh;
+    padding: 0 4cqw;
+    min-height: 0;
+}
+.gd-count {
+    font-family: var(--display);
+    letter-spacing: .14em;
+    font-size: clamp(14px, 2.6cqmin, 40px);
+    color: var(--cream);
+}
+.gd-count b { color: var(--gold); font-weight: 400; }
+
+/* The rings live on the wrapper, not the button, so they share its exact
+   center; the shadow is centered too, so nothing reads as offset. */
+.gd-go-wrap {
+    position: relative;
+    width: clamp(160px, 32cqmin, 460px);
+    aspect-ratio: 1;
+    animation: gd-bob 2.4s ease-in-out infinite;
+}
+.gd-go-wrap::before, .gd-go-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid var(--cream);
+    animation: gd-ring 2.4s ease-out infinite;
+    pointer-events: none;
+}
+.gd-go-wrap::after { animation-delay: 1.2s; }
+.gd-go-off { animation: none; opacity: .4; }
+.gd-go-off::before, .gd-go-off::after { display: none; }
+
+.gd-go {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 50%;
+    border: clamp(10px, 1.6cqmin, 22px) solid var(--ink);
+    background: var(--cream);
+    color: var(--red);
+    font-family: var(--display);
+    font-size: clamp(56px, 12cqmin, 180px);
+    cursor: pointer;
+    box-shadow: 0 0 0 clamp(4px, .6cqmin, 8px) rgba(10, 10, 10, .35), 0 0 80px rgba(255, 220, 160, .35);
+    transition: transform .12s;
+}
+.gd-go span { display: block; translate: 0 .03em; }
+.gd-go:hover { transform: scale(1.04); }
+.gd-go:active { transform: scale(.96); }
+.gd-go:disabled { cursor: not-allowed; }
+@keyframes gd-bob { 50% { transform: translateY(-1.2cqh); } }
+@keyframes gd-ring { from { opacity: .8; scale: 1; } to { opacity: 0; scale: 1.45; } }
+
+/* ---------- reel ---------- */
+.gd-reel {
+    position: relative;
+    width: 100%;
+    height: 42cqh;
+    overflow: hidden;
+    border-top: 5px solid var(--gold);
+    border-bottom: 5px solid var(--gold);
+    background: rgba(10, 10, 10, .55);
+    mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.gd-reel::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 17cqh;
+    translate: 0 -50%;
+    background: rgba(242, 235, 218, .08);
+    border-top: 2px solid rgba(219, 199, 146, .5);
+    border-bottom: 2px solid rgba(219, 199, 146, .5);
+}
+.gd-reel-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: gd-roll var(--ms) cubic-bezier(.2, .7, .3, 1);
+}
+@keyframes gd-roll {
+    from { transform: translateY(-12cqh); filter: blur(3px); }
+    to { transform: none; filter: none; }
+}
+.gd-row {
+    font-family: var(--display);
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+.gd-dim { height: 12cqh; font-size: clamp(16px, 4cqmin, 60px); color: rgba(242, 235, 218, .35); }
+.gd-cur { height: 17cqh; color: var(--cream); text-shadow: .05em .05em 0 var(--ink); max-width: 96cqw; }
+
+/* ---------- reveal ---------- */
+.gd-reveal {
+    text-align: center;
+    animation: gd-shake .5s .05s;
+}
+.gd-kicker {
+    display: inline-block;
+    font-family: var(--display);
+    letter-spacing: .16em;
+    font-size: clamp(18px, 4.2cqmin, 64px);
+    color: var(--ink);
+    background: var(--gold);
+    padding: .25em .8em;
+    rotate: -2deg;
+    box-shadow: .12em .12em 0 var(--ink);
+    animation: gd-pop .5s cubic-bezier(.2, 1.6, .4, 1) both;
+}
+.gd-name {
+    font-family: var(--display);
+    text-transform: uppercase;
+    line-height: .98;
+    margin: 3.5cqh auto 0;
+    max-width: 94cqw;
+    color: var(--cream);
+    text-shadow: .045em .045em 0 var(--ink), 0 0 60px rgba(255, 210, 140, .55);
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    animation: gd-slam .7s .12s cubic-bezier(.16, 1.3, .3, 1) both, gd-glow 2s 1s ease-in-out infinite;
+}
+.gd-city {
+    font-family: var(--display);
+    letter-spacing: .2em;
+    font-size: clamp(14px, 3cqmin, 44px);
+    color: var(--gold);
+    margin-top: 2.5cqh;
+    animation: gd-rise .6s .7s both;
+}
+@keyframes gd-pop { from { scale: 0; rotate: -20deg; } }
+@keyframes gd-slam {
+    from { scale: 3; opacity: 0; filter: blur(12px); }
+    to { scale: 1; opacity: 1; filter: none; }
+}
+@keyframes gd-glow { 50% { text-shadow: .045em .045em 0 var(--ink), 0 0 110px rgba(255, 220, 150, .9); } }
+@keyframes gd-rise { from { opacity: 0; translate: 0 2cqh; } }
+@keyframes gd-shake {
+    10%, 50%, 90% { translate: -1.2cqmin .6cqmin; }
+    30%, 70% { translate: 1.2cqmin -.6cqmin; }
+}
+
+.gd-confetti {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.gd-flash {
+    position: absolute;
+    inset: 0;
+    background: #fff8e6;
+    pointer-events: none;
+    animation: gd-flash .7s ease-out forwards;
+}
+@keyframes gd-flash { from { opacity: .95; } to { opacity: 0; } }
+
+/* ---------- controls ---------- */
+.gd-bar {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: calc(100% - 24px);
+    opacity: .35;
+    transition: opacity .2s;
+}
+.gd-bar:hover { opacity: 1; }
+.gd-bar button {
+    font: 600 12px/1 var(--font-inter), system-ui, sans-serif;
+    color: var(--cream);
+    background: rgba(10, 10, 10, .75);
+    border: 1px solid rgba(242, 235, 218, .3);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.gd-bar button:hover { background: var(--ink); border-color: var(--cream); }
+
+/* ---------- setup panel ---------- */
+.gd-setup {
+    position: fixed;
+    inset: 0;
+    z-index: 4;
+    background: rgba(5, 5, 5, .7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 5vh 16px;
+    overflow-y: auto;
+    cursor: auto;
+}
+.gd-panel {
+    width: min(680px, 100%);
+    background: var(--cream);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--ink);
+    padding: 28px;
+}
+.gd-panel h2 {
+    font-family: var(--display);
+    font-size: 34px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+.gd-panel h3 { font-family: var(--display); font-size: 20px; text-transform: uppercase; margin-bottom: 8px; }
+.gd-help { font-size: 14px; line-height: 1.5; color: #3a3a3a; margin: 8px 0; }
+.gd-drop {
+    display: block;
+    margin: 16px 0 12px;
+    padding: 28px 16px;
+    text-align: center;
+    border: 2.5px dashed var(--ink);
+    background: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.gd-drop:hover { background: #fffaf0; border-color: var(--red); color: var(--red); }
+.gd-drop input { display: none; }
+.gd-paste summary { font-size: 14px; cursor: pointer; color: #3a3a3a; }
+.gd-paste textarea {
+    width: 100%;
+    margin: 10px 0 8px;
+    padding: 10px;
+    border: 2px solid var(--ink);
+    font: 14px/1.4 ui-monospace, monospace;
+    background: #fff;
+}
+.gd-paste button, .gd-actions button {
+    font-family: var(--display);
+    letter-spacing: .08em;
+    font-size: 15px;
+    padding: 12px 18px;
+    border: 2.5px solid var(--ink);
+    cursor: pointer;
+    background: #fff;
+    color: var(--ink);
+}
+.gd-panel button:disabled { opacity: .4; cursor: not-allowed; }
+.gd-stats { margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--ink); font-size: 15px; }
+.gd-warn { margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--red); }
+.gd-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.gd-chip {
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--cream);
+    cursor: pointer;
+}
+.gd-chip span { opacity: .6; margin-left: 4px; }
+.gd-chip-off { background: transparent; color: #8a8378; border-color: #b5ad9c; text-decoration: line-through; }
+.gd-log { margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--ink); }
+.gd-log-row { display: flex; flex-direction: column; gap: 2px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #d8d0bd; }
+.gd-muted { color: #6a6458; font-size: 12px; }
+.gd-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 22px; }
+.gd-primary { background: var(--red) !important; color: #fff !important; box-shadow: 4px 4px 0 var(--ink); }
+.gd-ghost { background: transparent !important; }
+.gd-keys { margin-top: 16px; font-size: 12px; color: #5a5a5a; line-height: 1.8; }
+.gd-keys kbd {
+    font: 600 11px ui-monospace, monospace;
+    border: 1px solid #a0998a;
+    border-bottom-width: 2px;
+    padding: 1px 5px;
+    background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gd-snow, .gd-go-wrap, .gd-go-wrap::before, .gd-go-wrap::after, .gd-won .gd-rays { animation: none; }
+}

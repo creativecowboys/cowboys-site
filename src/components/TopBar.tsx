@@ -7,7 +7,7 @@ export default function TopBar() {
     const pathname = usePathname();
     // Internal pages (call desk, admin panel + its login) don't get the marketing promo bar —
     // it's position:fixed and sits on top of their own headers.
-    if (pathname === "/leads" || pathname.startsWith("/leads/") || pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/playbooks/")) return null;
+    if (pathname === "/leads" || pathname.startsWith("/leads/") || pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/playbooks/") || pathname === "/thebiggiveaway/draw") return null;
     return (
         <>
             <style>{`
