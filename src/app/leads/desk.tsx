@@ -34,7 +34,7 @@ async function json<T>(response: Response): Promise<T> {
   if (!response.ok) throw Object.assign(new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again; your draft stays in this tab." : "Monday could not complete that request. Please try again.")), { status: response.status });
   return data;
 }
-export default function Desk({ demo = false, onStartOnboarding }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void }) {
+export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void; onOpenPackages?: (lead: CallLead | null) => void }) {
   const storageKey = demo ? "cc-call-desk-demo-v1" : "cc-call-desk-v1";
   const [leads, setLeads] = useState<CallLead[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -189,7 +189,7 @@ export default function Desk({ demo = false, onStartOnboarding }: { demo?: boole
   const field = (key: keyof Pick<CallDraft, "goal" | "currentMarketing" | "challenge" | "budget" | "timing" | "recommendation" | "notes" | "nextStep">, label: string, placeholder: string, wide = false) => <label className={wide ? "call-field call-wide" : "call-field"}>{label}<textarea rows={key === "notes" ? 4 : 3} value={draft?.[key] || ""} onChange={e => patch({ [key]: e.target.value })} placeholder={placeholder} maxLength={key === "notes" ? 8000 : key === "budget" || key === "timing" ? 500 : 2000} /></label>;
   const link = (value: string, label: string) => { const href = safeUrl(value); return href ? <a href={href} target="_blank" rel="noreferrer">{label} ↗</a> : null; };
   return <main className="call-desk">
-    <header className="call-header"><Link className="call-brand" href="/"><Image src="/cowboys-logo-stacked-orange.png" alt="Creative Cowboys" width={150} height={64} priority /><span>TEAM FIELD GUIDE</span></Link><div className="call-header-title"><span className="call-eyebrow">CHRISTMAS IN SEPTEMBER</span><h1>Good conversations.<br className="call-mobile-break" /> Real next steps.</h1></div><div className="call-mode">{demo ? "FICTIONAL DEMO" : "MONDAY CALL WORKSPACE"}<span>Ask. Listen. Find the right fit.</span></div></header>
+    <header className="call-header"><Link className="call-brand" href="/"><Image src="/cowboys-logo-stacked-orange.png" alt="Creative Cowboys" width={150} height={64} priority /><span>TEAM FIELD GUIDE</span></Link><div className="call-header-title"><span className="call-eyebrow">CHRISTMAS IN SEPTEMBER</span><h1>Good conversations.<br className="call-mobile-break" /> Real next steps.</h1></div><div className="call-mode">{onOpenPackages && !demo ? <button type="button" className="call-header-button" onClick={() => onOpenPackages(detail)}>Package builder →</button> : (demo ? "FICTIONAL DEMO" : "MONDAY CALL WORKSPACE")}<span>{onOpenPackages && !demo ? "Build a plan, get a pay link." : "Ask. Listen. Find the right fit."}</span></div></header>
     {demo && <div className="call-demo-banner">Preview workspace · All businesses below are fictional. Demo saves stay in this browser tab.</div>}
     {storageError && <div role="alert" className="call-alert">{storageError}</div>}
     <div className="call-layout"><aside className="call-roster" aria-label="Giveaway entrants">

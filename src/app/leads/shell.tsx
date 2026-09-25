@@ -6,6 +6,7 @@ import Desk from "./desk";
 import Handoff from "./handoff";
 import Onboarding from "./onboarding";
 import Clients from "./clients";
+import Packages from "./packages";
 import type { CallLead } from "./types";
 import "./onboarding.css";
 
@@ -17,6 +18,7 @@ export default function Shell() {
   const tab = params.get("tab") === "onboarding" ? "onboarding" : params.get("tab") === "clients" ? "clients" : "sales";
   const client = params.get("client") || "";
   const [handoff, setHandoff] = useState<{ lead: CallLead | null } | null>(null);
+  const [packages, setPackages] = useState<{ lead: CallLead | null } | null>(null);
   const go = useCallback((next: "sales" | "onboarding" | "clients", clientId?: string) => {
     const q = new URLSearchParams();
     if (next !== "sales") q.set("tab", next);
@@ -29,9 +31,10 @@ export default function Shell() {
       <button type="button" className={tab === "onboarding" ? "is-active" : ""} aria-current={tab === "onboarding" ? "page" : undefined} onClick={() => go("onboarding")}>Onboarding</button>
       <button type="button" className={tab === "clients" ? "is-active" : ""} aria-current={tab === "clients" ? "page" : undefined} onClick={() => go("clients")}>Clients</button>
     </nav>
-    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} /></div>
+    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} onOpenPackages={(lead) => setPackages({ lead })} /></div>
     {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} />}
     {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} />}
+    {packages && <Packages lead={packages.lead} onClose={() => setPackages(null)} />}
     {handoff && <Handoff lead={handoff.lead} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
   </div>;
 }

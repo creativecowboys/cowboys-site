@@ -29,3 +29,7 @@
 .call-brand img{display:block;width:150px;height:auto}
 @media(max-width:760px){.call-brand img{width:110px}}
 
+/* Header action (package builder) in the old "Monday call workspace" slot */
+.call-header-button{background:#e8603c;border:1px solid #e8603c;color:#fffaf2;border-radius:4px;padding:10px 16px;font-size:12px!important;font-weight:700!important;letter-spacing:.08em;cursor:pointer;transition:background .18s}.call-header-button:hover{background:#d95330}
+@media(max-width:1150px){.call-mode{display:block!important;margin-left:auto}.call-mode span{display:none}}
+

@@ -12,6 +12,7 @@ const sources = {
   'config': '../src/lib/onboarding/config.ts', 'api': '../src/lib/onboarding/api.ts', 'checklist': '../src/lib/onboarding/checklist.ts',
   'validation': '../src/lib/onboarding/validation.ts', 'pipeline': '../src/lib/onboarding/pipeline.ts',
   'clients-config': '../src/lib/clients/config.ts', 'clients-stripe': '../src/lib/clients/stripe.ts', 'clients-board': '../src/lib/clients/board.ts', 'clients-types': '../src/lib/clients/types.ts', 'clients.test': '../src/lib/clients/clients.test.ts',
+  'catalog': '../src/lib/packages/catalog.ts', 'catalog.test': '../src/lib/packages/catalog.test.ts',
   'checklist.test': '../src/lib/onboarding/checklist.test.ts', 'validation.test': '../src/lib/onboarding/validation.test.ts', 'pipeline.test': '../src/lib/onboarding/pipeline.test.ts',
 };
 try {
@@ -25,7 +26,7 @@ try {
     fs.writeFileSync(path.join(output, `${name}.js`), result.outputText);
   }
   // calls/validation imports "./validation"? No — it imports "./outcomes" only; onboarding/validation imports "./config" and "@/lib/calls/validation".
-  const tests = ['checklist.test', 'validation.test', 'pipeline.test', 'clients.test'].map((t) => path.join(output, `${t}.js`));
+  const tests = ['checklist.test', 'validation.test', 'pipeline.test', 'clients.test', 'catalog.test'].map((t) => path.join(output, `${t}.js`));
   process.exitCode = spawnSync(process.execPath, ['--test', ...tests], { stdio: 'inherit' }).status ?? 1;
 } finally {
   fs.rmSync(output, { recursive: true, force: true });
