@@ -3,7 +3,7 @@ import { isTeam } from "@/lib/team-auth";
 import { assertSameOrigin } from "@/lib/calls/validation";
 import { issueIntakeLink, revokeIntakeLink } from "@/lib/onboarding/intake";
 import { validateItemId } from "@/lib/onboarding/validation";
-import { failure, unauthorized } from "@/lib/onboarding/http";
+import { assertOrigin, failure, unauthorized } from "@/lib/onboarding/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ type Context = { params: Promise<{ id: string }> };
 export async function POST(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
-    assertSameOrigin(req);
+    assertOrigin(req);
     const id = validateItemId((await context.params).id);
     const origin = new URL(req.url).origin;
     return NextResponse.json(await issueIntakeLink(id, origin), { headers });
@@ -24,8 +24,7 @@ export async function POST(req: Request, context: Context) {
 export async function DELETE(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
-    const origin = req.headers.get("origin");
-    if (origin && origin !== new URL(req.url).origin) return NextResponse.json({ error: "This request must come from the call desk." }, { status: 403, headers });
+    assertOrigin(req);
     const id = validateItemId((await context.params).id);
     await revokeIntakeLink(id);
     return NextResponse.json({ revoked: true }, { headers });

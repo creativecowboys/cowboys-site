@@ -9,3 +9,10 @@ export function failure(error: unknown) {
   return NextResponse.json({ error: known ? error.message : "This request could not be completed. Nothing was lost; please try again." }, { status: known ? error.status : 500, headers: teamHeaders });
 }
 export const unauthorized = () => NextResponse.json({ error: "Please sign in to the team area." }, { status: 401, headers: teamHeaders });
+
+/** Same-origin check for body-less staff POST/DELETE calls (no JSON content-type to demand). */
+export function assertOrigin(req: Request): void {
+  const origin = req.headers.get("origin");
+  if ((origin && origin !== new URL(req.url).origin) || req.headers.get("sec-fetch-site") === "cross-site") throw new CallDeskError("This request must come from the team desk.", 403);
+}
+

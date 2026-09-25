@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { isTeam } from "@/lib/team-auth";
-import { assertSameOrigin, CallDeskError } from "@/lib/calls/validation";
+import { CallDeskError } from "@/lib/calls/validation";
 import { retryOnboarding } from "@/lib/onboarding/handoff";
 import { getOnboarding } from "@/lib/onboarding/pipeline";
 import { validateItemId } from "@/lib/onboarding/validation";
-import { failure, unauthorized } from "@/lib/onboarding/http";
+import { assertOrigin, failure, unauthorized } from "@/lib/onboarding/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ const headers = { "Cache-Control": "private, no-store" };
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     if (!(await isTeam())) return unauthorized();
-    assertSameOrigin(req);
+    assertOrigin(req);
     const id = validateItemId((await context.params).id);
     const { row } = await getOnboarding(id);
     if (!row.leadId) throw new CallDeskError("This client was not created from a giveaway lead, so there is nothing to retry.", 400);
