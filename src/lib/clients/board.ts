@@ -78,7 +78,7 @@ export async function listClients(cursor: string | null): Promise<ClientsListDat
   const rows = board.items_page.items.map(mapClient).filter((r) => r.teamDesk);
   const stillOnboarding = await onboardingInProgress(rows.map((r) => r.onboardingItem).filter(Boolean));
   // One place at a time (Dave, Sep 25 2026): a client whose onboarding record is not Launched stays on the Onboarding tab.
-  return { rows: rows.filter((r) => !stillOnboarding.has(r.onboardingItem)), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected() };
+  return { rows: rows.filter((r) => !stillOnboarding.has(r.onboardingItem)), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected(), canSeeMoney: false /* the route decides per session */ };
 }
 
 /** Which of these Onboarding Pipeline items are still before the Launched stage. Unknown/deleted items count as done. */
