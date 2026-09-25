@@ -87,3 +87,20 @@
 .ob-review dl{border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
 
 @media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}}
+
+/* Header actions + staff file uploads on the client panel */
+.ob-head-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ob-files-box{margin-top:14px;border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
+.ob-files-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.ob-files-head small{color:#71665a;font-size:11px}
+.ob-files-cat{border-top:1px solid #e3d8c6;padding:8px 0}
+.ob-files-cat-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ob-files-cat-head>span{font-size:12px;font-weight:600}
+.ob-upload{position:relative;overflow:hidden;cursor:pointer;font-size:11px!important;padding:6px 12px!important}
+.ob-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.ob-files-box .ob-files{padding:0}
+.ob-files-box .ob-files li{display:flex;align-items:center;gap:8px;border-top:0;padding:4px 0}
+.ob-files-box .ob-files li small{color:#71665a}
+.ob-files-box .ob-files li.is-uploading{color:#9a7051}
+.ob-file-remove{margin-left:auto;background:none;border:1px solid #cabcaa;border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;color:#554432}
+

@@ -54,3 +54,12 @@ test("tokens and filenames are constrained", () => {
   assert.equal(safeFilename("My Logo (final).svg"), "My Logo (final).svg");
   assert.equal(safeFilename(""), "file");
 });
+
+test("a manual client needs no lead and no lead version, but may not also name a lead", () => {
+  const manual = validateHandoff({ ...good(), leadId: "", expectedUpdatedAt: "", manual: true });
+  assert.equal(manual.manual, true); assert.equal(manual.leadId, ""); assert.equal(manual.expectedUpdatedAt, "");
+  assert.throws(() => validateHandoff({ ...good(), manual: true }), /cannot also reference a lead/);
+  assert.throws(() => validateHandoff({ ...good(), leadId: "" }), /Invalid lead/);
+  assert.throws(() => validateHandoff({ ...good(), leadId: "", manual: "yes" }), /Invalid handoff/);
+});
+

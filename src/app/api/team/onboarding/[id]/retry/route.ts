@@ -18,8 +18,9 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
     assertOrigin(req);
     const id = validateItemId((await context.params).id);
     const { row } = await getOnboarding(id);
-    if (!row.leadId) throw new CallDeskError("This client was not created from a giveaway lead, so there is nothing to retry.", 400);
-    const result = await retryOnboarding(row.leadId);
+    const key = row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "");
+    if (!key) throw new CallDeskError("This client was created in Monday by hand, so there is nothing to retry.", 400);
+    const result = await retryOnboarding(key);
     if (result.itemId !== id) throw new CallDeskError("The stored handoff points at a different Monday record. Check the Onboarding Pipeline board.", 409);
     return NextResponse.json(result, { status: result.pending.length ? 202 : 200, headers });
   } catch (error) { return failure(error); }

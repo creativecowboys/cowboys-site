@@ -22,7 +22,8 @@ export async function GET(_req: Request, context: Context) {
     if (!(await isTeam())) return unauthorized();
     const id = validateItemId((await context.params).id);
     const { row, history } = await getOnboarding(id);
-    const [record, intake] = await Promise.all([row.leadId ? readHandoff(row.leadId).catch(() => null) : Promise.resolve(null), readIntake(id).catch(() => null)]);
+    const key = row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "");
+    const [record, intake] = await Promise.all([key ? readHandoff(key).catch(() => null) : Promise.resolve(null), readIntake(id).catch(() => null)]);
     const detail: OnboardingDetail = {
       row, history, record: record?.itemId === id ? record : null,
       intake: intake ? { ...stripToken(intake), linkActive: linkActive(intake) } : null,

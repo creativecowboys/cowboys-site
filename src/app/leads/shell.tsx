@@ -16,7 +16,7 @@ export default function Shell() {
   const router = useRouter();
   const tab = params.get("tab") === "onboarding" ? "onboarding" : params.get("tab") === "clients" ? "clients" : "sales";
   const client = params.get("client") || "";
-  const [handoffLead, setHandoffLead] = useState<CallLead | null>(null);
+  const [handoff, setHandoff] = useState<{ lead: CallLead | null } | null>(null);
   const go = useCallback((next: "sales" | "onboarding" | "clients", clientId?: string) => {
     const q = new URLSearchParams();
     if (next !== "sales") q.set("tab", next);
@@ -29,9 +29,9 @@ export default function Shell() {
       <button type="button" className={tab === "onboarding" ? "is-active" : ""} aria-current={tab === "onboarding" ? "page" : undefined} onClick={() => go("onboarding")}>Onboarding</button>
       <button type="button" className={tab === "clients" ? "is-active" : ""} aria-current={tab === "clients" ? "page" : undefined} onClick={() => go("clients")}>Clients</button>
     </nav>
-    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoffLead(lead)} /></div>
-    {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} />}
+    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} /></div>
+    {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} />}
     {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} />}
-    {handoffLead && <Handoff lead={handoffLead} onClose={() => setHandoffLead(null)} onDone={(itemId) => { setHandoffLead(null); go("onboarding", itemId); }} />}
+    {handoff && <Handoff lead={handoff.lead} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
   </div>;
 }

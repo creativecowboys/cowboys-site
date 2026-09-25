@@ -22,11 +22,11 @@ function seedForm(row: OnboardingRow): HandoffForm {
   return { handoffId: "", leadId: row.leadId || "", expectedUpdatedAt: row.updatedAt, business: row.name, contact: row.contact, email: row.email, phone: row.phone, website: row.siteUrl, city: row.city, businessType: row.businessType, salesOwner: "Dave", packages: [], monthlyAgreed: "", setupAgreed: "", scope: "", exclusions: "", goals: "", context: "", startDate: "", agreement: "Unknown", payment: "Unknown", nextAction: "", nextOwner: "", nextDue: "" };
 }
 
-async function ensureIntake(itemId: string): Promise<IntakeRecord> {
+export async function ensureIntake(itemId: string): Promise<IntakeRecord> {
   const existing = await readIntake(itemId);
   if (existing) return existing;
   const row = mapRow(await readPipelineItem(itemId));
-  const record = await readHandoff(row.leadId);
+  const record = await readHandoff(row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "none"));
   if (record?.itemId === itemId) { const fresh = emptyIntake(itemId, row.leadId, record.handoff); await writeIntake(fresh); return fresh; }
   // Client created in Monday by hand (e.g. Choice Pressure Washing): seed from the board row.
   const seed = emptyIntake(itemId, row.leadId || "", seedForm(row));

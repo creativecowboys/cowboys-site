@@ -61,7 +61,7 @@ export async function listFiles(prefix: string): Promise<{ pathname: string; siz
 }
 
 export const readHandoff = (leadId: string) => readJson<HandoffRecord>(HANDOFF_PATH(leadId));
-export const writeHandoff = (record: HandoffRecord) => writeJson(HANDOFF_PATH(record.leadId), record);
+export const writeHandoff = (record: HandoffRecord) => writeJson(HANDOFF_PATH(record.leadId || `manual-${record.handoffId}`), record);
 export const readIntake = (itemId: string) => readJson<IntakeRecord>(INTAKE_PATH(itemId));
 export const writeIntake = (record: IntakeRecord) => writeJson(INTAKE_PATH(record.itemId), record);
 export const readTokenIndex = (tokenHash: string) => readJson<{ itemId: string }>(TOKEN_PATH(tokenHash));

@@ -13,24 +13,26 @@ const STORAGE = "cc-handoff-v1";
 type Drafts = Record<string, HandoffForm>;
 const ownerFor = (id: string): HandoffForm["salesOwner"] => (({ "39848115": "Dave", "39848217": "Josh", "116679004": "Keaton" } as Record<string, HandoffForm["salesOwner"]>)[id] || "Dave");
 
-function blank(lead: CallLead): HandoffForm {
+const MANUAL_KEY = "manual";
+function blank(lead: CallLead | null): HandoffForm {
   return {
-    handoffId: crypto.randomUUID(), leadId: lead.id, expectedUpdatedAt: lead.updatedAt,
-    business: lead.name, contact: lead.contact, email: lead.email, phone: lead.phone, website: lead.website, city: lead.city,
-    businessType: "", salesOwner: ownerFor(lead.ownerId), packages: [], monthlyAgreed: lead.quotedMonthly || "", setupAgreed: "",
+    handoffId: crypto.randomUUID(), leadId: lead?.id || "", manual: !lead, expectedUpdatedAt: lead?.updatedAt || "",
+    business: lead?.name || "", contact: lead?.contact || "", email: lead?.email || "", phone: lead?.phone || "", website: lead?.website || "", city: lead?.city || "",
+    businessType: "", salesOwner: lead ? ownerFor(lead.ownerId) : "Dave", packages: [], monthlyAgreed: lead?.quotedMonthly || "", setupAgreed: "",
     scope: "", exclusions: "", goals: "", context: "", startDate: "", agreement: "Unknown", payment: "Unknown", nextAction: "", nextOwner: "Madison", nextDue: "",
   };
 }
 function readDrafts(): Drafts { try { return JSON.parse(sessionStorage.getItem(STORAGE) || "{}"); } catch { return {}; } }
 function writeDrafts(d: Drafts) { try { sessionStorage.setItem(STORAGE, JSON.stringify(d)); } catch { /* keep in memory only */ } }
 
-export default function Handoff({ lead, onClose, onDone }: { lead: CallLead; onClose: () => void; onDone: (itemId: string) => void }) {
-  const [form, setForm] = useState<HandoffForm>(() => readDrafts()[lead.id] || blank(lead));
+export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void }) {
+  const draftKey = lead ? lead.id : MANUAL_KEY;
+  const [form, setForm] = useState<HandoffForm>(() => readDrafts()[draftKey] || blank(lead));
   const [review, setReview] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<StartResult | null>(null);
-  useEffect(() => { writeDrafts({ ...readDrafts(), [lead.id]: form }); }, [form, lead.id]);
+  useEffect(() => { writeDrafts({ ...readDrafts(), [draftKey]: form }); }, [form, draftKey]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape" && !busy) onClose(); };
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
@@ -51,11 +53,11 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead; onC
     setBusy(true); setError("");
     try {
       // The version was captured when the panel opened; the server refuses if the lead changed since.
-      const res = await fetch("/api/team/onboarding", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: form.expectedUpdatedAt || lead.updatedAt }) });
+      const res = await fetch("/api/team/onboarding", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: lead ? (form.expectedUpdatedAt || lead.updatedAt) : "" }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || (res.status === 401 ? "Your team session expired. Sign in again; this handoff draft stays in this tab." : "The handoff could not be saved. Your draft is still here."));
       setResult(data as StartResult);
-      if (!(data as StartResult).pending?.length) { const d = readDrafts(); delete d[lead.id]; writeDrafts(d); }
+      if (!(data as StartResult).pending?.length) { const d = readDrafts(); delete d[draftKey]; writeDrafts(d); }
     } catch (e) { setError(e instanceof Error ? e.message : "The handoff could not be saved."); }
     finally { setBusy(false); }
   };
@@ -67,9 +69,9 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead; onC
   );
   return <div className="ob-modal" role="dialog" aria-modal="true" aria-labelledby="ob-handoff-title">
     <div className="ob-modal-card">
-      <header className="ob-modal-head"><div><span className="call-eyebrow">SALES → ONBOARDING</span><h2 id="ob-handoff-title">{lead.name}</h2><p className="call-muted">Everything Madison needs to start. Use the amounts and scope that were actually agreed on the call.</p></div><button type="button" className="call-icon-button" aria-label="Close" onClick={onClose} disabled={busy}><CloseIcon /></button></header>
+      <header className="ob-modal-head"><div><span className="call-eyebrow">{lead ? "SALES → ONBOARDING" : "NEW CLIENT"}</span><h2 id="ob-handoff-title">{lead ? lead.name : form.business || "Add a client"}</h2><p className="call-muted">{lead ? "Everything Madison needs to start. Use the amounts and scope that were actually agreed on the call." : "A client that did not come through the giveaway. Fill in what was sold; the onboarding record and checklist are created the same way."}</p></div><button type="button" className="call-icon-button" aria-label="Close" onClick={onClose} disabled={busy}><CloseIcon /></button></header>
       {result ? <div className={result.pending.length ? "call-alert" : "call-success"} role="status">
-        <strong>{result.adopted ? "This lead already has an onboarding record." : result.pending.length ? "Onboarding record created, with steps still pending." : "Handed off to onboarding."}</strong>
+        <strong>{result.adopted ? "This client already has an onboarding record." : result.pending.length ? "Onboarding record created, with steps still pending." : lead ? "Handed off to onboarding." : "Client added to onboarding."}</strong>
         {result.pending.length > 0 && <p>Still pending: {result.pending.join(", ")}. Open the client on the Onboarding tab and press <b>Retry pending steps</b>; nothing will be duplicated.</p>}
         <p><a href={result.itemUrl} target="_blank" rel="noreferrer">Open in Monday ↗</a></p>
         <div><button type="button" className="call-primary" onClick={() => onDone(result.itemId)}>Open on the Onboarding tab</button></div>
@@ -90,10 +92,10 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead; onC
             <dt>Agreement · Payment</dt><dd>{form.agreement} · {form.payment}</dd>
             <dt>Next action</dt><dd>{[form.nextOwner, form.nextAction, form.nextDue && `due ${form.nextDue}`].filter(Boolean).join(" — ") || "Madison sends the intake link"}</dd>
           </dl>
-          <p className="call-save-explainer">Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the giveaway lead Won (its call history stays put) and prepares the client intake. Nothing is emailed to the client.</p>
+          <p className="call-save-explainer">{lead ? "Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the giveaway lead Won (its call history stays put) and prepares the client intake. Nothing is emailed to the client." : "This creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client."}</p>
         </section>
         {error && <div className="call-alert" role="alert"><strong>Your draft is still here.</strong><p>{error}</p></div>}
-        <footer className="call-form-footer"><span>{busy ? "Handing off… keep this page open." : "Nothing is sent to the client."}</span><div><button type="button" className="call-secondary" disabled={busy} onClick={() => setReview(false)}>Back</button><button type="button" className="call-primary" disabled={busy || problems.length > 0} onClick={submit}>{busy ? "Handing off…" : "Confirm handoff"}</button></div></footer>
+        <footer className="call-form-footer"><span>{busy ? "Handing off… keep this page open." : "Nothing is sent to the client."}</span><div><button type="button" className="call-secondary" disabled={busy} onClick={() => setReview(false)}>Back</button><button type="button" className="call-primary" disabled={busy || problems.length > 0} onClick={submit}>{busy ? "Saving…" : lead ? "Confirm handoff" : "Add client"}</button></div></footer>
       </> : <>
         <fieldset className="call-form" disabled={busy}>
           <div className="call-fields">

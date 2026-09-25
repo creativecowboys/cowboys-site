@@ -1,7 +1,9 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AGREEMENT, CHECK_STATUS, DNS_PATHS, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, STAGES } from "@/lib/onboarding/config";
+import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, STAGES, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
+import { uploadPath } from "@/lib/onboarding/validation";
 import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
 import { CloseIcon, RefreshIcon } from "./icons";
@@ -16,7 +18,7 @@ async function json<T>(response: Response): Promise<T> {
 const stageLabel = (id: string) => STAGES.find((s) => s.id === id)?.label || "Unknown";
 const fmtDate = (v: string) => v ? new Date(`${v}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
 
-export default function Onboarding({ clientId, onOpenClient, onGraduated }: { clientId: string; onOpenClient: (id: string) => void; onGraduated?: (clientRowId: string) => void }) {
+export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddClient }: { clientId: string; onOpenClient: (id: string) => void; onGraduated?: (clientRowId: string) => void; onAddClient?: () => void }) {
   const [rows, setRows] = useState<OnboardingRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [board, setBoard] = useState("Onboarding Pipeline");
@@ -48,7 +50,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated }: { cl
   ).sort((a, b) => Number(b.overdue) - Number(a.overdue) || (a.stage === "launched" ? 1 : 0) - (b.stage === "launched" ? 1 : 0) || b.missing.length - a.missing.length || a.name.localeCompare(b.name));
   const update = (row: OnboardingRow) => setRows((prev) => prev.map((r) => r.id === row.id ? row : r));
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></header>
+    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><div className="ob-head-actions">{onAddClient && <button type="button" className="call-primary" onClick={onAddClient}>+ Add client</button>}<button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></div></header>
     <div className="ob-toolbar">
       <input placeholder="Search business, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
       <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by onboarding owner"><option value="">All owners</option>{owners.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
@@ -68,7 +70,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated }: { cl
         <span>{r.nextAction || <em>None set</em>}<small className={r.overdue ? "ob-overdue" : ""}>{r.overdue ? "Overdue" : ""}{r.lastTouch && ` · touched ${fmtDate(r.lastTouch)}`}</small></span>
       </button>)}
       {loading && <p role="status" className="call-roster-message">Loading from Monday…</p>}
-      {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients in onboarding yet. Hand one off from the Sales tab."}</p>}
+      {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients in onboarding yet. Hand one off from the Sales tab or add one here."}</p>}
     </div>
     {cursor && <button className="call-secondary call-load-more" disabled={loading} onClick={() => load(cursor)}>Load more clients</button>}
     {clientId && <ClientPanel key={clientId} id={clientId} onClose={() => onOpenClient("")} onRow={update} onGraduated={onGraduated} />}
@@ -83,6 +85,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
   const [next, setNext] = useState({ action: "", due: "" });
   const [link, setLink] = useState<{ url: string; expiresAt: string } | null>(null);
   const [gbpUrl, setGbpUrl] = useState("");
+  const [uploading, setUploading] = useState<string[]>([]);
   const load = useCallback(async () => {
     setError("");
     try { const d: OnboardingDetail = await json(await fetch(`/api/team/onboarding/${id}`, { cache: "no-store" })); setDetail(d); onRow(d.row); setNext({ action: d.row.nextAction, due: "" }); setGbpUrl(d.row.gbpUrl); }
@@ -104,6 +107,24 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
     try { return await json<Record<string, unknown>>(await fetch(`/api/team/onboarding/${id}/${path}`, { method, headers: { "Content-Type": "application/json" } })); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not complete that."); return null; }
     finally { setBusy(""); }
+  };
+  const addFiles = async (category: (typeof FILE_CATEGORIES)[number], list: FileList | null) => {
+    if (!list?.length) return;
+    for (const file of Array.from(list)) {
+      if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB.`); continue; }
+      setUploading((u) => [...u, file.name]);
+      try {
+        const blob = await upload(uploadPath(id, category, file.name), file, { access: "private", handleUploadUrl: `/api/team/onboarding/${id}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        await json(await fetch(`/api/team/onboarding/${id}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }));
+      } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload.`); }
+      finally { setUploading((u) => u.filter((n) => n !== file.name)); }
+    }
+    await load();
+  };
+  const removeFile = async (key: string) => {
+    setError("");
+    try { await json(await fetch(`/api/team/onboarding/${id}/files?key=${encodeURIComponent(key)}`, { method: "DELETE" })); await load(); }
+    catch (e) { setError(e instanceof Error ? e.message : "Could not remove that file."); }
   };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
   const { row, record, intake, owners, history } = detail;
@@ -143,7 +164,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
       {row.overdue && <p className="ob-overdue">Overdue.</p>}
     </section>
 
-    <section className="ob-section"><h3>Client intake</h3>
+    <section className="ob-section"><h3>Client intake &amp; files</h3>
       <div className="ob-grid"><div><span>Status</span><b>{row.intake || "Not sent"}</b></div><div><span>Link</span><b>{intake?.linkActive ? `Active until ${intake.tokenExpiresAt?.slice(0, 10)}` : "None active"}</b></div><div><span>Submitted</span><b>{intake?.submittedAt ? intake.submittedAt.slice(0, 10) : "—"}</b></div><div><span>Files</span><b>{intake?.files.length || 0}</b></div></div>
       <div className="ob-buttons">
         <button className="call-primary" disabled={!!busy} onClick={async () => { const r = await post("intake-link", "link") as { url: string; expiresAt: string } | null; if (r) { setLink(r); await load(); } }}>{busy === "link" ? "Issuing…" : intake?.linkActive ? "Issue a new link (replaces the old one)" : "Issue intake link"}</button>
@@ -153,8 +174,14 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
       {link && <div className="call-success"><strong>Copy this link now — it is shown once.</strong><p><input readOnly value={link.url} onFocus={(e) => e.currentTarget.select()} /></p><button className="call-secondary" onClick={() => copy(link.url)}>Copy link</button><p>Expires {link.expiresAt.slice(0, 10)}. Send it yourself; nothing is emailed automatically.</p></div>}
       {intake && <details className="ob-details"><summary>What the client has filled in{intake.lastSavedAt ? ` (saved ${intake.lastSavedAt.slice(0, 10)})` : ""}</summary>
         <dl>{Object.entries(intake.form).map(([k, v]) => <FormRow key={k} k={k} v={v} />)}</dl>
-        {intake.files.length > 0 && <ul className="ob-files">{intake.files.map((f) => <li key={f.key}><a href={`/api/team/onboarding/${id}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{f.category} · {(f.size / 1024).toFixed(0)} KB</small></li>)}</ul>}
       </details>}
+      <div className="ob-files-box">
+        <div className="ob-files-head"><strong>Files</strong><small>{intake?.files.length || 0} on file · up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each · private to the team</small></div>
+        {FILE_CATEGORIES.map((cat) => <div key={cat} className="ob-files-cat">
+          <div className="ob-files-cat-head"><span>{cat}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
+          <ul className="ob-files">{(intake?.files || []).filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${id}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
+        </div>)}
+      </div>
     </section>
 
     <section className="ob-section"><h3>Access</h3>

@@ -19,7 +19,7 @@ function object(input: unknown, what: string): Record<string, unknown> {
   return input as Record<string, unknown>;
 }
 
-const HANDOFF_KEYS: (keyof HandoffForm)[] = ["handoffId", "leadId", "expectedUpdatedAt", "business", "contact", "email", "phone", "website", "city", "businessType", "salesOwner", "packages", "monthlyAgreed", "setupAgreed", "scope", "exclusions", "goals", "context", "startDate", "agreement", "payment", "nextAction", "nextOwner", "nextDue"];
+const HANDOFF_KEYS: (keyof HandoffForm)[] = ["handoffId", "leadId", "manual", "expectedUpdatedAt", "business", "contact", "email", "phone", "website", "city", "businessType", "salesOwner", "packages", "monthlyAgreed", "setupAgreed", "scope", "exclusions", "goals", "context", "startDate", "agreement", "payment", "nextAction", "nextOwner", "nextDue"];
 
 export function validateHandoff(input: unknown, routeLeadId?: string): HandoffForm {
   const raw = object(input, "handoff");
@@ -35,9 +35,17 @@ export function validateHandoff(input: unknown, routeLeadId?: string): HandoffFo
     nextAction: s("nextAction", 500), nextOwner: s("nextOwner", 10) as HandoffForm["nextOwner"], nextDue: s("nextDue", 10),
   };
   if (!UUID.test(form.handoffId)) throw new CallDeskError("Invalid handoff reference. Reopen the lead.", 400);
-  validateLeadId(form.leadId);
-  if (routeLeadId && routeLeadId !== form.leadId) throw new CallDeskError("The selected lead does not match this handoff.", 400);
-  if (!ISO.test(form.expectedUpdatedAt) || !Number.isFinite(Date.parse(form.expectedUpdatedAt))) throw new CallDeskError("Reload the lead before handing it off.", 400);
+  if (raw.manual !== undefined && typeof raw.manual !== "boolean") throw new CallDeskError("Invalid handoff.", 400);
+  form.manual = raw.manual === true;
+  if (form.manual) {
+    // Added by hand on the Onboarding tab: no giveaway lead, no lead version to check.
+    if (form.leadId) throw new CallDeskError("A manual client cannot also reference a lead.", 400);
+    form.expectedUpdatedAt = "";
+  } else {
+    validateLeadId(form.leadId);
+    if (routeLeadId && routeLeadId !== form.leadId) throw new CallDeskError("The selected lead does not match this handoff.", 400);
+    if (!ISO.test(form.expectedUpdatedAt) || !Number.isFinite(Date.parse(form.expectedUpdatedAt))) throw new CallDeskError("Reload the lead before handing it off.", 400);
+  }
   if (!form.business) throw new CallDeskError("Business name is required.", 400);
   if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) throw new CallDeskError("Enter a valid email or leave it blank.", 400);
   if (form.businessType && !(BUSINESS_TYPES as readonly string[]).includes(form.businessType)) throw new CallDeskError("Choose a valid business type.", 400);

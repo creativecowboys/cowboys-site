@@ -2,7 +2,8 @@ import type { FileCategory, PackageLabel, StageId } from "./config";
 
 export type HandoffForm = {
   handoffId: string; // uuid v4, minted by the desk when the panel opens; idempotency key
-  leadId: string;
+  leadId: string; // "" for a client added by hand (manual: true)
+  manual?: boolean;
   expectedUpdatedAt: string; // Giveaway lead version at the time of handoff
   business: string; contact: string; email: string; phone: string; website: string; city: string;
   businessType: string; // one of BUSINESS_TYPES or ""

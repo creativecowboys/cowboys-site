@@ -119,6 +119,15 @@ export async function findByLeadId(leadId: string): Promise<OnboardingRow[]> {
   return (data.items_page_by_column_values?.items || []).filter((i) => i.group?.id !== TEMPLATE_GROUP_ID).map(mapRow);
 }
 
+/** Manual clients have no lead; their handoff id is the only stable key on the board. */
+export async function findByHandoffId(handoffId: string): Promise<OnboardingRow[]> {
+  const data = await monday<{ items_page_by_column_values: { items: Item[] } }>(
+    `query OnboardingByHandoff($board: ID!, $columns: [ItemsPageByColumnValuesQuery!]) { items_page_by_column_values(board_id: $board, limit: 10, columns: $columns) { items { ${ITEM_FIELDS} } } }`,
+    { board: PIPELINE_BOARD_ID, columns: [{ column_id: COL.handoffId, column_values: [handoffId] }] },
+  );
+  return (data.items_page_by_column_values?.items || []).filter((i) => i.group?.id !== TEMPLATE_GROUP_ID).map(mapRow);
+}
+
 export function handoffColumns(form: HandoffForm): Record<string, unknown> {
   const today = todayEastern();
   const staff = STAFF.find((s) => s.name === form.salesOwner);
@@ -131,7 +140,7 @@ export function handoffColumns(form: HandoffForm): Record<string, unknown> {
     [COL.signed]: { date: today }, [COL.lastTouch]: { date: today },
     [COL.health]: { label: "Not Started" }, [COL.gbpAccess]: { label: "Not Requested" }, [COL.intake]: { label: "Not sent" },
     [COL.agreement]: { label: form.agreement }, [COL.payment]: { label: form.payment },
-    [COL.package]: { labels: form.packages }, [COL.leadId]: form.leadId, [COL.handoffId]: form.handoffId,
+    [COL.package]: { labels: form.packages }, [COL.handoffId]: form.handoffId, ...(form.leadId ? { [COL.leadId]: form.leadId } : {}),
     [COL.notes]: noteLines,
     [COL.nextAction]: form.nextAction ? joinNextAction(`${form.nextOwner ? `${form.nextOwner}: ` : ""}${form.nextAction}`, form.nextDue) : joinNextAction("Madison: send the intake link and request assets", form.nextDue),
   };
