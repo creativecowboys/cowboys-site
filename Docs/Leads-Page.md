@@ -10,8 +10,8 @@ interest / follow-up / quote back to Monday, and **assign the lead to Dave, Josh
 Owner people column).
 
 ## Sign-in (email-only since Sep 24 2026)
-`/admin/login` asks for a work email. Team addresses (dave@, josh@, keaton@, madison@creativecowboys.co, plus any in
-`TEAM_LOGIN_EMAILS`) get a one-time link from howdy@ via Resend (`src/lib/team-login.ts`, tokens hashed in private Blob,
+`/admin/login` asks for a work email. Any **@creativecowboys.co** address (plus any outside address listed in
+`TEAM_LOGIN_EMAILS`) gets a one-time link from howdy@ via Resend (`src/lib/team-login.ts`, tokens hashed in private Blob,
 15-minute expiry, single use, 1 link per minute per address). The link hits `/api/admin/verify`, which sets the same
 `cc_admin_token` cookie as before (issuer `cc-admin`, now 30 days, `sub` = the email). `src/middleware.ts` still sends
 unauthenticated visitors from `/leads` to `/admin/login?next=/leads`; the APIs still check the cookie via

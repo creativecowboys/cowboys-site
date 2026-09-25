@@ -10,14 +10,17 @@ import { Resend } from "resend";
 export const SESSION_DAYS = 30;
 const LINK_MINUTES = 15;
 const THROTTLE_SECONDS = 60;
-const DEFAULT_TEAM = ["dave@creativecowboys.co", "josh@creativecowboys.co", "keaton@creativecowboys.co", "madison@creativecowboys.co"];
+// Dave, Sep 24 2026: "anyone that has a cowboys email account should be able to get in."
+const TEAM_DOMAIN = "creativecowboys.co";
 
-export function teamEmails(): string[] {
-  const extra = (process.env.TEAM_LOGIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter((s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s));
-  return [...new Set([...DEFAULT_TEAM, ...extra])];
+export function extraTeamEmails(): string[] {
+  return (process.env.TEAM_LOGIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter((s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s));
 }
 export const normalizeEmail = (value: unknown): string => (typeof value === "string" ? value.trim().toLowerCase().slice(0, 200) : "");
-export const isTeamEmail = (email: string): boolean => teamEmails().includes(email);
+export function isTeamEmail(email: string): boolean {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return false;
+  return email.endsWith(`@${TEAM_DOMAIN}`) || extraTeamEmails().includes(email);
+}
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 const magicPath = (tokenHash: string) => `auth/magic/${tokenHash}.json`;
