@@ -6,13 +6,13 @@ import { checklistFor, isRequiredName, missingRequired, readinessProblems } from
 import type { ChecklistItem, HandoffForm, OnboardingListData, OnboardingRow } from "./types";
 import type { PatchAction } from "./validation";
 
-type Column = { id: string; text: string | null; value: string | null };
+type Column = { id: string; text: string | null; value: string | null; display_value?: string | null }; // display_value: formula columns
 type Sub = { id: string; name: string; column_values: Column[] };
 type Update = { id: string; text_body: string | null; created_at: string; creator: { name: string } | null };
 type Item = { id: string; name: string; updated_at: string; board: { id: string }; group: { id: string; title: string } | null; column_values: Column[]; subitems?: Sub[] | null; updates?: Update[] };
 
 const COLUMN_IDS = Object.values(COL);
-const ITEM_FIELDS = `id name updated_at board { id } group { id title } column_values(ids: ${JSON.stringify(COLUMN_IDS)}) { id text value } subitems { id name column_values(ids: ${JSON.stringify(Object.values(SUBITEM_COL))}) { id text value } }`;
+const ITEM_FIELDS = `id name updated_at board { id } group { id title } column_values(ids: ${JSON.stringify(COLUMN_IDS)}) { id text value ... on FormulaValue { display_value } } subitems { id name column_values(ids: ${JSON.stringify(Object.values(SUBITEM_COL))}) { id text value ... on FormulaValue { display_value } } }`;
 const UPDATE_FIELDS = "id text_body created_at creator { name }";
 export const GIVEAWAY_WON_GROUP = "group_mm76aae3";
 
@@ -43,7 +43,7 @@ export const joinNextAction = (action: string, due: string) => (due ? `[due ${du
 export function mapRow(item: Item): OnboardingRow {
   requirePipeline(item);
   const cols = item.column_values;
-  const text = (id: string) => cols.find((c) => c.id === id)?.text || "";
+  const text = (id: string) => { const c = cols.find((x) => x.id === id); return (c?.display_value ?? c?.text) || ""; };
   const packages = text(COL.package);
   const packageList = packages.split(",").map((s) => s.trim()).filter(Boolean);
   const checklist: ChecklistItem[] = (item.subitems || []).map((s) => {
