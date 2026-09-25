@@ -6,6 +6,7 @@ import { snapshot, stripeConnected } from "@/lib/clients/stripe";
 import type { ClientDetail } from "@/lib/clients/types";
 import { validateClientId, validateClientPatch } from "@/lib/clients/validation";
 import { onboardingOwners } from "@/lib/onboarding/config";
+import { readIntake } from "@/lib/onboarding/store";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 
 export const runtime = "nodejs";
@@ -22,7 +23,10 @@ export async function GET(_req: Request, context: Context) {
     const { row, history } = await getClient(id);
     // Live Stripe read when we know the customer; a Stripe hiccup never hides the Monday record.
     const stripe = stripeConnected() && row.stripeCustomer ? await snapshot(row.stripeCustomer).catch(() => null) : null;
-    const detail: ClientDetail = { row: canSeeMoney ? row : withoutMoney(row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: onboardingOwners(), canSeeMoney };
+    // Files live with the onboarding record when there is one; otherwise in a store keyed by this client row.
+    const fileScope = row.onboardingItem || `c${row.id}`;
+    const files = (await readIntake(fileScope).catch(() => null))?.files.map((f) => ({ key: f.key, name: f.name, size: f.size, category: f.category, uploadedAt: f.uploadedAt })) || [];
+    const detail: ClientDetail = { fileScope, files, row: canSeeMoney ? row : withoutMoney(row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: onboardingOwners(), canSeeMoney };
     return NextResponse.json(detail, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }

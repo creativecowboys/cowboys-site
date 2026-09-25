@@ -5,7 +5,7 @@ import { CallDeskError } from "@/lib/calls/validation";
 import { UPLOAD_MAX_BYTES, UPLOAD_TYPES } from "@/lib/onboarding/config";
 import { ensureIntake, filePathFor, indexFile } from "@/lib/onboarding/intake";
 import { FILE_PREFIX } from "@/lib/onboarding/store";
-import { validateFileCategory, validateItemId } from "@/lib/onboarding/validation";
+import { validateFileCategory, validateFileScope } from "@/lib/onboarding/validation";
 import { teamHeaders } from "@/lib/onboarding/http";
 
 export const runtime = "nodejs";
@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 // is authenticated by handleUpload's own signature instead.
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const id = validateItemId((await context.params).id);
+    const id = validateFileScope((await context.params).id);
     const body = (await req.json()) as HandleUploadBody;
     if (body.type === "blob.generate-client-token") {
       if (!(await isTeam())) return NextResponse.json({ error: "Please sign in to the team area." }, { status: 401, headers: teamHeaders });

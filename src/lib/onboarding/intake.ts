@@ -25,6 +25,14 @@ function seedForm(row: OnboardingRow): HandoffForm {
 export async function ensureIntake(itemId: string): Promise<IntakeRecord> {
   const existing = await readIntake(itemId);
   if (existing) return existing;
+  if (itemId.startsWith("c")) {
+    // Client-row file store (Clients tab) for a client that has no onboarding record.
+    const { getClient } = await import("@/lib/clients/board");
+    const { row } = await getClient(itemId.slice(1));
+    const seed = emptyIntake(itemId, "", { handoffId: "", leadId: "", expectedUpdatedAt: row.updatedAt, business: row.name, contact: row.contact, email: row.email, phone: row.phone, website: row.website, city: "", businessType: "", salesOwner: "Dave", packages: [], monthlyAgreed: "", setupAgreed: "", scope: "", exclusions: "", goals: "", context: "", startDate: "", agreement: "Unknown", payment: "Unknown", nextAction: "", nextOwner: "", nextDue: "" });
+    await writeIntake(seed);
+    return seed;
+  }
   const row = mapRow(await readPipelineItem(itemId));
   const record = await readHandoff(row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "none"));
   if (record?.itemId === itemId) { const fresh = emptyIntake(itemId, row.leadId, record.handoff); await writeIntake(fresh); return fresh; }

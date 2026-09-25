@@ -101,6 +101,12 @@ export function validatePatch(input: unknown): PatchAction & { expectedUpdatedAt
   }
 }
 
+/** A file store belongs to an onboarding item (digits) or, for clients that never went through onboarding, to a client row ("c" + digits). */
+export function validateFileScope(id: string): string {
+  if (!/^c?[1-9]\d{0,19}$/.test(id)) throw new CallDeskError("Invalid client.", 400);
+  return id;
+}
+
 export function validateItemId(id: string): string {
   if (!/^[1-9]\d{0,19}$/.test(id)) throw new CallDeskError("Invalid client.", 400);
   return id;

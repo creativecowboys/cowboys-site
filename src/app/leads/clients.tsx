@@ -1,7 +1,10 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from "@/lib/clients/config";
+import { FILE_CATEGORIES, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
+import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
 import { CloseIcon, RefreshIcon } from "./icons";
 
@@ -87,6 +90,7 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
   const [dates, setDates] = useState({ nextBill: "", termEnds: "", billingDay: "" });
   const [gbpUrl, setGbpUrl] = useState("");
   const [synced, setSynced] = useState<string[] | null>(null);
+  const [uploading, setUploading] = useState<string[]>([]);
   const load = useCallback(async () => {
     setError("");
     try {
@@ -111,8 +115,28 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     catch (e) { setError(e instanceof Error ? e.message : "Sync failed."); }
     finally { setBusy(""); }
   };
+  const addFiles = async (category: (typeof FILE_CATEGORIES)[number], list: FileList | null) => {
+    const scope = detail?.fileScope;
+    if (!list?.length || !scope) return;
+    for (const file of Array.from(list)) {
+      if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB.`); continue; }
+      setUploading((u) => [...u, file.name]);
+      try {
+        const blob = await upload(uploadPath(scope, category, file.name), file, { access: "private", handleUploadUrl: `/api/team/onboarding/${scope}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        await json(await fetch(`/api/team/onboarding/${scope}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }));
+      } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload.`); }
+      finally { setUploading((u) => u.filter((n) => n !== file.name)); }
+    }
+    await load();
+  };
+  const removeFile = async (key: string) => {
+    if (!detail) return;
+    setError("");
+    try { await json(await fetch(`/api/team/onboarding/${detail.fileScope}/files?key=${encodeURIComponent(key)}`, { method: "DELETE" })); await load(); }
+    catch (e) { setError(e instanceof Error ? e.message : "Could not remove that file."); }
+  };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
-  const { row, stripe, stripeConnected, owners, history, canSeeMoney } = detail;
+  const { row, stripe, stripeConnected, owners, history, canSeeMoney, files, fileScope } = detail;
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
     <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">Monday ↗</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
@@ -163,6 +187,16 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "reportSent" }, "report")}>Report sent today</button>{row.website && <a className="call-secondary" href={row.website} target="_blank" rel="noreferrer">Site ↗</a>}{row.ghlContact && <a className="call-secondary" href={row.ghlContact} target="_blank" rel="noreferrer">GHL ↗</a>}{row.driveFolder && <a className="call-secondary" href={row.driveFolder} target="_blank" rel="noreferrer">Files ↗</a>}</div>
       <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}`}>open</a>.</>}</p>
       {row.notes && <p className="call-preserve ob-notes">{row.notes}</p>}
+    </section>
+
+    <section className="ob-section"><h3>Files <small>{files.length} on file{row.onboardingItem ? " · from onboarding" : ""}</small></h3>
+      <div className="ob-files-box">
+        <div className="ob-files-head"><strong>Logo, photos, content, references</strong><small>Everything the client uploaded during onboarding, plus anything the team adds here. Up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each, private to the team.</small></div>
+        {FILE_CATEGORIES.map((cat) => <div key={cat} className="ob-files-cat">
+          <div className="ob-files-cat-head"><span>{cat}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
+          <ul className="ob-files">{files.filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${fileScope}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
+        </div>)}
+      </div>
     </section>
 
     <section className="ob-section"><h3>Notes</h3>

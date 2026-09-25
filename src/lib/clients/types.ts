@@ -18,4 +18,5 @@ export type StripeSnapshot = {
   latestInvoice: { id: string; status: string; amountDue: number; paidAt: string; dueDate: string; attempted: boolean; hostedUrl: string } | null;
   fetchedAt: string;
 };
-export type ClientDetail = { row: ClientRow; history: { id: string; text: string; createdAt: string; author: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean };
+export type ClientFile = { key: string; name: string; size: number; category: string; uploadedAt: string };
+export type ClientDetail = { fileScope: string; files: ClientFile[]; row: ClientRow; history: { id: string; text: string; createdAt: string; author: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean };
