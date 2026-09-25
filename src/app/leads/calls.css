@@ -24,3 +24,8 @@
 .call-last-heading span,.call-last-conversation small{font-size:11px;color:#71665a}
 .call-last-conversation p{font-size:13px;line-height:1.8;margin:12px 0}
 @media(max-width:760px){.call-queue-filter select{font-size:16px}.call-last-conversation{padding:16px}}
+
+/* Stacked script logo in the desk header (replaces the text wordmark, Sep 24 2026) */
+.call-brand img{display:block;width:150px;height:auto}
+@media(max-width:760px){.call-brand img{width:110px}}
+
