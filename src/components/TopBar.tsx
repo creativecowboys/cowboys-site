@@ -34,9 +34,9 @@ export default function TopBar() {
                     className="w-full flex justify-between items-center"
                     style={{ width: "100%" }}
                 >
-                    {/* Giveaway promo (swap back to the Franklin line after Sept 25) */}
+                    {/* Franklin, TN office line (giveaway promo removed Sep 24 2026 — entries closed) */}
                     <Link
-                        href="/thebiggiveaway"
+                        href="/franklin-tn/web-design"
                         prefetch={false}
                         style={{
                             fontFamily: "var(--font-body), sans-serif",
@@ -55,7 +55,7 @@ export default function TopBar() {
                             ((e.currentTarget as HTMLAnchorElement).style.color = "#1a1a1a")
                         }
                     >
-                        🎁 CHRISTMAS IN SEPTEMBER: WIN A $44,000 MARKETING PACKAGE — ENTER BY SEPT 24 →
+                        COMING SOON: OUR FRANKLIN, TN OFFICE →
                     </Link>
 
                     {/* Phone — turns red-orange on hover */}

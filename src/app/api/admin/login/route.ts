@@ -6,8 +6,10 @@ const secret = () => new TextEncoder().encode(process.env.NEXTAUTH_SECRET ?? "")
 export async function POST(req: NextRequest) {
     const { username, password } = await req.json();
 
-    const validUser = username === process.env.ADMIN_USERNAME;
-    const validPass = password === process.env.ADMIN_PASSWORD;
+    // Exact secrets, but forgiving about stray whitespace and username case (autofill, mobile keyboards).
+    const clean = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+    const validUser = !!process.env.ADMIN_USERNAME && clean(username).toLowerCase() === process.env.ADMIN_USERNAME.trim().toLowerCase();
+    const validPass = !!process.env.ADMIN_PASSWORD && clean(password) === process.env.ADMIN_PASSWORD.trim();
 
     if (!validUser || !validPass) {
         return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
+import { redirect } from "next/navigation";
 import { ENTRY_DEADLINE, resolvePhase } from "@/lib/giveaway";
 import { SITE_URL } from "@/lib/seo";
 import Countdown from "./Countdown";
@@ -101,6 +102,9 @@ const faqSchema = {
 
 export default function ChristmasInSeptemberPage() {
     const phase = resolvePhase();
+    // Entries closed Sep 24 2026 (Dave: "the page needs to be hidden"). Anything but an open
+    // giveaway sends visitors home; the API rejects late submissions on its own (410).
+    if (phase !== "open") redirect("/");
     const isOpen = phase === "open";
 
     return (
