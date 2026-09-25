@@ -9,10 +9,13 @@ A private page for Dave, Josh and Keaton to work Christmas in September entrants
 interest / follow-up / quote back to Monday, and **assign the lead to Dave, Josh or Keaton** (writes the board's
 Owner people column).
 
-## Sign-in
-Reuses the site's existing admin sign-in: `/admin/login` (ADMIN_USERNAME / ADMIN_PASSWORD, 12-hour `cc_admin_token`
-cookie). `src/middleware.ts` redirects unauthenticated visitors from `/leads` to `/admin/login?next=/leads`; the API
-routes check the same cookie via `src/lib/team-auth.ts`. One shared login; the rep name on a call note is self-selected.
+## Sign-in (email-only since Sep 24 2026)
+`/admin/login` asks for a work email. Team addresses (dave@, josh@, keaton@, madison@creativecowboys.co, plus any in
+`TEAM_LOGIN_EMAILS`) get a one-time link from howdy@ via Resend (`src/lib/team-login.ts`, tokens hashed in private Blob,
+15-minute expiry, single use, 1 link per minute per address). The link hits `/api/admin/verify`, which sets the same
+`cc_admin_token` cookie as before (issuer `cc-admin`, now 30 days, `sub` = the email). `src/middleware.ts` still sends
+unauthenticated visitors from `/leads` to `/admin/login?next=/leads`; the APIs still check the cookie via
+`src/lib/team-auth.ts`. ADMIN_USERNAME / ADMIN_PASSWORD are no longer used. The rep name on a call note is still self-selected.
 
 ## Code
 - `src/app/leads/` — page + desk UI (desk.tsx now calls the real API; `demo` prop kept for local review).

@@ -1,35 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SignJWT } from "jose";
+import { issueMagicLink, normalizeEmail, safeNext } from "@/lib/team-login";
 
-const secret = () => new TextEncoder().encode(process.env.NEXTAUTH_SECRET ?? "");
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
+// Email-only sign-in: POST { email, next? } → a one-time link is emailed if the address is on the team list.
+// The response is the same whether or not the address is known, so the list cannot be probed.
 export async function POST(req: NextRequest) {
-    const { username, password } = await req.json();
-
-    // Exact secrets, but forgiving about stray whitespace and username case (autofill, mobile keyboards).
-    const clean = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-    const validUser = !!process.env.ADMIN_USERNAME && clean(username).toLowerCase() === process.env.ADMIN_USERNAME.trim().toLowerCase();
-    const validPass = !!process.env.ADMIN_PASSWORD && clean(password) === process.env.ADMIN_PASSWORD.trim();
-
-    if (!validUser || !validPass) {
-        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    // Sign a short-lived JWT as the admin session token
-    const token = await new SignJWT({ role: "admin", sub: username })
-        .setProtectedHeader({ alg: "HS256" })
-        .setIssuedAt()
-        .setIssuer("cc-admin")
-        .setExpirationTime("12h")
-        .sign(secret());
-
-    const response = NextResponse.json({ ok: true });
-    response.cookies.set("cc_admin_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 12, // 12 hours
-        path: "/",
-    });
-    return response;
+  let body: { email?: unknown; next?: unknown } = {};
+  try { body = await req.json(); } catch { /* handled below */ }
+  const email = normalizeEmail(body.email);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return NextResponse.json({ error: "Enter your work email address." }, { status: 400 });
+  const origin = req.headers.get("origin");
+  if (origin && origin !== req.nextUrl.origin) return NextResponse.json({ error: "Sign in from the site itself." }, { status: 403 });
+  try {
+    const result = await issueMagicLink(email, req.nextUrl.origin, safeNext(typeof body.next === "string" ? body.next : ""));
+    if (result === "unconfigured") return NextResponse.json({ error: "Sign-in email is not configured on this deployment yet." }, { status: 503 });
+    // "sent", "not-team" and "throttled" all read the same to the browser.
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "The sign-in email could not be sent right now. Try again in a minute." }, { status: 502 });
+  }
 }

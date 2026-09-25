@@ -1,37 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function AdminLoginPage() {
-    const router = useRouter();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    return <Suspense fallback={null}><LoginCard /></Suspense>;
+}
+
+function LoginCard() {
+    const params = useSearchParams();
+    const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [sent, setSent] = useState(false);
+    const expired = params.get("expired") === "1";
 
+    // Email-only sign-in: the server emails a one-time link to team addresses. The reply is the same
+    // whether or not the address is on the team, so nothing here confirms who is on the list.
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
         setLoading(true);
-
+        const next = params.get("next") || "";
         const res = await fetch("/api/admin/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password }),
-        });
-
+            body: JSON.stringify({ email, next }),
+        }).catch(() => null);
         setLoading(false);
-
-        if (!res.ok) {
-            setError("Incorrect username or password.");
-        } else {
-            // The call desk sends people here with ?next=/leads; only that path is honored.
-            const next = new URLSearchParams(window.location.search).get("next");
-            router.push(next === "/leads" ? "/leads" : "/admin");
-            router.refresh();
-        }
+        if (!res) { setError("Could not reach the site. Check your connection and try again."); return; }
+        if (!res.ok) { const data = await res.json().catch(() => ({})); setError(data.error || "Could not send the sign-in link."); return; }
+        setSent(true);
     }
 
     return (
@@ -53,9 +54,9 @@ export default function AdminLoginPage() {
             <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "350px", height: "350px", borderRadius: "50%", background: "radial-gradient(ellipse, rgba(241,95,42,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
 
             {/* Logo */}
-            <a href="/" style={{ display: "block", marginBottom: "36px" }}>
+            <Link href="/" style={{ display: "block", marginBottom: "36px" }}>
                 <Image src="/Main%20logo%202.png" alt="Creative Cowboys" width={150} height={42} priority style={{ width: "150px", height: "auto" }} />
-            </a>
+            </Link>
 
             {/* Card */}
             <div
@@ -78,39 +79,36 @@ export default function AdminLoginPage() {
                         Control Panel
                     </h1>
                     <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.35)", margin: "4px 0 0" }}>
-                        Manage clients &amp; reporting
+                        Sales desk, onboarding &amp; client reporting
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                    <div>
-                        <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: "7px" }}>
-                            Username
-                        </label>
-                        <input
-                            id="admin-username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            autoComplete="username"
-                            style={{ width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", color: "#fff", outline: "none", boxSizing: "border-box", transition: "border-color 200ms ease" }}
-                            onFocus={(e) => (e.target.style.borderColor = "rgba(42,156,241,0.5)")}
-                            onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
-                        />
+                {sent ? (
+                    <div style={{ textAlign: "center", color: "rgba(255,255,255,0.75)", fontSize: "14px", lineHeight: 1.6 }}>
+                        <p style={{ margin: "0 0 8px", color: "#fff", fontWeight: 700 }}>Check your email</p>
+                        <p style={{ margin: 0 }}>If <b>{email}</b> is on the team, a sign-in link is on its way. It works once and expires in 15 minutes.</p>
+                        <button type="button" onClick={() => { setSent(false); setError(""); }} style={{ marginTop: "18px", background: "none", border: "none", color: "rgba(42,156,241,0.9)", fontSize: "13px", cursor: "pointer" }}>Use a different address</button>
                     </div>
-
+                ) : (
+                <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                    {expired && !error && (
+                        <div style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "8px", padding: "9px 12px", fontSize: "13px", color: "#fde68a", textAlign: "center" }}>
+                            That link has expired or was already used. Request a new one.
+                        </div>
+                    )}
                     <div>
                         <label style={{ display: "block", fontSize: "11px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginBottom: "7px" }}>
-                            Password
+                            Work email
                         </label>
                         <input
-                            id="admin-password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            id="admin-email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
-                            autoComplete="current-password"
+                            autoComplete="email"
+                            inputMode="email"
+                            placeholder="you@creativecowboys.co"
                             style={{ width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "10px", padding: "11px 14px", fontSize: "14px", color: "#fff", outline: "none", boxSizing: "border-box", transition: "border-color 200ms ease" }}
                             onFocus={(e) => (e.target.style.borderColor = "rgba(42,156,241,0.5)")}
                             onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
@@ -129,9 +127,10 @@ export default function AdminLoginPage() {
                         disabled={loading}
                         style={{ width: "100%", padding: "12px 20px", borderRadius: "10px", border: "none", background: loading ? "rgba(42,156,241,0.3)" : "linear-gradient(135deg, #2A9CF1 0%, #92A6DB 100%)", color: "#fff", fontWeight: 700, fontSize: "14px", cursor: loading ? "not-allowed" : "pointer", boxShadow: loading ? "none" : "0 4px 20px rgba(42,156,241,0.30)" }}
                     >
-                        {loading ? "Signing in…" : "Sign In"}
+                        {loading ? "Sending…" : "Email me a sign-in link"}
                     </button>
                 </form>
+                )}
             </div>
         </div>
     );
