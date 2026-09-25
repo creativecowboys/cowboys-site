@@ -9,6 +9,8 @@ Josh's **Active Clients** board (`18432563557`). Reused, not duplicated. Five co
 Not Requested / Requested / Verified / No GBP Exists / Lost-recheck), `Onboarding Item ID` (text_mm7he8kn),
 `GBP Last Checked` date (date_mm7hzkw). Groups = Payment issue / Active / At risk / Paused / Churned.
 
+**One place at a time** (Dave, Sep 25 2026): a Team-desk row whose linked onboarding record is not yet Launched is hidden here and stays on the Onboarding tab; the Onboarding tab hides Launched records unless "Show launched" is ticked.
+
 **Only rows with "Team desk" checked appear** (Dave, Sep 24: start with Choice Pressure Washing and Squirrel Made; the
 other 17 rows stay Josh's bookkeeping). Graduating a client from the Onboarding tab checks it automatically.
 

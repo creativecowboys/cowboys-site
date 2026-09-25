@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { CallDeskError } from "@/lib/calls/validation";
 import { escapeHtml, monday, mondayToken, todayEastern } from "@/lib/onboarding/api";
-import { COL as OCOL, STAGES, onboardingOwners, PIPELINE_BOARD_ID } from "@/lib/onboarding/config";
+import { COL as OCOL, STAGES, onboardingOwners, PIPELINE_BOARD_ID, stageForGroup } from "@/lib/onboarding/config";
 import type { OnboardingRow } from "@/lib/onboarding/types";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS, GBP_RECHECK_DAYS, MONDAY_ORIGIN, REPORT_STALE_DAYS, TERM_SOON_DAYS, groupIdFor } from "./config";
 import { paymentFromSnapshot, snapshot, findCustomerByEmail, stripeConnected } from "./stripe";
@@ -75,7 +75,24 @@ export async function listClients(cursor: string | null): Promise<ClientsListDat
   );
   const board = data.boards?.find((b) => b.id === CLIENTS_BOARD_ID);
   if (!board?.items_page) throw new CallDeskError("The Active Clients board is not available to this connection.", 502);
-  return { rows: board.items_page.items.map(mapClient).filter((r) => r.teamDesk), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected() };
+  const rows = board.items_page.items.map(mapClient).filter((r) => r.teamDesk);
+  const stillOnboarding = await onboardingInProgress(rows.map((r) => r.onboardingItem).filter(Boolean));
+  // One place at a time (Dave, Sep 25 2026): a client whose onboarding record is not Launched stays on the Onboarding tab.
+  return { rows: rows.filter((r) => !stillOnboarding.has(r.onboardingItem)), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected() };
+}
+
+/** Which of these Onboarding Pipeline items are still before the Launched stage. Unknown/deleted items count as done. */
+export async function onboardingInProgress(itemIds: string[]): Promise<Set<string>> {
+  const ids = [...new Set(itemIds.filter((id) => /^[1-9]\d{0,19}$/.test(id)))];
+  if (!ids.length) return new Set();
+  const data = await monday<{ items: { id: string; board: { id: string }; group: { id: string } | null }[] }>("query OnboardingStages($ids: [ID!]!) { items(ids: $ids) { id board { id } group { id } } }", { ids });
+  const busy = new Set<string>();
+  for (const item of data.items || []) {
+    if (item.board?.id !== PIPELINE_BOARD_ID) continue;
+    const stage = stageForGroup(item.group?.id || "");
+    if (stage !== "launched" && stage !== "template") busy.add(item.id);
+  }
+  return busy;
 }
 
 export async function readClient(id: string, withHistory = false): Promise<Item> {

@@ -10,7 +10,8 @@
 .ob-desk button,.ob-desk input,.ob-desk select,.ob-desk textarea{font:inherit}
 .ob-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
 .ob-head h1{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:34px;font-weight:400;line-height:1.15;margin:6px 0 4px}
-.ob-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin:22px 0 10px}
+.ob-toolbar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;margin:22px 0 10px;align-items:center}
+.ob-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:#4b3423;white-space:nowrap;padding:0 4px}
 .ob-toolbar input,.ob-toolbar select{height:42px;border:1px solid #cabcaa;background:#fffaf2;border-radius:4px;padding:0 10px;color:#1f1a17;font-size:13px;width:100%}
 .ob-count{font-size:10px;color:#746655;letter-spacing:.03em;margin:8px 0 10px}
 .ob-table{border:1px solid #d6cab8;border-radius:4px;background:#fffaf2;overflow:hidden}
@@ -86,7 +87,7 @@
 .ob-review h3{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:22px;font-weight:400;margin:0 0 12px}
 .ob-review dl{border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
 
-@media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}}
+@media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-toggle{grid-column:1/-1}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}}
 
 /* Header actions + staff file uploads on the client panel */
 .ob-head-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}

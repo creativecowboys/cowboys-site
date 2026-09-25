@@ -28,6 +28,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
   const [owner, setOwner] = useState("");
   const [stage, setStage] = useState("");
   const [only, setOnly] = useState<"" | "overdue" | "missing" | "stalled">("");
+  const [showLaunched, setShowLaunched] = useState(false); // launched clients live on the Clients tab
   const [spin, setSpin] = useState(false);
   const lock = useRef(false);
   const load = useCallback(async (next?: string) => {
@@ -45,6 +46,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
   const filtered = rows.filter((r) =>
     (!owner || (owner === "unassigned" ? r.onboardingOwnerIds.length === 0 : r.onboardingOwnerIds.includes(owner))) &&
     (!stage || r.stage === stage) &&
+    (showLaunched || stage === "launched" || r.stage !== "launched") &&
     (only !== "overdue" || r.overdue) && (only !== "missing" || r.missing.length > 0) && (only !== "stalled" || r.stage === "hold" || r.health === "Blocked" || r.health === "Waiting on Client") &&
     `${r.name} ${r.contact} ${r.email} ${r.city} ${r.packages}`.toLowerCase().includes(search.toLowerCase()),
   ).sort((a, b) => Number(b.overdue) - Number(a.overdue) || (a.stage === "launched" ? 1 : 0) - (b.stage === "launched" ? 1 : 0) || b.missing.length - a.missing.length || a.name.localeCompare(b.name));
@@ -56,9 +58,10 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
       <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by onboarding owner"><option value="">All owners</option>{owners.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
       <select value={stage} onChange={(e) => setStage(e.target.value)} aria-label="Filter by stage"><option value="">All stages</option>{STAGES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}</select>
       <select value={only} onChange={(e) => setOnly(e.target.value as typeof only)} aria-label="Show only"><option value="">Everything</option><option value="overdue">Overdue next action</option><option value="missing">Missing requirements</option><option value="stalled">Stalled / waiting</option></select>
+      <label className="ob-toggle"><input type="checkbox" checked={showLaunched} onChange={(e) => setShowLaunched(e.target.checked)} /> Show launched</label>
     </div>
     {error && <div className="call-alert" role="alert">{error}<button onClick={() => load()}>Try again</button></div>}
-    <div className="ob-count">{filtered.length} shown · {rows.length} loaded{cursor ? " · more available" : ""}</div>
+    <div className="ob-count">{filtered.length} shown · {rows.length} loaded{cursor ? " · more available" : ""}{!showLaunched && rows.some((r) => r.stage === "launched") ? ` · ${rows.filter((r) => r.stage === "launched").length} launched hidden (on the Clients tab)` : ""}</div>
     <div className="ob-table" role="table" aria-label="Onboarding clients">
       <div className="ob-row ob-row-head" role="row"><span>Business</span><span>Package</span><span>Owner</span><span>Stage</span><span>Missing</span><span>Next action</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.overdue ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
