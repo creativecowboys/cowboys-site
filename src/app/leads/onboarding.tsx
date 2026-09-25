@@ -16,7 +16,7 @@ async function json<T>(response: Response): Promise<T> {
 const stageLabel = (id: string) => STAGES.find((s) => s.id === id)?.label || "Unknown";
 const fmtDate = (v: string) => v ? new Date(`${v}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
 
-export default function Onboarding({ clientId, onOpenClient }: { clientId: string; onOpenClient: (id: string) => void }) {
+export default function Onboarding({ clientId, onOpenClient, onGraduated }: { clientId: string; onOpenClient: (id: string) => void; onGraduated?: (clientRowId: string) => void }) {
   const [rows, setRows] = useState<OnboardingRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [board, setBoard] = useState("Onboarding Pipeline");
@@ -71,11 +71,11 @@ export default function Onboarding({ clientId, onOpenClient }: { clientId: strin
       {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients in onboarding yet. Hand one off from the Sales tab."}</p>}
     </div>
     {cursor && <button className="call-secondary call-load-more" disabled={loading} onClick={() => load(cursor)}>Load more clients</button>}
-    {clientId && <ClientPanel key={clientId} id={clientId} onClose={() => onOpenClient("")} onRow={update} />}
+    {clientId && <ClientPanel key={clientId} id={clientId} onClose={() => onOpenClient("")} onRow={update} onGraduated={onGraduated} />}
   </main>;
 }
 
-function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; onRow: (row: OnboardingRow) => void }) {
+function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose: () => void; onRow: (row: OnboardingRow) => void; onGraduated?: (clientRowId: string) => void }) {
   const [detail, setDetail] = useState<OnboardingDetail | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
@@ -175,6 +175,11 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
       {problems.length ? <ul className="ob-problems">{problems.map((p) => <li key={p}>{p}</li>)}</ul> : <p className="ob-ok">All required items are complete.</p>}
       <button className="call-primary" disabled={!!busy || problems.length > 0 || row.stage === "ready" || row.stage === "building" || row.stage === "launched"} onClick={() => patch({ action: "ready" }, "ready")}>Mark ready for production</button>
       <p className="call-muted ob-hint">This is a staff decision. Sending a link or a client saying they invited us never counts by itself.</p>
+    </section>
+
+    <section className="ob-section"><h3>Launch</h3>
+      <p className="call-muted ob-hint">When the work is live, graduate the client to the Clients tab: one row on the Active Clients board (contact, package, owner, GBP state carried over), and this record moves to Launched. Safe to press twice.</p>
+      <button className="call-primary" disabled={!!busy || row.stage === "new" || row.stage === "collecting"} onClick={async () => { const r = await post("graduate", "graduate") as { id: string; created: boolean } | null; if (r) { await load(); onGraduated?.(r.id); } }}>{busy === "graduate" ? "Graduating…" : "Mark launched → Clients"}</button>
     </section>
 
     <section className="ob-section"><h3>Notes</h3>
