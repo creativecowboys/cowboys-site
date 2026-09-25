@@ -249,7 +249,7 @@ const testimonials = [
     tag: "WEB + LOCAL SEO",
     subtitle: "ROOFING + RESTORATION · DOUGLASVILLE, GA",
     quote: '"Creative Cowboys Media knows exactly what they\'re doing! They get the job done right and it shows in the projects that they get their hands on. These guys have so much experience between the two of them and all of that wisdom and experience can be trusted!"',
-    attribution: "— ALEXANDRA McKINLEY",
+    attribution: "— CAITLYN McKINLEY",
     domain: "mckinleyroofing.net",
     themeBg: "bg-h3-black",
     activeBtnBg: "bg-h3-red",
