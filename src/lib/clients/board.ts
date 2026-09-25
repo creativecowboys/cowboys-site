@@ -227,3 +227,13 @@ export async function graduateFromOnboarding(ob: OnboardingRow, managerId: strin
   } catch { /* visible on the next refresh; the desk shows the client link regardless */ }
   return { id, url, created: true };
 }
+
+/** Non-owners get the same row without dollar amounts. */
+export function withoutMoney(row: ClientRow): ClientRow {
+  return { ...row, mrr: "", customMonthly: "" };
+}
+export function stripeWithoutMoney(s: StripeSnapshot | null): StripeSnapshot | null {
+  if (!s) return s;
+  return { ...s, subscription: s.subscription ? { ...s.subscription, amount: 0 } : null, latestInvoice: s.latestInvoice ? { ...s.latestInvoice, amountDue: 0 } : null };
+}
+

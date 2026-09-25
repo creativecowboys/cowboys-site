@@ -11,11 +11,11 @@ export type ClientRow = {
   gbpAccess: string; gbpChecked: string; stripeCustomer: string; onboardingItem: string; teamDesk: boolean;
   flags: ClientFlag[];
 };
-export type ClientsListData = { rows: ClientRow[]; cursor: string | null; boardName: string; stripeConnected: boolean };
+export type ClientsListData = { rows: ClientRow[]; cursor: string | null; boardName: string; stripeConnected: boolean; canSeeMoney: boolean };
 export type StripeSnapshot = {
   customerId: string; email: string; name: string;
   subscription: { id: string; status: string; currentPeriodEnd: string; cancelAt: string; amount: number; interval: string } | null;
   latestInvoice: { id: string; status: string; amountDue: number; paidAt: string; dueDate: string; attempted: boolean; hostedUrl: string } | null;
   fetchedAt: string;
 };
-export type ClientDetail = { row: ClientRow; history: { id: string; text: string; createdAt: string; author: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[] };
+export type ClientDetail = { row: ClientRow; history: { id: string; text: string; createdAt: string; author: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean };

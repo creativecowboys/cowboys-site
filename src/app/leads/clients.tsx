@@ -13,13 +13,14 @@ async function json<T>(response: Response): Promise<T> {
 }
 const FLAG: Record<ClientFlag, string> = { payment: "Payment issue", gbp: "GBP not verified", "gbp-recheck": "GBP recheck due", report: "No report 35+ days", term: "Term ends soon", "no-stripe": "No Stripe link" };
 const groupLabel = (id: string) => CLIENT_GROUPS.find((g) => g.id === id)?.label || "Unknown";
-const money = (v: string) => (v && v !== "0" ? `$${Number(v).toLocaleString()}` : "—");
+const fmtMoney = (v: string) => (v && v !== "0" ? `$${Number(v).toLocaleString()}` : "—");
 
 export default function Clients({ clientId, onOpenClient }: { clientId: string; onOpenClient: (id: string) => void }) {
   const [rows, setRows] = useState<ClientRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [board, setBoard] = useState("Active Clients");
   const [stripeOn, setStripeOn] = useState(false);
+  const [money, setMoney] = useState(false); // owners only
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -34,7 +35,7 @@ export default function Clients({ clientId, onOpenClient }: { clientId: string; 
     try {
       const data: ClientsListData = await json(await fetch(`/api/team/clients${next ? `?cursor=${encodeURIComponent(next)}` : ""}`, { cache: "no-store" }));
       setRows((prev) => next ? [...new Map([...prev, ...data.rows].map((r) => [r.id, r])).values()] : data.rows);
-      setCursor(data.cursor); setBoard(data.boardName); setStripeOn(data.stripeConnected);
+      setCursor(data.cursor); setBoard(data.boardName); setStripeOn(data.stripeConnected); setMoney(data.canSeeMoney);
     } catch (e) { setError(e instanceof Error ? e.message : "Could not load clients."); }
     finally { lock.current = false; setLoading(false); }
   }, []);
@@ -49,7 +50,7 @@ export default function Clients({ clientId, onOpenClient }: { clientId: string; 
   const update = (row: ClientRow) => setRows((prev) => prev.map((r) => r.id === row.id ? row : r));
   const mrr = rows.filter((r) => r.group !== "churned" && r.group !== "paused").reduce((sum, r) => sum + (Number(r.mrr) || 0), 0);
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {rows.length} on the desk · ${mrr.toLocaleString()}/mo list · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></header>
+    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {rows.length} on the desk{money ? ` · $${mrr.toLocaleString()}/mo list` : ""} · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></header>
     <div className="ob-toolbar">
       <input placeholder="Search client, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
       <select value={manager} onChange={(e) => setManager(e.target.value)} aria-label="Filter by account manager"><option value="">All managers</option>{managers.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
@@ -62,7 +63,7 @@ export default function Clients({ clientId, onOpenClient }: { clientId: string; 
       <div className="ob-row ob-row-head" role="row"><span>Client</span><span>Package</span><span>Manager</span><span>Payment</span><span>GBP</span><span>Flags</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.flags.includes("payment") ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
         <span><b>{r.name}</b><small>{r.contact || "no contact"}{r.clientSince && ` · since ${r.clientSince}`}</small></span>
-        <span>{r.packages || "—"}<small>{money(r.mrr)}/mo</small></span>
+        <span>{r.packages || "—"}<small>{money ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
         <span>{r.accountManager || <em>Unassigned</em>}<small>{groupLabel(r.group)} · {r.health || "—"}</small></span>
         <span><i className={`ob-stage ${r.flags.includes("payment") ? "ob-stage-hold" : r.payStatus === "Paid / Current" ? "ob-stage-launched" : ""}`}>{r.payStatus || "—"}</i><small>{r.payMethod || ""}{r.nextBill && ` · next ${r.nextBill}`}</small></span>
         <span><i className={`ob-stage ${r.gbpAccess === "Verified" ? "ob-stage-launched" : r.gbpAccess === "No GBP Exists" ? "" : "ob-stage-hold"}`}>{r.gbpAccess || "Not Requested"}</i><small>{r.gbpChecked && `checked ${r.gbpChecked}`}</small></span>
@@ -111,7 +112,7 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     finally { setBusy(""); }
   };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
-  const { row, stripe, stripeConnected, owners, history } = detail;
+  const { row, stripe, stripeConnected, owners, history, canSeeMoney } = detail;
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
     <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">Monday ↗</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
@@ -120,10 +121,10 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     <section className="ob-section"><h3>Billing {stripeConnected ? <small>Stripe connected</small> : <small>Stripe not connected — add the restricted key in Vercel</small>}</h3>
       <div className="ob-grid">
         <div><span>Status</span><b>{row.payStatus || "—"}</b><small>{row.payMethod}</small></div>
-        <div><span>Package</span><b>{row.packages || "—"}</b><small>{money(row.mrr)}/mo list</small></div>
+        <div><span>Package</span><b>{row.packages || "—"}</b>{canSeeMoney && <small>{fmtMoney(row.mrr)}/mo list</small>}</div>
         <div><span>Last payment</span><b>{row.lastPayment || "—"}</b></div>
         <div><span>Next bill</span><b>{row.nextBill || "—"}</b><small>{row.billingDay && `day ${row.billingDay}`}</small></div>
-        {stripe && <><div><span>Stripe subscription</span><b>{stripe.subscription ? `${stripe.subscription.status} · $${stripe.subscription.amount}/${stripe.subscription.interval}` : "none"}</b><small>{stripe.subscription?.currentPeriodEnd && `renews ${stripe.subscription.currentPeriodEnd}`}{stripe.subscription?.cancelAt && ` · cancels ${stripe.subscription.cancelAt}`}</small></div><div><span>Latest invoice</span><b>{stripe.latestInvoice ? `${stripe.latestInvoice.status} · $${stripe.latestInvoice.amountDue}` : "none"}</b><small>{stripe.latestInvoice?.paidAt && `paid ${stripe.latestInvoice.paidAt}`}{stripe.latestInvoice?.hostedUrl && <> · <a href={stripe.latestInvoice.hostedUrl} target="_blank" rel="noreferrer">open</a></>}</small></div></>}
+        {stripe && <><div><span>Stripe subscription</span><b>{stripe.subscription ? `${stripe.subscription.status}${canSeeMoney ? ` · $${stripe.subscription.amount}/${stripe.subscription.interval}` : ""}` : "none"}</b><small>{stripe.subscription?.currentPeriodEnd && `renews ${stripe.subscription.currentPeriodEnd}`}{stripe.subscription?.cancelAt && ` · cancels ${stripe.subscription.cancelAt}`}</small></div><div><span>Latest invoice</span><b>{stripe.latestInvoice ? `${stripe.latestInvoice.status}${canSeeMoney ? ` · $${stripe.latestInvoice.amountDue}` : ""}` : "none"}</b><small>{stripe.latestInvoice?.paidAt && `paid ${stripe.latestInvoice.paidAt}`}{stripe.latestInvoice?.hostedUrl && <> · <a href={stripe.latestInvoice.hostedUrl} target="_blank" rel="noreferrer">open</a></>}</small></div></>}
       </div>
       <div className="ob-buttons">
         <button className="call-primary" disabled={!!busy || !stripeConnected} onClick={sync}>{busy === "sync" ? "Syncing…" : "Sync from Stripe"}</button>

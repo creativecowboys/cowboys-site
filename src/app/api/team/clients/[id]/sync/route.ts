@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { isTeam } from "@/lib/team-auth";
-import { syncClientFromStripe } from "@/lib/clients/board";
+import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
+import { stripeWithoutMoney, syncClientFromStripe, withoutMoney } from "@/lib/clients/board";
 import { validateClientId } from "@/lib/clients/validation";
 import { assertOrigin, failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 
@@ -14,6 +14,8 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
     if (!(await isTeam())) return unauthorized();
     assertOrigin(req);
     const id = validateClientId((await context.params).id);
-    return NextResponse.json(await syncClientFromStripe(id), { headers: teamHeaders });
+    const result = await syncClientFromStripe(id);
+    const owner = isOwnerEmail((await teamSession())?.email);
+    return NextResponse.json(owner ? result : { ...result, row: withoutMoney(result.row), stripe: stripeWithoutMoney(result.stripe) }, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }

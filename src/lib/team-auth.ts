@@ -15,3 +15,24 @@ export async function isTeam(): Promise<boolean> {
         return false;
     }
 }
+
+/** The signed-in team member's email (magic-link sessions put it in `sub`); null when not signed in. */
+export async function teamSession(): Promise<{ email: string } | null> {
+    const token = (await cookies()).get("cc_admin_token")?.value;
+    if (!token) return null;
+    try {
+        const { payload } = await jwtVerify(token, secret(), { issuer: "cc-admin" });
+        return { email: typeof payload.sub === "string" ? payload.sub.toLowerCase() : "" };
+    } catch {
+        return null;
+    }
+}
+
+// Owners see money (Dave, Sep 25 2026: "keep that for only Josh and I to see"). Override with TEAM_OWNER_EMAILS.
+const DEFAULT_OWNERS = ["dave@creativecowboys.co", "josh@creativecowboys.co"];
+export function isOwnerEmail(email: string | null | undefined): boolean {
+    if (!email) return false;
+    const list = (process.env.TEAM_OWNER_EMAILS || "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+    return [...DEFAULT_OWNERS, ...list].includes(email.toLowerCase());
+}
+

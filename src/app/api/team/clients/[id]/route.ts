@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { isTeam } from "@/lib/team-auth";
+import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
 import { assertSameOrigin, readCallBody } from "@/lib/calls/validation";
-import { applyClientPatch, getClient } from "@/lib/clients/board";
+import { applyClientPatch, getClient, stripeWithoutMoney, withoutMoney } from "@/lib/clients/board";
 import { snapshot, stripeConnected } from "@/lib/clients/stripe";
 import type { ClientDetail } from "@/lib/clients/types";
 import { validateClientId, validateClientPatch } from "@/lib/clients/validation";
@@ -15,12 +15,14 @@ type Context = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, context: Context) {
   try {
-    if (!(await isTeam())) return unauthorized();
+    const session = await teamSession();
+    if (!session) return unauthorized();
+    const canSeeMoney = isOwnerEmail(session.email);
     const id = validateClientId((await context.params).id);
     const { row, history } = await getClient(id);
     // Live Stripe read when we know the customer; a Stripe hiccup never hides the Monday record.
     const stripe = stripeConnected() && row.stripeCustomer ? await snapshot(row.stripeCustomer).catch(() => null) : null;
-    const detail: ClientDetail = { row, history, stripe, stripeConnected: stripeConnected(), owners: onboardingOwners() };
+    const detail: ClientDetail = { row: canSeeMoney ? row : withoutMoney(row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: onboardingOwners(), canSeeMoney };
     return NextResponse.json(detail, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }
@@ -30,6 +32,8 @@ export async function PATCH(req: Request, context: Context) {
     if (!(await isTeam())) return unauthorized();
     assertSameOrigin(req);
     const id = validateClientId((await context.params).id);
-    return NextResponse.json({ row: await applyClientPatch(id, validateClientPatch(await readCallBody(req))) }, { headers: teamHeaders });
+    const session = await teamSession();
+    const row = await applyClientPatch(id, validateClientPatch(await readCallBody(req)));
+    return NextResponse.json({ row: isOwnerEmail(session?.email) ? row : withoutMoney(row) }, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }
