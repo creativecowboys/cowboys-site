@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AGREEMENT, CHECK_STATUS, DNS_PATHS, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, STAGES } from "@/lib/onboarding/config";
 import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
+import { CloseIcon, RefreshIcon } from "./icons";
 
 // Madison's view: every client in onboarding, what is missing, and one-click updates that write to
 // Monday. Every change sends the record version it was based on; a 409 means reload and look first.
@@ -25,6 +26,7 @@ export default function Onboarding({ clientId, onOpenClient }: { clientId: strin
   const [owner, setOwner] = useState("");
   const [stage, setStage] = useState("");
   const [only, setOnly] = useState<"" | "overdue" | "missing" | "stalled">("");
+  const [spin, setSpin] = useState(false);
   const lock = useRef(false);
   const load = useCallback(async (next?: string) => {
     if (lock.current) return;
@@ -46,7 +48,7 @@ export default function Onboarding({ clientId, onOpenClient }: { clientId: strin
   ).sort((a, b) => Number(b.overdue) - Number(a.overdue) || (a.stage === "launched" ? 1 : 0) - (b.stage === "launched" ? 1 : 0) || b.missing.length - a.missing.length || a.name.localeCompare(b.name));
   const update = (row: OnboardingRow) => setRows((prev) => prev.map((r) => r.id === row.id ? row : r));
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><button className="call-icon-button" onClick={() => load()} disabled={loading} aria-label="Refresh from Monday">↻</button></header>
+    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></header>
     <div className="ob-toolbar">
       <input placeholder="Search business, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
       <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by onboarding owner"><option value="">All owners</option>{owners.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
@@ -103,13 +105,13 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     catch (e) { setError(e instanceof Error ? e.message : "Could not complete that."); return null; }
     finally { setBusy(""); }
   };
-  if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}>×</button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
+  if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
   const { row, record, intake, owners, history } = detail;
   const pending = record ? (Object.entries(record.steps).filter(([, s]) => s.state !== "done").map(([k]) => k)) : [];
   const problems = readinessProblems(row);
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
   return <aside className="ob-panel" aria-label={`${row.name} onboarding`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">Monday ↗</a><button className="call-icon-button" aria-label="Close" onClick={onClose}>×</button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">Monday ↗</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {pending.length > 0 && <div className="call-alert" role="alert"><strong>Handoff steps still pending:</strong> {pending.join(", ")}.<button className="call-secondary" disabled={!!busy} onClick={async () => { const r = await post("retry", "retry") as StartResult | null; if (r) { if (r.pending.length) setError(`Still pending: ${r.pending.join(", ")}. Try again in a moment.`); await load(); } }}>{busy === "retry" ? "Retrying…" : "Retry pending steps"}</button></div>}
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AGREEMENT, BUSINESS_TYPES, PACKAGES, PAYMENT } from "@/lib/onboarding/config";
 import type { HandoffForm, StartResult } from "@/lib/onboarding/types";
 import type { CallLead } from "./types";
+import { CloseIcon } from "./icons";
 
 // Sales → onboarding handoff. Opens over the call desk for the selected lead, keeps a draft per
 // lead in sessionStorage (with a fixed handoffId so a retry can never create a second record),
@@ -66,7 +67,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead; onC
   );
   return <div className="ob-modal" role="dialog" aria-modal="true" aria-labelledby="ob-handoff-title">
     <div className="ob-modal-card">
-      <header className="ob-modal-head"><div><span className="call-eyebrow">SALES → ONBOARDING</span><h2 id="ob-handoff-title">{lead.name}</h2><p className="call-muted">Everything Madison needs to start. Use the amounts and scope that were actually agreed on the call.</p></div><button type="button" className="call-icon-button" aria-label="Close" onClick={onClose} disabled={busy}>×</button></header>
+      <header className="ob-modal-head"><div><span className="call-eyebrow">SALES → ONBOARDING</span><h2 id="ob-handoff-title">{lead.name}</h2><p className="call-muted">Everything Madison needs to start. Use the amounts and scope that were actually agreed on the call.</p></div><button type="button" className="call-icon-button" aria-label="Close" onClick={onClose} disabled={busy}><CloseIcon /></button></header>
       {result ? <div className={result.pending.length ? "call-alert" : "call-success"} role="status">
         <strong>{result.adopted ? "This lead already has an onboarding record." : result.pending.length ? "Onboarding record created, with steps still pending." : "Handed off to onboarding."}</strong>
         {result.pending.length > 0 && <p>Still pending: {result.pending.join(", ")}. Open the client on the Onboarding tab and press <b>Retry pending steps</b>; nothing will be duplicated.</p>}

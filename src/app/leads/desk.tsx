@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "./types";
 import { CALL_OUTCOMES, isCallOutcome, mondayOutcome } from "@/lib/calls/outcomes";
 import { CALL_OWNERS, compareLeads, contactStage, matchesOwner } from "@/lib/calls/roster";
+import { RefreshIcon } from "./icons";
 import "./calls.css";
 
 type Entry = { draft: CallDraft; dirty: boolean; result?: SaveCallResult };
@@ -40,6 +41,7 @@ export default function Desk({ demo = false, onStartOnboarding }: { demo?: boole
   const [board, setBoard] = useState("Giveaway leads");
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState("");
+  const [spin, setSpin] = useState(false); // one visible turn per click, even when Monday answers fast
   const [selected, setSelected] = useState("");
   const [detail, setDetail] = useState<CallLead | null>(null);
   const [history, setHistory] = useState<CallHistory[]>([]);
@@ -191,7 +193,7 @@ export default function Desk({ demo = false, onStartOnboarding }: { demo?: boole
     {demo && <div className="call-demo-banner">Preview workspace · All businesses below are fictional. Demo saves stay in this browser tab.</div>}
     {storageError && <div role="alert" className="call-alert">{storageError}</div>}
     <div className="call-layout"><aside className="call-roster" aria-label="Giveaway entrants">
-      <div className="call-roster-heading"><div><span className="call-eyebrow">YOUR STARTING POINT</span><h2>The people.</h2></div><button className="call-icon-button" onClick={() => loadList()} disabled={listLoading || saving || assigning} aria-label={demo ? "Refresh sample entrant list" : "Refresh Monday entrant list"}>↻</button></div>
+      <div className="call-roster-heading"><div><span className="call-eyebrow">YOUR STARTING POINT</span><h2>The people.</h2></div><button className={`call-icon-button ${spin || listLoading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void loadList(); }} disabled={listLoading || saving || assigning} aria-label={demo ? "Refresh sample entrant list" : "Refresh Monday entrant list"}><RefreshIcon /></button></div>
       <p className="call-muted call-board-name">{board}</p>
       <label className="call-search"><span className="call-sr-only">Search loaded entrants</span><input placeholder="Search a name or business…" value={search} onChange={e => setSearch(e.target.value)} /></label>
       <div className="call-filters"><label><span className="call-sr-only">Filter by owner</span><select value={owner} onChange={e => setOwner(e.target.value)}><option value="">All owners</option>{CALL_OWNERS.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}<option value="unassigned">Unassigned</option></select></label><label><span className="call-sr-only">Filter by outreach status</span><select value={status} onChange={e => setStatus(e.target.value)}><option value="">All statuses</option>{[...new Set(leads.map(x => x.outreach).filter(Boolean))].sort().map(x => <option key={x}>{x}</option>)}</select></label></div>
