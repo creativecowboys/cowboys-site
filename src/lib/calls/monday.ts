@@ -2,6 +2,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "@/app/leads/types";
 import { CallDeskError, validateLeadId } from "./validation";
 import { isCallOutcome, mondayOutcome } from "./outcomes";
+import { mondayDateValue, prettyTime, utcToZoned } from "./followup-time";
 
 // Server routes only. Never expose the token through NEXT_PUBLIC_ variables or client code.
 // Ported from creativecowboys/local-seo-engine PR #1 (Codex, Sep 21 2026); assignment added.
@@ -65,10 +66,16 @@ export function mapLead(item: Item): CallLead {
     ownerIds = (raw?.personsAndTeams || []).filter((p: { kind?: string; id?: unknown }) => p?.kind === "person" && p.id != null).map((p: { id: unknown }) => String(p.id));
     ownerId = ownerIds[0] || "";
   } catch { /* empty owner */ }
+  // Next Follow-up may carry a time; Monday stores it in UTC, the desk shows Eastern.
+  let nextFollowup = cols.next_followup || ""; let nextFollowupTime = "";
+  try {
+    const raw = JSON.parse(item.column_values.find((c) => c.id === "next_followup")?.value || "null") as { date?: string; time?: string | null } | null;
+    if (raw?.date) { nextFollowup = raw.date; if (raw.time) { const z = utcToZoned(raw.date, raw.time); nextFollowup = z.date; nextFollowupTime = z.time; } }
+  } catch { /* text fallback above */ }
   return {
     id: item.id, name: item.name, contact: cols.contact || "", email: cols.email || "", phone: cols.phone || "",
     website: link("website"), city: cols.city || "", owner: cols.owner || "", ownerId, ownerIds, outreach: cols.outreach || "",
-    interest: cols.interest || "", notes: cols.notes || "", lastContact: cols.last_contact || "", nextFollowup: cols.next_followup || "",
+    interest: cols.interest || "", notes: cols.notes || "", lastContact: cols.last_contact || "", nextFollowup, nextFollowupTime,
     quotedMonthly: cols.quoted_monthly || "", interestedIn: cols.dropdown_mm77a9z5 || "", auditScore: cols.audit_score || "",
     auditReport: link("audit_report"), group: item.group?.title || "", updatedAt: item.updated_at,
     mondayUrl: `https://creativecowboys.monday.com/boards/${GIVEAWAY_BOARD_ID}/pulses/${item.id}`,
@@ -154,7 +161,7 @@ export function formatCallSummary(draft: CallDraft): string {
   const fields: [string, string][] = [
     ["Rep", draft.rep], ["Outcome", draft.outcome], ["Business goal", draft.goal], ["Current marketing", draft.currentMarketing],
     ["Main challenge", draft.challenge], ["Budget discussed", draft.budget], ["Timing", draft.timing], ["Recommendation", draft.recommendation],
-    ["Conversation notes", draft.notes], ["Next step", draft.nextStep], ["Interest", draft.interest], ["Follow-up date", draft.followupDate],
+    ["Conversation notes", draft.notes], ["Next step", draft.nextStep], ["Interest", draft.interest], ["Follow-up date", draft.followupDate ? `${draft.followupDate}${draft.followupTime ? ` around ${prettyTime(draft.followupTime)}` : ""}` : ""],
     ["Monthly quote discussed", draft.quotedMonthly ? `$${draft.quotedMonthly}` : ""],
   ];
   return `<p><strong>Christmas in September — follow-up call</strong></p>${fields.filter(([, value]) => value).map(([label, value]) => `<p><strong>${label}:</strong> ${escapeHtml(value)}</p>`).join("")}<p>${marker(draft.callId)} ${payloadMarker(draft)}</p>`;
@@ -180,7 +187,7 @@ export function callColumns(draft: CallDraft, today: string): Record<string, unk
   if (!isCallOutcome(draft.outcome)) throw new CallDeskError("Choose a valid call outcome.", 400);
   const columns: Record<string, unknown> = { outreach: { label: mondayOutcome(draft.outcome) }, last_contact: { date: today } };
   if (draft.interest) columns.interest = { label: draft.interest };
-  if (draft.followupDate) columns.next_followup = { date: draft.followupDate };
+  if (draft.followupDate) columns.next_followup = mondayDateValue(draft.followupDate, draft.followupTime || undefined);
   if (draft.quotedMonthly) columns.quoted_monthly = draft.quotedMonthly;
   return columns;
 }

@@ -37,3 +37,6 @@
 .call-book-cta{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:34px;line-height:1.1;letter-spacing:.01em;background:#e8603c;color:#fffaf2;border-radius:6px;padding:22px 26px;display:flex;align-items:center;gap:16px;box-shadow:0 6px 20px #e8603c44}.call-book-cta span{font-size:30px}.call-book-cta.is-booked{background:#354c2c;box-shadow:none;font-size:24px}
 @media(max-width:760px){.call-book-cta{font-size:26px;padding:16px 18px}.call-book-cta.is-booked{font-size:19px}}
 
+/* Follow-up calendar subscribe box in the roster */
+.call-feed{margin-top:18px}.call-feed>button{width:100%}.call-feed-body{margin-top:10px;border:1px solid var(--line);border-radius:4px;background:#fffaf2;padding:12px}.call-feed-body p{font-size:11px;line-height:1.6;margin:10px 0 0}.call-feed-row{margin-bottom:10px}.call-feed-row b{display:block;font-size:12px;margin-bottom:4px}.call-feed-row input{width:100%;font-size:11px;padding:6px 8px;border:1px solid #cabcaa;border-radius:4px;background:#fff;color:#1f1a17;margin-bottom:6px}.call-feed-row>div{display:flex;gap:6px;flex-wrap:wrap}.call-feed-row .call-secondary{font-size:11px!important;padding:6px 10px;text-decoration:none}
+

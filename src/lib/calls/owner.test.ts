@@ -71,7 +71,7 @@ for (const outcome of CALL_OUTCOMES) test(`notes save after assignment with outc
   const draft: CallDraft = {
     callId: '78f205d3-abc0-4e10-812f-ccb149629725', leadId: '12345', expectedUpdatedAt: lead.updatedAt, rep: 'Keaton',
     goal: '', currentMarketing: '', challenge: '', budget: '', timing: '', recommendation: '', notes: 'Notes typed before assignment.',
-    nextStep: '', outcome, interest: '', followupDate: '', quotedMonthly: '',
+    nextStep: '', outcome, interest: '', followupDate: '', followupTime: '', quotedMonthly: '',
   };
   queue.push({ items: [assigned] }, { items: [assigned] }, { items: [assigned] }, { create_update: { id: '789' } }, { items: [assigned] }, { change_multiple_column_values: { id: '12345' } });
   assert.equal(validateCallDraft(draft, '12345').outcome, outcome);

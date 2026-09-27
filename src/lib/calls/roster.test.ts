@@ -8,7 +8,7 @@ function lead(id: string, changes: Partial<CallLead> & { ownerIds?: string[] } =
   return {
     id, name: `Lead ${id}`, contact: "", email: "", phone: "", website: "", city: "",
     owner: "", ownerId: "", outreach: "", interest: "", notes: "", lastContact: "",
-    nextFollowup: "", quotedMonthly: "", interestedIn: "", auditScore: "", auditReport: "",
+    nextFollowup: "", nextFollowupTime: "", quotedMonthly: "", interestedIn: "", auditScore: "", auditReport: "",
     group: "", updatedAt: "2026-09-22T12:00:00Z", mondayUrl: "", ...changes,
   };
 }
