@@ -92,7 +92,7 @@ function unwrapCursor(value: string | null): string | null {
 export async function listOnboarding(cursor: string | null): Promise<OnboardingListData> {
   const raw = unwrapCursor(cursor);
   const data = await monday<{ boards: { id: string; name: string; items_page: { cursor: string | null; items: Item[] } }[] }>(
-    `query OnboardingList($board: [ID!]!, $cursor: String) { boards(ids: $board) { id name items_page(limit: 50, cursor: $cursor) { cursor items { ${ITEM_FIELDS} } } } }`,
+    `query OnboardingList($board: [ID!]!, $cursor: String) { boards(ids: $board) { id name items_page(limit: 200, cursor: $cursor) { cursor items { ${ITEM_FIELDS} } } } }`,
     { board: [PIPELINE_BOARD_ID], cursor: raw }, 25000,
   );
   const board = data.boards?.find((b) => b.id === PIPELINE_BOARD_ID);

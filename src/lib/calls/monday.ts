@@ -30,7 +30,7 @@ async function monday<T>(query: string, variables: Record<string, unknown> = {})
     // No automatic retries: a timed-out mutation may already have been applied by Monday.
     const response = await fetch("https://api.monday.com/v2", {
       method: "POST", headers: { Authorization: auth, "Content-Type": "application/json", "API-Version": API_VERSION },
-      body: JSON.stringify({ query, variables }), cache: "no-store", signal: AbortSignal.timeout(15000),
+      body: JSON.stringify({ query, variables }), cache: "no-store", signal: AbortSignal.timeout(25000),
     });
     if (!response.ok) throw new Error("upstream");
     const result = await response.json() as { data?: T; errors?: unknown[] };
@@ -95,10 +95,12 @@ export function unwrapCursor(value: string | null): string | null {
   } catch { throw new CallDeskError("This page has expired. Reload the lead list.", 400); }
 }
 
+// 500 per page (Monday's max) so the whole giveaway board arrives in one call and the desk's owner / stage
+// filters see every lead, not just the first screenful (Dave, Sep 26 2026: filtering by his name showed nothing).
 export async function getCallsPage(cursor: string | null): Promise<CallsPageData> {
   const rawCursor = unwrapCursor(cursor);
   const data = await monday<{ boards: { id: string; name: string; items_page: { cursor: string | null; items: Item[] } }[] }>(
-    `query CallDeskLeads($board: [ID!]!, $cursor: String) { boards(ids: $board) { id name items_page(limit: 50, cursor: $cursor) { cursor items { ${ITEM_FIELDS} } } } }`,
+    `query CallDeskLeads($board: [ID!]!, $cursor: String) { boards(ids: $board) { id name items_page(limit: 500, cursor: $cursor) { cursor items { ${ITEM_FIELDS} } } } }`,
     { board: [GIVEAWAY_BOARD_ID], cursor: rawCursor },
   );
   const board = data.boards?.find((b) => b.id === GIVEAWAY_BOARD_ID);

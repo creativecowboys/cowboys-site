@@ -5,6 +5,7 @@ import { CallDeskError } from "@/lib/calls/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // a full-board page (up to 500 leads) can take a few seconds
 const headers = { "Cache-Control": "private, no-store" };
 
 export async function GET(req: Request) {
