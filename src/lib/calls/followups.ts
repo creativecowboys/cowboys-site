@@ -31,9 +31,10 @@ const VTIMEZONE = ["BEGIN:VTIMEZONE", "TZID:America/New_York", "BEGIN:DAYLIGHT",
 
 export type FollowupLead = Pick<CallLead, "id" | "name" | "contact" | "phone" | "email" | "city" | "nextFollowup" | "outreach" | "notes" | "updatedAt"> & { nextFollowupTime?: string };
 
-/** Build the iCalendar text for one rep. Leads without a follow-up date are skipped; closed leads are skipped. */
+/** Build the iCalendar text for one rep. Leads without a follow-up date are skipped, and so are dead leads (Not Interested, Bad contact number). Won leads stay. */
 export function buildFeed(rep: Rep, leads: FollowupLead[], origin: string, now = new Date()): string {
-  const closed = new Set(["not interested", "bad contact number", "won"]);
+  // Won stays in: a handed-off client with a booked call (kickoff, check-in) is a real appointment (Dave, Sep 28 2026).
+  const closed = new Set(["not interested", "bad contact number"]);
   const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Creative Cowboys//Follow-ups//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", `X-WR-CALNAME:Follow-ups · ${rep.name}`, `X-WR-TIMEZONE:${TZ}`, "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H", ...VTIMEZONE];
   for (const lead of leads) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(lead.nextFollowup) || closed.has(lead.outreach.trim().toLowerCase())) continue;

@@ -27,6 +27,7 @@ test("the feed emits timed and all-day events and skips closed or undated leads"
     { id: "2", name: "Arctic Law", outreach: "Call Held", nextFollowup: "2026-09-29", ...base },
     { id: "3", name: "Closed Co", outreach: "Not Interested", nextFollowup: "2026-09-29", ...base },
     { id: "4", name: "No date", outreach: "Replied", nextFollowup: "", ...base },
+    { id: "5", name: "Won Client", outreach: "Won", nextFollowup: "2026-09-30", nextFollowupTime: "13:30", ...base },
   ], "https://www.creativecowboys.co", new Date("2026-09-26T12:00:00Z"));
   assert.match(ics, /X-WR-CALNAME:Follow-ups · Dave/);
   assert.match(ics, /UID:followup-1@creativecowboys\.co/);
@@ -36,6 +37,8 @@ test("the feed emits timed and all-day events and skips closed or undated leads"
   assert.match(ics, /DTEND;VALUE=DATE:20260930/);
   assert.doesNotMatch(ics, /Closed Co/);
   assert.doesNotMatch(ics, /No date/);
+  assert.match(ics, /SUMMARY:Follow-up: Won Client/, "won clients with a booked call stay on the calendar");
+  assert.match(ics, /DTSTART;TZID=America\/New_York:20260930T133000/);
   assert.match(ics, /SUMMARY:Follow-up: Ladybug Hot Sauces/);
   assert.match(ics, /leads\?lead=1/);
   assert.ok(ics.split("\r\n").every((l) => l.length <= 75), "lines are folded");
