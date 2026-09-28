@@ -14,10 +14,12 @@ type Drafts = Record<string, HandoffForm>;
 const ownerFor = (id: string): HandoffForm["salesOwner"] => (({ "39848115": "Dave", "39848217": "Josh", "116679004": "Keaton" } as Record<string, HandoffForm["salesOwner"]>)[id] || "Dave");
 
 const MANUAL_KEY = "manual";
+// Monday stores phones as bare digits ("13865895606"); show US numbers the way people read them.
+const prettyPhone = (raw: string) => { const d = raw.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, ""); return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : raw; };
 function blank(lead: CallLead | null): HandoffForm {
   return {
     handoffId: crypto.randomUUID(), leadId: lead?.id || "", manual: !lead, expectedUpdatedAt: lead?.updatedAt || "",
-    business: lead?.name || "", contact: lead?.contact || "", email: lead?.email || "", phone: lead?.phone || "", website: lead?.website || "", city: lead?.city || "",
+    business: lead?.name || "", contact: lead?.contact || "", email: lead?.email || "", phone: prettyPhone(lead?.phone || ""), website: lead?.website || "", city: lead?.city || "",
     businessType: "", salesOwner: lead ? ownerFor(lead.ownerId) : "Dave", packages: [], monthlyAgreed: lead?.quotedMonthly || "", setupAgreed: "",
     scope: "", exclusions: "", goals: "", context: "", startDate: "", agreement: "Unknown", payment: "Unknown", nextAction: "", nextOwner: "Madison", nextDue: "",
   };
