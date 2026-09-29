@@ -224,6 +224,9 @@ export async function markSourceLead(leadId: string, itemUrl: string, handoffId:
 export async function readLeadVersion(leadId: string): Promise<{ updatedAt: string; name: string }> {
   const data = await monday<{ items: { id: string; name: string; updated_at: string; board: { id: string } }[] }>("query LeadVersion($ids: [ID!]!) { items(ids: $ids) { id name updated_at board { id } } }", { ids: [leadId] });
   const lead = data.items?.find((i) => i.id === leadId);
+  // Someone dragged the lead to the Onboarding board by hand in Monday (Arctic Law, Sep 29 2026):
+  // say so, because the fix is a person moving it back, not a retry.
+  if (lead && lead.board?.id === PIPELINE_BOARD_ID) throw new CallDeskError(`${lead.name} was moved to the Onboarding Pipeline board by hand in Monday, so the handoff can't run. In Monday, move it back to Giveaway Leads (item menu → Move to → Board), then press Confirm handoff again — this draft is kept.`, 409);
   if (!lead || lead.board?.id !== GIVEAWAY_BOARD_ID) throw new CallDeskError("This lead is not available on the giveaway board.", 404);
   return { updatedAt: lead.updated_at, name: lead.name };
 }
