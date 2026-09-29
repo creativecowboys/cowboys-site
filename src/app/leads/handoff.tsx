@@ -29,7 +29,11 @@ function writeDrafts(d: Drafts) { try { sessionStorage.setItem(STORAGE, JSON.str
 
 export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void }) {
   const draftKey = lead ? lead.id : MANUAL_KEY;
-  const [form, setForm] = useState<HandoffForm>(() => readDrafts()[draftKey] || blank(lead));
+  // A saved draft keeps the lead version it was started against. If the lead changed since (a note,
+  // a move between boards), adopt the current version so Confirm can work, and say so; the rep still
+  // sees the review step before anything is written.
+  const [staleDraft] = useState(() => { const d = readDrafts()[draftKey]; return !!(d && lead && d.expectedUpdatedAt && d.expectedUpdatedAt !== lead.updatedAt); });
+  const [form, setForm] = useState<HandoffForm>(() => { const d = readDrafts()[draftKey]; return d ? (lead ? { ...d, expectedUpdatedAt: lead.updatedAt } : d) : blank(lead); });
   const [review, setReview] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -81,6 +85,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
         <section className="ob-review">
           <h3>Review before handing off</h3>
           {problems.length > 0 && <div className="call-alert" role="alert"><strong>Still needed:</strong> {problems.join(" · ")}</div>}
+          {staleDraft && <div className="call-alert" role="status">This lead changed in Monday since you started this draft. Check the details above before confirming.</div>}
           <dl>
             <dt>Business</dt><dd>{form.business} · {[form.contact, form.email, form.phone].filter(Boolean).join(" · ") || "no contact details"}{form.city && ` · ${form.city}`}{form.businessType && ` · ${form.businessType}`}</dd>
             <dt>Sales owner</dt><dd>{form.salesOwner}</dd>
@@ -99,6 +104,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
         {error && <div className="call-alert" role="alert"><strong>Your draft is still here.</strong><p>{error}</p></div>}
         <footer className="call-form-footer"><span>{busy ? "Handing off… keep this page open." : "Nothing is sent to the client."}</span><div><button type="button" className="call-secondary" disabled={busy} onClick={() => setReview(false)}>Back</button><button type="button" className="call-primary" disabled={busy || problems.length > 0} onClick={submit}>{busy ? "Saving…" : lead ? "Confirm handoff" : "Add client"}</button></div></footer>
       </> : <>
+        {staleDraft && <div className="call-alert" role="status">This lead changed in Monday since you started this draft. Your answers are kept; check them against the lead before handing off.</div>}
         <fieldset className="call-form" disabled={busy}>
           <div className="call-fields">
             {text("business", "Business")}{text("contact", "Main contact")}{text("email", "Email", { type: "email" })}{text("phone", "Phone")}{text("website", "Website")}{text("city", "Location(s)")}
