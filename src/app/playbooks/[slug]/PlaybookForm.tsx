@@ -18,7 +18,7 @@ const ERRORS: Record<string, string> = {
     first_name: "What should we call you?",
     phone: "We text the playbook to this number.",
     email: "We email the playbook here.",
-    city: "Which town do you work out of?",
+    city: "Which city and state do you work out of?",
     crew_size: "Pick one.",
     typical_job: "Pick one. A rough guess is fine.",
     has_website: "Pick one.",
@@ -210,7 +210,7 @@ export default function PlaybookForm({ playbook }: { playbook: Playbook }) {
 
                     {step === 1 && (
                         <>
-                            {field("city", "WHAT TOWN ARE YOU BASED IN?", { type: "text", placeholder: "Villa Rica, Carrollton, Douglasville...", autoComplete: "address-level2", autoFocus: true })}
+                            {field("city", "WHAT CITY AND STATE ARE YOU BASED IN?", { type: "text", placeholder: "City, State", autoComplete: "address-level2", autoFocus: true })}
                             {pills("crew_size", "HOW BIG IS YOUR CREW?", CREW_SIZES)}
                             {pills("typical_job", "WHAT'S A TYPICAL JOB WORTH?", JOB_VALUES)}
                         </>
