@@ -17,7 +17,7 @@ export const maxDuration = 60;
 // the 29th–31st GHL put the first invoice a month out and the wait timed out with a bare 502 (two stray
 // templates per attempt); GHL's own picker accepts 1st–31st, and with dayOfMonth = today's day it issues
 // the first invoice today. (2) The send step passed userId "" when GHL_USER_ID was unset, so the invoice
-// stayed in Draft — the sender is now resolved (env or the location's users) BEFORE anything is created.
+// stayed in Draft — the sender (GHL_USER_ID, default Dave's user id) is checked BEFORE anything is created.
 // (3) Every failure now says which step broke, what already exists in GHL, and where to open it.
 const BUSINESS = {
   name: "Creative Cowboys", logoUrl: "https://onboarding.creativecowboys.co/brand/creative-cowboys-logo.png", phoneNo: "+14708340242",

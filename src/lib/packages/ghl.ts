@@ -45,27 +45,14 @@ export async function ghl<T>(method: string, path: string, body?: unknown): Prom
   return (text ? JSON.parse(text) : {}) as T;
 }
 
-/** GHL's invoice "send" endpoint requires the id of a real user on the account (the sender). We use
- *  GHL_USER_ID when set; otherwise the first user on the location, looked up once per instance. An empty
- *  userId is what left the Sep 25 2026 Jeremy invoice sitting in Draft. */
-let cachedUserId: string | undefined;
+/** GHL's invoice "send" endpoint requires the id of a real user on the account (the sender). An empty
+ *  userId is what left the Sep 25 2026 Jeremy invoice sitting in Draft. GHL_USER_ID overrides; the
+ *  default is Dave's user on the Creative Cowboys location (GHL → Settings → Users shows the ids). The
+ *  site's token has no users scope (GET /users → 401 "not authorized for this scope"), so no lookup. */
+const DEFAULT_SENDER_USER_ID = "zqnRMqxrUZh0qBzF12Re"; // Dave Collum, dave@creativecowboys.co, Agency admin
 export async function ghlUserId(): Promise<string> {
-  const fromEnv = (process.env.GHL_USER_ID || "").trim();
-  if (fromEnv) return fromEnv;
-  if (cachedUserId) return cachedUserId;
-  type U = { id?: string; _id?: string; email?: string; role?: string; roles?: { role?: string; type?: string } };
-  let users: U[] = [];
-  try {
-    const r = await ghl<{ users?: U[] }>("GET", `/users/?locationId=${ghlLocationId()}`);
-    users = r.users ?? [];
-  } catch (e) {
-    console.error("ghlUserId lookup failed:", e instanceof Error ? e.message : e);
-  }
-  const preferred = (process.env.GHL_USER_EMAIL || "").trim().toLowerCase();
-  const pick = users.find((u) => preferred && u.email?.toLowerCase() === preferred) || users.find((u) => u.roles?.role === "admin") || users[0];
-  const id = pick?.id || pick?._id;
-  if (!id) throw new CallDeskError("GoHighLevel needs a sender for invoice emails and the site has none. Set GHL_USER_ID on Vercel (GHL → Settings → Users shows each user's id).", 503);
-  cachedUserId = id;
+  const id = (process.env.GHL_USER_ID || "").trim() || DEFAULT_SENDER_USER_ID;
+  if (!/^[A-Za-z0-9]{10,64}$/.test(id)) throw new CallDeskError("GHL_USER_ID on Vercel is not a valid GoHighLevel user id (GHL → Settings → Users shows each user's id).", 503);
   return id;
 }
 
