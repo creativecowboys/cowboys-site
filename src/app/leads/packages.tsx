@@ -9,14 +9,18 @@ import type { CallLead } from "./types";
 // reachable from the Sales tab. Same catalog, same GHL recurring-invoice flow; opens prefilled with the
 // selected lead's details so the customer search is one keystroke away.
 type Contact = { id: string; name: string; email: string; phone: string; company: string };
-type Result = { url: string; invoiceNumber?: string; total: number; lines: { name: string; amount: number }[]; liveMode: boolean; emailed: boolean; to: string };
+type Result = { url: string; invoiceNumber?: string; total: number; lines: { name: string; amount: number }[]; liveMode: boolean; emailed: boolean; emailRequested?: boolean; to: string; ghlUrl?: string };
+/** A failed desk call, with whatever GHL already created (Sep 30 2026: the desk used to show a bare "Error 502"). */
+type Fail = { message: string; step?: string; ghlUrl?: string; url?: string };
+class ApiError extends Error { constructor(public fail: Fail) { super(fail.message); } }
 type Recent = { id: string; number: string; customer: string; status: string; total: number; live: boolean; issued: string; url: string; recurring: boolean };
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0 })}`;
 async function json<T>(response: Response): Promise<T> {
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again." : `Error ${response.status}`));
+  if (!response.ok) throw new ApiError({ message: data.error || (response.status === 401 ? "Your team session expired. Sign in again." : `Error ${response.status}`), step: data.step, ghlUrl: data.ghlUrl, url: data.url });
   return data;
 }
+const toFail = (e: unknown, fallback: string): Fail => (e instanceof ApiError ? e.fail : { message: e instanceof Error ? e.message : fallback });
 
 export default function Packages({ lead, onClose }: { lead: CallLead | null; onClose: () => void }) {
   const [q, setQ] = useState(lead?.email || lead?.name || "");
@@ -32,7 +36,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     debounce.current = window.setTimeout(async () => {
       setSearching(true);
       try { setHits((await json<{ contacts: Contact[] }>(await fetch(`/api/team/packages/contacts?q=${encodeURIComponent(q.trim())}`))).contacts); }
-      catch (e) { setErr(e instanceof Error ? e.message : "Search failed."); }
+      catch (e) { setErr(toFail(e, "Search failed.")); }
       finally { setSearching(false); }
     }, 250);
   }, [q, contact]);
@@ -52,7 +56,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     setSel((s) => { const n = { ...s }; if (!on) { delete n[key]; return n; } const item = CATALOG.find((c) => c.key === key)!; if (item.group === "plan") for (const c of CATALOG) if (c.group === "plan") delete n[c.key]; n[key] = { key, promo: Boolean(item.promo), tier: item.tiers?.[0].key }; return n; });
   }
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
+  const [err, setErr] = useState<Fail | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [copied, setCopied] = useState(false);
   const [recent, setRecent] = useState<Recent[] | null>(null);
@@ -61,15 +65,15 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
   useEffect(() => { void loadRecent(); }, []);
   async function create() {
     if (!contact || busy) return;
-    setBusy(true); setErr(""); setResult(null);
+    setBusy(true); setErr(null); setResult(null);
     try { setResult(await json<Result>(await fetch("/api/team/packages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contactId: contact.id, selections, sendEmail, testMode, termsExtra }) }))); void loadRecent(); }
-    catch (e) { setErr(e instanceof Error ? e.message : "Could not create the plan."); }
+    catch (e) { setErr(toFail(e, "Could not create the plan.")); void loadRecent(); }
     finally { setBusy(false); }
   }
   async function createContact() {
-    setErr("");
+    setErr(null);
     try { const d = await json<{ contact: Contact; existed?: boolean }>(await fetch("/api/team/packages/contacts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(nc) })); setContact(d.contact); setShowNew(false); setQ(""); }
-    catch (e) { setErr(e instanceof Error ? e.message : "Could not add the contact."); }
+    catch (e) { setErr(toFail(e, "Could not add the contact.")); }
   }
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); setCopied(true); window.setTimeout(() => setCopied(false), 1500); } catch { /* field stays selectable */ } };
   const plans = CATALOG.filter((c) => c.group === "plan"), ads = CATALOG.filter((c) => c.group === "ads"), addons = CATALOG.filter((c) => c.group === "addon");
@@ -78,7 +82,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
 
   return <aside className="ob-panel pk-panel" aria-label="Package builder">
     <div className="ob-panel-head"><div><span className="call-eyebrow">PACKAGE BUILDER</span><h2>One link that bills it all.</h2><p className="call-muted">Pick the customer, pick the monthly services, get a pay link. Same builder as onboarding.creativecowboys.co.</p></div><div className="ob-panel-actions"><button className="call-icon-button" aria-label="Close" onClick={onClose} disabled={busy}><CloseIcon /></button></div></div>
-    {err && <div className="call-alert" role="alert">{err}</div>}
+    {err && <div className="call-alert" role="alert"><strong>{err.step ? `The plan was NOT finished (failed at: ${err.step}).` : "Nothing was created."}</strong> {err.message}{(err.ghlUrl || err.url) && <div className="ob-buttons">{err.ghlUrl && <a className="call-secondary" href={err.ghlUrl} target="_blank" rel="noreferrer">Open the recurring template in GHL ↗</a>}{err.url && <a className="call-secondary" href={err.url} target="_blank" rel="noreferrer">Open the invoice ↗</a>}</div>}</div>}
 
     <section className="ob-section"><h3>1. Customer <small>from GoHighLevel</small></h3>
       {contact ? <div className="pk-contact"><div><b>{contact.company || contact.name}</b><small>{contact.company ? `${contact.name} · ` : ""}{contact.email}{contact.phone ? ` · ${contact.phone}` : ""}</small></div><button type="button" className="call-secondary" onClick={() => { setContact(null); setResult(null); }}>Change</button></div>
@@ -127,7 +131,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
         {preview.error && <p className="pk-err">{preview.error}</p>}
         <button type="button" className="call-primary" disabled={busy || !contact || Boolean(preview.error)} onClick={create}>{busy ? "Creating plan…" : contact ? "Create plan & get link" : "Pick a customer first"}</button>
       </div>
-      {result && <div className="call-success"><strong>Link is ready{result.liveMode ? "" : " (test mode)"}.</strong><p>Invoice {result.invoiceNumber}. {result.emailed ? `Emailed to ${result.to}.` : "Not emailed — send the link yourself."}</p><p><input readOnly value={result.url} onFocus={(e) => e.currentTarget.select()} /></p><div className="ob-buttons"><button type="button" className="call-secondary" onClick={() => copy(result.url)}>{copied ? "Copied!" : "Copy link"}</button><a className="call-secondary" href={result.url} target="_blank" rel="noreferrer">Open ↗</a></div></div>}
+      {result && <div className="call-success"><strong>Link is ready{result.liveMode ? "" : " (test mode)"}.</strong><p>Invoice {result.invoiceNumber}. {result.emailed ? `Emailed by GHL to ${result.to}.` : result.emailRequested ? `GHL accepted the send but did not confirm an email to ${result.to} — check the invoice in GHL or send the link yourself.` : "Not emailed — send the link yourself."}</p><p><input readOnly value={result.url} onFocus={(e) => e.currentTarget.select()} /></p><div className="ob-buttons"><button type="button" className="call-secondary" onClick={() => copy(result.url)}>{copied ? "Copied!" : "Copy link"}</button><a className="call-secondary" href={result.url} target="_blank" rel="noreferrer">Open ↗</a>{result.ghlUrl && <a className="call-secondary" href={result.ghlUrl} target="_blank" rel="noreferrer">In GHL ↗</a>}</div></div>}
     </section>
 
     <section className="ob-section"><h3>Recent invoices <small><button type="button" className="pk-link" onClick={loadRecent}>refresh</button></small></h3>
