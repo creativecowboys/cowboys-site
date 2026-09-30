@@ -1,4 +1,5 @@
 import type { FileCategory, PackageLabel, StageId } from "./config";
+import type { GbpCard, GbpLocationSummary } from "@/lib/gbp/types";
 
 export type HandoffForm = {
   handoffId: string; // uuid v4, minted by the desk when the panel opens; idempotency key
@@ -54,6 +55,7 @@ export type OnboardingRow = {
   signed: string; targetLaunch: string; nextAction: string; lastTouch: string;
   gbpAccess: string; dnsPath: string; agreement: string; payment: string; intake: string;
   leadId: string; handoffId: string; siteUrl: string; gbpUrl: string; onboardingLink: string; driveFolder: string; notes: string;
+  searchAtlasListing: string; // Search Atlas GBP location id (numeric text) or ""
   profileComplete: boolean; baseline: boolean;
   checklist: ChecklistItem[];
   missing: string[]; // required onboarding items still open (computed)
@@ -66,5 +68,8 @@ export type OnboardingDetail = {
   record: HandoffRecord | null;
   intake: (Omit<IntakeRecord, "tokenHash"> & { linkActive: boolean }) | null;
   owners: { id: string; name: string }[];
+  gbp: GbpCard | null; // live Search Atlas read when a listing is linked
+  gbpLocations: GbpLocationSummary[]; // every listing on our account, for the link select
+  searchAtlasConnected: boolean;
 };
 export type StartResult = { itemId: string; itemUrl: string; pending: StepName[]; adopted: boolean };

@@ -30,6 +30,7 @@ export const CCOL = {
   gbpAccess: "color_mm7hxmhp", // added
   onboardingItem: "text_mm7he8kn", // added
   gbpChecked: "date_mm7hzkw", // added
+  searchAtlasListing: "text_mm7p124g", // added Sep 30 2026 — Search Atlas GBP location id (numeric) the desk links this client to
 } as const;
 
 export const CLIENT_GROUPS = [

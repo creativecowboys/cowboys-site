@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
 import { assertSameOrigin, readCallBody } from "@/lib/calls/validation";
-import { applyClientPatch, getClient, stripeWithoutMoney, withoutMoney } from "@/lib/clients/board";
+import { applyClientPatch, getClient, liveGbpForClient, stripeWithoutMoney, withoutMoney } from "@/lib/clients/board";
+import { listLocations, searchAtlasConnected } from "@/lib/gbp/searchatlas";
 import { snapshot, stripeConnected } from "@/lib/clients/stripe";
 import type { ClientDetail } from "@/lib/clients/types";
 import { validateClientId, validateClientPatch } from "@/lib/clients/validation";
@@ -20,13 +21,18 @@ export async function GET(_req: Request, context: Context) {
     if (!session) return unauthorized();
     const canSeeMoney = isOwnerEmail(session.email);
     const id = validateClientId((await context.params).id);
-    const { row, history } = await getClient(id);
+    const { row: stored, history } = await getClient(id);
     // Live Stripe read when we know the customer; a Stripe hiccup never hides the Monday record.
-    const stripe = stripeConnected() && row.stripeCustomer ? await snapshot(row.stripeCustomer).catch(() => null) : null;
+    const [stripe, live, gbpLocations] = await Promise.all([
+      stripeConnected() && stored.stripeCustomer ? snapshot(stored.stripeCustomer).catch(() => null) : Promise.resolve(null),
+      liveGbpForClient(stored), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
+      searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
+    ]);
+    const row = live.row;
     // Files live with the onboarding record when there is one; otherwise in a store keyed by this client row.
     const fileScope = row.onboardingItem || `c${row.id}`;
     const files = (await readIntake(fileScope).catch(() => null))?.files.map((f) => ({ key: f.key, name: f.name, size: f.size, category: f.category, uploadedAt: f.uploadedAt })) || [];
-    const detail: ClientDetail = { fileScope, files, row: canSeeMoney ? row : withoutMoney(row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: onboardingOwners(), canSeeMoney };
+    const detail: ClientDetail = { fileScope, files, row: canSeeMoney ? row : withoutMoney(row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: onboardingOwners(), canSeeMoney, gbpLocations, searchAtlasConnected: searchAtlasConnected() };
     return NextResponse.json(detail, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }

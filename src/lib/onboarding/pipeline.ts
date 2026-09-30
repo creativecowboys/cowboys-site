@@ -5,6 +5,9 @@ import { COL, GIVEAWAY_BOARD_ID, MONDAY_ORIGIN, PIPELINE_BOARD_ID, PIPELINE_CHEC
 import { checklistFor, isRequiredName, missingRequired, readinessProblems } from "./checklist";
 import type { ChecklistItem, HandoffForm, OnboardingListData, OnboardingRow } from "./types";
 import type { PatchAction } from "./validation";
+import { accessFromCard, parseListingId } from "@/lib/gbp/state";
+import { gbpCard } from "@/lib/gbp/searchatlas";
+import type { GbpCard } from "@/lib/gbp/types";
 
 type Column = { id: string; text: string | null; value: string | null; display_value?: string | null }; // display_value: formula columns
 type Sub = { id: string; name: string; column_values: Column[] };
@@ -64,6 +67,7 @@ export function mapRow(item: Item): OnboardingRow {
     signed: text(COL.signed), targetLaunch: text(COL.targetLaunch), nextAction: next.action, lastTouch: text(COL.lastTouch),
     gbpAccess: text(COL.gbpAccess), dnsPath: text(COL.dnsPath), agreement: text(COL.agreement), payment: text(COL.payment), intake: text(COL.intake),
     leadId: text(COL.leadId), handoffId: text(COL.handoffId), siteUrl: link(cols, COL.siteUrl), gbpUrl: link(cols, COL.gbpUrl), onboardingLink: link(cols, COL.onboardingLink), driveFolder: link(cols, COL.driveFolder), notes: text(COL.notes),
+    searchAtlasListing: text(COL.searchAtlasListing).trim(),
     profileComplete: checked(cols, COL.profileComplete), baseline: checked(cols, COL.baseline),
     checklist, missing: missingRequired(checklist),
     overdue: !!next.due && next.due < today && stageForGroup(item.group?.id || "") !== "launched",
@@ -269,6 +273,13 @@ export async function applyPatch(itemId: string, patch: PatchAction & { expected
       break;
     }
     case "gbp": await setColumns(itemId, { ...touch, [COL.gbpAccess]: { label: patch.value }, ...(patch.gbpUrl ? { [COL.gbpUrl]: { url: patch.gbpUrl, text: patch.gbpUrl } } : {}) }); break;
+    case "searchAtlasListing": {
+      // Link (or unlink) the Search Atlas listing, then let the live read set GBP access if Google says verified.
+      await setColumns(itemId, { ...touch, [COL.searchAtlasListing]: patch.listingId });
+      const id = parseListingId(patch.listingId);
+      if (id) { const card = await gbpCard(id, { detail: true, fresh: true }); await promoteFromLive(itemId, before.gbpAccess, card); }
+      break;
+    }
     case "agreement": await setColumns(itemId, { ...touch, [COL.agreement]: { label: patch.value } }); break;
     case "payment": await setColumns(itemId, { ...touch, [COL.payment]: { label: patch.value } }); break;
     case "dns": await setColumns(itemId, { ...touch, [COL.dnsPath]: patch.value ? { labels: [patch.value] } : { labels: [] } }); break;
@@ -277,4 +288,23 @@ export async function applyPatch(itemId: string, patch: PatchAction & { expected
     case "note": await postUpdate(itemId, `<p>${escapeHtml(patch.text)}</p>`); await setColumns(itemId, touch); break;
   }
   return mapRow(await readPipelineItem(itemId));
+}
+
+/** Only a connected + verified listing changes Monday on its own (→ Verified); anything else leaves the staff value alone. */
+async function promoteFromLive(itemId: string, manual: string, card: GbpCard): Promise<boolean> {
+  const live = accessFromCard(card, manual);
+  if (!live.live || live.value !== "Verified" || !live.changed) return false;
+  await setColumns(itemId, { [COL.gbpAccess]: { label: "Verified" }, [COL.lastTouch]: { date: todayEastern() } });
+  return true;
+}
+
+/** Live GBP card for an onboarding row plus the auto-promotion; returns the refreshed row when Monday changed. */
+export async function liveGbpForOnboarding(row: OnboardingRow, opts: { fresh?: boolean } = {}): Promise<{ card: GbpCard | null; row: OnboardingRow }> {
+  const id = parseListingId(row.searchAtlasListing);
+  if (!id) return { card: null, row };
+  const card = await gbpCard(id, { detail: true, fresh: !!opts.fresh });
+  let promoted = false;
+  try { promoted = await promoteFromLive(row.id, row.gbpAccess, card); }
+  catch (error) { console.error(`[gbp] could not write Verified to onboarding ${row.id}: ${error instanceof Error ? error.message : error}`); }
+  return { card, row: promoted ? mapRow(await readPipelineItem(row.id)) : row };
 }

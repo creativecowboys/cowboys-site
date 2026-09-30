@@ -56,10 +56,23 @@ open invoice not yet due → Due Soon; canceled → group Churned. Sync never mo
 
 If GHL runs the subscriptions with Stripe as processor, the same Stripe events fire, so nothing changes here.
 
-## GBP — honest limits
-Phase one is what ships: the state carried from onboarding plus a staff "I confirmed access" stamp every 90 days.
-Actually verifying manager access automatically needs Google's Business Profile API (application + approval) or a
-Search Atlas GBP connection per client. Not built.
+## GBP — live from Search Atlas (Sep 30 2026)
+Each client (Onboarding Pipeline and Active Clients) has a **Search Atlas listing** text column (`text_mm7pjpc1` /
+`text_mm7p124g`) holding the numeric Search Atlas GBP location id. The panels offer "Link to Search Atlas listing"
+(every listing on our account) and then show a live card: name, connected/verified, rating, review count, unanswered,
+last review, last post, profile completeness, "Open in Search Atlas" (`dashboard.searchatlas.com/gbp-galactic/overview?id=<id>`),
+"Refresh live". Rules: a connected **and verified** listing writes GBP Access → Verified (+ GBP Last Checked → today on
+Active Clients) on its own; connected-but-unverified shows as not verified and flags `gbp` even if Monday says Verified;
+a failed Search Atlas read changes nothing and the Monday state is used. The Clients list reads the whole account listing
+once per load (cached 10 min) so the GBP column and flags are live for linked rows; the 90-day recheck flag does not
+apply while a live read succeeds. Nothing is ever written to Search Atlas or Google.
+
+Code: `src/lib/gbp/{types,state,searchatlas}.ts` (+ `gbp.test.ts`), `src/app/leads/gbp-card.tsx`,
+`src/app/api/team/gbp/{locations,card/[listing]}/route.ts`. Search Atlas REST (docs.searchatlas.com):
+`https://sa.searchatlas.com/api/gbp/v2/locations/`, `/api/gbp/v1/reviews/star-rating-count/?location=`, `/api/gbp/v1/reviews/?location=`,
+`/api/gbp/v1/posts/?location=`, header `X-API-Key`. **Needs on Vercel:** `SEARCH_ATLAS_API_KEY` (Search Atlas → avatar →
+Settings → API Keys; any plan). Optional: `SEARCH_ATLAS_API_BASE`, `SEARCH_ATLAS_LOCATION_URL` (`{id}` placeholder).
+Until the key is set the panels say "Search Atlas not connected" and the old manual dropdown + 90-day stamp still work.
 
 ## Code
 `src/lib/clients/{config,types,stripe,board,validation}.ts` + `clients.test.ts` (in `npm run test:onboarding`),

@@ -3,7 +3,8 @@ import { isTeam } from "@/lib/team-auth";
 import { assertSameOrigin, readCallBody } from "@/lib/calls/validation";
 import { onboardingOwners } from "@/lib/onboarding/config";
 import { linkActive } from "@/lib/onboarding/intake";
-import { applyPatch, getOnboarding } from "@/lib/onboarding/pipeline";
+import { applyPatch, getOnboarding, liveGbpForOnboarding } from "@/lib/onboarding/pipeline";
+import { listLocations, searchAtlasConnected } from "@/lib/gbp/searchatlas";
 import { readHandoff, readIntake } from "@/lib/onboarding/store";
 import type { OnboardingDetail } from "@/lib/onboarding/types";
 import { validateItemId, validatePatch } from "@/lib/onboarding/validation";
@@ -21,13 +22,19 @@ export async function GET(_req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
     const id = validateItemId((await context.params).id);
-    const { row, history } = await getOnboarding(id);
-    const key = row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "");
-    const [record, intake] = await Promise.all([key ? readHandoff(key).catch(() => null) : Promise.resolve(null), readIntake(id).catch(() => null)]);
+    const { row: stored, history } = await getOnboarding(id);
+    const key = stored.leadId || (stored.handoffId ? `manual-${stored.handoffId}` : "");
+    const [record, intake, live, gbpLocations] = await Promise.all([
+      key ? readHandoff(key).catch(() => null) : Promise.resolve(null), readIntake(id).catch(() => null),
+      liveGbpForOnboarding(stored), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
+      searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
+    ]);
+    const row = live.row;
     const detail: OnboardingDetail = {
       row, history, record: record?.itemId === id ? record : null,
       intake: intake ? { ...stripToken(intake), linkActive: linkActive(intake) } : null,
       owners: onboardingOwners(),
+      gbp: live.card, gbpLocations, searchAtlasConnected: searchAtlasConnected(),
     };
     return NextResponse.json(detail, { headers });
   } catch (error) { return failure(error); }

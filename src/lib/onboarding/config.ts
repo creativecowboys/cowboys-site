@@ -39,6 +39,7 @@ export const COL = {
   agreement: "color_mm7g32e6", // added
   payment: "color_mm7gz9ng", // added
   intake: "color_mm7gmf8r", // added
+  searchAtlasListing: "text_mm7pjpc1", // added Sep 30 2026 — Search Atlas GBP location id (numeric) the desk links this client to
 } as const;
 
 export const SUBITEM_COL = { owner: "person", status: "status", due: "date0", phase: "phase" } as const;

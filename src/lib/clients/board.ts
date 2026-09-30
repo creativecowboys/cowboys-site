@@ -6,6 +6,9 @@ import type { OnboardingRow } from "@/lib/onboarding/types";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS, GBP_RECHECK_DAYS, MONDAY_ORIGIN, REPORT_STALE_DAYS, TERM_SOON_DAYS, groupIdFor } from "./config";
 import { paymentFromSnapshot, snapshot, findCustomerByEmail, stripeConnected } from "./stripe";
 import type { ClientFlag, ClientRow, ClientsListData, StripeSnapshot } from "./types";
+import { accessFromCard, cardFromSummary, cardUnavailable, parseListingId, searchAtlasLocationUrl } from "@/lib/gbp/state";
+import { gbpCard, listLocations, searchAtlasConnected } from "@/lib/gbp/searchatlas";
+import type { GbpCard } from "@/lib/gbp/types";
 
 type Column = { id: string; text: string | null; value: string | null; display_value?: string | null }; // display_value: formula columns
 type Update = { id: string; text_body: string | null; created_at: string; creator: { name: string } | null };
@@ -23,7 +26,10 @@ const daysBetween = (a: string, b: string) => Math.round((Date.parse(`${b}T12:00
 export function flagsFor(row: Omit<ClientRow, "flags">, today = todayEastern()): ClientFlag[] {
   const flags: ClientFlag[] = [];
   if (row.group === "issue" || ["Overdue", "Card Failed"].includes(row.payStatus)) flags.push("payment");
-  if (!["Verified", "No GBP Exists"].includes(row.gbpAccess)) flags.push("gbp");
+  // A successful live Search Atlas read is the truth: verified → no GBP flags at all (the 90-day recheck is moot);
+  // connected but unverified → "gbp". A failed read (or no link) falls back to the Monday state.
+  if (row.gbpLive?.ok) { if (!row.gbpLive.verified) flags.push("gbp"); }
+  else if (!["Verified", "No GBP Exists"].includes(row.gbpAccess)) flags.push("gbp");
   else if (row.gbpAccess === "Verified" && (!row.gbpChecked || daysBetween(row.gbpChecked, today) > GBP_RECHECK_DAYS)) flags.push("gbp-recheck");
   if (row.group !== "churned" && row.group !== "paused" && (!row.lastReport || daysBetween(row.lastReport, today) > REPORT_STALE_DAYS)) flags.push("report");
   if (row.termEnds && daysBetween(today, row.termEnds) <= TERM_SOON_DAYS && daysBetween(today, row.termEnds) >= 0) flags.push("term");
@@ -46,8 +52,50 @@ export function mapClient(item: Item): ClientRow {
     contact: text(CCOL.contact), email: text(CCOL.email), phone: text(CCOL.phone), website: link(CCOL.website), gbpUrl: link(CCOL.gbpUrl), ghlContact: link(CCOL.ghlContact), driveFolder: link(CCOL.driveFolder), notes: text(CCOL.notes),
     payStatus: text(CCOL.payStatus), payMethod: text(CCOL.payMethod), billingDay: text(CCOL.billingDay), nextBill: text(CCOL.nextBill), lastPayment: text(CCOL.lastPayment), clientSince: text(CCOL.clientSince), termEnds: text(CCOL.termEnds), lastReport: text(CCOL.lastReport),
     gbpAccess: text(CCOL.gbpAccess), gbpChecked: text(CCOL.gbpChecked), stripeCustomer: text(CCOL.stripeCustomer).trim(), onboardingItem: text(CCOL.onboardingItem).trim(), teamDesk: checked(CCOL.teamDesk),
+    searchAtlasListing: text(CCOL.searchAtlasListing).trim(), gbpLive: null,
   };
   return { ...base, flags: flagsFor(base) };
+}
+
+/** Attach the live listing state to every linked row from ONE cached account listing; a Search Atlas failure never hides the list. */
+export async function withLiveGbp(rows: ClientRow[]): Promise<ClientRow[]> {
+  const linked = rows.filter((r) => parseListingId(r.searchAtlasListing));
+  if (!linked.length || !searchAtlasConnected()) return rows;
+  const fetchedAt = new Date().toISOString();
+  let byId: Map<number, GbpCard> | null = null;
+  let failure = "";
+  try { byId = new Map((await listLocations()).map((l) => [l.id, cardFromSummary(l, fetchedAt, searchAtlasLocationUrl(l.id))])); }
+  catch (error) { failure = error instanceof Error ? error.message : "Search Atlas read failed."; console.error(`[gbp] client list live read failed: ${failure}`); }
+  return rows.map((r) => {
+    const id = parseListingId(r.searchAtlasListing);
+    if (!id) return r;
+    const gbpLive = byId ? byId.get(id) || cardUnavailable(id, `Listing ${id} is not connected to our Search Atlas account.`, fetchedAt) : cardUnavailable(id, failure, fetchedAt);
+    const next = { ...r, gbpLive };
+    return { ...next, flags: flagsFor(next) };
+  });
+}
+
+/** Only a connected + verified listing changes Monday on its own: GBP Access → Verified and the recheck stamp → today. */
+async function promoteClientFromLive(row: ClientRow, card: GbpCard): Promise<boolean> {
+  const live = accessFromCard(card, row.gbpAccess);
+  const today = todayEastern();
+  if (!live.live || live.value !== "Verified") return false;
+  if (!live.changed && row.gbpChecked === today) return false;
+  await setColumns(row.id, { [CCOL.gbpAccess]: { label: "Verified" }, [CCOL.gbpChecked]: { date: today } });
+  return true;
+}
+
+/** Live GBP card for a client row plus the auto-promotion; returns the refreshed row when Monday changed. */
+export async function liveGbpForClient(row: ClientRow, opts: { fresh?: boolean } = {}): Promise<{ card: GbpCard | null; row: ClientRow }> {
+  const id = parseListingId(row.searchAtlasListing);
+  if (!id) return { card: null, row };
+  const card = await gbpCard(id, { detail: true, fresh: !!opts.fresh });
+  let promoted = false;
+  try { promoted = await promoteClientFromLive(row, card); }
+  catch (error) { console.error(`[gbp] could not write Verified to client ${row.id}: ${error instanceof Error ? error.message : error}`); }
+  const fresh = promoted ? mapClient(await readClient(row.id)) : row;
+  const withLive = { ...fresh, gbpLive: card };
+  return { card, row: { ...withLive, flags: flagsFor(withLive) } };
 }
 
 function signCursor(body: string): string { return createHmac("sha256", mondayToken()).update(`clients-cursor.${body}`).digest("base64url"); }
@@ -78,7 +126,8 @@ export async function listClients(cursor: string | null): Promise<ClientsListDat
   const rows = board.items_page.items.map(mapClient).filter((r) => r.teamDesk);
   const stillOnboarding = await onboardingInProgress(rows.map((r) => r.onboardingItem).filter(Boolean));
   // One place at a time (Dave, Sep 25 2026): a client whose onboarding record is not Launched stays on the Onboarding tab.
-  return { rows: rows.filter((r) => !stillOnboarding.has(r.onboardingItem)), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected(), canSeeMoney: false /* the route decides per session */ };
+  const shown = await withLiveGbp(rows.filter((r) => !stillOnboarding.has(r.onboardingItem)));
+  return { rows: shown, cursor: wrapCursor(board.items_page.cursor), boardName: board.name, stripeConnected: stripeConnected(), canSeeMoney: false /* the route decides per session */, searchAtlasConnected: searchAtlasConnected() };
 }
 
 /** Which of these Onboarding Pipeline items are still before the Launched stage. Unknown/deleted items count as done. */
@@ -123,6 +172,7 @@ export type ClientPatch =
   | { action: "payMethod"; value: string }
   | { action: "gbp"; value: string; gbpUrl: string }
   | { action: "gbpChecked" }
+  | { action: "searchAtlasListing"; listingId: string } // "" unlinks
   | { action: "reportSent" }
   | { action: "manager"; ownerId: string }
   | { action: "stripeCustomer"; customerId: string }
@@ -141,6 +191,12 @@ export async function applyClientPatch(itemId: string, patch: ClientPatch & { ex
     case "payMethod": await setColumns(itemId, { [CCOL.payMethod]: { labels: [patch.value] } }); break;
     case "gbp": await setColumns(itemId, { [CCOL.gbpAccess]: { label: patch.value }, ...(patch.value === "Verified" ? { [CCOL.gbpChecked]: { date: today } } : {}), ...(patch.gbpUrl ? { [CCOL.gbpUrl]: { url: patch.gbpUrl, text: patch.gbpUrl } } : {}) }); break;
     case "gbpChecked": await setColumns(itemId, { [CCOL.gbpChecked]: { date: today }, [CCOL.gbpAccess]: { label: "Verified" } }); break;
+    case "searchAtlasListing": {
+      await setColumns(itemId, { [CCOL.searchAtlasListing]: patch.listingId });
+      const id = parseListingId(patch.listingId);
+      if (id) { const linked = mapClient(await readClient(itemId)); return (await liveGbpForClient(linked, { fresh: true })).row; }
+      break;
+    }
     case "reportSent": await setColumns(itemId, { [CCOL.lastReport]: { date: today } }); break;
     case "manager": await setColumns(itemId, { [CCOL.accountManager]: patch.ownerId ? { personsAndTeams: [{ id: Number(patch.ownerId), kind: "person" }] } : { personsAndTeams: [] } }); break;
     case "stripeCustomer": await setColumns(itemId, { [CCOL.stripeCustomer]: patch.customerId }); break;
@@ -205,6 +261,7 @@ export async function graduateFromOnboarding(ob: OnboardingRow, managerId: strin
     [CCOL.notes]: `Graduated from onboarding ${today}. Sales owner: ${ob.salesOwner || "—"}. ${ob.notes || ""}`.trim(),
   };
   if (ob.gbpAccess === "Verified") values[CCOL.gbpChecked] = { date: today };
+  if (parseListingId(ob.searchAtlasListing)) values[CCOL.searchAtlasListing] = ob.searchAtlasListing;
   if (packages.length) values[CCOL.package] = { labels: packages };
   if (ob.email) values[CCOL.email] = { email: ob.email, text: ob.email };
   if (ob.phone) values[CCOL.phone] = { phone: ob.phone.replace(/[^+\d]/g, ""), countryShortName: "US" };

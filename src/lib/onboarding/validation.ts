@@ -69,6 +69,7 @@ export type PatchAction =
   | { action: "owner"; ownerId: string } // "" clears
   | { action: "checklist"; subitemId: string; status: (typeof CHECK_STATUS)[number] | "" }
   | { action: "gbp"; value: (typeof GBP_ACCESS)[number]; gbpUrl?: string }
+  | { action: "searchAtlasListing"; listingId: string } // "" unlinks
   | { action: "agreement"; value: (typeof AGREEMENT)[number] }
   | { action: "payment"; value: (typeof PAYMENT)[number] }
   | { action: "dns"; value: (typeof DNS_PATHS)[number] | "" }
@@ -90,6 +91,7 @@ export function validatePatch(input: unknown): PatchAction & { expectedUpdatedAt
     case "owner": { allowKeys(["ownerId"]); const ownerId = str(raw, "ownerId", 12); if (ownerId && !onboardingOwners().some((o) => o.id === ownerId)) throw bad("Choose a team member who has a Monday seat."); return { action, ownerId, expectedUpdatedAt: expected }; }
     case "checklist": { allowKeys(["subitemId", "status"]); const subitemId = str(raw, "subitemId", 20); const status = str(raw, "status", 20); if (!/^[1-9]\d{0,19}$/.test(subitemId)) throw bad("Invalid checklist item."); if (status && !(CHECK_STATUS as readonly string[]).includes(status)) throw bad("Choose a valid checklist status."); return { action, subitemId, status: status as (typeof CHECK_STATUS)[number] | "", expectedUpdatedAt: expected }; }
     case "gbp": { allowKeys(["value", "gbpUrl"]); const value = str(raw, "value", 30); const gbpUrl = str(raw, "gbpUrl", 300); if (!(GBP_ACCESS as readonly string[]).includes(value)) throw bad("Choose a valid access state."); return { action, value: value as (typeof GBP_ACCESS)[number], gbpUrl, expectedUpdatedAt: expected }; }
+    case "searchAtlasListing": { allowKeys(["listingId"]); const listingId = str(raw, "listingId", 12); if (listingId && !/^[1-9]\d{0,9}$/.test(listingId)) throw bad("Choose a listing from the Search Atlas list."); return { action, listingId, expectedUpdatedAt: expected }; }
     case "agreement": { allowKeys(["value"]); const value = str(raw, "value", 20); if (!(AGREEMENT as readonly string[]).includes(value)) throw bad("Choose a valid agreement status."); return { action, value: value as (typeof AGREEMENT)[number], expectedUpdatedAt: expected }; }
     case "payment": { allowKeys(["value"]); const value = str(raw, "value", 20); if (!(PAYMENT as readonly string[]).includes(value)) throw bad("Choose a valid payment status."); return { action, value: value as (typeof PAYMENT)[number], expectedUpdatedAt: expected }; }
     case "dns": { allowKeys(["value"]); const value = str(raw, "value", 40); if (value && !(DNS_PATHS as readonly string[]).includes(value)) throw bad("Choose a valid DNS path."); return { action, value: value as (typeof DNS_PATHS)[number] | "", expectedUpdatedAt: expected }; }

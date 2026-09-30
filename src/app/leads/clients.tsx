@@ -7,6 +7,7 @@ import { FILE_CATEGORIES, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
 import { CloseIcon, RefreshIcon } from "./icons";
+import { GbpLink } from "./gbp-card";
 
 // Clients tab: the Team-desk rows of Josh's Active Clients board, problems first.
 async function json<T>(response: Response): Promise<T> {
@@ -69,7 +70,9 @@ export default function Clients({ clientId, onOpenClient }: { clientId: string; 
         <span>{r.packages || "—"}<small>{money ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
         <span>{r.accountManager || <em>Unassigned</em>}<small>{groupLabel(r.group)} · {r.health || "—"}</small></span>
         <span><i className={`ob-stage ${r.flags.includes("payment") ? "ob-stage-hold" : r.payStatus === "Paid / Current" ? "ob-stage-launched" : ""}`}>{r.payStatus || "—"}</i><small>{r.payMethod || ""}{r.nextBill && ` · next ${r.nextBill}`}</small></span>
-        <span><i className={`ob-stage ${r.gbpAccess === "Verified" ? "ob-stage-launched" : r.gbpAccess === "No GBP Exists" ? "" : "ob-stage-hold"}`}>{r.gbpAccess || "Not Requested"}</i><small>{r.gbpChecked && `checked ${r.gbpChecked}`}</small></span>
+        <span>{r.gbpLive?.ok
+          ? <><i className={`ob-stage ${r.gbpLive.verified ? "ob-stage-launched" : "ob-stage-hold"}`}>{r.gbpLive.verified ? "Verified (live)" : "Not verified (live)"}</i><small>{r.gbpLive.reviewCount ? `${r.gbpLive.rating.toFixed(1)} ★ · ${r.gbpLive.reviewCount} reviews` : "no reviews"}{r.gbpLive.unanswered ? ` · ${r.gbpLive.unanswered} unanswered` : ""}</small></>
+          : <><i className={`ob-stage ${r.gbpAccess === "Verified" ? "ob-stage-launched" : r.gbpAccess === "No GBP Exists" ? "" : "ob-stage-hold"}`}>{r.gbpAccess || "Not Requested"}</i><small>{r.gbpLive ? "Search Atlas read failed" : r.gbpChecked ? `checked ${r.gbpChecked}` : "not linked to Search Atlas"}</small></>}</span>
         <span>{r.flags.length ? r.flags.map((f) => <small key={f} className={f === "payment" ? "ob-overdue" : ""}>{FLAG[f]}</small>) : <b className="ob-ok">All good</b>}</span>
       </button>)}
       {loading && <p role="status" className="call-roster-message">Loading from Monday…</p>}
@@ -104,7 +107,7 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
   const patch = async (body: Record<string, unknown>, label: string) => {
     if (!detail || busy) return;
     setBusy(label); setError("");
-    try { const data: { row: ClientRow } = await json(await fetch(`/api/team/clients/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) })); setDetail({ ...detail, row: data.row }); onRow(data.row); }
+    try { const data: { row: ClientRow } = await json(await fetch(`/api/team/clients/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) })); setDetail({ ...detail, row: data.row }); onRow(data.row); if (body.action === "searchAtlasListing") await load(); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); }
     finally { setBusy(""); }
   };
@@ -166,12 +169,13 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     </section>
 
     <section className="ob-section"><h3>Google Business Profile</h3>
+      <GbpLink listing={row.searchAtlasListing} locations={detail.gbpLocations} connected={detail.searchAtlasConnected} card={row.gbpLive} busy={!!busy} onLink={(listingId) => patch({ action: "searchAtlasListing", listingId }, "gbp-link")} onRefreshed={load} />
       <div className="ob-controls">
         <label>Access<select value={row.gbpAccess || "Not Requested"} disabled={!!busy} onChange={(e) => patch({ action: "gbp", value: e.target.value, gbpUrl }, "gbp")}>{CLIENT_GBP.map((g) => <option key={g}>{g}</option>)}</select></label>
         <label>GBP / Maps URL<input value={gbpUrl} disabled={!!busy} onChange={(e) => setGbpUrl(e.target.value)} onBlur={() => gbpUrl !== row.gbpUrl && patch({ action: "gbp", value: row.gbpAccess || "Not Requested", gbpUrl }, "gbp")} placeholder="https://maps.google.com/…" /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "gbpChecked" }, "gbpchk")}>I just confirmed we still have access</button>{row.gbpUrl && <a className="call-secondary" href={row.gbpUrl} target="_blank" rel="noreferrer">Open listing ↗</a>}</div>
-      <p className="call-muted ob-hint">Last confirmed: {row.gbpChecked || "never"}. The tab asks for a recheck every 90 days. Only a staff check counts.</p>
+      <p className="call-muted ob-hint">Last confirmed: {row.gbpChecked || "never"}. {row.gbpLive?.ok ? "A live Search Atlas read counts as a check, so the 90-day recheck does not apply while the listing is linked." : "The tab asks for a recheck every 90 days. Only a staff check (or a live Search Atlas read) counts."}</p>
     </section>
 
     <section className="ob-section"><h3>Account</h3>

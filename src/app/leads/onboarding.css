@@ -150,3 +150,5 @@
 .pk-recent .pk-link{margin:0}
 @media(max-width:760px){.pk-cards{grid-template-columns:1fr}.pk-custom-fields{grid-template-columns:1fr}.pk-recent li{grid-template-columns:1fr auto}}
 
+
+.ob-gbp-card{margin-top:12px;border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}.ob-gbp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.ob-gbp-head b{font-weight:600}.ob-gbp code{font-size:11px;background:#efe6d6;padding:1px 4px;border-radius:3px}

@@ -7,6 +7,7 @@ import { uploadPath } from "@/lib/onboarding/validation";
 import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
 import { CloseIcon, RefreshIcon } from "./icons";
+import { GbpLink } from "./gbp-card";
 
 // Madison's view: every client in onboarding, what is missing, and one-click updates that write to
 // Monday. Every change sends the record version it was based on; a 409 means reload and look first.
@@ -101,6 +102,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
     try {
       const data: { row: OnboardingRow } = await json(await fetch(`/api/team/onboarding/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }));
       setDetail({ ...detail, row: data.row }); onRow(data.row);
+      if (body.action === "searchAtlasListing") await load(); // pick up the live card for the newly linked listing
     } catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); }
     finally { setBusy(""); }
   };
@@ -188,6 +190,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
     </section>
 
     <section className="ob-section"><h3>Access</h3>
+      <GbpLink listing={row.searchAtlasListing} locations={detail.gbpLocations} connected={detail.searchAtlasConnected} card={detail.gbp} busy={!!busy} onLink={(listingId) => patch({ action: "searchAtlasListing", listingId }, "gbp-link")} onRefreshed={load} />
       <div className="ob-controls">
         <label>Google Business Profile<select value={row.gbpAccess || "Not Requested"} disabled={!!busy} onChange={(e) => patch({ action: "gbp", value: e.target.value, gbpUrl }, "gbp")}>{GBP_ACCESS.map((g) => <option key={g}>{g}</option>)}</select></label>
         <label>GBP / Maps URL<input value={gbpUrl} disabled={!!busy} onChange={(e) => setGbpUrl(e.target.value)} onBlur={() => gbpUrl !== row.gbpUrl && patch({ action: "gbp", value: row.gbpAccess || "Not Requested", gbpUrl }, "gbp")} placeholder="https://maps.google.com/…" /></label>

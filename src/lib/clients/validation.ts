@@ -33,6 +33,7 @@ export function validateClientPatch(input: unknown): ClientPatch & { expectedUpd
     case "payMethod": only(["value"]); return { action, value: oneOf(str(raw, "value", 30), PAY_METHOD, "Choose a valid payment method."), expectedUpdatedAt: expected };
     case "gbp": only(["value", "gbpUrl"]); return { action, value: oneOf(str(raw, "value", 30), CLIENT_GBP, "Choose a valid GBP state."), gbpUrl: str(raw, "gbpUrl", 300), expectedUpdatedAt: expected };
     case "gbpChecked": only([]); return { action, expectedUpdatedAt: expected };
+    case "searchAtlasListing": { only(["listingId"]); const listingId = str(raw, "listingId", 12); if (listingId && !/^[1-9]\d{0,9}$/.test(listingId)) throw bad("Choose a listing from the Search Atlas list."); return { action, listingId, expectedUpdatedAt: expected }; }
     case "reportSent": only([]); return { action, expectedUpdatedAt: expected };
     case "manager": { only(["ownerId"]); const ownerId = str(raw, "ownerId", 12); if (ownerId && !onboardingOwners().some((o) => o.id === ownerId)) throw bad("Choose a team member who has a Monday seat."); return { action, ownerId, expectedUpdatedAt: expected }; }
     case "stripeCustomer": { only(["customerId"]); const customerId = str(raw, "customerId", 40); if (customerId && !/^cus_[A-Za-z0-9]+$/.test(customerId)) throw bad("A Stripe customer id looks like cus_…"); return { action, customerId, expectedUpdatedAt: expected }; }
