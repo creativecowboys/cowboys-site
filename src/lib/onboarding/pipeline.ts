@@ -156,8 +156,10 @@ export function handoffColumns(form: HandoffForm): Record<string, unknown> {
 
 export async function createPipelineItem(form: HandoffForm): Promise<{ id: string; url: string }> {
   const group = STAGES.find((s) => s.id === "new")!.group;
+  // create_labels_if_missing: a dropdown label the code knows (BUSINESS_TYPES / PACKAGES) but the board
+  // doesn't yet is added to the board instead of failing the handoff (Sep 30 2026, "Ecommerce").
   const data = await monday<{ create_item: { id: string } }>(
-    "mutation OnboardingCreate($board: ID!, $group: String!, $name: String!, $values: JSON!) { create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values) { id } }",
+    "mutation OnboardingCreate($board: ID!, $group: String!, $name: String!, $values: JSON!) { create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values, create_labels_if_missing: true) { id } }",
     { board: PIPELINE_BOARD_ID, group, name: form.business.slice(0, 255), values: JSON.stringify(handoffColumns(form)) }, 25000,
   );
   const id = data.create_item?.id;

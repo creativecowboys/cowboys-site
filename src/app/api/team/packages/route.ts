@@ -19,6 +19,10 @@ export const maxDuration = 60;
 // the first invoice today. (2) The send step passed userId "" when GHL_USER_ID was unset, so the invoice
 // stayed in Draft — the sender (GHL_USER_ID, default Dave's user id) is checked BEFORE anything is created.
 // (3) Every failure now says which step broke, what already exists in GHL, and where to open it.
+//
+// Sep 30 2026 pricing rule (Dave): Local Growth is $297/mo on a 12-month agreement, $497/mo month-to-month.
+// The "$297 first year, then $497" step-up is retired. A 12-month plan gets a GHL task ~11 months out to
+// renew at $297 or move the recurring invoice to $497 month-to-month; month-to-month plans get no task.
 const BUSINESS = {
   name: "Creative Cowboys", logoUrl: "https://onboarding.creativecowboys.co/brand/creative-cowboys-logo.png", phoneNo: "+14708340242",
   address: { addressLine1: "222 West Montgomery St", city: "Villa Rica", state: "GA", countryCode: "US", postalCode: "30180" }, website: "https://www.creativecowboys.co",
@@ -29,6 +33,12 @@ type SendResult = { invoice?: { _id: string; status?: string }; emailData?: unkn
 function todayInET() {
   const d = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
   return { iso: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`, day: d.getDate() };
+}
+/** `iso` plus N months (clamped to the last day of the target month, Jan 31 + 1 → Feb 28) plus `days`, as "Sep 29, 2027". */
+function plusMonths(iso: string, months: number, days = 0) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const lastDay = new Date(Date.UTC(y, m - 1 + months + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(y, m - 1 + months, Math.min(d, lastDay) + days)).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
 /** What the desk gets when GHL work was partly done: the step that failed plus links to what exists. */
@@ -50,7 +60,7 @@ export async function POST(req: Request) {
     const contactId = typeof b.contactId === "string" && /^[A-Za-z0-9]{6,64}$/.test(b.contactId) ? b.contactId : "";
     if (!contactId) throw new CallDeskError("Pick a customer first.", 400);
     if (!Array.isArray(b.selections) || b.selections.length > 20) throw new CallDeskError("Pick at least one item.", 400);
-    const selections = (b.selections as Selection[]).map((s) => ({ key: String(s.key || "").slice(0, 40), tier: s.tier ? String(s.tier).slice(0, 20) : undefined, amount: s.amount === undefined ? undefined : Number(s.amount), promo: s.promo === true, name: s.name ? String(s.name).slice(0, 120) : undefined }));
+    const selections = (b.selections as Selection[]).map((s) => ({ key: String(s.key || "").slice(0, 40), tier: s.tier ? String(s.tier).slice(0, 20) : undefined, term: s.term ? String(s.term).slice(0, 20) : undefined, amount: s.amount === undefined ? undefined : Number(s.amount), name: s.name ? String(s.name).slice(0, 120) : undefined }));
     let lines;
     try { lines = buildLines(selections); } catch (e) { throw new CallDeskError((e as Error).message, 400); }
     const total = monthlyTotal(lines);
@@ -68,15 +78,20 @@ export async function POST(req: Request) {
     if (!contact?.email) throw new CallDeskError("This contact has no email address. Add one in GHL first.", 400);
     const personName = [contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.email;
     const business = contact.companyName || personName;
-    const promoNotes = lines.map((l) => l.promoNote).filter(Boolean) as string[];
+    const { iso, day } = todayInET();
+    // One sentence per line that carries a term, then the agreement window for any fixed-term line.
+    const termNotes = lines.map((l) => l.termNote).filter(Boolean) as string[];
+    const agreement = lines.find((l) => l.termMonths);
+    // 12 monthly charges starting today cover today through the day before the 13th would land.
+    const agreementEnds = agreement ? plusMonths(iso, agreement.termMonths!, -1) : "";
     const terms = [
       `Monthly plan for ${business}. Billed on the same day each month; the card used for this first payment is charged automatically for future months.`,
-      ...promoNotes,
+      ...termNotes,
+      agreement ? `The ${agreement.termMonths}-month agreement starts ${plusMonths(iso, 0)} and runs through ${agreementEnds}.` : "",
       "Ad packages are one flat price that includes ad spend.",
       termsExtra, liveMode ? "" : "TEST MODE — this invoice will not charge a card.",
     ].filter(Boolean).join(" ");
 
-    const { iso, day } = todayInET();
     const name = `${business} — Monthly plan`.slice(0, 40);
     // dayOfMonth must equal the start date's day or GHL waits for the next matching day (on the 30th a
     // clamp to 28 meant "first invoice Oct 28"). GHL's own recurring-invoice picker offers 1st–31st.
@@ -118,7 +133,8 @@ export async function POST(req: Request) {
     const url = INVOICE_HOST + invoice._id;
     const summary = lines.map((l) => `• ${l.name} — $${l.amount}/mo`).join("\n");
     await addNote(contact.id, `Package builder (call desk): monthly plan created${liveMode ? "" : " (TEST MODE)"}.\n${summary}\nTotal $${total}/mo. Invoice ${invoice.invoiceNumber ?? invoice._id}: ${url}`).catch((e) => console.error(`packages: note failed: ${msg(e)}`));
-    if (promoNotes.length && liveMode) await addTask(contact.id, `${business}: Local Growth first-year rate ends`, "The $297/mo first-year rate ends after 12 payments. Update the recurring invoice to $497/mo before the 13th charge.", 335).catch((e) => console.error(`packages: task failed: ${msg(e)}`));
+    // Renewal reminder at ~11 months (335 days) so the conversation happens before the 12th payment. Month-to-month plans get none.
+    if (agreement && liveMode) await addTask(contact.id, `${business}: 12-month agreement ends ${agreementEnds}`, `${business}'s ${agreement.termMonths}-month Local Growth agreement ends ${agreementEnds}. Before then: renew at $297/mo for another 12 months, or move the recurring invoice to $497/mo month-to-month.`, 335).catch((e) => console.error(`packages: task failed: ${msg(e)}`));
     console.log(`packages: ok scheduleId=${scheduleId} invoiceId=${invoice._id} number=${invoice.invoiceNumber ?? "-"} live=${liveMode} emailed=${emailed} to=${contact.email}`);
     return NextResponse.json({ ok: true, url, invoiceId: invoice._id, invoiceNumber: invoice.invoiceNumber, scheduleId, ghlUrl: `${GHL_APP}/${locationId}/payments/recurring-templates/v2/${scheduleId}`, total, lines, liveMode, emailed, emailRequested: sendEmail, to: contact.email }, { headers: teamHeaders });
   } catch (error) {

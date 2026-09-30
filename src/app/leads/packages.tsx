@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATALOG, buildLines, monthlyTotal, type CatalogItem, type Selection } from "@/lib/packages/catalog";
+import { CATALOG, buildLines, monthlyTotal, termFor, type CatalogItem, type Selection } from "@/lib/packages/catalog";
 import { CloseIcon } from "./icons";
 import type { CallLead } from "./types";
 
@@ -45,7 +45,8 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
   });
 
-  const [sel, setSel] = useState<Record<string, Selection>>({ "local-growth": { key: "local-growth", promo: true } });
+  // Local Growth opens on its default term (the 12-month agreement, $297/mo); the rep can switch to month-to-month ($497/mo).
+  const [sel, setSel] = useState<Record<string, Selection>>({ "local-growth": { key: "local-growth", term: "12-month" } });
   const [custom, setCustom] = useState({ name: "", amount: "" });
   const [sendEmail, setSendEmail] = useState(true);
   const [testMode, setTestMode] = useState(false);
@@ -53,7 +54,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
   const selections = useMemo<Selection[]>(() => { const list = Object.values(sel); if (custom.name.trim() && custom.amount) list.push({ key: "custom", name: custom.name, amount: Number(custom.amount) }); return list; }, [sel, custom]);
   const preview = useMemo(() => { try { const lines = buildLines(selections); return { lines, total: monthlyTotal(lines), error: "" }; } catch (e) { return { lines: [], total: 0, error: (e as Error).message }; } }, [selections]);
   function toggle(key: string, on: boolean) {
-    setSel((s) => { const n = { ...s }; if (!on) { delete n[key]; return n; } const item = CATALOG.find((c) => c.key === key)!; if (item.group === "plan") for (const c of CATALOG) if (c.group === "plan") delete n[c.key]; n[key] = { key, promo: Boolean(item.promo), tier: item.tiers?.[0].key }; return n; });
+    setSel((s) => { const n = { ...s }; if (!on) { delete n[key]; return n; } const item = CATALOG.find((c) => c.key === key)!; if (item.group === "plan") for (const c of CATALOG) if (c.group === "plan") delete n[c.key]; n[key] = { key, term: item.terms?.[0].key, tier: item.tiers?.[0].key }; return n; });
   }
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<Fail | null>(null);
@@ -104,7 +105,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     </section>
 
     <section className="ob-section"><h3>2. Plan</h3>
-      <div className="pk-cards">{plans.map((p) => { const on = Boolean(sel[p.key]); return <label key={p.key} className={`pk-card ${on ? "is-on" : ""}`}><div className="pk-card-top"><div><b>{p.name}</b><small>{p.blurb}</small></div><input type="radio" name="pk-plan" checked={on} onChange={() => toggle(p.key, true)} /></div><div className="pk-price">{money(p.amount!)}<span>/mo</span></div>{p.promo && on && <label className="pk-promo"><input type="checkbox" checked={Boolean(sel[p.key]?.promo)} onChange={(e) => setSel((s) => ({ ...s, [p.key]: { ...s[p.key], promo: e.target.checked } }))} /> {p.promo.label}: <b>{money(p.promo.amount)}/mo</b></label>}</label>; })}</div>
+      <div className="pk-cards">{plans.map((p) => { const on = Boolean(sel[p.key]); const term = termFor(p, on ? sel[p.key]?.term : undefined); return <div key={p.key} className={`pk-card ${on ? "is-on" : ""}`}><label className="pk-card-top"><div><b>{p.name}</b><small>{p.blurb}</small></div><input type="radio" name="pk-plan" checked={on} onChange={() => toggle(p.key, true)} /></label><div className="pk-price">{money(term ? term.amount : p.amount!)}<span>/mo{term ? ` · ${term.label.toLowerCase()}` : ""}</span></div>{p.terms && on && <div className="pk-tiers" role="radiogroup" aria-label={`${p.name} term`}>{p.terms.map((t) => <button type="button" key={t.key} role="radio" aria-checked={term?.key === t.key} className={term?.key === t.key ? "is-on" : ""} onClick={() => setSel((s) => ({ ...s, [p.key]: { ...s[p.key], term: t.key } }))}>{t.label} · {money(t.amount)}/mo</button>)}</div>}</div>; })}</div>
       <button type="button" className="pk-link" onClick={() => { for (const p of plans) toggle(p.key, false); }}>No plan, add-ons only</button>
     </section>
 

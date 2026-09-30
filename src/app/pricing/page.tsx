@@ -39,10 +39,11 @@ interface Service {
  * Rebuilt 21 Sept 2026 off the Monday "Packages & Pricing" board, which is the
  * source of truth. If a price changes there, change it here.
  *
- * Promotional rates stay off this page on purpose: the $297 first-year Local
- * Growth rate and the $497 website build are both specials the team quotes
- * directly, not list prices. Publishing them would make the standard rate
- * unsellable.
+ * Agreement pricing stays off this page on purpose: Local Growth is $297/mo on
+ * a 12-month agreement and $497/mo month-to-month (Dave, Sep 30 2026 — the old
+ * "first year" step-up is retired), and the $497 website build is a special the
+ * team quotes directly. The list price shown here is the month-to-month rate;
+ * publishing the agreement rate would make it unsellable.
  */
 const MONTHLY_SERVICES: Service[] = [
     {

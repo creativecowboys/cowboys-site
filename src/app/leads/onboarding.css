@@ -128,7 +128,6 @@
 .pk-card input[type=radio],.pk-card input[type=checkbox]{accent-color:#e8603c;margin-top:3px;flex-shrink:0}
 .pk-card input[type=number]{width:100%;margin-top:10px;background:#fff;border:1px solid #cabcaa;border-radius:4px;padding:8px 10px;font-size:13px}
 .pk-price{font-size:16px;font-weight:700;margin-top:8px}.pk-price span{font-size:12px;font-weight:400;color:#71665a}
-.pk-promo{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;cursor:pointer}
 .pk-tiers{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pk-tiers button{border:1px solid #cabcaa;background:#fffaf2;border-radius:100px;padding:4px 12px;font-size:12px;cursor:pointer}
 .pk-tiers button.is-on{background:#1f1a17;border-color:#1f1a17;color:#f6efe3}

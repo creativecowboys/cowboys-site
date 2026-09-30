@@ -9,9 +9,13 @@
  * Note the website is no longer free with a monthly plan (changed Sept 21 2026). The
  * build is a separate one-time charge and its $30/mo hosting is required, so
  * website-hosting below is expected on any client who has a site with us.
+ * Local Growth terms (Dave, Sep 30 2026): $297/mo on a 12-month agreement, $497/mo month-to-month.
+ * The old "$297 for the first 12 months, then $497" rule is retired — a 12-month client renews at $297.
  */
 
 export type Tier = { key: string; label: string; amount: number };
+/** An agreement length with its own monthly price. `months` set = fixed-term agreement; unset = month-to-month. */
+export type Term = { key: string; label: string; amount: number; months?: number; note: string };
 
 export type CatalogItem = {
   key: string;
@@ -23,7 +27,7 @@ export type CatalogItem = {
   custom?: boolean;        // rep types the amount
   requires?: string[];     // only valid alongside one of these keys
   conflictsWith?: string[]; // cannot be combined with any of these keys
-  promo?: { label: string; amount: number; months: number; note: string }; // first-year rate
+  terms?: Term[];       // pick one (plans priced by agreement length); the first is the default
 };
 
 export const CATALOG: CatalogItem[] = [
@@ -32,13 +36,22 @@ export const CATALOG: CatalogItem[] = [
     name: "Local Growth",
     blurb: "Found on Google Maps for your service and city, reviews handled, monthly report.",
     group: "plan",
-    amount: 497,
-    promo: {
-      label: "First-year rate (12-month agreement)",
-      amount: 297,
-      months: 12,
-      note: "Local Growth bills at $297/mo for the first 12 months, then $497/mo.",
-    },
+    amount: 497, // month-to-month list price; the 12-month agreement is the default term below
+    terms: [
+      {
+        key: "12-month",
+        label: "12-month agreement",
+        amount: 297,
+        months: 12,
+        note: "Local Growth is $297/mo on a 12-month agreement. At the end of the term it renews for another 12 months at $297/mo, or continues month-to-month at $497/mo.",
+      },
+      {
+        key: "month-to-month",
+        label: "Month-to-month",
+        amount: 497,
+        note: "Local Growth is $497/mo month-to-month with no long-term agreement.",
+      },
+    ],
   },
   {
     key: "max-growth",
@@ -122,11 +135,26 @@ export type Selection = {
   key: string;
   tier?: string;        // tier key for ads
   amount?: number;      // custom amount (ai-seo / custom line)
-  promo?: boolean;      // use first-year rate
+  term?: string;        // term key for plans with terms (defaults to the first term)
   name?: string;        // custom line name
 };
 
-export type Line = { name: string; description: string; amount: number; promoNote?: string };
+export type Line = {
+  name: string;
+  description: string;
+  amount: number;
+  termNote?: string;    // sentence for the invoice terms
+  termMonths?: number;  // set when the line is on a fixed-term agreement (drives the renewal task)
+};
+
+/** The term a selection resolves to for a plan with terms: the chosen key, else the first (default). */
+export function termFor(item: CatalogItem, key?: string): Term | undefined {
+  if (!item.terms) return undefined;
+  if (!key) return item.terms[0];
+  const t = item.terms.find((x) => x.key === key);
+  if (!t) throw new Error(`Pick a term for ${item.name}.`);
+  return t;
+}
 
 /** Turn a selection list into invoice lines. Throws on invalid combinations. */
 export function buildLines(selections: Selection[]): Line[] {
@@ -155,8 +183,14 @@ export function buildLines(selections: Selection[]): Line[] {
       const amt = Number(s.amount);
       if (!Number.isFinite(amt) || amt <= 0) throw new Error(`Enter a monthly amount for ${item.name}.`);
       lines.push({ name: item.name, description: item.blurb, amount: Math.round(amt * 100) / 100 });
-    } else if (item.promo && s.promo) {
-      lines.push({ name: `${item.name} — first year`, description: `${item.promo.label}. Regular rate $${item.amount}/mo after month ${item.promo.months}.`, amount: item.promo.amount, promoNote: item.promo.note });
+    } else if (item.terms) {
+      const t = termFor(item, s.term)!;
+      const other = item.terms.filter((x) => x.key !== t.key).map((x) => `${x.label.toLowerCase()} $${x.amount}/mo`).join(", ");
+      lines.push({
+        name: `${item.name} — ${t.label.toLowerCase()}`,
+        description: t.months ? `${t.label} at $${t.amount}/mo. Renews at $${t.amount}/mo for another ${t.months} months, or ${other}.` : `${t.label} at $${t.amount}/mo, no long-term agreement.`,
+        amount: t.amount, termNote: t.note, termMonths: t.months,
+      });
     } else {
       lines.push({ name: item.name, description: item.blurb, amount: item.amount! });
     }

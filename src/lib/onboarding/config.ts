@@ -63,7 +63,7 @@ export const AGREEMENT = ["Unknown", "Pending", "Signed", "Not required"] as con
 export const PAYMENT = ["Unknown", "Pending", "Deposit paid", "Paid"] as const;
 export const INTAKE = ["Not sent", "Link issued", "Client submitted", "Reviewed"] as const;
 export const CHECK_STATUS = ["Working on it", "Done", "Stuck"] as const;
-export const BUSINESS_TYPES = ["Roofing", "Plumbing", "HVAC", "Concrete", "Law", "Landscaping", "Dental", "Auto Repair", "Other Local Service"] as const;
+export const BUSINESS_TYPES = ["Roofing", "Plumbing", "HVAC", "Concrete", "Law", "Landscaping", "Dental", "Auto Repair", "Ecommerce", "Other Local Service"] as const;
 export const DNS_PATHS = ["We register a new domain", "Registrar access (secure link)", "Client adds our CNAME"] as const;
 
 /** Package labels exactly as they exist on the Onboarding Pipeline "Package" dropdown. */
