@@ -123,7 +123,8 @@ export async function POST(request: NextRequest) {
     await Promise.all([
         emailLead(pb.slug, s, tier, ok, texted, utm),
         appendPlaybookLeadRow([
-            when, s.first_name, normalizePhone(s.phone), s.email, pb.trade, tier.toUpperCase(), s.city,
+            // Formatted so Sheets keeps it as text instead of parsing +1... into a number.
+            when, s.first_name, normalizePhone(s.phone).replace(/^\+1(\d{3})(\d{3})(\d{4})$/, "($1) $2-$3"), s.email, pb.trade, tier.toUpperCase(), s.city,
             s.crew_size, s.typical_job, s.has_website === "yes" ? "Yes" : "No", s.website_url,
             texted ? "Yes" : "No", ok ? "Yes" : "NO, add by hand",
             [utm.source, utm.medium, utm.campaign].filter(Boolean).join(" / "),
