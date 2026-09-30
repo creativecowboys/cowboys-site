@@ -3,11 +3,12 @@ import { Resend } from "resend";
 import { PLAYBOOKS, normalizePhone, readUrl, tierFor, validateSubmission, type Submission } from "@/lib/playbooks";
 import { pushPlaybookLeadToGHL } from "@/lib/ghl-playbook";
 import { sendSms } from "@/lib/twilio-sms";
+import { appendPlaybookLeadRow } from "@/lib/sheets-playbook";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const FALLBACK_TO = ["josh@creativecowboys.co"];
+const LEAD_EMAIL_TO = ["josh@creativecowboys.co"];
 
 // Same in-memory speed bump as /api/giveaway: not a security control.
 const RATE_LIMIT_MAX = 5;
@@ -30,32 +31,45 @@ function clientIp(req: NextRequest): string {
     return (fwd ? fwd.split(",")[0] : req.headers.get("x-real-ip") ?? "").trim() || "unknown";
 }
 
+const esc = (v: unknown) =>
+    String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+
 /**
- * If GHL can't take the lead, the delivery text never fires, so the team
- * has to send it by hand. Mail the raw lead to Josh.
+ * Every lead is mailed to Josh. When GHL couldn't take it, the email becomes
+ * the only record, so it says so and asks for the contact to be added by hand.
  */
-async function emailFallback(slug: string, s: Submission, tier: string) {
+async function emailLead(slug: string, s: Submission, tier: string, ghlOk: boolean, texted: boolean, utm: Record<string, string>) {
     if (!process.env.RESEND_API_KEY) {
-        console.error("PLAYBOOK LEAD LOST — no RESEND_API_KEY:", slug, JSON.stringify(s));
+        if (!ghlOk) console.error("PLAYBOOK LEAD LOST — no RESEND_API_KEY:", slug, JSON.stringify(s));
         return;
     }
     try {
         const resend = new Resend(process.env.RESEND_API_KEY);
-        const rows = Object.entries({ playbook: slug, tier, ...s })
-            .map(([k, v]) => `<tr><td style="padding:6px 10px;border:1px solid #eee;font-weight:600">${k}</td><td style="padding:6px 10px;border:1px solid #eee">${String(v ?? "")}</td></tr>`)
+        const rows = Object.entries({
+            playbook: slug,
+            tier,
+            ...s,
+            "text sent": texted ? "yes" : "NO, text them the playbook by hand",
+            source: [utm.source, utm.medium, utm.campaign].filter(Boolean).join(" / "),
+        })
+            .map(([k, v]) => `<tr><td style="padding:6px 10px;border:1px solid #eee;font-weight:600">${esc(k)}</td><td style="padding:6px 10px;border:1px solid #eee">${esc(v)}</td></tr>`)
             .join("");
+        const heading = ghlOk
+            ? `<h2 style="margin:0 0 8px">New playbook lead: ${esc(s.first_name)}</h2>` +
+              `<p style="margin:0 0 16px;color:#555">They're in GHL and the playbook email is on its way.</p>`
+            : `<h2 style="color:#B5330E;margin:0 0 8px">A playbook lead did not reach GHL</h2>` +
+              `<p style="margin:0 0 16px;color:#555">Add the contact by hand and text them the playbook. Tag: <b>${PLAYBOOKS[slug]?.tag}</b>, <b>pb-tier-${tier}</b>.</p>`;
         await resend.emails.send({
             from: "Creative Cowboys <howdy@creativecowboys.co>",
-            to: FALLBACK_TO,
+            to: LEAD_EMAIL_TO,
             replyTo: s.email,
-            subject: `PLAYBOOK LEAD — GHL WRITE FAILED (${slug})`,
-            html:
-                `<h2 style="color:#B5330E;margin:0 0 8px">A playbook lead did not reach GHL</h2>` +
-                `<p style="margin:0 0 16px;color:#555">Add the contact by hand and text them the playbook. Tag: <b>${PLAYBOOKS[slug]?.tag}</b>, <b>pb-tier-${tier}</b>.</p>` +
-                `<table style="border-collapse:collapse;max-width:620px">${rows}</table>`,
+            subject: ghlOk
+                ? `New playbook lead: ${s.first_name} (${PLAYBOOKS[slug]?.trade ?? slug}, tier ${tier.toUpperCase()})`
+                : `PLAYBOOK LEAD — GHL WRITE FAILED (${slug})`,
+            html: heading + `<table style="border-collapse:collapse;max-width:620px">${rows}</table>`,
         });
     } catch (err) {
-        console.error("PLAYBOOK LEAD LOST — fallback email also failed:", err, JSON.stringify(s));
+        console.error(ghlOk ? "playbook lead email failed:" : "PLAYBOOK LEAD LOST — fallback email also failed:", err, JSON.stringify(s));
     }
 }
 
@@ -104,7 +118,17 @@ export async function POST(request: NextRequest) {
               )
             : Promise.resolve(false),
     ]);
-    if (!ok) await emailFallback(pb.slug, s, tierFor(s));
+    const tier = tierFor(s);
+    const when = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+    await Promise.all([
+        emailLead(pb.slug, s, tier, ok, texted, utm),
+        appendPlaybookLeadRow([
+            when, s.first_name, normalizePhone(s.phone), s.email, pb.trade, tier.toUpperCase(), s.city,
+            s.crew_size, s.typical_job, s.has_website === "yes" ? "Yes" : "No", s.website_url,
+            texted ? "Yes" : "No", ok ? "Yes" : "NO, add by hand",
+            [utm.source, utm.medium, utm.campaign].filter(Boolean).join(" / "),
+        ]),
+    ]);
 
-    return NextResponse.json({ ok: true, tier: tierFor(s), texted });
+    return NextResponse.json({ ok: true, tier, texted });
 }
