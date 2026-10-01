@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { pushWebsiteFormToGHL } from "@/lib/ghl-website-form";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -120,6 +124,15 @@ export async function POST(request: NextRequest) {
       console.error("Resend error:", JSON.stringify(error));
       return NextResponse.json({ error: "Failed to send email", details: error }, { status: 500 });
     }
+
+    // Mirror the lead into GoHighLevel (tag website-form, Lead Source "Website form") so it shows on the
+    // sales desk. Awaited so the lambda isn't frozen mid-request; it can never fail the submission.
+    await pushWebsiteFormToGHL({
+      name: String(name), email: String(email), phone: typeof phone === "string" ? phone : undefined,
+      company: typeof (company || business) === "string" ? String(company || business) : undefined,
+      message: typeof message === "string" ? message : undefined, service: typeof service === "string" ? service : undefined,
+      industry: typeof industry === "string" ? industry : undefined, source: typeof source === "string" ? source : undefined,
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

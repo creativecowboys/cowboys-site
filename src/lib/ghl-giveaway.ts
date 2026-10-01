@@ -4,10 +4,13 @@
  * Called from /api/giveaway AFTER the Sheet write succeeds. The Sheet stays the
  * source of truth; this never throws and never changes the entrant's response.
  * In GHL the contact lands with tag `giveaway-entrant`, which is what starts
- * the "Giveaway — Welcome" workflow (Josh's personal note).
+ * the "Giveaway — Welcome" workflow (Josh's personal note), and with
+ * Lead Source = "The Big Giveaway" so the sales desk can filter on it (Oct 1 2026).
  */
 
-const GHL_API = "https://services.leadconnectorhq.com";
+import { ghlConfigured, upsertContact } from "./ghl/client";
+import { LEAD_SOURCE, salesFields } from "./ghl/fields";
+
 const FIELD_BUSINESS_TYPE = "AeSdXgSyDcUHh4NtPxfE"; // contact.giveaway_business_type
 const FIELD_SOURCE = "wQFw6yjQ4c4bRq705N6O";        // contact.giveaway_source
 const TIMEOUT_MS = 8_000;
@@ -26,7 +29,7 @@ export type GiveawayEntry = {
 
 const NO_SITE = /^(none|none yet|not yet|n\/?a|no|nothing|-)?$/i;
 
-export function giveawayContactPayload(entry: GiveawayEntry, locationId: string) {
+export function giveawayContactPayload(entry: GiveawayEntry, locationId: string, leadSourceFieldId?: string) {
     const parts = entry.name.trim().split(/\s+/);
     const site = entry.website.trim();
     const noSite = NO_SITE.test(site.replace(/[^a-z\/ -]/gi, ""));
@@ -49,30 +52,22 @@ export function giveawayContactPayload(entry: GiveawayEntry, locationId: string)
         customFields: [
             { id: FIELD_BUSINESS_TYPE, field_value: entry.business_type },
             { id: FIELD_SOURCE, field_value: entry.utm_content || entry.utm_source || "organic" },
+            ...(leadSourceFieldId ? [{ id: leadSourceFieldId, field_value: LEAD_SOURCE.giveaway }] : []),
         ],
     };
 }
 
 export async function pushGiveawayEntryToGHL(entry: GiveawayEntry): Promise<void> {
-    const token = process.env.GHL_API_TOKEN;
-    const locationId = process.env.GHL_LOCATION_ID;
-    if (!token || !locationId) {
+    if (!ghlConfigured()) {
         console.warn("giveaway → GHL skipped: GHL_API_TOKEN / GHL_LOCATION_ID not set");
         return;
     }
     try {
-        const res = await fetch(`${GHL_API}/contacts/upsert`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Version: "2021-07-28",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(giveawayContactPayload(entry, locationId)),
-            signal: AbortSignal.timeout(TIMEOUT_MS),
-        });
-        if (!res.ok) console.error("giveaway → GHL upsert failed:", res.status, await res.text());
+        // Lead Source is best-effort: a missing field or an unreadable definition list must never cost the entry.
+        const leadSourceId = await salesFields().then((f) => f.leadSource?.id).catch(() => undefined);
+        if (!leadSourceId) console.warn("giveaway → GHL: Lead Source field not resolved; entry pushed without it");
+        await upsertContact(giveawayContactPayload(entry, process.env.GHL_LOCATION_ID!, leadSourceId), { timeoutMs: TIMEOUT_MS, retries: 0 });
     } catch (err) {
-        console.error("giveaway → GHL upsert threw:", err);
+        console.error("giveaway → GHL upsert failed:", err instanceof Error ? err.message : err);
     }
 }
