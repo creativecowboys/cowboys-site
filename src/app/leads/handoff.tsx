@@ -11,7 +11,8 @@ import { CloseIcon } from "./icons";
 // shows a review step, then POSTs once. Prices are typed by the rep — nothing is inferred.
 const STORAGE = "cc-handoff-v1";
 type Drafts = Record<string, HandoffForm>;
-const ownerFor = (id: string): HandoffForm["salesOwner"] => (({ "39848115": "Dave", "39848217": "Josh", "116679004": "Keaton" } as Record<string, HandoffForm["salesOwner"]>)[id] || "Dave");
+// The lead's owner name is computed server-side for whichever system holds the lead (Monday or GHL).
+const ownerFor = (lead: CallLead): HandoffForm["salesOwner"] => lead.ownerName || "Dave";
 
 const MANUAL_KEY = "manual";
 // Monday stores phones as bare digits ("13865895606"); show US numbers the way people read them.
@@ -20,7 +21,7 @@ function blank(lead: CallLead | null): HandoffForm {
   return {
     handoffId: crypto.randomUUID(), leadId: lead?.id || "", manual: !lead, expectedUpdatedAt: lead?.updatedAt || "",
     business: lead?.name || "", contact: lead?.contact || "", email: lead?.email || "", phone: prettyPhone(lead?.phone || ""), website: lead?.website || "", city: lead?.city || "",
-    businessType: "", salesOwner: lead ? ownerFor(lead.ownerId) : "Dave", packages: [], monthlyAgreed: lead?.quotedMonthly || "", setupAgreed: "",
+    businessType: "", salesOwner: lead ? ownerFor(lead) : "Dave", packages: [], monthlyAgreed: lead?.quotedMonthly || "", setupAgreed: "",
     scope: "", exclusions: "", goals: "", context: "", startDate: "", agreement: "Unknown", payment: "Unknown", nextAction: "", nextOwner: "Madison", nextDue: "",
   };
 }
@@ -93,7 +94,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
         <section className="ob-review">
           <h3>Review before handing off</h3>
           {problems.length > 0 && <div className="call-alert" role="alert"><strong>Still needed:</strong> {problems.join(" · ")}</div>}
-          {staleDraft && <div className="call-alert" role="status">This lead changed in Monday since you started this draft. Check the details above before confirming.</div>}
+          {staleDraft && <div className="call-alert" role="status">This lead changed since you started this draft. Check the details above before confirming.</div>}
           <dl>
             <dt>Business</dt><dd>{form.business} · {[form.contact, form.email, form.phone].filter(Boolean).join(" · ") || "no contact details"}{form.city && ` · ${form.city}`}{form.businessType && ` · ${form.businessType}`}</dd>
             <dt>Sales owner</dt><dd>{form.salesOwner}</dd>
@@ -107,12 +108,12 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
             <dt>Agreement · Payment</dt><dd>{form.agreement} · {form.payment}</dd>
             <dt>Next action</dt><dd>{[form.nextOwner, form.nextAction, form.nextDue && `due ${form.nextDue}`].filter(Boolean).join(" — ") || "Madison sends the intake link"}</dd>
           </dl>
-          <p className="call-save-explainer">{lead ? "Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the giveaway lead Won (its call history stays put) and prepares the client intake. Nothing is emailed to the client." : "This creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client."}</p>
+          <p className="call-save-explainer">{lead ? "Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the lead Won where it lives (its call history stays put) and prepares the client intake. Nothing is emailed to the client." : "This creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client."}</p>
         </section>
         {error && <div className="call-alert" role="alert"><strong>Your draft is still here.</strong><p>{error}</p></div>}
         <footer className="call-form-footer"><span>{busy ? "Handing off… keep this page open." : "Nothing is sent to the client."}</span><div><button type="button" className="call-secondary" disabled={busy} onClick={() => setReview(false)}>Back</button><button type="button" className="call-primary" disabled={busy || problems.length > 0} onClick={submit}>{busy ? "Saving…" : lead ? "Confirm handoff" : "Add client"}</button></div></footer>
       </> : <>
-        {staleDraft && <div className="call-alert" role="status">This lead changed in Monday since you started this draft. Your answers are kept; check them against the lead before handing off.</div>}
+        {staleDraft && <div className="call-alert" role="status">This lead changed since you started this draft. Your answers are kept; check them against the lead before handing off.</div>}
         <fieldset className="call-form" disabled={busy}>
           <div className="call-fields">
             {text("business", "Business")}{text("contact", "Main contact")}{text("email", "Email", { type: "email" })}{text("phone", "Phone")}{text("website", "Website")}{text("city", "Location(s)")}

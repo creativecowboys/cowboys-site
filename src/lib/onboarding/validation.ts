@@ -26,7 +26,7 @@ export function validateHandoff(input: unknown, routeLeadId?: string): HandoffFo
   if (Object.keys(raw).some((k) => !(HANDOFF_KEYS as string[]).includes(k))) throw new CallDeskError("Unexpected handoff field.", 400);
   const s = (k: string, n: number) => str(raw, k, n);
   const form: HandoffForm = {
-    handoffId: s("handoffId", 36), leadId: s("leadId", 20), expectedUpdatedAt: s("expectedUpdatedAt", 40),
+    handoffId: s("handoffId", 36), leadId: s("leadId", 64), expectedUpdatedAt: s("expectedUpdatedAt", 40), // leadId: Monday item id or GHL contact id
     business: s("business", 200), contact: s("contact", 120), email: s("email", 200), phone: s("phone", 40), website: s("website", 300), city: s("city", 120),
     businessType: s("businessType", 40), salesOwner: s("salesOwner", 10) as HandoffForm["salesOwner"],
     packages: [], monthlyAgreed: s("monthlyAgreed", 12), setupAgreed: s("setupAgreed", 12),

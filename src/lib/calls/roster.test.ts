@@ -7,9 +7,9 @@ import { CALL_OWNERS, compareLeads, contactStage, matchesOwner } from "./roster"
 function lead(id: string, changes: Partial<CallLead> & { ownerIds?: string[] } = {}): CallLead & { ownerIds?: string[] } {
   return {
     id, name: `Lead ${id}`, contact: "", email: "", phone: "", website: "", city: "",
-    owner: "", ownerId: "", outreach: "", interest: "", notes: "", lastContact: "",
+    owner: "", ownerId: "", ownerName: "", outreach: "", interest: "", notes: "", lastContact: "",
     nextFollowup: "", nextFollowupTime: "", quotedMonthly: "", interestedIn: "", auditScore: "", auditReport: "",
-    group: "", updatedAt: "2026-09-22T12:00:00Z", mondayUrl: "", ...changes,
+    group: "", leadSource: "", updatedAt: "2026-09-22T12:00:00Z", recordUrl: "", ...changes,
   };
 }
 

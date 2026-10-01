@@ -1,8 +1,10 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "@/app/leads/types";
 import { CallDeskError, validateLeadId } from "./validation";
 import { isCallOutcome, mondayOutcome } from "./outcomes";
 import { mondayDateValue, prettyTime, utcToZoned } from "./followup-time";
+import { callMarker as marker, payloadMarker, readableHistory } from "./markers";
+import { MONDAY_IDS, REP_NAMES, type RepName } from "@/lib/ghl/reps";
 
 // Server routes only. Never expose the token through NEXT_PUBLIC_ variables or client code.
 // Ported from creativecowboys/local-seo-engine PR #1 (Codex, Sep 21 2026); assignment added.
@@ -11,7 +13,8 @@ const API_VERSION = "2026-07";
 const COLUMN_IDS = ["contact", "email", "phone", "website", "city", "owner", "outreach", "interest", "notes", "last_contact", "next_followup", "quoted_monthly", "dropdown_mm77a9z5", "audit_score", "audit_report"];
 
 // Monday user ids for the three people who work the desk (creativecowboys.monday.com, Sep 21 2026).
-export const TEAM: Record<"Dave" | "Josh" | "Keaton", number> = { Dave: 39848115, Josh: 39848217, Keaton: 116679004 };
+export const TEAM: Record<RepName, number> = { Dave: Number(MONDAY_IDS.Dave), Josh: Number(MONDAY_IDS.Josh), Keaton: Number(MONDAY_IDS.Keaton) };
+export const MONDAY_OWNERS = REP_NAMES.map((name) => ({ id: MONDAY_IDS[name], name }));
 
 type Column = { id: string; text: string | null; value: string | null };
 type Update = { id: string; text_body: string | null; created_at: string; creator: { name: string } | null };
@@ -72,15 +75,17 @@ export function mapLead(item: Item): CallLead {
     const raw = JSON.parse(item.column_values.find((c) => c.id === "next_followup")?.value || "null") as { date?: string; time?: string | null } | null;
     if (raw?.date) { nextFollowup = raw.date; if (raw.time) { const z = utcToZoned(raw.date, raw.time); nextFollowup = z.date; nextFollowupTime = z.time; } }
   } catch { /* text fallback above */ }
+  const ownerName = (REP_NAMES.find((n) => MONDAY_IDS[n] === ownerId) as RepName | undefined) || "";
   return {
     id: item.id, name: item.name, contact: cols.contact || "", email: cols.email || "", phone: cols.phone || "",
-    website: link("website"), city: cols.city || "", owner: cols.owner || "", ownerId, ownerIds, outreach: cols.outreach || "",
+    website: link("website"), city: cols.city || "", owner: cols.owner || "", ownerId, ownerIds, ownerName, outreach: cols.outreach || "",
     interest: cols.interest || "", notes: cols.notes || "", lastContact: cols.last_contact || "", nextFollowup, nextFollowupTime,
     quotedMonthly: cols.quoted_monthly || "", interestedIn: cols.dropdown_mm77a9z5 || "", auditScore: cols.audit_score || "",
-    auditReport: link("audit_report"), group: item.group?.title || "", updatedAt: item.updated_at,
-    mondayUrl: `https://creativecowboys.monday.com/boards/${GIVEAWAY_BOARD_ID}/pulses/${item.id}`,
+    auditReport: link("audit_report"), group: item.group?.title || "", leadSource: "", updatedAt: item.updated_at,
+    recordUrl: mondayLeadUrl(item.id),
   };
 }
+export const mondayLeadUrl = (id: string) => `https://creativecowboys.monday.com/boards/${GIVEAWAY_BOARD_ID}/pulses/${id}`;
 
 function signCursor(body: string): string { return createHmac("sha256", token()).update(`call-desk-cursor.${body}`).digest("base64url"); }
 function wrapCursor(cursor: string | null): string | null {
@@ -112,7 +117,7 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
   );
   const board = data.boards?.find((b) => b.id === GIVEAWAY_BOARD_ID);
   if (!board?.items_page) throw new CallDeskError("The giveaway board is not available to this connection.", 502);
-  return { leads: board.items_page.items.map(mapLead), cursor: wrapCursor(board.items_page.cursor), boardName: board.name };
+  return { leads: board.items_page.items.map(mapLead), cursor: wrapCursor(board.items_page.cursor), boardName: board.name, system: "monday", systemName: "Monday", owners: MONDAY_OWNERS, leadSources: [] };
 }
 
 async function readItem(id: string, withHistory = false): Promise<Item> {
@@ -127,7 +132,7 @@ export async function getCallLead(id: string): Promise<{ lead: CallLead; history
 }
 
 /** Assign (or clear) the Monday owner. Returns the refreshed lead so the desk can update in place. */
-export async function assignOwner(id: string, owner: "Dave" | "Josh" | "Keaton" | "", expectedUpdatedAt: string): Promise<CallLead> {
+export async function assignOwner(id: string, owner: RepName | "", expectedUpdatedAt: string): Promise<CallLead> {
   validateLeadId(id);
   const initial = await readItem(id); // 404s outside the giveaway board.
   if (initial.updated_at !== expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your notes are safe. Load the latest Monday record before assigning it.", 409);
@@ -142,20 +147,6 @@ export async function assignOwner(id: string, owner: "Dave" | "Josh" | "Keaton" 
   return confirmed;
 }
 
-function readableHistory(text: string): string {
-  return text
-    .replace(/\[CC-CALL:[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}\]/gi, "")
-    .replace(/\[CC-PAYLOAD:[\da-f]{64}\]/gi, "")
-    .trim();
-}
-
-const marker = (callId: string) => `[CC-CALL:${callId}]`;
-// Exclude the optimistic version: a legitimate retry may follow a reload. Include
-// every user-entered field so a reused call ID cannot silently discard changed notes.
-function payloadMarker(draft: CallDraft): string {
-  const content = Object.entries(draft).filter(([key]) => key !== "expectedUpdatedAt").sort(([a], [b]) => a.localeCompare(b));
-  return `[CC-PAYLOAD:${createHash("sha256").update(JSON.stringify(content)).digest("hex")}]`;
-}
 const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/\n/g, "<br>");
 export function formatCallSummary(draft: CallDraft): string {
   const fields: [string, string][] = [
@@ -209,10 +200,10 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
   try {
     const initial = await readItem(draft.leadId);
     const prior = await findPriorCall(draft.leadId, draft.callId);
-    const mondayUrl = mapLead(initial).mondayUrl;
+    const recordUrl = mapLead(initial).recordUrl;
     if (prior) {
       if (!(prior.text_body || "").includes(payloadMarker(draft))) throw new CallDeskError("A different version of this call note is already in Monday. Your edited draft has not been saved. Review the existing note before starting a new call record.", 409);
-      return { saved: true, updateId: prior.id, mondayUrl, warning: "This call note was already saved. Board-field completion could not be confirmed, so no fields were overwritten. Review the lead in Monday." };
+      return { saved: true, updateId: prior.id, recordUrl, warning: "This call note was already saved. Board-field completion could not be confirmed, so no fields were overwritten. Review the lead in Monday." };
     }
     const baseline = await readItem(draft.leadId);
     if (baseline.updated_at !== draft.expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your draft is safe. Reload the lead and review the changes before saving.", 409);
@@ -224,7 +215,7 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
     } catch {
       throw new CallDeskError("Monday did not confirm the call note. It may already be saved. Keep this draft and retry with the same call reference; do not start a new call.", 502);
     }
-    const saved = { saved: true as const, updateId, mondayUrl };
+    const saved = { saved: true as const, updateId, recordUrl };
     try {
       const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
       const columns = callColumns(draft, today);

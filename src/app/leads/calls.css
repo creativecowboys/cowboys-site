@@ -40,3 +40,7 @@
 /* Follow-up calendar subscribe box in the roster */
 .call-feed{margin-top:18px}.call-feed>button{width:100%}.call-feed-body{margin-top:10px;border:1px solid var(--line);border-radius:4px;background:#fffaf2;padding:12px}.call-feed-body p{font-size:11px;line-height:1.6;margin:10px 0 0}.call-feed-row{margin-bottom:10px}.call-feed-row b{display:block;font-size:12px;margin-bottom:4px}.call-feed-row input{width:100%;font-size:11px;padding:6px 8px;border:1px solid #cabcaa;border-radius:4px;background:#fff;color:#1f1a17;margin-bottom:6px}.call-feed-row>div{display:flex;gap:6px;flex-wrap:wrap}.call-feed-row .call-secondary{font-size:11px!important;padding:6px 10px;text-decoration:none}
 
+/* Lead Source (GHL dropdown, Oct 1 2026): a small tag on each roster row, and a select in the context strip. */
+.call-person-source{display:inline-block;margin-top:9px;padding:2px 7px;border-radius:999px;background:#e7dcc9;color:#5a4a37;font-size:9px;font-weight:600;letter-spacing:.04em}
+.call-context .call-assign{margin-left:0;max-width:100%;font-size:11px}
+.call-context em{display:block;font-size:10px;color:#766955;margin-top:4px}

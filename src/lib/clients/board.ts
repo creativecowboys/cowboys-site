@@ -270,6 +270,8 @@ export async function graduateFromOnboarding(ob: OnboardingRow, managerId: strin
   if (ob.siteUrl) values[CCOL.website] = { url: ob.siteUrl, text: ob.siteUrl };
   if (ob.gbpUrl) values[CCOL.gbpUrl] = { url: ob.gbpUrl, text: ob.gbpUrl };
   if (ob.driveFolder) values[CCOL.driveFolder] = { url: ob.driveFolder, text: ob.driveFolder };
+  // Carry the GHL contact link over (set by a handoff from a GoHighLevel lead) so the package builder's winner guard still matches.
+  if (ob.ghlContact) values[CCOL.ghlContact] = { url: ob.ghlContact, text: ob.ghlContact.split("/").pop() || ob.ghlContact };
   if (managerId && onboardingOwners().some((o) => o.id === managerId)) values[CCOL.accountManager] = { personsAndTeams: [{ id: Number(managerId), kind: "person" }] };
   const data = await monday<{ create_item: { id: string } }>(
     "mutation ClientCreate($board: ID!, $group: String!, $name: String!, $values: JSON!) { create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values, create_labels_if_missing: true) { id } }",

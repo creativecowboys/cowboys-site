@@ -56,6 +56,7 @@ export type OnboardingRow = {
   gbpAccess: string; dnsPath: string; agreement: string; payment: string; intake: string;
   leadId: string; handoffId: string; siteUrl: string; gbpUrl: string; onboardingLink: string; driveFolder: string; notes: string;
   searchAtlasListing: string; // Search Atlas GBP location id (numeric text) or ""
+  ghlContact: string; // GHL Contact link column (URL of the contact in the GHL app) or ""
   profileComplete: boolean; baseline: boolean;
   checklist: ChecklistItem[];
   missing: string[]; // required onboarding items still open (computed)

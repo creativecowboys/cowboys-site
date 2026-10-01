@@ -15,12 +15,14 @@ const sources = {
   'catalog': '../src/lib/packages/catalog.ts', 'catalog.test': '../src/lib/packages/catalog.test.ts',
   'winners': '../src/lib/packages/winners.ts', 'winners.test': '../src/lib/packages/winners.test.ts',
   'gbp-state': '../src/lib/gbp/state.ts', 'gbp-searchatlas': '../src/lib/gbp/searchatlas.ts', 'gbp.test': '../src/lib/gbp/gbp.test.ts',
+  'ghl-reps': '../src/lib/ghl/reps.ts', 'ghl-links': '../src/lib/ghl/links.ts',
   'checklist.test': '../src/lib/onboarding/checklist.test.ts', 'validation.test': '../src/lib/onboarding/validation.test.ts', 'pipeline.test': '../src/lib/onboarding/pipeline.test.ts',
 };
 try {
   for (const [name, rel] of Object.entries(sources)) {
     let input = fs.readFileSync(path.join(__dirname, rel), 'utf8');
-    input = input.replace(/from "@\/lib\/calls\/validation"/g, 'from "./calls-validation"').replace(/from "@\/lib\/onboarding\/api"/g, 'from "./api"').replace(/from "@\/lib\/onboarding\/config"/g, 'from "./config"').replace(/from "@\/lib\/clients\/config"/g, 'from "./clients-config"')
+    input = input.replace(/from "@\/lib\/ghl\/reps"/g, 'from "./ghl-reps"').replace(/from "@\/lib\/ghl\/links"/g, 'from "./ghl-links"')
+      .replace(/from "@\/lib\/calls\/validation"/g, 'from "./calls-validation"').replace(/from "@\/lib\/onboarding\/api"/g, 'from "./api"').replace(/from "@\/lib\/onboarding\/config"/g, 'from "./config"').replace(/from "@\/lib\/clients\/config"/g, 'from "./clients-config"')
       .replace(/from "\.\/stripe"/g, 'from "./clients-stripe"').replace(/from "\.\/board"/g, 'from "./clients-board"')
       .replace(/from "@\/lib\/gbp\/state"/g, 'from "./gbp-state"').replace(/from "@\/lib\/gbp\/searchatlas"/g, 'from "./gbp-searchatlas"');
     if (name.startsWith('gbp')) input = input.replace(/from "\.\/state"/g, 'from "./gbp-state"');

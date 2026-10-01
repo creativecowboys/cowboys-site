@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { CallDeskError } from "@/lib/calls/validation";
+import { CallDeskError, GHL_ID, MONDAY_ID } from "@/lib/calls/validation";
+import { ghlContactUrl } from "@/lib/ghl/links";
 import { escapeHtml, monday, mondayToken, todayEastern } from "./api";
 import { COL, GIVEAWAY_BOARD_ID, MONDAY_ORIGIN, PAYMENT_NO_CHARGE, PIPELINE_BOARD_ID, isGiveawayWinner, PIPELINE_CHECKLIST_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, onboardingOwners, stageForGroup, STAFF } from "./config";
 import { checklistFor, isRequiredName, missingRequired, readinessProblems } from "./checklist";
@@ -67,7 +68,7 @@ export function mapRow(item: Item): OnboardingRow {
     signed: text(COL.signed), targetLaunch: text(COL.targetLaunch), nextAction: next.action, lastTouch: text(COL.lastTouch),
     gbpAccess: text(COL.gbpAccess), dnsPath: text(COL.dnsPath), agreement: text(COL.agreement), payment: text(COL.payment), intake: text(COL.intake),
     leadId: text(COL.leadId), handoffId: text(COL.handoffId), siteUrl: link(cols, COL.siteUrl), gbpUrl: link(cols, COL.gbpUrl), onboardingLink: link(cols, COL.onboardingLink), driveFolder: link(cols, COL.driveFolder), notes: text(COL.notes),
-    searchAtlasListing: text(COL.searchAtlasListing).trim(),
+    searchAtlasListing: text(COL.searchAtlasListing).trim(), ghlContact: link(cols, COL.ghlContact),
     profileComplete: checked(cols, COL.profileComplete), baseline: checked(cols, COL.baseline),
     checklist, missing: missingRequired(checklist),
     overdue: !!next.due && next.due < today && stageForGroup(item.group?.id || "") !== "launched",
@@ -147,6 +148,9 @@ export function handoffColumns(form: HandoffForm): Record<string, unknown> {
     [COL.health]: { label: "Not Started" }, [COL.gbpAccess]: { label: "Not Requested" }, [COL.intake]: { label: "Not sent" },
     [COL.agreement]: { label: form.agreement }, [COL.payment]: { label: form.payment },
     [COL.package]: { labels: form.packages }, [COL.handoffId]: form.handoffId, ...(form.leadId ? { [COL.leadId]: form.leadId } : {}),
+    // A lead that came from GoHighLevel: the Lead ID column holds the GHL contact id AND the GHL Contact link column points at it,
+    // so the package builder's winner guard (matches on ghl_contact) and a person in Monday both find the contact.
+    ...(form.leadId && GHL_ID.test(form.leadId) && !MONDAY_ID.test(form.leadId) ? { [COL.ghlContact]: { url: ghlContactUrl(form.leadId), text: form.leadId } } : {}),
     [COL.notes]: noteLines,
     [COL.nextAction]: form.nextAction ? joinNextAction(`${form.nextOwner ? `${form.nextOwner}: ` : ""}${form.nextAction}`, form.nextDue) : joinNextAction("Madison: send the intake link and request assets", form.nextDue),
   };

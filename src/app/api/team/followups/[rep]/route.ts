@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { buildFeed, feedKeyMatches, repBySlug } from "@/lib/calls/followups";
-import { getCallsPage } from "@/lib/calls/monday";
+import { defaultBackend, getCallsPage, repIdFor } from "@/lib/calls/backend";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 // Private iCalendar feed: /api/team/followups/<rep>.ics?key=<feed key>. No cookie (calendar apps can't
-// sign in); the key is the credential. Reads the Giveaway Leads board and emits one event per owned
-// lead with a Next Follow-up. Calendar apps poll this on their own schedule.
+// sign in); the key is the credential. Reads the lead roster (Monday board or GHL contacts, per
+// LEADS_BACKEND) and emits one event per owned lead with a Next Follow-up. Calendar apps poll this on
+// their own schedule. Event UIDs carry the lead id, so a lead keeps its event across the cutover only
+// if its id is the same — after the Monday → GHL import the events are re-issued under the GHL ids.
 export async function GET(req: Request, context: { params: Promise<{ rep: string }> }) {
   const slugRaw = (await context.params).rep;
   const slug = slugRaw.replace(/\.ics$/i, "").toLowerCase();
@@ -16,11 +18,13 @@ export async function GET(req: Request, context: { params: Promise<{ rep: string
   const key = new URL(req.url).searchParams.get("key") || "";
   if (!rep || !feedKeyMatches(slug, key)) return new NextResponse("Not found", { status: 404 });
   try {
+    const backend = defaultBackend();
+    const mine = repIdFor(rep.name, backend);
     const leads = [];
     let cursor: string | null = null;
     for (let page = 0; page < 4; page++) {
-      const data = await getCallsPage(cursor);
-      leads.push(...data.leads.filter((l) => (l.ownerIds || []).includes(rep.mondayId)));
+      const data = await getCallsPage(cursor, backend);
+      leads.push(...data.leads.filter((l) => (l.ownerIds || []).includes(mine)));
       cursor = data.cursor; if (!cursor) break;
     }
     const body = buildFeed(rep, leads, new URL(req.url).origin);

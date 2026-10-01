@@ -1,5 +1,8 @@
 import { CallDeskError } from "@/lib/calls/validation";
-import { createPipelineItem, ensureChecklist, findByHandoffId, findByLeadId, findHandoffUpdate, formatHandoffSummary, markSourceLead, postUpdate, readLeadVersion } from "./pipeline";
+import { createPipelineItem, ensureChecklist, findByHandoffId, findByLeadId, findHandoffUpdate, formatHandoffSummary, postUpdate } from "./pipeline";
+// The source lead can live on the Monday Giveaway Leads board or in GoHighLevel (LEADS_BACKEND, Oct 1 2026);
+// the dispatcher picks by the lead id's shape, so "mark it Won" lands in the right system either way.
+import { markSourceLead, readLeadVersion } from "@/lib/calls/backend";
 import { readHandoff, readIntake, writeHandoff, writeIntake } from "./store";
 import type { HandoffForm, HandoffRecord, IntakeRecord, StartResult, StepName } from "./types";
 
