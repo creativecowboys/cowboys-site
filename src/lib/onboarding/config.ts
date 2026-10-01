@@ -61,7 +61,9 @@ export const stageForGroup = (groupId: string): StageId | "template" | "unknown"
 export const HEALTH = ["Not Started", "On Track", "Waiting on Client", "Blocked"] as const;
 export const GBP_ACCESS = ["Not Requested", "Requested", "Verified", "No GBP Exists"] as const;
 export const AGREEMENT = ["Unknown", "Pending", "Signed", "Not required"] as const;
-export const PAYMENT = ["Unknown", "Pending", "Deposit paid", "Paid"] as const;
+/** "No charge" is only for Giveaway Winner records (added Oct 1 2026; created on the board on first use). */
+export const PAYMENT = ["Unknown", "Pending", "Deposit paid", "Paid", "No charge"] as const;
+export const PAYMENT_NO_CHARGE = "No charge";
 export const INTAKE = ["Not sent", "Link issued", "Client submitted", "Reviewed"] as const;
 export const CHECK_STATUS = ["Working on it", "Done", "Stuck"] as const;
 export const BUSINESS_TYPES = ["Roofing", "Plumbing", "HVAC", "Concrete", "Law", "Landscaping", "Dental", "Auto Repair", "Ecommerce", "Other Local Service"] as const;
@@ -72,9 +74,19 @@ export const PACKAGES = [
   "Local Growth", "Local Growth — First Year $297", "Max Growth", "Expanded Reach (+5 cities)", "AI SEO",
   "Social Ads $300", "Social Ads $600", "Social Ads $1,200", "Social Ads Custom",
   "Google Ads $500", "Google Ads $1,000", "Google Ads $1,500", "Google Ads Custom",
-  "CRM (incl. AI Chat)", "AI Chat only", "Growth Strategy Session",
+  "CRM (incl. AI Chat)", "AI Chat only", "Growth Strategy Session", "Giveaway Winner",
 ] as const;
 export type PackageLabel = (typeof PACKAGES)[number];
+
+/** Giveaway winners (Dave, Oct 1 2026: "a winner tab, where we don't have to charge them"). The label rides
+ *  alongside whatever they won (e.g. Giveaway Winner + Local Growth). Any record carrying it is never billed:
+ *  amounts are $0, Payment is "No charge", and the package builder refuses to create a plan for them.
+ *  Client-safe (no node imports) — the handoff form and the panels use it too. */
+export const GIVEAWAY_WINNER = "Giveaway Winner";
+export function isGiveawayWinner(packages: string | readonly string[] | null | undefined): boolean {
+  const list = Array.isArray(packages) ? packages : String(packages || "").split(",");
+  return list.some((p) => String(p).trim() === GIVEAWAY_WINNER);
+}
 
 /** Monday user ids (creativecowboys.monday.com, verified Sep 24 2026). Madison has no Monday seat yet —
  *  add her via ONBOARDING_EXTRA_OWNERS="Madison:<id>" once Josh invites her; do not guess an id. */

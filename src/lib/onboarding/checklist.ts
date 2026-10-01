@@ -1,4 +1,5 @@
 import type { ChecklistItem } from "./types";
+import { isGiveawayWinner } from "./config";
 
 // Package-driven checklist. Pure functions so they can be unit tested without Monday.
 // "required" items must be Done before a client can be marked Ready for production.
@@ -15,6 +16,9 @@ const BASE: TemplateItem[] = [
   { name: "Payment status confirmed (deposit or first payment)", phase: "Onboard", required: true },
   { name: "Kickoff call offered", phase: "Onboard", required: false },
 ];
+// Giveaway winners are never billed: the payment row becomes a "make sure nobody bills them" row.
+const PAYMENT_ROW = "Payment status confirmed (deposit or first payment)";
+const WINNER_NO_BILLING: TemplateItem = { name: "Giveaway winner: confirmed no invoice or recurring plan in GHL", phase: "Onboard", required: true };
 const GBP: TemplateItem[] = [
   { name: "GBP access: instructions sent", phase: "Onboard", required: true },
   { name: "GBP access: client reports invitation sent", phase: "Onboard", required: true },
@@ -57,7 +61,7 @@ const STRATEGY: TemplateItem[] = [
 export function checklistFor(packages: string[]): TemplateItem[] {
   const set = new Set(packages);
   const has = (test: (p: string) => boolean) => [...set].some(test);
-  const groups: TemplateItem[][] = [BASE];
+  const groups: TemplateItem[][] = [isGiveawayWinner(packages) ? BASE.map((i) => (i.name === PAYMENT_ROW ? WINNER_NO_BILLING : i)) : BASE];
   const seo = has((p) => /Local Growth|Max Growth|Expanded Reach|AI SEO/.test(p));
   if (seo) groups.push(GBP, SEO);
   if (has((p) => /Website/i.test(p)) || seo) groups.push(WEBSITE);
@@ -84,7 +88,8 @@ export function readinessProblems(row: { checklist: ChecklistItem[]; gbpAccess: 
   const needsGbp = packages.some((p) => /Local Growth|Max Growth|Expanded Reach|AI SEO/.test(p));
   if (needsGbp && !["Verified", "No GBP Exists"].includes(row.gbpAccess)) problems.push("GBP access is not verified by staff");
   if (!["Signed", "Not required"].includes(row.agreement)) problems.push(`Agreement is ${row.agreement || "Unknown"}`);
-  if (!["Deposit paid", "Paid"].includes(row.payment)) problems.push(`Payment is ${row.payment || "Unknown"}`);
+  // A giveaway winner owes nothing, so payment is not a readiness gate for them.
+  if (!isGiveawayWinner(packages) && !["Deposit paid", "Paid"].includes(row.payment)) problems.push(`Payment is ${row.payment || "Unknown"}`);
   if (!["Client submitted", "Reviewed"].includes(row.intake)) problems.push("Client intake has not been submitted");
   return problems;
 }

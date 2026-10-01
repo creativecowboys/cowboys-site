@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { CallDeskError } from "@/lib/calls/validation";
 import { escapeHtml, monday, mondayToken, todayEastern } from "./api";
-import { COL, GIVEAWAY_BOARD_ID, MONDAY_ORIGIN, PIPELINE_BOARD_ID, PIPELINE_CHECKLIST_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, onboardingOwners, stageForGroup, STAFF } from "./config";
+import { COL, GIVEAWAY_BOARD_ID, MONDAY_ORIGIN, PAYMENT_NO_CHARGE, PIPELINE_BOARD_ID, isGiveawayWinner, PIPELINE_CHECKLIST_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, onboardingOwners, stageForGroup, STAFF } from "./config";
 import { checklistFor, isRequiredName, missingRequired, readinessProblems } from "./checklist";
 import type { ChecklistItem, HandoffForm, OnboardingListData, OnboardingRow } from "./types";
 import type { PatchAction } from "./validation";
@@ -135,7 +135,9 @@ export async function findByHandoffId(handoffId: string): Promise<OnboardingRow[
 export function handoffColumns(form: HandoffForm): Record<string, unknown> {
   const today = todayEastern();
   const staff = STAFF.find((s) => s.name === form.salesOwner);
+  const winner = isGiveawayWinner(form.packages);
   const noteLines = [
+    winner && "GIVEAWAY WINNER — NO CHARGE. Do not invoice or set up a recurring plan.",
     `Monthly agreed: ${form.monthlyAgreed ? `$${form.monthlyAgreed}` : "not recorded"} · Setup agreed: ${form.setupAgreed ? `$${form.setupAgreed}` : "not recorded"}`,
     `Scope: ${form.scope}`, form.exclusions && `Exclusions: ${form.exclusions}`, form.goals && `Goals: ${form.goals}`,
   ].filter(Boolean).join("\n");
@@ -237,8 +239,8 @@ export async function readLeadVersion(leadId: string): Promise<{ updatedAt: stri
   return { updatedAt: lead.updated_at, name: lead.name };
 }
 
-async function setColumns(itemId: string, values: Record<string, unknown>, board = PIPELINE_BOARD_ID): Promise<void> {
-  const data = await monday<{ change_multiple_column_values: { id: string } }>("mutation OnboardingSet($board: ID!, $id: ID!, $values: JSON!) { change_multiple_column_values(board_id: $board, item_id: $id, column_values: $values) { id } }", { board, id: itemId, values: JSON.stringify(values) });
+async function setColumns(itemId: string, values: Record<string, unknown>, board = PIPELINE_BOARD_ID, createLabels = false): Promise<void> {
+  const data = await monday<{ change_multiple_column_values: { id: string } }>(`mutation OnboardingSet($board: ID!, $id: ID!, $values: JSON!) { change_multiple_column_values(board_id: $board, item_id: $id, column_values: $values${createLabels ? ", create_labels_if_missing: true" : ""}) { id } }`, { board, id: itemId, values: JSON.stringify(values) });
   if (data.change_multiple_column_values?.id !== itemId) throw new CallDeskError("Monday did not confirm the change. Reload and check the record.", 502);
 }
 export const setPipelineColumns = (itemId: string, values: Record<string, unknown>) => setColumns(itemId, values);
@@ -281,7 +283,12 @@ export async function applyPatch(itemId: string, patch: PatchAction & { expected
       break;
     }
     case "agreement": await setColumns(itemId, { ...touch, [COL.agreement]: { label: patch.value } }); break;
-    case "payment": await setColumns(itemId, { ...touch, [COL.payment]: { label: patch.value } }); break;
+    case "payment": {
+      // "No charge" exists for Giveaway Winner records only; the label is created on the board on first use.
+      if (patch.value === PAYMENT_NO_CHARGE && !isGiveawayWinner(before.packages)) throw new CallDeskError("No charge is only for Giveaway Winner clients.", 400);
+      await setColumns(itemId, { ...touch, [COL.payment]: { label: patch.value } }, PIPELINE_BOARD_ID, patch.value === PAYMENT_NO_CHARGE);
+      break;
+    }
     case "dns": await setColumns(itemId, { ...touch, [COL.dnsPath]: patch.value ? { labels: [patch.value] } : { labels: [] } }); break;
     case "next": await setColumns(itemId, { ...touch, [COL.nextAction]: joinNextAction(patch.nextAction, patch.due) }); break;
     case "intakeReviewed": await setColumns(itemId, { ...touch, [COL.intake]: { label: "Reviewed" } }); break;

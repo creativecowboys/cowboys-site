@@ -63,3 +63,14 @@ test("a manual client needs no lead and no lead version, but may not also name a
   assert.throws(() => validateHandoff({ ...good(), leadId: "", manual: "yes" }), /Invalid handoff/);
 });
 
+
+// Giveaway winners (Dave, Oct 1 2026): never charged, but the prize still has to be named.
+test("a giveaway winner handoff is forced to $0 and No charge", () => {
+  const form = validateHandoff({ ...good(), packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "", setupAgreed: "0", payment: "Unknown" });
+  assert.equal(form.monthlyAgreed, "0");
+  assert.equal(form.setupAgreed, "0");
+  assert.equal(form.payment, "No charge");
+  assert.throws(() => validateHandoff({ ...good(), packages: ["Giveaway Winner"] }), /what they won/);
+  assert.throws(() => validateHandoff({ ...good(), packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "297" }), /not charged/);
+  assert.throws(() => validateHandoff({ ...good(), packages: ["Local Growth"], payment: "No charge" }), /only for Giveaway Winner/);
+});

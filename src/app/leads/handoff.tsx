@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AGREEMENT, BUSINESS_TYPES, PACKAGES, PAYMENT } from "@/lib/onboarding/config";
+import { AGREEMENT, BUSINESS_TYPES, GIVEAWAY_WINNER, PACKAGES, PAYMENT, PAYMENT_NO_CHARGE, isGiveawayWinner } from "@/lib/onboarding/config";
 import type { HandoffForm, StartResult } from "@/lib/onboarding/types";
 import type { CallLead } from "./types";
 import { CloseIcon } from "./icons";
@@ -45,10 +45,18 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
   }, [busy, onClose]);
   const set = (change: Partial<HandoffForm>) => setForm((f) => ({ ...f, ...change }));
   const togglePackage = (p: HandoffForm["packages"][number]) => set({ packages: form.packages.includes(p) ? form.packages.filter((x) => x !== p) : [...form.packages, p] });
+  // Giveaway winners are never charged (Dave, Oct 1 2026): ticking the tile locks both amounts at $0 and
+  // Payment at "No charge"; unticking clears them back to blank / Unknown. The server enforces the same.
+  const winner = isGiveawayWinner(form.packages);
+  const toggleWinner = () => setForm((f) => isGiveawayWinner(f.packages)
+    ? { ...f, packages: f.packages.filter((x) => x !== GIVEAWAY_WINNER), monthlyAgreed: "", setupAgreed: "", payment: f.payment === PAYMENT_NO_CHARGE ? "Unknown" : f.payment }
+    : { ...f, packages: [...f.packages, GIVEAWAY_WINNER], monthlyAgreed: "0", setupAgreed: "0", payment: PAYMENT_NO_CHARGE });
+  const prizes = PACKAGES.filter((p) => p !== GIVEAWAY_WINNER);
   const problems = useMemo(() => {
     const list: string[] = [];
     if (!form.business.trim()) list.push("Business name");
     if (!form.packages.length) list.push("At least one package");
+    else if (winner && form.packages.length < 2) list.push("What they won (tick the prize package next to Giveaway Winner)");
     if (!form.scope.trim()) list.push("Agreed scope");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) list.push("A valid email (or blank)");
     for (const k of ["monthlyAgreed", "setupAgreed"] as const) if (form[k] && !/^\d{1,6}(?:\.\d{1,2})?$/.test(form[k])) list.push(k === "monthlyAgreed" ? "Monthly amount (numbers only)" : "Setup amount (numbers only)");
@@ -90,7 +98,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
             <dt>Business</dt><dd>{form.business} · {[form.contact, form.email, form.phone].filter(Boolean).join(" · ") || "no contact details"}{form.city && ` · ${form.city}`}{form.businessType && ` · ${form.businessType}`}</dd>
             <dt>Sales owner</dt><dd>{form.salesOwner}</dd>
             <dt>Packages</dt><dd>{form.packages.join(", ") || "none"}</dd>
-            <dt>Agreed amounts</dt><dd>Monthly {form.monthlyAgreed ? `$${form.monthlyAgreed}` : "not recorded"} · Setup {form.setupAgreed ? `$${form.setupAgreed}` : "not recorded"}</dd>
+            <dt>Agreed amounts</dt><dd>{winner ? "Giveaway winner — no charge ($0 monthly, $0 setup). Nobody invoices this client." : <>Monthly {form.monthlyAgreed ? `$${form.monthlyAgreed}` : "not recorded"} · Setup {form.setupAgreed ? `$${form.setupAgreed}` : "not recorded"}</>}</dd>
             <dt>Scope</dt><dd className="call-preserve">{form.scope || "—"}</dd>
             {form.exclusions && <><dt>Exclusions</dt><dd className="call-preserve">{form.exclusions}</dd></>}
             {form.goals && <><dt>Goals</dt><dd className="call-preserve">{form.goals}</dd></>}
@@ -110,14 +118,21 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
             {text("business", "Business")}{text("contact", "Main contact")}{text("email", "Email", { type: "email" })}{text("phone", "Phone")}{text("website", "Website")}{text("city", "Location(s)")}
             <label className="ob-field">Business type<select value={form.businessType} onChange={(e) => set({ businessType: e.target.value })}><option value="">Not set</option>{BUSINESS_TYPES.map((t) => <option key={t}>{t}</option>)}</select></label>
             <label className="ob-field">Sales owner<select value={form.salesOwner} onChange={(e) => set({ salesOwner: e.target.value as HandoffForm["salesOwner"] })}>{(["Dave", "Josh", "Keaton"] as const).map((r) => <option key={r}>{r}</option>)}</select><small>Stays the relationship owner after Madison takes onboarding.</small></label>
-            <div className="ob-field ob-wide"><span>Packages / services sold</span><div className="ob-packages">{PACKAGES.map((p) => <label key={p}><input type="checkbox" checked={form.packages.includes(p)} onChange={() => togglePackage(p)} /> {p}</label>)}</div><small>These names match the Onboarding Pipeline board. Pick what was sold, not what was discussed.</small></div>
-            {text("monthlyAgreed", "Monthly amount agreed ($)", { placeholder: "Leave blank if not agreed", type: "text" })}{text("setupAgreed", "Setup / one-time amount agreed ($)", { placeholder: "Leave blank if none", type: "text" })}
+            <div className="ob-field ob-wide"><span>Packages / services sold</span><div className="ob-packages">
+              {prizes.map((p) => <label key={p}><input type="checkbox" checked={form.packages.includes(p)} onChange={() => togglePackage(p)} /> {p}</label>)}
+              {/* Dave, Oct 1 2026: Giveaway Winner is the last tile, after Growth Strategy Session. */}
+              <label className="ob-winner"><input type="checkbox" checked={winner} onChange={toggleWinner} /> {GIVEAWAY_WINNER}<small>No charge. Tick it together with what they won, e.g. Local Growth.</small></label>
+            </div><small>These names match the Onboarding Pipeline board. Pick what was sold, not what was discussed.</small></div>
+            {winner ? <>
+              <label className="ob-field">Monthly amount agreed ($)<input type="text" value="0" disabled readOnly /><small className="ob-winner-note">Giveaway winner — no charge</small></label>
+              <label className="ob-field">Setup / one-time amount agreed ($)<input type="text" value="0" disabled readOnly /><small className="ob-winner-note">Giveaway winner — no charge</small></label>
+            </> : <>{text("monthlyAgreed", "Monthly amount agreed ($)", { placeholder: "Leave blank if not agreed", type: "text" })}{text("setupAgreed", "Setup / one-time amount agreed ($)", { placeholder: "Leave blank if none", type: "text" })}</>}
             {text("scope", "Agreed scope", { wide: true, rows: 3, placeholder: "What we are delivering, in the words used on the call." })}
             {text("exclusions", "Exclusions / not included", { wide: true, rows: 2, placeholder: "Anything the client asked about that is not part of this deal." })}
             {text("goals", "Client goals", { rows: 2 })}{text("context", "Promises & important call context", { rows: 2, placeholder: "Anything Madison must know or must not contradict." })}
             {text("startDate", "Expected start date", { type: "date" })}
             <label className="ob-field">Agreement status<select value={form.agreement} onChange={(e) => set({ agreement: e.target.value as HandoffForm["agreement"] })}>{AGREEMENT.map((a) => <option key={a}>{a}</option>)}</select><small>Unknown is honest. Never mark Signed unless you saw it.</small></label>
-            <label className="ob-field">Payment status<select value={form.payment} onChange={(e) => set({ payment: e.target.value as HandoffForm["payment"] })}>{PAYMENT.map((a) => <option key={a}>{a}</option>)}</select></label>
+            <label className="ob-field">Payment status<select value={form.payment} disabled={winner} onChange={(e) => set({ payment: e.target.value as HandoffForm["payment"] })}>{PAYMENT.filter((a) => winner || a !== PAYMENT_NO_CHARGE).map((a) => <option key={a}>{a}</option>)}</select>{winner && <small className="ob-winner-note">Giveaway winner — no charge</small>}</label>
             {text("nextAction", "Next action", { placeholder: "Default: Madison sends the intake link" })}
             <label className="ob-field">Next action owner<select value={form.nextOwner} onChange={(e) => set({ nextOwner: e.target.value as HandoffForm["nextOwner"] })}><option value="">Unassigned</option>{(["Madison", "Dave", "Josh", "Keaton"] as const).map((r) => <option key={r}>{r}</option>)}</select></label>
             {text("nextDue", "Next action due", { type: "date" })}

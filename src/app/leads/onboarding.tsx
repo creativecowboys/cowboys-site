@@ -2,7 +2,7 @@
 
 import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, STAGES, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
+import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, PAYMENT_NO_CHARGE, STAGES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
@@ -67,7 +67,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
       <div className="ob-row ob-row-head" role="row"><span>Business</span><span>Package</span><span>Owner</span><span>Stage</span><span>Missing</span><span>Next action</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.overdue ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
         <span><b>{r.name}</b><small>{r.contact || "no contact"}{r.city && ` · ${r.city}`}</small></span>
-        <span>{r.packages || "—"}<small>{r.monthly && r.monthly !== "0" ? `$${r.monthly}/mo list` : ""}</small></span>
+        <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : r.monthly && r.monthly !== "0" ? `$${r.monthly}/mo list` : ""}</small></span>
         <span>{r.onboardingOwner || <em>Unassigned</em>}<small>Sales: {r.salesOwner || "—"}</small></span>
         <span><i className={`ob-stage ob-stage-${r.stage}`}>{stageLabel(r.stage)}</i><small>{r.health}</small></span>
         <span>{r.missing.length ? <b className="ob-missing">{r.missing.length} open</b> : <b className="ob-ok">Complete</b>}<small>Intake: {r.intake || "Not sent"}</small></span>
@@ -144,7 +144,8 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
     <section className="ob-section"><h3>Sold</h3>
       <div className="ob-grid">
         <div><span>Packages</span><b>{row.packages || "—"}</b></div>
-        <div><span>Agreed monthly</span><b>{record?.handoff.monthlyAgreed ? `$${record.handoff.monthlyAgreed}` : "not recorded"}</b><small>List: {row.monthly && row.monthly !== "0" ? `$${row.monthly}` : "—"}</small></div>
+        {isGiveawayWinner(row.packages) ? <div><span>Agreed monthly</span><b>$0 — giveaway winner</b><small>No charge. Do not invoice.</small></div>
+          : <div><span>Agreed monthly</span><b>{record?.handoff.monthlyAgreed ? `$${record.handoff.monthlyAgreed}` : "not recorded"}</b><small>List: {row.monthly && row.monthly !== "0" ? `$${row.monthly}` : "—"}</small></div>}
         <div><span>Setup</span><b>{row.setup ? `$${row.setup}` : "—"}</b></div>
         <div><span>Sales owner</span><b>{row.salesOwner || "—"}</b></div>
         <div><span>Signed / start</span><b>{row.signed || "—"} / {row.targetLaunch || "—"}</b></div>
@@ -159,7 +160,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
         <label>Stage<select value={row.stage} disabled={!!busy} onChange={(e) => patch({ action: "stage", stage: e.target.value }, "stage")}>{STAGES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}{row.stage === "unknown" && <option value="unknown">Unknown</option>}</select></label>
         <label>Health<select value={row.health} disabled={!!busy} onChange={(e) => patch({ action: "health", value: e.target.value }, "health")}>{!HEALTH.includes(row.health as (typeof HEALTH)[number]) && <option value={row.health}>{row.health || "Not set"}</option>}{HEALTH.map((h) => <option key={h}>{h}</option>)}</select></label>
         <label>Agreement<select value={row.agreement || "Unknown"} disabled={!!busy} onChange={(e) => patch({ action: "agreement", value: e.target.value }, "agreement")}>{AGREEMENT.map((a) => <option key={a}>{a}</option>)}</select></label>
-        <label>Payment<select value={row.payment || "Unknown"} disabled={!!busy} onChange={(e) => patch({ action: "payment", value: e.target.value }, "payment")}>{PAYMENT.map((a) => <option key={a}>{a}</option>)}</select></label>
+        <label>Payment<select value={row.payment || "Unknown"} disabled={!!busy} onChange={(e) => patch({ action: "payment", value: e.target.value }, "payment")}>{PAYMENT.filter((a) => a !== PAYMENT_NO_CHARGE || isGiveawayWinner(row.packages) || row.payment === a).map((a) => <option key={a}>{a}</option>)}</select></label>
       </div>
       <p className="call-muted ob-hint">Madison is not on Monday yet, so she cannot be assigned until Josh invites her (then add her id to ONBOARDING_EXTRA_OWNERS). Sales owner is never changed here.</p>
     </section>

@@ -15,7 +15,7 @@ export type HandoffForm = {
   scope: string; exclusions: string; goals: string; context: string;
   startDate: string; // YYYY-MM-DD or ""
   agreement: "Unknown" | "Pending" | "Signed" | "Not required";
-  payment: "Unknown" | "Pending" | "Deposit paid" | "Paid";
+  payment: "Unknown" | "Pending" | "Deposit paid" | "Paid" | "No charge"; // No charge: Giveaway Winner only
   nextAction: string; nextOwner: "Dave" | "Josh" | "Keaton" | "Madison" | ""; nextDue: string;
 };
 

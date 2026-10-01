@@ -33,3 +33,13 @@ test("an open required row blocks readiness", () => {
   const problems = readinessProblems({ checklist: [item("Intake link delivered to client", "Working on it")], gbpAccess: "Verified", agreement: "Signed", payment: "Paid", intake: "Reviewed", packages: "Local Growth" });
   assert.deepEqual(problems, ["Checklist: Intake link delivered to client"]);
 });
+
+test("a giveaway winner swaps the payment row for a no-billing row and skips the payment gate", () => {
+  const names = checklistFor(["Giveaway Winner", "Local Growth"]).map((t) => t.name);
+  assert.ok(names.includes("Giveaway winner: confirmed no invoice or recurring plan in GHL"));
+  assert.ok(!names.includes("Payment status confirmed (deposit or first payment)"));
+  assert.ok(names.includes("GBP access: verified by staff (or No GBP Exists confirmed)"));
+  const base = { checklist: [], gbpAccess: "Verified", agreement: "Not required", intake: "Reviewed" };
+  assert.deepEqual(readinessProblems({ ...base, payment: "No charge", packages: "Giveaway Winner, Local Growth" }), []);
+  assert.ok(readinessProblems({ ...base, payment: "No charge", packages: "Local Growth" }).some((p) => /Payment/.test(p)));
+});

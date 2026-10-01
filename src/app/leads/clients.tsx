@@ -3,7 +3,7 @@
 import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from "@/lib/clients/config";
-import { FILE_CATEGORIES, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
+import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
 import { CloseIcon, RefreshIcon } from "./icons";
@@ -67,7 +67,7 @@ export default function Clients({ clientId, onOpenClient }: { clientId: string; 
       <div className="ob-row ob-row-head" role="row"><span>Client</span><span>Package</span><span>Manager</span><span>Payment</span><span>GBP</span><span>Flags</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.flags.includes("payment") ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
         <span><b>{r.name}</b><small>{r.contact || "no contact"}{r.clientSince && ` · since ${r.clientSince}`}</small></span>
-        <span>{r.packages || "—"}<small>{money ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
+        <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : money ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
         <span>{r.accountManager || <em>Unassigned</em>}<small>{groupLabel(r.group)} · {r.health || "—"}</small></span>
         <span><i className={`ob-stage ${r.flags.includes("payment") ? "ob-stage-hold" : r.payStatus === "Paid / Current" ? "ob-stage-launched" : ""}`}>{r.payStatus || "—"}</i><small>{r.payMethod || ""}{r.nextBill && ` · next ${r.nextBill}`}</small></span>
         <span>{r.gbpLive?.ok
@@ -148,7 +148,7 @@ function ClientPanel({ id, onClose, onRow }: { id: string; onClose: () => void; 
     <section className="ob-section"><h3>Billing {stripeConnected ? <small>Stripe connected</small> : <small>Stripe not connected — add the restricted key in Vercel</small>}</h3>
       <div className="ob-grid">
         <div><span>Status</span><b>{row.payStatus || "—"}</b><small>{row.payMethod}</small></div>
-        <div><span>Package</span><b>{row.packages || "—"}</b>{canSeeMoney && <small>{fmtMoney(row.mrr)}/mo list</small>}</div>
+        <div><span>Package</span><b>{row.packages || "—"}</b>{isGiveawayWinner(row.packages) ? <small>Giveaway winner — no charge. Do not invoice.</small> : canSeeMoney && <small>{fmtMoney(row.mrr)}/mo list</small>}</div>
         <div><span>Last payment</span><b>{row.lastPayment || "—"}</b></div>
         <div><span>Next bill</span><b>{row.nextBill || "—"}</b><small>{row.billingDay && `day ${row.billingDay}`}</small></div>
         {stripe && <><div><span>Stripe subscription</span><b>{stripe.subscription ? `${stripe.subscription.status}${canSeeMoney ? ` · $${stripe.subscription.amount}/${stripe.subscription.interval}` : ""}` : "none"}</b><small>{stripe.subscription?.currentPeriodEnd && `renews ${stripe.subscription.currentPeriodEnd}`}{stripe.subscription?.cancelAt && ` · cancels ${stripe.subscription.cancelAt}`}</small></div><div><span>Latest invoice</span><b>{stripe.latestInvoice ? `${stripe.latestInvoice.status}${canSeeMoney ? ` · $${stripe.latestInvoice.amountDue}` : ""}` : "none"}</b><small>{stripe.latestInvoice?.paidAt && `paid ${stripe.latestInvoice.paidAt}`}{stripe.latestInvoice?.hostedUrl && <> · <a href={stripe.latestInvoice.hostedUrl} target="_blank" rel="noreferrer">open</a></>}</small></div></>}

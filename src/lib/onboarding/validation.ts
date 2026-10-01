@@ -1,5 +1,5 @@
 import { CallDeskError, validateLeadId } from "@/lib/calls/validation";
-import { AGREEMENT, BUSINESS_TYPES, CHECK_STATUS, FILE_CATEGORIES, GBP_ACCESS, HEALTH, PACKAGES, PAYMENT, STAGES, DNS_PATHS, onboardingOwners } from "./config";
+import { AGREEMENT, BUSINESS_TYPES, CHECK_STATUS, FILE_CATEGORIES, GBP_ACCESS, HEALTH, PACKAGES, PAYMENT, PAYMENT_NO_CHARGE, STAGES, DNS_PATHS, GIVEAWAY_WINNER, isGiveawayWinner, onboardingOwners } from "./config";
 import type { HandoffForm, IntakeForm } from "./types";
 
 const UUID = /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i;
@@ -53,6 +53,12 @@ export function validateHandoff(input: unknown, routeLeadId?: string): HandoffFo
   const packages = raw.packages;
   if (!Array.isArray(packages) || packages.length === 0 || packages.length > 8 || packages.some((p) => typeof p !== "string" || !(PACKAGES as readonly string[]).includes(p))) throw new CallDeskError("Choose at least one package that exists on the pricing list.", 400);
   form.packages = [...new Set(packages as HandoffForm["packages"])];
+  if (isGiveawayWinner(form.packages)) {
+    // Winners are never charged: the prize still has to be named, amounts are forced to $0, payment to No charge.
+    if (form.packages.length < 2) throw new CallDeskError(`Also tick what they won (e.g. ${GIVEAWAY_WINNER} + Local Growth).`, 400);
+    if ((form.monthlyAgreed && Number(form.monthlyAgreed) !== 0) || (form.setupAgreed && Number(form.setupAgreed) !== 0)) throw new CallDeskError("Giveaway winners are not charged. Leave the amounts at $0.", 400);
+    form.monthlyAgreed = "0"; form.setupAgreed = "0"; form.payment = PAYMENT_NO_CHARGE;
+  } else if (form.payment === PAYMENT_NO_CHARGE) throw new CallDeskError("No charge is only for Giveaway Winner clients. Tick Giveaway Winner or pick another payment status.", 400);
   if (!money(form.monthlyAgreed) || !money(form.setupAgreed)) throw new CallDeskError("Enter agreed amounts between 0 and 100,000, or leave them blank.", 400);
   if (form.startDate && !isDate(form.startDate)) throw new CallDeskError("Choose a valid start date.", 400);
   if (!(AGREEMENT as readonly string[]).includes(form.agreement)) throw new CallDeskError("Choose the agreement status (Unknown is allowed).", 400);

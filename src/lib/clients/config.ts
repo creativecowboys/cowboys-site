@@ -49,7 +49,7 @@ export const PAY_METHOD = ["Stripe via GHL", "QuickBooks invoice", "ACH / bank t
 export const CLIENT_GBP = ["Not Requested", "Requested", "Verified", "No GBP Exists", "Lost / recheck"] as const;
 export const CLIENT_PACKAGES = [
   "Local Growth", "Max Growth", "Expanded Reach (+5 cities)", "Local Growth — First Year $297", "Social Ads $300", "Social Ads $600", "Social Ads $1,200", "Social Ads Custom",
-  "Google Ads $500", "Google Ads $1,000", "Google Ads $1,500", "Google Ads Custom", "CRM (incl. AI Chat)", "AI Chat only", "Growth Strategy Session", "AI SEO", "Website hosting / care", "Custom retainer",
+  "Google Ads $500", "Google Ads $1,000", "Google Ads $1,500", "Google Ads Custom", "CRM (incl. AI Chat)", "AI Chat only", "Growth Strategy Session", "AI SEO", "Website hosting / care", "Custom retainer", "Giveaway Winner",
 ] as const;
 
 /** Problem thresholds shown on the tab. */

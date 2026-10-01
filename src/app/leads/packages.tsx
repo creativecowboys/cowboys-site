@@ -8,7 +8,8 @@ import type { CallLead } from "./types";
 // Package builder slide-out (Dave, Sep 25 2026): the onboarding.creativecowboys.co/team/packages builder,
 // reachable from the Sales tab. Same catalog, same GHL recurring-invoice flow; opens prefilled with the
 // selected lead's details so the customer search is one keystroke away.
-type Contact = { id: string; name: string; email: string; phone: string; company: string };
+/** `winner` is set by the server when this contact is tagged Giveaway Winner on Monday — never billed (Oct 1 2026). */
+type Contact = { id: string; name: string; email: string; phone: string; company: string; winner?: { name: string; board: string; url: string } };
 type Result = { url: string; invoiceNumber?: string; total: number; lines: { name: string; amount: number }[]; liveMode: boolean; emailed: boolean; emailRequested?: boolean; to: string; ghlUrl?: string };
 /** A failed desk call, with whatever GHL already created (Sep 30 2026: the desk used to show a bare "Error 502"). */
 type Fail = { message: string; step?: string; ghlUrl?: string; url?: string };
@@ -86,6 +87,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     {err && <div className="call-alert" role="alert"><strong>{err.step ? `The plan was NOT finished (failed at: ${err.step}).` : "Nothing was created."}</strong> {err.message}{(err.ghlUrl || err.url) && <div className="ob-buttons">{err.ghlUrl && <a className="call-secondary" href={err.ghlUrl} target="_blank" rel="noreferrer">Open the recurring template in GHL ↗</a>}{err.url && <a className="call-secondary" href={err.url} target="_blank" rel="noreferrer">Open the invoice ↗</a>}</div>}</div>}
 
     <section className="ob-section"><h3>1. Customer <small>from GoHighLevel</small></h3>
+      {contact?.winner && <div className="call-alert pk-winner" role="alert"><strong>Giveaway winner — no charge.</strong> {contact.winner.name} is tagged Giveaway Winner on the {contact.winner.board} board, so the package builder won&apos;t create a plan or invoice for them. <a href={contact.winner.url} target="_blank" rel="noreferrer">Open in Monday ↗</a></div>}
       {contact ? <div className="pk-contact"><div><b>{contact.company || contact.name}</b><small>{contact.company ? `${contact.name} · ` : ""}{contact.email}{contact.phone ? ` · ${contact.phone}` : ""}</small></div><button type="button" className="call-secondary" onClick={() => { setContact(null); setResult(null); }}>Change</button></div>
       : showNew ? <div className="ob-controls">
           <label>First name *<input value={nc.firstName} onChange={(e) => setNc({ ...nc, firstName: e.target.value })} /></label>
@@ -98,7 +100,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
       : <div className="pk-search">
           <input autoFocus placeholder="Search GHL by name, business, email or phone…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search GoHighLevel contacts" />
           {searching && <small className="call-muted">Searching…</small>}
-          {hits.length > 0 && <ul className="pk-hits">{hits.map((h) => <li key={h.id}><button type="button" onClick={() => { setContact(h); setHits([]); }}><b>{h.company || h.name}</b><small>{h.company ? `${h.name} · ` : ""}{h.email}{h.phone ? ` · ${h.phone}` : ""}</small></button></li>)}</ul>}
+          {hits.length > 0 && <ul className="pk-hits">{hits.map((h) => <li key={h.id}><button type="button" onClick={() => { setContact(h); setHits([]); }}><b>{h.company || h.name}{h.winner && <span className="pk-tag pk-tag-winner">giveaway winner · no charge</span>}</b><small>{h.company ? `${h.name} · ` : ""}{h.email}{h.phone ? ` · ${h.phone}` : ""}</small></button></li>)}</ul>}
           {!searching && q.trim().length >= 2 && !hits.length && <small className="call-muted">No match in GHL.</small>}
           <button type="button" className="pk-link" onClick={() => setShowNew(true)}>Not in GHL yet? Add them{lead ? " (prefilled from this lead)" : ""}</button>
         </div>}
@@ -130,7 +132,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
         <ul>{preview.lines.map((l) => <li key={l.name}><span>{l.name}</span><span>{money(l.amount)}</span></li>)}{!preview.lines.length && <li className="pk-muted">Nothing selected yet.</li>}</ul>
         <p>Card used on the first payment is charged monthly after that.{testMode ? " TEST MODE." : ""}</p>
         {preview.error && <p className="pk-err">{preview.error}</p>}
-        <button type="button" className="call-primary" disabled={busy || !contact || Boolean(preview.error)} onClick={create}>{busy ? "Creating plan…" : contact ? "Create plan & get link" : "Pick a customer first"}</button>
+        <button type="button" className="call-primary" disabled={busy || !contact || Boolean(contact?.winner) || Boolean(preview.error)} onClick={create}>{busy ? "Creating plan…" : contact?.winner ? "Giveaway winner — no charge" : contact ? "Create plan & get link" : "Pick a customer first"}</button>
       </div>
       {result && <div className="call-success"><strong>Link is ready{result.liveMode ? "" : " (test mode)"}.</strong><p>Invoice {result.invoiceNumber}. {result.emailed ? `Emailed by GHL to ${result.to}.` : result.emailRequested ? `GHL accepted the send but did not confirm an email to ${result.to} — check the invoice in GHL or send the link yourself.` : "Not emailed — send the link yourself."}</p><p><input readOnly value={result.url} onFocus={(e) => e.currentTarget.select()} /></p><div className="ob-buttons"><button type="button" className="call-secondary" onClick={() => copy(result.url)}>{copied ? "Copied!" : "Copy link"}</button><a className="call-secondary" href={result.url} target="_blank" rel="noreferrer">Open ↗</a>{result.ghlUrl && <a className="call-secondary" href={result.ghlUrl} target="_blank" rel="noreferrer">In GHL ↗</a>}</div></div>}
     </section>

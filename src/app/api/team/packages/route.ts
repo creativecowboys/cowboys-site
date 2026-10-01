@@ -4,6 +4,7 @@ import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/valid
 import { buildLines, monthlyTotal, type Selection } from "@/lib/packages/catalog";
 import { addNote, addTask, ghl, GHL_APP, ghlLocationId, ghlUserId, INVOICE_HOST } from "@/lib/packages/ghl";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
+import { listWinners, matchWinner, winnerMessage } from "@/lib/packages/winners";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -77,6 +78,17 @@ export async function POST(req: Request) {
     const contact = c.contact;
     if (!contact?.email) throw new CallDeskError("This contact has no email address. Add one in GHL first.", 400);
     const personName = [contact.firstName, contact.lastName].filter(Boolean).join(" ") || contact.email;
+
+    // Giveaway winners are never charged (Dave, Oct 1 2026). Fresh Monday read, no cache, test mode included;
+    // if Monday can't be read we refuse rather than risk billing a winner.
+    let winners;
+    try { winners = await listWinners(); }
+    catch { throw new CallDeskError("Couldn't check Monday for giveaway winners, so nothing was created in GHL. Try again in a minute.", 503); }
+    const winner = matchWinner({ id: contact.id, email: contact.email, phone: contact.phone, company: contact.companyName, name: personName }, winners);
+    if (winner) {
+      console.warn(`packages: refused — giveaway winner contact=${contact.id} item=${winner.itemId} board=${winner.board}`);
+      return NextResponse.json({ error: winnerMessage(winner), winner: { name: winner.name, board: winner.board, url: winner.url } }, { status: 409, headers: teamHeaders });
+    }
     const business = contact.companyName || personName;
     const { iso, day } = todayInET();
     // One sentence per line that carries a term, then the agreement window for any fixed-term line.

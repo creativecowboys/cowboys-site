@@ -3,6 +3,7 @@ import { isTeam } from "@/lib/team-auth";
 import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/validation";
 import { ghl, ghlLocationId, slimContact, type GhlContact } from "@/lib/packages/ghl";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
+import { listWinnersCached, matchWinner, type Winner } from "@/lib/packages/winners";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,9 +14,19 @@ export async function GET(req: Request) {
     if (!(await isTeam())) return unauthorized();
     const q = (new URL(req.url).searchParams.get("q") || "").trim().slice(0, 120);
     if (q.length < 2) return NextResponse.json({ contacts: [] }, { headers: teamHeaders });
-    const r = await ghl<{ contacts?: GhlContact[] }>("GET", `/contacts/?locationId=${ghlLocationId()}&query=${encodeURIComponent(q)}&limit=8`);
-    return NextResponse.json({ contacts: (r.contacts ?? []).map(slimContact) }, { headers: teamHeaders });
+    const [r, winners] = await Promise.all([
+      ghl<{ contacts?: GhlContact[] }>("GET", `/contacts/?locationId=${ghlLocationId()}&query=${encodeURIComponent(q)}&limit=8`),
+      // Flag giveaway winners so the builder locks before anyone tries to bill them. A failed Monday read
+      // just leaves the flags off; the create route re-checks and refuses on its own.
+      listWinnersCached().catch(() => null as Winner[] | null),
+    ]);
+    return NextResponse.json({ contacts: (r.contacts ?? []).map(slimContact).map((c) => withWinner(c, winners)), winnerCheck: winners ? "ok" : "unavailable" }, { headers: teamHeaders });
   } catch (error) { return failure(error); }
+}
+
+function withWinner<C extends { id: string; email: string; phone: string; company: string; name: string }>(c: C, winners: Winner[] | null) {
+  const w = winners ? matchWinner(c, winners) : null;
+  return w ? { ...c, winner: { name: w.name, board: w.board, url: w.url } } : c;
 }
 
 /** POST — create the contact in GHL when the customer isn't there yet. Duplicate → returns the existing one. */
@@ -29,12 +40,12 @@ export async function POST(req: Request) {
     if (!firstName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new CallDeskError("First name and a valid email are required.", 400);
     try {
       const r = await ghl<{ contact: GhlContact }>("POST", "/contacts/", { locationId: ghlLocationId(), firstName, lastName: lastName || undefined, email, phone: phone || undefined, companyName: company || undefined, source: "Package builder (call desk)" });
-      return NextResponse.json({ contact: slimContact(r.contact) }, { headers: teamHeaders });
+      return NextResponse.json({ contact: withWinner(slimContact(r.contact), await listWinnersCached().catch(() => null)) }, { headers: teamHeaders });
     } catch (e) {
       const m = /"contactId":"([A-Za-z0-9]+)"/.exec(e instanceof Error ? e.message : "");
       if (!m) throw e;
       const existing = await ghl<{ contact: GhlContact }>("GET", `/contacts/${m[1]}`);
-      return NextResponse.json({ contact: slimContact(existing.contact), existed: true }, { headers: teamHeaders });
+      return NextResponse.json({ contact: withWinner(slimContact(existing.contact), await listWinnersCached().catch(() => null)), existed: true }, { headers: teamHeaders });
     }
   } catch (error) { return failure(error); }
 }

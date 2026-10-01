@@ -80,6 +80,7 @@
 .ob-field>span{font-size:12px;font-weight:500}
 .ob-field input,.ob-field select,.ob-field textarea{width:100%;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:9px 11px;font-size:13px;line-height:1.5;color:#1f1a17;font-weight:400}
 .ob-field textarea{resize:vertical}
+.ob-field input:disabled,.ob-field select:disabled{background:#f1ebe0;color:#6b6157;cursor:not-allowed}
 .ob-field small{font-size:10px;line-height:1.5;color:#766955;font-weight:400}
 .ob-wide{grid-column:1/-1}
 .ob-packages{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;border:1px solid #e3d8c6;border-radius:4px;padding:12px;background:#f6efe3}
@@ -89,6 +90,16 @@
 .ob-packages label:hover{border-color:#b9a78f}
 .ob-packages label:has(input:checked){border-color:#e8603c;background:#fdeee6;box-shadow:inset 3px 0 0 #e8603c}
 .ob-field .ob-packages input[type="checkbox"]{flex:0 0 16px;width:16px;height:16px;margin:0;padding:0;border:0;background:none;accent-color:#e8603c;cursor:pointer}
+/* Giveaway Winner tile (Oct 1 2026): its own full-width row in gold, last after the paid packages (Dave's call). These rules
+   tie the hover/:has(checked) rules above on specificity and win by coming after them — keep them below. */
+.ob-packages label.ob-winner{grid-column:1/-1;flex-wrap:wrap;background:#fbf6e8;border:1px dashed #b89a4e;font-weight:600}
+.ob-packages label.ob-winner:hover{border-color:#8f7430}
+.ob-packages label.ob-winner:has(input:checked){border-style:solid;border-color:#8f7430;background:#f3e7c3;box-shadow:inset 3px 0 0 #8f7430}
+.ob-field .ob-packages label.ob-winner input[type="checkbox"]{accent-color:#8f7430}
+.ob-packages label.ob-winner small{flex:1 1 auto;font-size:11px;font-weight:400;color:#6b5a2c}
+.ob-field small.ob-winner-note,.ob-winner-note{display:block;font-size:11px;line-height:1.4;color:#6b5a2c;background:#fbf6e8;border:1px solid #e2d3a6;border-radius:4px;padding:6px 9px}
+.pk-tag-winner{color:#6b5a2c;background:#f3e7c3;border-radius:3px;padding:1px 5px}
+.pk-winner a{color:inherit;text-decoration:underline}
 .ob-review h3{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:22px;font-weight:400;margin:0 0 12px}
 .ob-review dl{border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
 

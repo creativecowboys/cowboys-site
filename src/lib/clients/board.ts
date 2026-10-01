@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { CallDeskError } from "@/lib/calls/validation";
 import { escapeHtml, monday, mondayToken, todayEastern } from "@/lib/onboarding/api";
-import { COL as OCOL, STAGES, onboardingOwners, PIPELINE_BOARD_ID, stageForGroup } from "@/lib/onboarding/config";
+import { COL as OCOL, STAGES, onboardingOwners, PIPELINE_BOARD_ID, stageForGroup, isGiveawayWinner } from "@/lib/onboarding/config";
 import type { OnboardingRow } from "@/lib/onboarding/types";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS, GBP_RECHECK_DAYS, MONDAY_ORIGIN, REPORT_STALE_DAYS, TERM_SOON_DAYS, groupIdFor } from "./config";
 import { paymentFromSnapshot, snapshot, findCustomerByEmail, stripeConnected } from "./stripe";
@@ -254,11 +254,13 @@ export async function graduateFromOnboarding(ob: OnboardingRow, managerId: strin
   if (found) return { id: found.id, url: `${MONDAY_ORIGIN}/boards/${CLIENTS_BOARD_ID}/pulses/${found.id}`, created: false };
   const today = todayEastern();
   const packages = ob.packages.split(",").map((s) => s.trim()).filter(Boolean);
+  // Giveaway winners keep the "Giveaway Winner" package label (so nobody bills them), no payment method, and say so in the notes.
+  const winner = isGiveawayWinner(packages);
   const values: Record<string, unknown> = {
-    [CCOL.contact]: ob.contact, [CCOL.health]: { label: "Too New" }, [CCOL.payStatus]: { label: "No Billing Set Up" }, [CCOL.payMethod]: { labels: ["Stripe via GHL"] },
+    [CCOL.contact]: ob.contact, [CCOL.health]: { label: "Too New" }, [CCOL.payStatus]: { label: "No Billing Set Up" }, ...(winner ? {} : { [CCOL.payMethod]: { labels: ["Stripe via GHL"] } }),
     [CCOL.clientSince]: { date: ob.signed || today }, [CCOL.teamDesk]: { checked: "true" }, [CCOL.onboardingItem]: ob.id,
     [CCOL.gbpAccess]: { label: ["Verified", "No GBP Exists", "Requested"].includes(ob.gbpAccess) ? ob.gbpAccess : "Not Requested" },
-    [CCOL.notes]: `Graduated from onboarding ${today}. Sales owner: ${ob.salesOwner || "—"}. ${ob.notes || ""}`.trim(),
+    [CCOL.notes]: `${winner ? "GIVEAWAY WINNER — NO CHARGE. Do not invoice. " : ""}Graduated from onboarding ${today}. Sales owner: ${ob.salesOwner || "—"}. ${ob.notes || ""}`.trim(),
   };
   if (ob.gbpAccess === "Verified") values[CCOL.gbpChecked] = { date: today };
   if (parseListingId(ob.searchAtlasListing)) values[CCOL.searchAtlasListing] = ob.searchAtlasListing;
@@ -270,7 +272,7 @@ export async function graduateFromOnboarding(ob: OnboardingRow, managerId: strin
   if (ob.driveFolder) values[CCOL.driveFolder] = { url: ob.driveFolder, text: ob.driveFolder };
   if (managerId && onboardingOwners().some((o) => o.id === managerId)) values[CCOL.accountManager] = { personsAndTeams: [{ id: Number(managerId), kind: "person" }] };
   const data = await monday<{ create_item: { id: string } }>(
-    "mutation ClientCreate($board: ID!, $group: String!, $name: String!, $values: JSON!) { create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values) { id } }",
+    "mutation ClientCreate($board: ID!, $group: String!, $name: String!, $values: JSON!) { create_item(board_id: $board, group_id: $group, item_name: $name, column_values: $values, create_labels_if_missing: true) { id } }",
     { board: CLIENTS_BOARD_ID, group: CLIENT_GROUPS.find((g) => g.id === "active")!.group, name: ob.name.slice(0, 255), values: JSON.stringify(values) }, 25000,
   );
   const id = data.create_item?.id;

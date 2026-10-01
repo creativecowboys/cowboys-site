@@ -43,3 +43,11 @@ test("rows map stage from the board group and compute missing + overdue", () => 
   assert.deepEqual(row.salesOwnerIds, ["39848115"]);
   assert.throws(() => mapRow({ ...item, board: { id: "18430997894" } }), /onboarding board/);
 });
+
+test("a giveaway winner lands on Monday with the Giveaway Winner label, $0 setup, No charge and a do-not-bill note", () => {
+  const cols = handoffColumns({ ...form, packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "0", setupAgreed: "0", payment: "No charge" });
+  assert.deepEqual(cols[COL.package], { labels: ["Giveaway Winner", "Local Growth"] });
+  assert.deepEqual(cols[COL.payment], { label: "No charge" });
+  assert.equal(cols[COL.setup], "0");
+  assert.match(String(cols[COL.notes]), /^GIVEAWAY WINNER — NO CHARGE/);
+});
