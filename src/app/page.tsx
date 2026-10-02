@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeClient from "@/components/HomeClient";
+import { CHAT_WIDGET } from "@/lib/chat-widget";
 
 export const metadata: Metadata = {
   title: "Creative Cowboys — No-Fluff Digital Marketing Agency for the Southeast",
@@ -27,5 +28,18 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <HomeClient />;
+  return (
+    <>
+      <HomeClient />
+      {/* GHL chat widget (A2P SMS opt-in). Server-rendered so the tag is in the page HTML. */}
+      <script
+        id={CHAT_WIDGET.id}
+        src={CHAT_WIDGET.src}
+        data-resources-url={CHAT_WIDGET.resourcesUrl}
+        data-widget-id={CHAT_WIDGET.widgetId}
+        data-source="WEB_USER"
+        defer
+      />
+    </>
+  );
 }
