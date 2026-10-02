@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { assertMayWriteGhl, backendForRecordId, backendForScope, deskBackend, deskDefault, deskSystemName, isGhlRecordId, validateRecordId, validateScope } from "./switch";
+import { assertMayWriteGhl, assertMondayOpen, backendForRecordId, backendForScope, deskBackend, deskDefault, deskSystemName, isGhlRecordId, validateRecordId, validateScope } from "./switch";
 import { actorFor, deskTeam, isTeamName, memberByGhlUser, nameForMondayId, teamOwners } from "./team";
 import { ALL_PACKAGE_LABELS, joinPackages, listPrice, monthlyList, splitPackages } from "./money";
 import { itemId, mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, toChecklistItems } from "./checklist-text";
@@ -42,6 +42,9 @@ test("before the flip only an owner may change a GoHighLevel desk record; after 
   assert.throws(() => assertMayWriteGhl(false, undefined), { status: 403 });
   assert.doesNotThrow(() => assertMayWriteGhl(true, undefined));
   assert.doesNotThrow(() => assertMayWriteGhl(false, "ghl"));
+  // After the flip nothing new is created on the Monday boards, even with the look-back parameter; before it, Monday is the desk.
+  assert.doesNotThrow(() => assertMondayOpen(undefined)); assert.doesNotThrow(() => assertMondayOpen("monday")); assert.doesNotThrow(() => assertMondayOpen("GHL"));
+  assert.throws(() => assertMondayOpen("ghl"), { status: 409 });
 });
 
 test("team: owners are names; Madison needs no GoHighLevel user; ids come from the rep table and env", () => {

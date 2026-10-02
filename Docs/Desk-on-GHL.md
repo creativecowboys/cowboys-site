@@ -18,6 +18,9 @@ takes the same Monday code path as before. Nothing has been created in GoHighLev
   always goes to GoHighLevel; an all-digit Monday item id goes to Monday while the switch says Monday, and after the flip
   it is looked up among the imported records (never sent to Monday) — old links and open tabs keep working.
 - The Stripe webhook, the nightly reconcile, the package builder's winner guard and the client intake "Submit" follow the switch.
+- **After the flip nothing reaches Monday unless someone asks to look back.** `?backend=monday` still lists the two old
+  boards (read-only, and the only thing that still needs `MONDAY_API_TOKEN` besides the import); opening a row from that
+  list opens its GoHighLevel record; and a handoff or Add client from that view is refused rather than written to Monday.
 
 ## Model — one contact per business
 A business is **one GoHighLevel contact for its whole life**: lead → onboarding → client. The Sales tab already works the
@@ -215,7 +218,7 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
 - UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (55) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (57) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.

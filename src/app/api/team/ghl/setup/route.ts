@@ -7,7 +7,7 @@ import { deskSetup } from "@/lib/desk/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 120; // the desk scope creates 43 fields one at a time; a run that is cut short is safe to repeat (it only creates what is missing)
 
 /** Owner-only. POST { dryRun: true } lists the desk custom fields still missing in GHL; { dryRun: false } creates them. Never edits an existing field.
  *  `scope: "desk"` does the same for the Onboarding / Clients desk's "Desk …" fields (Phase 2) and reports whether a desk tag name is already taken;

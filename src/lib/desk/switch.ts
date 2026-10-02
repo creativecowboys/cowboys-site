@@ -48,6 +48,15 @@ export function validateScope(scope: string): string {
 export const backendForScope = (scope: string, env = process.env.DESK_BACKEND): DeskBackend => (isGhlRecordId(scope) ? "ghl" : deskDefault(env));
 
 /**
+ * Once the switch says ghl the link to Monday is cut: `?backend=monday` still LISTS the old boards (a look back), but
+ * nothing new is created there. Every other Monday write is already unreachable after the flip — a Monday item id on a
+ * record route is resolved to the imported contact, never sent to Monday.
+ */
+export function assertMondayOpen(env = process.env.DESK_BACKEND): void {
+  if (deskDefault(env) === "ghl") throw new CallDeskError("The desk is on GoHighLevel now, so nothing new is created on the Monday boards. Take “backend=monday” off the address and try again.", 409);
+}
+
+/**
  * While the switch still says Monday, GoHighLevel desk records are a preview: anyone on the team may look,
  * only an owner may change them (the import canary and the pre-flip checks). After the flip everyone works there.
  */

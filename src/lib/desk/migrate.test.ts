@@ -202,6 +202,22 @@ test("an email or phone another contact already holds is left off (GoHighLevel w
   assert.equal(ghl.get("SomeoneElse000000001").customFields!.length, 0);
 });
 
+test("a graduated client whose onboarding item is gone, pinned by hand, still finds the files the Monday desk kept under that item", async () => {
+  const GONE = "13000000001";
+  blobSeed(`onboarding/intake/${GONE}.json`, { version: 1, itemId: GONE, leadId: "", business: "Squirrel Made Products", tokenHash: null, tokenIssuedAt: null, tokenExpiresAt: null, revokedAt: null, form: { business: "Squirrel Made Products" }, lastSavedAt: null, submittedAt: null, reviewedAt: null, files: [{ key: `onboarding/files/${GONE}/Brand/logo.png`, name: "logo.png", size: 10, type: "image/png", category: "Brand", uploadedAt: "2026-09-20T10:00:00.000Z" }], createdAt: "", updatedAt: "" });
+  const base = ghl.monday!;
+  ghl.monday = (q, v) => { const d = base(q, v) as { boards: { items_page: { items: MondayRow[] } }[] }; if ((v.board as string[])[0] !== "18431157561") d.boards[0].items_page.items[0].column_values.push({ id: CCOL.onboardingItem, text: GONE, value: JSON.stringify(GONE) }); return d; };
+  const waiting = await migrateDesk({ pauseMs: 0, dryRun: false, boards: ["clients"], onlyIds: [SQUIRREL_CL] });
+  assert.equal(waiting.rows[0].match, "unmatched", "without a map the row waits for an onboarding record that will never come");
+  const pinned = await migrateDesk({ pauseMs: 0, dryRun: false, boards: ["clients"], onlyIds: [SQUIRREL_CL], map: { [SQUIRREL_CL]: "SquirrelMadeJeremy01" } });
+  assert.equal(pinned.counts.written, 1); assert.deepEqual(pinned.rows[0].storage, [`intake/${GONE}: contactId set`]);
+  assert.equal(ghl.value("SquirrelMadeJeremy01", "Desk Monday Onboarding ID"), GONE);
+  const detail = await clientDetailGhl("SquirrelMadeJeremy01", true);
+  assert.equal(detail.fileScope, GONE); assert.deepEqual(detail.files.map((x) => x.name), ["logo.png"]);
+  assert.deepEqual((await listOnboardingGhl()).rows, [], "carrying the id does not make the client an onboarding record");
+  assert.deepEqual((await listClientsGhl()).rows.map((x) => x.name), ["Squirrel Made Products"]);
+});
+
 test("matching order and its tie-breaks", () => {
   const f = resolveDeskFields(ghl.defs); const sales = resolveFromDefs(ghl.defs);
   const contacts = [...ghl.contacts.values()];

@@ -233,6 +233,11 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
   if (!had("gbpUrl")) put(values, "gbpUrl", link(row, CCOL.gbpUrl));
   const notes = text(row, CCOL.notes); const prior = had("notes");
   if (notes && !prior.includes(notes)) values.notes = prior ? `${prior}\n\n${notes}` : notes;
+  // The Monday desk kept a graduated client's files under its onboarding item. Normally this contact already carries that
+  // id (it IS the onboarding record). If the onboarding item is gone and the row was pinned to a contact by hand, carry the
+  // id anyway so the files are still found; it does not make the contact an onboarding record (that takes a stage or the tag).
+  const onboardingItem = text(row, CCOL.onboardingItem);
+  if (MONDAY_ID.test(onboardingItem) && !had("mondayOnboardingId")) values.mondayOnboardingId = onboardingItem;
   const native = nativeFor(row, existing, text(row, CCOL.contact), text(row, CCOL.email), text(row, CCOL.phone), link(row, CCOL.website), "", warnings);
   return { values, native, tags: [DESK_TAGS.client], salesLeadId: "", warnings };
 }
@@ -362,10 +367,12 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         copied++; await pause(gap);
       }
       // Storage: the client's intake / file record stays under its Monday-era key and learns which contact it belongs to.
-      const scope = kind === "onboarding" ? row.id : `c${row.id}`;
-      const intake = await readIntake(scope).catch(() => null);
-      if (intake && intake.contactId !== contactId) { await writeIntake({ ...intake, contactId }); out.storage.push(`intake/${scope}: contactId set`); }
-      else if (intake) out.storage.push(`intake/${scope}: already linked`);
+      const onboardingScope = kind === "client" ? text(row, CCOL.onboardingItem) : "";
+      for (const scope of kind === "onboarding" ? [row.id] : [`c${row.id}`, ...(MONDAY_ID.test(onboardingScope) ? [onboardingScope] : [])]) {
+        const intake = await readIntake(scope).catch(() => null);
+        if (intake && intake.contactId !== contactId) { await writeIntake({ ...intake, contactId }); out.storage.push(`intake/${scope}: contactId set`); }
+        else if (intake) out.storage.push(`intake/${scope}: already linked`);
+      }
       out.detail = `wrote ${customFields.length} fields, ${copied} of ${out.updates} updates copied as notes`; out.done = true;
       report.counts.written++;
       await pause(gap);
