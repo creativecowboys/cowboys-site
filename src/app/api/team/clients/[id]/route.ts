@@ -52,9 +52,11 @@ export async function PATCH(req: Request, context: Context) {
     const rawId = (await context.params).id;
     const session = await teamSession();
     if (backendForRecordId(rawId) === "ghl") {
-      assertMayWriteGhl(isOwnerEmail(session?.email));
-      const patched = await patchClientGhl(validateRecordId(rawId), validateDeskClientPatch(await readCallBody(req)), actorFor(session?.email));
-      return NextResponse.json({ row: isOwnerEmail(session?.email) ? patched : withoutMoney(patched) }, { headers: teamHeaders });
+      const owner = isOwnerEmail(session?.email);
+      assertMayWriteGhl(owner);
+      // `owner` also gates the one owners-only change: marking or un-marking a legacy client.
+      const patched = await patchClientGhl(validateRecordId(rawId), validateDeskClientPatch(await readCallBody(req)), actorFor(session?.email), { owner });
+      return NextResponse.json({ row: owner ? patched : withoutMoney(patched) }, { headers: teamHeaders });
     }
     const id = validateClientId(rawId);
     const row = await applyClientPatch(id, validateClientPatch(await readCallBody(req)));

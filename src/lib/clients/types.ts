@@ -12,6 +12,9 @@ export type ClientRow = {
   gbpAccess: string; gbpChecked: string; stripeCustomer: string; onboardingItem: string; teamDesk: boolean;
   searchAtlasListing: string; // Search Atlas GBP location id (numeric text) or ""
   gbpLive: GbpCard | null; // live Search Atlas read when linked (list: from the account listing; detail: full read)
+  /** GoHighLevel desk only (Oct 2 2026): a long-standing client that was never onboarded through the desk and is billed outside
+   *  GoHighLevel ("Desk Legacy Client" = Yes). Shown with a Legacy badge and only flagged for what its record actually tracks. */
+  legacy?: boolean;
   flags: ClientFlag[];
 };
 export type ClientsListData = { rows: ClientRow[]; cursor: string | null; boardName: string; stripeConnected: boolean; canSeeMoney: boolean; searchAtlasConnected: boolean; system?: "monday" | "ghl"; systemName?: string };

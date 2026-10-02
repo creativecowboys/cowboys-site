@@ -395,26 +395,26 @@ test("setup, diag and the self-test: what the desk writes is spelled out, and th
   // Before the fields exist.
   ghl.defs = ghl.defs.filter((d) => !isDeskFieldName(d.name));
   const dry = await deskSetup(true);
-  assert.equal(dry.missing.length, 43); assert.equal(ghl.writes().length, 0);
+  assert.equal(dry.missing.length, 44); assert.equal(ghl.writes().length, 0);
   assert.deepEqual(dry.tags, [{ name: "desk-onboarding", exists: false }, { name: "desk-client", exists: false }, { name: "monday-import", exists: false }]);
   const before = await deskDiagnose() as { fields: { deskPresent: number; deskMissing: string[]; lseOwned: string[] }; records?: string };
-  assert.equal(before.fields.deskPresent, 0); assert.equal(before.fields.deskMissing.length, 43); assert.match(String(before.records), /not counted/);
+  assert.equal(before.fields.deskPresent, 0); assert.equal(before.fields.deskMissing.length, 44); assert.match(String(before.records), /not counted/);
   // Create them (the fake answers instantly; the real call pauses between fields).
   for (const m of dry.missing) ghl.addField(m.name, m.dataType, m.options);
   const diag = await deskDiagnose() as { deskBackend: string; fields: { deskPresent: number; lseOwned: string[]; salesDesk: string[]; other: string[]; deskNotInCatalog: string[] }; tags: { lseOwned: string[]; deskOwned: { name: string; exists: boolean }[]; other: string[] }; onboardingRecords: number; clients: number; writes: ReturnType<typeof deskWriteList> };
-  assert.equal(diag.deskBackend, "monday"); assert.equal(diag.fields.deskPresent, 43); assert.deepEqual(diag.fields.deskNotInCatalog, []);
+  assert.equal(diag.deskBackend, "monday"); assert.equal(diag.fields.deskPresent, 44); assert.deepEqual(diag.fields.deskNotInCatalog, []);
   assert.ok(diag.fields.lseOwned.includes("LSE Health") && diag.fields.lseOwned.includes("LSE Term End")); assert.ok(diag.fields.salesDesk.includes("Lead Source")); assert.deepEqual(diag.fields.other, []);
   assert.deepEqual(diag.tags.lseOwned, ["lse:cancel-request", "lse:client", "lse:payment-failed", "lse:red"]); assert.ok(diag.tags.other.includes("giveaway-entrant") === false && diag.tags.deskOwned.every((t) => !t.exists));
-  assert.equal(diag.onboardingRecords, 0); assert.equal(diag.clients, 0);
-  assert.equal(diag.writes.customFields.length, 43); assert.ok(diag.writes.customFields.every(isDeskFieldName)); assert.ok(diag.writes.never.includes("any lse: tag"));
+  assert.equal(diag.onboardingRecords, 0); assert.equal(diag.clients, 0); assert.equal((diag as unknown as { legacyClients: number }).legacyClients, 0);
+  assert.equal(diag.writes.customFields.length, 44); assert.ok(diag.writes.customFields.every(isDeskFieldName)); assert.ok(diag.writes.never.includes("any lse: tag"));
   assert.ok(!JSON.stringify(diag).includes("nonfunctional-test"));
   // Self-test: dry run is a plan; the real run round-trips every field on the test contact and puts back what was there.
   const TEST = "C8FHl1LIfXEMI9isByB2";
   ghl.addContact({ id: TEST, companyName: "Test — Claude", tags: ["sales-lead"], fields: { "Desk Notes": "was here before", "Lead Source": "Other" } });
   const plan = await deskSelfTest(true, DAVE);
-  assert.equal(plan.plan!.length, 43); assert.equal(ghl.writes().length, 0);
+  assert.equal(plan.plan!.length, 44); assert.equal(ghl.writes().length, 0);
   const run = await deskSelfTest(false, DAVE);
-  assert.equal(run.error, undefined); assert.equal(run.passed, 43); assert.deepEqual(run.failed, []); assert.deepEqual(run.clearFailed, []);
+  assert.equal(run.error, undefined); assert.equal(run.passed, 44); assert.deepEqual(run.failed, []); assert.deepEqual(run.clearFailed, []);
   assert.match(run.tag!, /desk-onboarding: add ok, removed again: ok/); assert.match(run.search!, /accepted/); assert.equal(run.restored, "original values written back");
   assert.match(run.note!, /^added; authored as Dave; \d{4} characters kept whole$/, "a note as long as the desk accepts keeps its marker");
   assert.equal(run.version, "dateUpdated moved on the field write; moved on the tag add");
@@ -435,7 +435,7 @@ test("self-test: a field GoHighLevel refuses is named, the others are still prov
   ghl.addContact({ id: TEST, companyName: "Test — Claude", fields: { "Desk Notes": "was here before" } });
   ghl.refuse.add("Desk Billing Day");
   const run = await deskSelfTest(false, DAVE);
-  assert.equal(run.error, undefined); assert.equal(run.passed, 42); assert.deepEqual(run.failed, ["Desk Billing Day"]); assert.deepEqual(run.clearFailed, ["Desk Billing Day"]);
+  assert.equal(run.error, undefined); assert.equal(run.passed, 43); assert.deepEqual(run.failed, ["Desk Billing Day"]); assert.deepEqual(run.clearFailed, ["Desk Billing Day"]);
   assert.match(run.checks!.find((c) => c.field === "Desk Billing Day")!.error!, /^write refused: GoHighLevel error 422 .*Desk Billing Day.*; clear refused: /);
   assert.match(run.restored!, /^original values written back except Desk Billing Day — clear those on the test contact by hand$/);
   assert.equal(ghl.value(TEST, "Desk Notes"), "was here before"); assert.equal(ghl.value(TEST, "Desk Billing Day"), undefined); assert.deepEqual(ghl.value(TEST, "Desk Packages"), []);

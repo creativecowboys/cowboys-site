@@ -36,6 +36,8 @@ export const groupLabel = (id: ClientGroupId): string => CLIENT_GROUPS.find((g) 
 
 export const isOnboardingRecord = (c: GhlContact, f: DeskFields): boolean => hasTag(c, DESK_TAGS.onboarding) || !!deskText(c, f, "obStage");
 export const isClientRecord = (c: GhlContact, f: DeskFields): boolean => hasTag(c, DESK_TAGS.client) || !!deskText(c, f, "clientStatus");
+/** A legacy client: "Desk Legacy Client" says Yes. No, blank, or a location where that field does not exist yet is a normal desk client. */
+export const isLegacyClient = (c: GhlContact, f: DeskFields): boolean => deskText(c, f, "legacy").trim().toLowerCase() === "yes";
 
 /**
  * Where this business's files and intake record live in storage. A record imported from Monday keeps its
@@ -94,6 +96,7 @@ export function mapClient(c: GhlContact, f: DeskFields, today = todayEastern()):
     // The onboarding record is the same contact; the id lets the panel link back to it.
     onboardingItem: isOnboardingRecord(c, f) ? c.id : "", teamDesk: true,
     searchAtlasListing: t("searchAtlasListing").trim(), gbpLive: null,
+    legacy: isLegacyClient(c, f),
   };
   return { ...base, flags: flagsFor(base, today) }; // the same problem rules as the Monday Clients tab
 }
