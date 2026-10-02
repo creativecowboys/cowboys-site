@@ -19,6 +19,7 @@ import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, h
 import { isGhlRecordId } from "./switch";
 import { isTeamName, memberByName, teamOwners, type Actor } from "./team";
 import type { DeskOnboardingPatch } from "./validation";
+import { deskUrl } from "@/lib/desk-path";
 
 // The Onboarding tab on GoHighLevel (Phase 2). Same behaviour as src/lib/onboarding/pipeline.ts +
 // handoff.ts, against a contact instead of a Monday item. Nothing in this file talks to Monday.
@@ -344,7 +345,7 @@ export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: strin
         record = (await findHandoffRecord(contact, f)) || closed; // the record's own handoff, whose unfinished steps (if any) are its to finish
       } else {
         const owner = memberByName(form.salesOwner);
-        await writeRecord(contact.id, f, keepShared(handoffValues(form, todayEastern(), `${ctx.origin}/leads?tab=onboarding&client=${contact.id}`), contact, f), {
+        await writeRecord(contact.id, f, keepShared(handoffValues(form, todayEastern(), deskUrl(ctx.origin, { tab: "onboarding", client: contact.id })), contact, f), {
           ...handoffNative(form, contact),
           ...(!contact.assignedTo && owner?.ghlUserId ? { assignedTo: owner.ghlUserId } : {}), // never take a contact away from whoever GoHighLevel says owns it
         });

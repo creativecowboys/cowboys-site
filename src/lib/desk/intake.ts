@@ -10,6 +10,7 @@ import { deskText, type DeskFields } from "./fields";
 import { findHandoffRecord } from "./onboarding";
 import { allDeskFields, businessName, fileScopeFor, isClientRecord, isOnboardingRecord, listRecords, readContact, resolveRecordId, writeRecord } from "./record";
 import { isGhlRecordId, isLegacyScope } from "./switch";
+import { deskUrl } from "@/lib/desk-path";
 
 // Client intake on the GoHighLevel desk. The intake record, the hashed token, the token → record index and the
 // client's files all stay in the private Blob store exactly where they were — only the STATUS the desk shows
@@ -68,7 +69,7 @@ export async function issueIntakeLinkGhl(rawId: string, origin: string): Promise
   record.tokenHash = tokenHash; record.tokenIssuedAt = issued; record.tokenExpiresAt = expiresAt; record.revokedAt = null; record.updatedAt = issued; record.contactId = id;
   await writeIntake(record);
   if (old && old !== tokenHash) await deleteTokenIndex(old);
-  try { await writeRecord(id, f, { intake: record.submittedAt ? "Client submitted" : "Link issued", deskLink: `${origin}/leads?tab=onboarding&client=${id}` }); }
+  try { await writeRecord(id, f, { intake: record.submittedAt ? "Client submitted" : "Link issued", deskLink: deskUrl(origin, { tab: "onboarding", client: id }) }); }
   catch { /* the link works regardless; the status on the contact is advisory and shows on the next refresh */ }
   return { url: `${origin}/onboarding/${token}`, expiresAt };
 }

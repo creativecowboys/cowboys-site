@@ -31,7 +31,7 @@ test("handoff from a won lead: the lead's own contact becomes the onboarding rec
     "Desk Onboarding Stage": "New handoff", "Desk Onboarding Health": "Not Started", "Desk GBP Access": "Not Requested", "Desk Intake": "Not sent",
     "Desk Agreement": "Pending", "Desk Onboarding Payment": "Pending", "Desk Handoff ID": form.handoffId, "Desk Signed": today, "Desk Last Touch": today,
     "Desk Sales Owner": "Dave", "Desk Setup Amount": 497, "Desk Target Launch": "2026-10-15", "Desk Business Type": "Ecommerce",
-    "Desk Next Action": "Madison: send the intake link and request assets", "Desk Next Action Due": "2026-10-03", "Desk Link": `${ORIGIN}/leads?tab=onboarding&client=${LEAD}`,
+    "Desk Next Action": "Madison: send the intake link and request assets", "Desk Next Action Due": "2026-10-03", "Desk Link": `${ORIGIN}/admin?tab=onboarding&client=${LEAD}`,
   };
   for (const [name, value] of Object.entries(want)) assert.deepEqual(ghl.value(LEAD, name), value, name);
   assert.deepEqual(ghl.value(LEAD, "Desk Packages"), ["Local Growth — First Year $297"]);

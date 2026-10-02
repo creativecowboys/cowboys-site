@@ -66,6 +66,17 @@ const nextConfig: NextConfig = {
       { source: '/ppc-management', destination: '/ppc', permanent: true },
       { source: '/thank-you', destination: '/', permanent: true },
       { source: '/single-service', destination: '/services', permanent: true },
+      // The team desk moved from /leads to /admin on Oct 2 2026. Bookmarks, the Oct 2 team email, calendar-feed
+      // events and the "Desk Link" stored on GoHighLevel contacts all still say /leads, so it forwards for good:
+      // the same path under /admin, and Next keeps the query string (/leads?tab=clients&client=abc lands on
+      // /admin?tab=clients&client=abc). 307 on purpose: a browser caches a permanent redirect indefinitely, and a
+      // team tool gains nothing from that. These run before the middleware, which then asks for sign-in on /admin.
+      { source: '/leads', destination: '/admin', permanent: false },
+      { source: '/leads/:path*', destination: '/admin/:path*', permanent: false },
+      // The old admin screen (logins for the retired in-site client portal) was removed the same day. Its pages
+      // lived under /admin/clients; anything still pointing there goes to the desk.
+      { source: '/admin/clients', destination: '/admin', permanent: false },
+      { source: '/admin/clients/:path*', destination: '/admin', permanent: false },
     ];
   },
 };

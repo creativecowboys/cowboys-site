@@ -197,7 +197,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
   }, [demo]);
   // The initial request synchronizes this view with the external lead system (Monday or GoHighLevel).
   useEffect(() => { void loadList(); }, [loadList]);
-  // Calendar events link to /leads?lead=<id>: select that lead once, after the first load.
+  // Calendar events link to /admin?lead=<id> (older ones to /leads?lead=<id>, which forwards): select that lead once, after the first load.
   const deepLinked = useRef(false);
   useEffect(() => {
     if (deepLinked.current || demo || !ready || !leads.length) return;

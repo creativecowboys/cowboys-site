@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { jwtVerify } from "jose";
+import { DESK_PATH, deskGate } from "@/lib/desk-path";
 
 const secret = () => new TextEncoder().encode(process.env.NEXTAUTH_SECRET ?? "");
 
-// ─── Admin session helpers ─────────────────────────────────────────────────────
+// ─── Team session helpers (the desk's sign-in cookie, set by /api/admin/verify) ──
 
 async function isAdminAuthenticated(request: NextRequest): Promise<boolean> {
     const token = request.cookies.get("cc_admin_token")?.value;
@@ -40,15 +41,6 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // ── Giveaway call desk (team only) ────────────────────────────────────────
-    if (pathname === "/leads" || pathname.startsWith("/leads/")) {
-        if (!(await isAdminAuthenticated(request))) {
-            const login = new URL("/admin/login", request.url);
-            login.searchParams.set("next", "/leads");
-            return NextResponse.redirect(login);
-        }
-        return NextResponse.next();
-    }
     // ── Client onboarding intake (the token in the URL is the credential; never indexed) ──
     if (pathname === "/onboarding" || pathname.startsWith("/onboarding/")) {
         const res = NextResponse.next();
@@ -62,18 +54,16 @@ export async function middleware(request: NextRequest) {
         res.headers.set("X-Robots-Tag", "noindex, nofollow");
         return res;
     }
-    // ── Admin routes ──────────────────────────────────────────────────────────
-    if (pathname.startsWith("/admin")) {
-        const isLoginPage = pathname === "/admin/login";
-        const authenticated = await isAdminAuthenticated(request);
-
-        if (!authenticated && !isLoginPage) {
-            return NextResponse.redirect(new URL("/admin/login", request.url));
-        }
-        if (authenticated && isLoginPage) {
-            return NextResponse.redirect(new URL("/admin", request.url));
-        }
-        return NextResponse.next();
+    // ── Team desk and its sign-in: /admin and everything under it (team only, never indexed) ──
+    // The desk's old address, /leads, never reaches this file: next.config.ts forwards it to /admin first.
+    // Signed out, a desk page goes to the sign-in page carrying the path and query, so the emailed link lands
+    // back where the person was going. The rule itself is deskGate in src/lib/desk-path.ts (unit-tested).
+    if (pathname === DESK_PATH || pathname.startsWith(`${DESK_PATH}/`)) {
+        const to = deskGate(pathname, request.nextUrl.search, await isAdminAuthenticated(request));
+        if (to) return NextResponse.redirect(new URL(to, request.url));
+        const res = NextResponse.next();
+        res.headers.set("X-Robots-Tag", "noindex, nofollow");
+        return res;
     }
 
     // ── Client portal routes ───────────────────────────────────────────────────
