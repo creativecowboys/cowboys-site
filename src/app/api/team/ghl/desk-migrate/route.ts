@@ -16,7 +16,10 @@ export const maxDuration = 300;
  * repeat with the returned nextOffset until it is null. Safe to repeat: a row already imported is skipped unless `force`.
  * `map` pins a Monday row to a contact ({ "<monday item id>": "<contact id>" }) when the report says it is unmatched;
  * `boards` limits the run to ["onboarding"] or ["clients"]; `includeOffDesk` also takes Active Clients rows without
- * "Team desk" checked; `createNameOnly` allows a new contact for a row with no email and no phone.
+ * "Team desk" checked — the agency's long-standing clients, which come over marked as LEGACY clients (Oct 2 2026);
+ * `createNameOnly` allows a new contact for a row with no email and no phone (the business name becomes the contact's
+ * company name; `businessAsContactName` also puts it in the contact's own name, for the one case where GoHighLevel will
+ * not take a contact with nobody's name). Every row of the report says exactly what it writes (`values`, `contact`, `tags`).
  * Once DESK_BACKEND=ghl, `force` is refused unless `overwriteLiveDesk: true` comes with it: it re-writes each contact's desk
  * fields from what the old boards say, over whatever the team has done on the GoHighLevel desk since.
  */
@@ -39,7 +42,7 @@ export async function POST(req: Request) {
       offset: typeof body?.offset === "number" ? body.offset : 0,
       limit: typeof body?.limit === "number" ? body.limit : 25,
       force: body?.force === true, onlyIds: ids(body?.onlyIds), map, boards,
-      includeOffDesk: body?.includeOffDesk === true, createNameOnly: body?.createNameOnly === true,
+      includeOffDesk: body?.includeOffDesk === true, createNameOnly: body?.createNameOnly === true, businessAsContactName: body?.businessAsContactName === true,
       origin: new URL(req.url).origin,
     }), { headers: teamHeaders });
   } catch (error) { return failure(error); }
