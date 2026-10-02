@@ -19,7 +19,9 @@ export function readableHistory(text: string): string {
   return text
     .replace(/\[CC-CALL:[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}\]/gi, "")
     .replace(/\[CC-PAYLOAD:[\da-f]{64}\]/gi, "")
-    .replace(/\[CC-HANDOFF:[^\]]+\]/g, "")
+    .replace(/\[CC-HANDOFF(?:-SUMMARY)?:[^\]]+\]/g, "")
     .replace(/\[CC-MONDAY-UPDATE:[^\]]+\]/g, "")
+    // Notes written from the Onboarding / Clients tabs (src/lib/desk/notes.ts) share the contact with the Sales tab.
+    .replace(/\[CC-(?:NOTE|SRC|BY):[^\]\n]*\]/g, "")
     .trim();
 }

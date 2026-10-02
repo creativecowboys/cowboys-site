@@ -7,6 +7,7 @@ import { readPipelineItem, setPipelineColumns, mapRow } from "./pipeline";
 import { deletePath, deleteTokenIndex, FILE_PREFIX, readHandoff, readIntake, readTokenIndex, writeIntake, writeTokenIndex } from "./store";
 import type { HandoffForm, IntakeFile, IntakeForm, IntakeRecord, OnboardingRow } from "./types";
 import { safeFilename, uploadPath } from "./validation";
+import { isGhlRecordId } from "@/lib/desk/switch";
 
 // Client intake links are opaque, revocable and expiring. The token itself is never stored:
 // only its SHA-256 lives in the store, and the Monday board only ever sees a staff URL.
@@ -73,7 +74,8 @@ export async function resolveToken(token: string): Promise<IntakeRecord> {
   const tokenHash = hashToken(token);
   const index = await readTokenIndex(tokenHash);
   const invalid = () => new CallDeskError("This link is no longer active. Ask your Creative Cowboys contact for a new one.", 404);
-  if (!index?.itemId || !/^[1-9]\d{0,19}$/.test(index.itemId)) throw invalid();
+  // A Monday pipeline item id, or (Phase 2) a GoHighLevel contact id for links issued on the GoHighLevel desk.
+  if (!index?.itemId || !(/^[1-9]\d{0,19}$/.test(index.itemId) || isGhlRecordId(index.itemId))) throw invalid();
   const record = await readIntake(index.itemId);
   if (!record?.tokenHash) throw invalid();
   const a = Buffer.from(record.tokenHash); const b = Buffer.from(tokenHash);

@@ -9,7 +9,8 @@ import { CCOL, CLIENTS_BOARD_ID } from "@/lib/clients/config";
 // Both boards are small (tens of rows), so one page read per board is cheaper and sturdier than a
 // filtered query that breaks before the label exists on the board.
 
-export type Winner = { itemId: string; name: string; board: "Onboarding Pipeline" | "Active Clients"; url: string; email: string; phone: string; ghl: string };
+/** `board` is "Onboarding Pipeline" / "Active Clients" on Monday and "Onboarding" / "Clients" on the GoHighLevel desk (src/lib/desk/winners.ts). */
+export type Winner = { itemId: string; name: string; board: string; url: string; email: string; phone: string; ghl: string };
 export type ContactKeys = { id?: string; email?: string; phone?: string; company?: string; name?: string };
 
 const digits = (v: string) => v.replace(/\D/g, "").slice(-10);

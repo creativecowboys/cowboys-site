@@ -14,7 +14,7 @@ export type ClientRow = {
   gbpLive: GbpCard | null; // live Search Atlas read when linked (list: from the account listing; detail: full read)
   flags: ClientFlag[];
 };
-export type ClientsListData = { rows: ClientRow[]; cursor: string | null; boardName: string; stripeConnected: boolean; canSeeMoney: boolean; searchAtlasConnected: boolean };
+export type ClientsListData = { rows: ClientRow[]; cursor: string | null; boardName: string; stripeConnected: boolean; canSeeMoney: boolean; searchAtlasConnected: boolean; system?: "monday" | "ghl"; systemName?: string };
 export type StripeSnapshot = {
   customerId: string; email: string; name: string;
   subscription: { id: string; status: string; currentPeriodEnd: string; cancelAt: string; amount: number; interval: string } | null;
@@ -22,4 +22,4 @@ export type StripeSnapshot = {
   fetchedAt: string;
 };
 export type ClientFile = { key: string; name: string; size: number; category: string; uploadedAt: string };
-export type ClientDetail = { fileScope: string; files: ClientFile[]; row: ClientRow; history: { id: string; text: string; createdAt: string; author: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean; gbpLocations: GbpLocationSummary[]; searchAtlasConnected: boolean };
+export type ClientDetail = { fileScope: string; files: ClientFile[]; row: ClientRow; history: { id: string; text: string; createdAt: string; author: string; source?: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean; gbpLocations: GbpLocationSummary[]; searchAtlasConnected: boolean; system?: "monday" | "ghl" };

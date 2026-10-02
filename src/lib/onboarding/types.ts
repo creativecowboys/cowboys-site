@@ -43,6 +43,8 @@ export type IntakeRecord = {
   form: IntakeForm; lastSavedAt: string | null; submittedAt: string | null; reviewedAt: string | null;
   files: IntakeFile[];
   createdAt: string; updatedAt: string;
+  /** GoHighLevel contact this intake belongs to (Phase 2). Set for records created on the GoHighLevel desk and added to Monday-era records by the import; the Monday desk ignores it. */
+  contactId?: string;
 };
 
 export type ChecklistItem = { id: string; name: string; status: string; owner: string; due: string; phase: string; required: boolean };
@@ -62,15 +64,19 @@ export type OnboardingRow = {
   missing: string[]; // required onboarding items still open (computed)
   overdue: boolean; // next action due date passed (from checklist due or nextDue in notes)
 };
-export type OnboardingListData = { rows: OnboardingRow[]; cursor: string | null; boardName: string };
+/** `system` / `systemName` are set by the GoHighLevel desk (absent = Monday), so the UI can name the right system. */
+export type OnboardingListData = { rows: OnboardingRow[]; cursor: string | null; boardName: string; system?: "monday" | "ghl"; systemName?: string };
 export type OnboardingDetail = {
   row: OnboardingRow;
-  history: { id: string; text: string; createdAt: string; author: string }[];
+  history: { id: string; text: string; createdAt: string; author: string; source?: string }[]; // source: where a note came from (GoHighLevel desk only)
   record: HandoffRecord | null;
   intake: (Omit<IntakeRecord, "tokenHash"> & { linkActive: boolean }) | null;
   owners: { id: string; name: string }[];
   gbp: GbpCard | null; // live Search Atlas read when a listing is linked
   gbpLocations: GbpLocationSummary[]; // every listing on our account, for the link select
   searchAtlasConnected: boolean;
+  fileScope?: string; // storage key for this client's files when it differs from the record id (records imported to GoHighLevel keep their Monday-era key)
+  nextDue?: string; // the next action's due date, so the editor can show it (GoHighLevel desk)
+  system?: "monday" | "ghl";
 };
-export type StartResult = { itemId: string; itemUrl: string; pending: StepName[]; adopted: boolean };
+export type StartResult = { itemId: string; itemUrl: string; pending: StepName[]; adopted: boolean; system?: "monday" | "ghl" };

@@ -169,6 +169,11 @@ export class FakeGhl {
       const limit = Number(body?.pageLimit) || 100; const page = Number(body?.page) || 1;
       return json(200, { contacts: pool.slice((page - 1) * limit, page * limit).map((c) => structuredClone(c)), total: pool.length });
     }
+    if (path === "/contacts/" && method === "GET") { // the older free-text list endpoint (name, email, phone, company)
+      const q = (u.searchParams.get("query") || "").toLowerCase(); const digits = q.replace(/\D/g, "");
+      const hits = [...this.contacts.values()].filter((c) => [c.contactName, c.email, c.companyName].some((x) => (x || "").toLowerCase().includes(q)) || (digits.length >= 7 && (c.phone || "").replace(/\D/g, "").includes(digits)));
+      return json(200, { contacts: hits.slice(0, Number(u.searchParams.get("limit")) || 20).map((c) => structuredClone(c)) });
+    }
     if ((path === "/contacts/" || path === "/contacts/upsert") && method === "POST") {
       if (!body?.locationId) return json(422, { message: "locationId is required" });
       const email = String(body.email || "").toLowerCase(); const phone = String(body.phone || "");
