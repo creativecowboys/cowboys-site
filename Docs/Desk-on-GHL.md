@@ -131,8 +131,9 @@ be checked against the live account before the cutover.
   manager). A client that was already on the Clients tab keeps every value it has. Safe to press twice.
 - **One place at a time.** A client whose onboarding stage is not Launched shows on the Onboarding tab only.
 - **Money.** Monthly $ and MRR were Monday formulas; they are now computed from the package labels plus Custom $/mo
-  (`src/lib/desk/money.ts`, prices from the package catalog, label for label what the formulas gave; a Giveaway Winner is
-  $0). Owners-only visibility is unchanged, and on the Clients tab it covers the notes timeline too: the package
+  (`src/lib/desk/money.ts`, prices from the package catalog, label for label what the formulas gave). One deliberate
+  difference: a Giveaway Winner is $0 here whatever else is ticked — the Monday formulas only add up labels, so a winner
+  with Local Growth may still show the list price there. Owners-only visibility is unchanged, and on the Clients tab it covers the notes timeline too: the package
   builder's notes (plan line items and totals) are shown to owners only.
 - **Stripe.** Sync button, webhook and nightly reconcile write the same things as before, into desk fields. Because Josh's
   two Monday automations (Payment Status → Card Failed / Overdue: move to Payment Issue and notify Josh) stop firing once
@@ -216,6 +217,16 @@ Precondition: the Sales tab is already on GoHighLevel (`LEADS_BACKEND=ghl`, done
 GoHighLevel a lead that only exists on the old Monday board cannot be handed off — the lead and the onboarding record are
 the same contact.
 
+Every call below is made from Dave's signed-in Chrome on `/leads` (same origin, his cookie; a POST needs
+`Content-Type: application/json`). Park the answer and read it in slices, with the three characters the browser tool
+redacts taken out:
+`await fetch('/api/team/ghl/desk-migrate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).then(r => r.text()).then(t => { window.__x = t.replace(/[=?&]/g, ' '); return window.__x.length })`
+
+**Before anything else:** open `/leads?tab=onboarding` and `/leads?tab=clients` on production with no parameter and
+confirm they are the Monday desk exactly as before this code landed (the build was checked on production only as far as
+the sign-in wall; nobody has looked at the signed-in Monday tabs since). Open one client panel and watch the network
+tab: one detail request, not a stream of them.
+
 0. **Look first, in GoHighLevel.** Settings → Tags: `desk-onboarding` and `desk-client` must not exist. Settings → Custom
    Fields: nothing named "Desk …". Automation → Workflows: note the "Total enrolled" count of every published workflow (the
    LSE set above all), and open any whose trigger could be a bare *Contact Changed*, *Note Added*, *Task Added* or
@@ -224,12 +235,16 @@ the same contact.
 2. `POST /api/team/ghl/setup {"scope":"desk"}` (dry), then `{"scope":"desk","dryRun":false}` → `created: 43, failed: []`.
 3. `POST /api/team/ghl/desk-selftest {"dryRun":false}` → `passed: 43`, `failed: []`, `clearFailed: []`, tag ok, filter
    accepted, restored, `version` says the token moved on the field write, the note was kept whole, and `searchCarries`
-   shows `tags yes, customFields yes` (the lists need those two; a `NO` on website or the name pair only thins a list row). Compare the enrollment counts again: writing desk fields, a desk tag and a note on the test contact
-   must have enrolled nothing. **Stop here if any field fails** — that is a value-shape problem to fix before a client is touched.
+   shows `tags yes, customFields yes` (the lists need those two; a `NO` on website or the name pair only thins a list
+   row). Compare the enrollment counts again: writing desk fields, a desk tag and a note on the test contact must have
+   enrolled nothing. **Stop here if any field fails** — that is a value-shape problem to fix before a client is touched.
    The one known way out without a code change: if `Desk Packages` is the field that fails (a comma inside a label is the
    likely reason), delete that one field in GoHighLevel and add it again by hand as a single-line **Text** field with the
    same name. The desk shapes every value by the field's live type, so a text `Desk Packages` holds the labels joined
    with commas and is read back label for label. Run the self-test again.
+   If the note comes back **CUT SHORT**, stop as well: desk notes and the handoff summary keep their markers at the end
+   of the note, and a marker that is cut off means a retry could post the note twice. That needs a small code change
+   (markers on the first line, as imported notes already have) before the import.
 4. `POST /api/team/ghl/desk-migrate {}` (dry) → six rows. Read every match and warning. A row reported `unmatched` needs
    `map` (Squirrel Made Products has no email or phone on the board: it matches only if exactly one contact carries that
    business name). No row may say `BLOCKED`.
@@ -278,8 +293,11 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
 
 ## Known limits and things found on the way
 - Nothing here has run against the real GoHighLevel API (no production credentials on the build machine). The self-test
-  exists to close exactly that gap before a client is touched: multi-select and number shapes, clearing a field, the size
-  of the checklist field, the tag endpoints.
+  exists to close exactly that gap before a client is touched: multi-select and number shapes (a comma inside a label
+  above all), clearing each field type, the size of the checklist and notes fields, how long a note may be, the tag
+  endpoints, whether the version token moves on a write, and what a search result carries. Not covered by it, and first
+  exercised by the import or by real use: creating a contact, the duplicate answer on create, the task list and task
+  create for a payment alert, and the Stripe paths (Stripe is not connected on production yet).
 - GoHighLevel has no compare-and-set: two people changing the same client in the same second can race. The version check
   and the read-back reduce it, as on Monday.
 - Any change to the contact by anyone (a GoHighLevel automation, the Sales tab, a person) bumps its version, so "someone
@@ -289,7 +307,8 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   record (its earlier checklist rows and intake carry over) — see "A second handoff" above.
 - An unlinked Active Clients row whose files were added on the Clients tab keeps them under `c` + its row id. If the
   same business also has an onboarding record, the contact's files live under the onboarding key and those would not
-  show; the import warns when that is the case (none on Oct 2 2026).
+  show; the import warns when that is the case. (It cannot happen with the rows on the boards on Oct 2 2026: Choice's
+  client row is linked to its onboarding row, and Squirrel Made has no onboarding row.)
 - Packages have no editor on the desk (they never did; on Monday people edited the dropdown on the board). On GoHighLevel
   they are changed in the contact's `Desk Packages` field.
 - **Found on the Monday desk, not changed:** "Mark launched → Clients" sends a JSON content type with no body, and the
