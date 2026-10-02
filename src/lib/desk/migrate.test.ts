@@ -595,22 +595,29 @@ test("legacy clients: one business name is one contact — listed twice it is re
 
 test("legacy clients: contacts that look like the business are listed before one is created; an exact name is still a match", async () => {
   // GoHighLevel already holds: the same business without "Inc", someone at the business's own domain, a contact on its website,
-  // and — so that "roofing" and "restoration" are common words here — a handful of roofers.
+  // a person whose email spells the business — and the kind of contact that must NOT be offered: other churches, other roofers,
+  // other agencies, and a person whose first name happens to sit inside a business name.
   ghl.addContact({ id: "SconyersNoInc0000001", firstName: "Heather", companyName: "Sconyers Concrete" });
   ghl.addContact({ id: "WhitenPerson00000001", firstName: "Kelli", email: "kelli@whiten-pools.com" });
   ghl.addContact({ id: "ChapelSite0000000001", firstName: "Victor", companyName: "CHC Media", website: "https://www.chapelhill.cc/" });
   ghl.addContact({ id: "GmailLocal0000000001", firstName: "Mike", email: "innovativeconstructiongroup@gmail.com" });
   for (const [i, name] of ["Apex Roofing and Restoration", "Peach State Roofing & Restoration", "Blue Ridge Roofing Restoration", "Summit Roofing and Restoration LLC"].entries()) ghl.addContact({ id: `RooferContact000000${i}`, companyName: name });
   ghl.addContact({ id: "McKinleyOther0000001", companyName: "McKinley Home Services" });
-  boards([], [...legacyBoard(), legacyRow("905", "Innovative Construction Group"), legacyRow("906", "McKinley Roofing and Restoration"), legacyRow("907", "Georgia Truck Parking")]);
+  ghl.addContact({ id: "OtherChurch000000001", firstName: "Isabella", companyName: "First Assembly Church" });
+  ghl.addContact({ id: "OtherAgency000000001", firstName: "Jami", companyName: "Hometown Insurance" });
+  ghl.addContact({ id: "PersonChris000000001", firstName: "chris" });
+  boards([], [...legacyBoard(), legacyRow("905", "Innovative Construction Group"), legacyRow("906", "McKinley Roofing and Restoration"), legacyRow("907", "Georgia Truck Parking"), legacyRow("908", "Commercial Insurance Agency"), legacyRow("909", "Dunwoody Christian Academy")]);
   const r = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
   const similar = (id: string) => byMonday(r.rows, id).similar!.map((x) => [x.id, x.why]);
   assert.deepEqual(similar(SCONYERS), [["SconyersNoInc0000001", "the same name apart from Inc, LLC, The and the like"]]);
   assert.deepEqual(similar(WHITEN), [["WhitenPerson00000001", "the same website or email domain (whiten-pools.com)"]]);
   assert.deepEqual(similar(CHAPEL), [["ChapelSite0000000001", "the same website or email domain (chapelhill.cc)"]]);
   assert.deepEqual(similar("905"), [["GmailLocal0000000001", "its email or website spells this business name"]]);
-  assert.deepEqual(similar("906"), [["McKinleyOther0000001", 'its business name shares the uncommon word "mckinley"']], "the four other roofers are not look-alikes: roofing and restoration are common words here");
+  assert.deepEqual(similar("906"), [["McKinleyOther0000001", 'its business name also starts from the uncommon word "mckinley"']], "another roofer is not a look-alike: only the business's own first word counts");
   assert.deepEqual(similar("907"), []);
+  assert.deepEqual(similar("908"), [], "another insurance business is not a look-alike");
+  assert.deepEqual(similar("909"), [], "a person called chris is not a look-alike for a Christian academy");
+  assert.deepEqual(byMonday(r.rows, CHAPEL).similar!.map((x) => x.id), ["ChapelSite0000000001"], "another church is not a look-alike for Chapelhill Church");
   assert.ok(byMonday(r.rows, SCONYERS).warnings.some((w) => /^1 contact already in GoHighLevel looks like this business \(see similar\)/.test(w)));
   assert.equal(byMonday(r.rows, SCONYERS).match, "create-name-only", "a look-alike is a hint; it never changes the match");
   assert.equal(byMonday(r.rows, SQUIRREL_CL).match, "company-name");
@@ -621,7 +628,11 @@ test("legacy clients: contacts that look like the business are listed before one
   // The helper on its own: the test contact is never offered, and a short or generic name finds nothing.
   const f = resolveDeskFields(ghl.defs); const ix = indexForDesk([...ghl.contacts.values(), { id: "C8FHl1LIfXEMI9isByB2", companyName: "Sconyers Concrete" }], f, resolveFromDefs(ghl.defs));
   assert.deepEqual(lookalikes("Sconyers Concrete Inc", "", ix).map((x) => x.id), ["SconyersNoInc0000001"]);
-  assert.deepEqual(lookalikes("CDM", "", ix), []); assert.deepEqual(lookalikes("Roofing and Restoration", "", ix).map((x) => x.id).sort(), ["RooferContact0000000", "RooferContact0000001", "RooferContact0000002", "RooferContact0000003"].sort());
+  assert.deepEqual(lookalikes("CDM", "", ix), []); assert.deepEqual(lookalikes("Lane", "", ix), []);
+  assert.deepEqual(lookalikes("Roofing and Restoration", "", ix).map((x) => [x.id, x.why]).sort(), ["RooferContact0000000", "RooferContact0000001", "RooferContact0000002", "RooferContact0000003"].map((id) => [id, "one business name contains the other"]), "a whole business name inside another still counts");
+  // A word carried by more than three businesses is nobody's own: "Hometown" here is, so a fourth Hometown business is not offered a look-alike for it.
+  const many = indexForDesk([...ghl.contacts.values(), ...["Hometown Bakery", "Hometown Pharmacy", "Hometown Tire"].map((companyName, i) => ({ id: `HometownContact00000${i}`, companyName }))], f, resolveFromDefs(ghl.defs));
+  assert.deepEqual(lookalikes("Hometown Hardware", "", many), []); assert.deepEqual(lookalikes("Hometown Hardware", "", ix).map((x) => x.id), ["OtherAgency000000001"]);
 });
 
 test("legacy clients: if GoHighLevel will not take a contact with nobody's name, the row says so and nothing is created; businessAsContactName is the way through", async () => {

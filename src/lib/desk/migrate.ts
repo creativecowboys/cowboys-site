@@ -117,6 +117,11 @@ export function indexForDesk(contacts: GhlContact[], f: DeskFields, sales: Sales
 // different name ("Sconyers Concrete" for the board's "Sconyers Concrete Inc"), under a person's name with the business in
 // the email address, or on the same website. Exact names are matched above; this lists the near misses so a person can pin
 // the row to the right contact with `map` instead of creating a second one. It never changes what a row matches.
+//
+// It has to be worth reading: on the real location (1,216 contacts, Oct 2 2026) a first cut that offered any contact sharing
+// an "uncommon" word listed every church for Chapelhill Church and every insurance agent for Commercial Insurance Agency.
+// So a shared word only counts when it is the business's FIRST word (the part of a name that is its own — Sconyers, Whiten,
+// McKinley) and few other businesses carry it; a person's name never counts unless it IS the business name.
 const LEGAL_WORDS = new Set(["inc", "llc", "llp", "pllc", "pc", "co", "corp", "ltd", "company", "the", "and", "of", "at"]);
 function wordsOf(v: string): string[] { return v.toLowerCase().replace(/&/g, " and ").replace(/['’.]/g, "").split(/[^a-z0-9]+/).filter(Boolean); }
 const coreKey = (v: string) => wordsOf(v).filter((w) => !LEGAL_WORDS.has(w)).join("");
@@ -125,20 +130,21 @@ const lettersOf = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, "");
 export type Lookalike = { id: string; name: string; why: string };
 export function lookalikes(name: string, website: string, ix: DeskIndex): Lookalike[] {
   const core = coreKey(name);
-  const words = wordsOf(name).filter((w) => !LEGAL_WORDS.has(w) && w.length >= 4);
+  const first = wordsOf(name).find((w) => !LEGAL_WORDS.has(w)) || "";
+  const own = first.length >= 4 && (ix.wordCount.get(first) || 0) <= 3 ? first : ""; // the business's own word, if few others carry it
   const site = hostOf(website);
   const out: Lookalike[] = [];
   for (const c of ix.all) {
     if (c.id === TEST_CONTACT_ID) continue;
     const company = (c.companyName || c.businessName || "").trim();
-    const names = [coreKey(company), coreKey(contactDisplayName(c))].filter((k) => k.length >= 5);
+    const companyCore = coreKey(company);
     const host = hostOf(c.website || ""); const domain = (c.email || "").split("@")[1]?.toLowerCase() || "";
     let why = "";
-    if (core.length >= 5 && names.includes(core)) why = "the same name apart from Inc, LLC, The and the like";
-    else if (core.length >= 5 && names.some((k) => k.includes(core) || core.includes(k))) why = "one name contains the other";
+    if (core.length >= 5 && (companyCore === core || coreKey(contactDisplayName(c)) === core)) why = "the same name apart from Inc, LLC, The and the like";
+    else if ((core.length >= 5 && companyCore.includes(core)) || (companyCore.length >= 8 && core.includes(companyCore))) why = "one business name contains the other";
     else if (site && (host === site || domain === site)) why = `the same website or email domain (${site})`;
-    else if (core.length >= 6 && [host, c.email || ""].some((v) => lettersOf(v).includes(core))) why = "its email or website spells this business name";
-    else { const shared = words.find((w) => (ix.wordCount.get(w) || 0) <= 3 && wordsOf(company).includes(w)); if (shared) why = `its business name shares the uncommon word "${shared}"`; }
+    else if (core.length >= 8 && [host, c.email || ""].some((v) => lettersOf(v).includes(core))) why = "its email or website spells this business name";
+    else if (own && wordsOf(company).includes(own)) why = `its business name also starts from the uncommon word "${own}"`;
     if (why) out.push({ id: c.id, name: [company, contactDisplayName(c)].filter(Boolean).join(" — ") || c.email || c.id, why });
   }
   return out;
