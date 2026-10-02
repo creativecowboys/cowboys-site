@@ -97,3 +97,47 @@ Dave: "we should add a loose time to the client. So while we personally are look
 - **Where to get the link**: the roster's "📅 My follow-up calendar" button calls `GET /api/team/followups` (cookie) and shows the signed-in rep's link with Copy and an Apple Calendar `webcal:` link; Dave and Josh see all three. Google Calendar: Other calendars → + → From URL. Google refreshes subscribed feeds every few hours (not adjustable); Apple/iPhone can refresh hourly. Reps whose email is not one of the three (Madison) get "No calendar for this sign-in."
 - **Deep link**: events link to `/leads?lead=<id>`; the desk selects that lead after the first load.
 - Code: `src/lib/calls/followups.ts` (REPS, feed key, ICS builder), `src/lib/calls/followup-time.ts` (client-safe: HOUR_OPTIONS, prettyTime, ET↔UTC — keep `node:crypto` out of anything the desk imports or the webpack client build fails), routes under `src/app/api/team/followups/`. Tests in `followups.test.ts` (`npm run test:call-owner`).
+
+## Leads on GoHighLevel — the `LEADS_BACKEND` switch (October 1, 2026)
+Dave: "I need to change where all these leads are coming from. I think we will get away from monday… Can you swap the
+leads coming in to GHL? Also, we need a dropdown that lets us pick where they came from." Phase 1 moves the **Sales tab**
+onto GoHighLevel behind a switch; the Onboarding and Clients tabs stay on Monday (Phase 2).
+
+### Model
+A lead is a **GHL contact** (location `puV58eAAseerZcp5nxVM`). The desk's columns are contact **custom fields**, resolved
+by name at runtime (`src/lib/ghl/fields.ts`, cached 10 min) so nothing in code depends on a field id:
+Lead Source (dropdown), Outreach Status (dropdown, same labels as the Monday board), Interest (Cold/Warm/Hot), Last Contact
+(date), Next Follow-up (date) + Next Follow-up Time (text, `HH:MM` Eastern), Quoted Monthly (money), Interested In, Sales
+Notes, Monday Lead ID, and the two that already existed from the LSE audit flow: Audit Score, Audit Report URL.
+Owner = `assignedTo` (GHL user ids in `src/lib/ghl/reps.ts`, override `GHL_REP_IDS`). Call notes = GHL **notes** carrying the
+same `[CC-CALL:…] [CC-PAYLOAD:…]` markers Monday updates did (idempotent retries). Version token = the contact's
+`dateUpdated`. "Won" on handoff = Outreach Status Won + Last Contact + tag `sales-won` + one handoff note.
+Which contacts count as leads: anything tagged `giveaway-entrant`, `playbook-lead`, `website-form` or `sales-lead` (add
+that tag in GHL to push any contact onto the desk), or anything with a Lead Source. Not chosen: an Opportunities pipeline —
+it needs nothing the contact model can't do for Phase 1, and it can be layered on later.
+
+### Lead Source
+A GHL dropdown custom field, options seeded as `The Big Giveaway`, `Facebook`, `Ebook download`, `Website form`, `Referral`,
+`Other`. **The desk reads the option list from GHL every time** — add "Big Giveaway 2" in GHL → Settings → Custom Fields →
+Lead Source and it appears on the desk with no deploy. Set automatically at intake: `/api/giveaway` → The Big Giveaway,
+`/api/playbook` → Ebook download, `/api/contact` (contact page, proposal popup, industry offer forms) → Website form (new:
+those forms now also upsert the contact into GHL with tag `website-form` and a note carrying the message; the Resend email
+is unchanged). On the desk: tag on every roster row, "Lead source" filter, and a select on the lead that writes it back.
+
+### Code
+- `src/lib/ghl/client.ts` — the ONE GHL client (timeout, 429 backoff, typed `GhlError`); `src/lib/packages/ghl.ts` re-exports it.
+- `src/lib/ghl/fields.ts` (field catalog + resolver + `ensureSalesFields`), `src/lib/ghl/reps.ts`, `src/lib/ghl/admin.ts`.
+- `src/lib/calls/ghl.ts` — the GHL desk backend (same surface as `monday.ts`); `src/lib/calls/switch.ts` + `backend.ts` — the
+  switch and dispatch. Routes import from `backend.ts` only. Lead ids pick their system by shape (digits = Monday, else GHL),
+  so drafts, calendar deep links and handoffs keep working across the cutover.
+- Owner-only tooling: `GET /api/team/ghl/diag` (read-only probe), `POST /api/team/ghl/setup` `{dryRun}` (create missing
+  fields), `POST /api/team/ghl/backfill` `{dryRun, limit}` (Lead Source for existing tagged contacts), `POST
+  /api/team/ghl/migrate` `{dryRun, offset, limit, force, onlyIds}` (Monday Giveaway Leads → GHL, idempotent on Monday Lead ID).
+- Tests: `npm run test:call-owner` (Monday + GHL backends, switch, client, fields, admin) and `npm run test:onboarding`.
+
+### Cutover
+1. `POST /api/team/ghl/setup {dryRun:false}` once (creates the missing fields). 2. `POST /api/team/ghl/backfill {dryRun:false}`
+until `remaining` is 0. 3. `POST /api/team/ghl/migrate {dryRun:true}`, read the rows, then `{dryRun:false}` with `offset`
+until `nextOffset` is null. 4. Preview at `/leads?backend=ghl`. 5. Set `LEADS_BACKEND=ghl` on Vercel (Production) and
+redeploy. Follow-up calendar feeds re-issue events under the GHL ids after the flip. GHL search results lag writes by a few
+seconds, so a roster refresh right after a save can briefly show the old status; the lead detail is always fresh.
