@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { assertMayWriteGhl, assertMondayOpen, backendForRecordId, backendForScope, deskBackend, deskDefault, deskSystemName, isGhlRecordId, validateRecordId, validateScope } from "./switch";
+import { assertForceAllowed, assertMayWriteGhl, assertMondayOpen, backendForRecordId, backendForScope, deskBackend, deskDefault, deskSystemName, isGhlRecordId, validateRecordId, validateScope } from "./switch";
 import { actorFor, deskTeam, isTeamName, memberByGhlUser, nameForMondayId, teamOwners } from "./team";
 import { ALL_PACKAGE_LABELS, joinPackages, listPrice, monthlyList, splitPackages } from "./money";
 import { itemId, mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, toChecklistItems } from "./checklist-text";
@@ -47,6 +47,10 @@ test("before the flip only an owner may change a GoHighLevel desk record; after 
   // After the flip nothing new is created on the Monday boards, even with the look-back parameter; before it, Monday is the desk.
   assert.doesNotThrow(() => assertMondayOpen(undefined)); assert.doesNotThrow(() => assertMondayOpen("monday")); assert.doesNotThrow(() => assertMondayOpen("GHL"));
   assert.throws(() => assertMondayOpen("ghl"), { status: 409 });
+  // The import's force: free before the flip, a dry run always, and after the flip only with the second word.
+  const force = { dryRun: false, force: true, overwriteLiveDesk: false };
+  assert.doesNotThrow(() => assertForceAllowed(force, undefined)); assert.doesNotThrow(() => assertForceAllowed({ ...force, dryRun: true }, "ghl")); assert.doesNotThrow(() => assertForceAllowed({ ...force, force: false }, "ghl"));
+  assert.throws(() => assertForceAllowed(force, "ghl"), { status: 409 }); assert.doesNotThrow(() => assertForceAllowed({ ...force, overwriteLiveDesk: true }, "ghl"));
 });
 
 test("team: owners are names; Madison needs no GoHighLevel user; ids come from the rep table and env", () => {

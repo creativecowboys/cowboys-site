@@ -235,9 +235,10 @@ export function keepShared(values: DeskValues, contact: GhlContact, f: DeskField
   return merged;
 }
 /** A package GoHighLevel's "Desk Packages" list does not have would be dropped on save — refuse the handoff instead of losing it (a lost Giveaway Winner label would let a winner be billed). */
-function assertPackagesKnown(f: DeskFields, packages: readonly string[]): void {
-  const options = f.packages?.options || [];
-  const unknown = options.length ? packages.filter((p) => !options.includes(p)) : [];
+async function assertPackagesKnown(f: DeskFields, packages: readonly string[]): Promise<void> {
+  const missing = (fields: DeskFields) => { const options = fields.packages?.options || []; return options.length ? packages.filter((p) => !options.includes(p)) : []; };
+  // The definitions are cached for ten minutes. Before refusing, look again: someone may have just added the option in GoHighLevel.
+  const unknown = missing(f).length ? missing(await allDeskFields(true)) : [];
   if (unknown.length) throw new CallDeskError(`${unknown.map((p) => `"${p}"`).join(", ")} ${unknown.length === 1 ? "is" : "are"} not on the "Desk Packages" list in GoHighLevel, so nothing was saved. Add ${unknown.length === 1 ? "it" : "them"} there (Settings → Custom Fields → Desk Packages) and try again.`, 409);
 }
 /** After the write: GoHighLevel must actually hold every package of this handoff. A dropped label — above all Giveaway Winner — is an error, not a detail. */
@@ -322,7 +323,7 @@ export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: strin
       if (record.steps.item.state !== "done" || !record.itemId) { record.itemId = record.itemId || contact.id; record.itemUrl = record.itemUrl || contactUrl(contact.id); record.steps.item = { state: "done", at: now() }; record.updatedAt = now(); await writeHandoff(record); }
     } else {
       if (!form.manual && version(contact!) !== form.expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your handoff draft is safe. Reload the lead and review before handing it off.", 409);
-      assertPackagesKnown(f, form.packages);
+      await assertPackagesKnown(f, form.packages);
       record = freshRecord(form);
       if (contact) { record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); }
       await writeHandoff(record); // durable "in progress" marker before anything is written to GoHighLevel

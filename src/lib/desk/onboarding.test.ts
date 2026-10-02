@@ -193,6 +193,10 @@ test("a package GoHighLevel's Desk Packages list does not have is refused before
   const form = validateHandoff(handoffForm(ghl, { packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "", setupAgreed: "" }));
   await assert.rejects(startOnboardingGhl(form, ctx), (e: Error & { status?: number }) => e.status === 409 && /"Giveaway Winner" is not on the "Desk Packages" list in GoHighLevel, so nothing was saved/.test(e.message));
   assert.equal(ghl.writes().length, 0); assert.deepEqual(blobKeys(), []);
+  // Someone adds the option in GoHighLevel and the rep presses Confirm again straight away: no ten-minute wait for the cache.
+  def.picklistOptions = [...(def.picklistOptions || []), "Giveaway Winner"];
+  const done = await startOnboardingGhl(form, ctx);
+  assert.deepEqual([done.itemId, done.pending], [LEAD, []]); assert.deepEqual(ghl.value(LEAD, "Desk Packages"), ["Giveaway Winner", "Local Growth"]);
 });
 
 test("the list and the panel: rows, what is missing, overdue, the whole history, the stored handoff", async () => {

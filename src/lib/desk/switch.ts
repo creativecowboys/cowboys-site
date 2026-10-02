@@ -62,6 +62,14 @@ export function assertMondayOpen(env = process.env.DESK_BACKEND): void {
  * While the switch still says Monday, GoHighLevel desk records are a preview: anyone on the team may look,
  * only an owner may change them (the import canary and the pre-flip checks). After the flip everyone works there.
  */
+/**
+ * The import's `force` re-writes each contact's desk fields from the old Monday boards. Before the flip that is how a
+ * board change made after the first import is carried over; AFTER the flip it would put stale board values over work
+ * done on the desk, so it then takes a second, explicit word.
+ */
+export function assertForceAllowed(opts: { dryRun: boolean; force: boolean; overwriteLiveDesk: boolean }, env = process.env.DESK_BACKEND): void {
+  if (!opts.dryRun && opts.force && deskDefault(env) === "ghl" && !opts.overwriteLiveDesk) throw new CallDeskError("The desk is on GoHighLevel now. force would re-write each client's desk fields from the old Monday boards, over whatever was changed on the desk since the switch. If that is really what you want, send overwriteLiveDesk: true as well.", 409);
+}
 export const mayWriteGhl = (isOwner: boolean, env = process.env.DESK_BACKEND): boolean => deskDefault(env) === "ghl" || isOwner;
 export function assertMayWriteGhl(isOwner: boolean, env = process.env.DESK_BACKEND): void {
   if (deskDefault(env) !== "ghl" && !isOwner) throw new CallDeskError("The GoHighLevel desk is still a preview. Only an owner can change records there until the desk is switched over.", 403);

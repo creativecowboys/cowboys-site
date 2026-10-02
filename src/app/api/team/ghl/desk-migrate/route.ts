@@ -3,6 +3,7 @@ import { isOwnerEmail, teamSession } from "@/lib/team-auth";
 import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/validation";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 import { migrateDesk } from "@/lib/desk/migrate";
+import { assertForceAllowed } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +17,8 @@ export const maxDuration = 300;
  * `map` pins a Monday row to a contact ({ "<monday item id>": "<contact id>" }) when the report says it is unmatched;
  * `boards` limits the run to ["onboarding"] or ["clients"]; `includeOffDesk` also takes Active Clients rows without
  * "Team desk" checked; `createNameOnly` allows a new contact for a row with no email and no phone.
+ * Once DESK_BACKEND=ghl, `force` is refused unless `overwriteLiveDesk: true` comes with it: it re-writes each contact's desk
+ * fields from what the old boards say, over whatever the team has done on the GoHighLevel desk since.
  */
 export async function POST(req: Request) {
   try {
@@ -29,6 +32,7 @@ export async function POST(req: Request) {
     if (body?.map && typeof body.map === "object" && !Array.isArray(body.map)) {
       for (const [k, v] of Object.entries(body.map as Record<string, unknown>).slice(0, 100)) if (/^\d{1,20}$/.test(k) && typeof v === "string" && /^[A-Za-z0-9]{10,64}$/.test(v)) map[k] = v;
     }
+    assertForceAllowed({ dryRun: body?.dryRun !== false, force: body?.force === true, overwriteLiveDesk: body?.overwriteLiveDesk === true });
     const boards = Array.isArray(body?.boards) ? body.boards.filter((b): b is "onboarding" | "clients" => b === "onboarding" || b === "clients") : undefined;
     return NextResponse.json(await migrateDesk({
       dryRun: body?.dryRun !== false,

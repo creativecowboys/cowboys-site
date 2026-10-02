@@ -195,12 +195,17 @@ a dropped connection finds the note instead of posting it twice) and needs no re
     only, so **every winner must be `protected: true` before the flip** (a winner on an Active Clients row without "Team
     desk" is brought over with `{"onlyIds":["<id>"],"includeOffDesk":true}`).
   - `force` re-writes fields from the board; it never removes a package the contact already has, never copies a note
-    twice, and never replaces a checklist that is already on the contact.
+    twice, and never replaces a checklist that is already on the contact. After the flip it is refused unless
+    `overwriteLiveDesk: true` comes with it (it would put the old boards' values over work done on the desk since).
+  - The import reads the field definitions fresh, so an option added in GoHighLevel a moment ago (Giveaway Winner, a
+    business type such as "Referral") counts on the next run.
   An email or phone on the board that another contact already holds is left off the matched contact, with a warning
   (GoHighLevel refuses duplicates, and that refusal would fail the row). Monday hands over the newest 50 updates of an
   item; the report warns when an item has that many.
 - These reports contain no `=`, `?` or `&` in their own text (the browser tool Claude reads them with redacts anything
   shaped like a query string). Error text passed through from GoHighLevel has those characters replaced with spaces.
+  Names that come from the account (a custom field called "How did you hear about us?") can still carry one, so read a
+  report as text with those three characters replaced: `r.text().then(t => t.replace(/[=?&]/g, " "))`.
 
 ## Cutover runbook
 State on Oct 2 2026: code on main, `DESK_BACKEND` unset, no desk field exists in GoHighLevel, nothing imported.

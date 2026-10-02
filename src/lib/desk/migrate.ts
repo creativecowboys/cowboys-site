@@ -273,7 +273,7 @@ async function readAllContacts(): Promise<GhlContact[]> {
 const fieldNames = (f: DeskFields, values: DeskValues) => (Object.keys(values) as DeskFieldKey[]).map((k) => f[k]?.name || DESK_FIELDS[k].name);
 
 export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateReport> {
-  const f = await allDeskFields();
+  const f = await allDeskFields(true); // fresh definitions: an option someone just added in GoHighLevel (Giveaway Winner, a business type) counts at once
   const sales = await salesFields();
   const boards = opts.boards?.length ? opts.boards : (["onboarding", "clients"] as const);
   const [pipeline, clients] = await Promise.all([

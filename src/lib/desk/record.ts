@@ -101,8 +101,9 @@ export function mapClient(c: GhlContact, f: DeskFields, today = todayEastern()):
 export const stillOnboarding = (c: GhlContact, f: DeskFields): boolean => isOnboardingRecord(c, f) && stageIdForLabel(deskText(c, f, "obStage")) !== "launched";
 
 // ───────────────────────────── reads ─────────────────────────────
-export async function allDeskFields(): Promise<DeskFields> {
-  const fields = await deskFields();
+/** `fresh` re-reads the definitions from GoHighLevel instead of the 10-minute cache — for the moment after someone changed a field's options there. */
+export async function allDeskFields(fresh = false): Promise<DeskFields> {
+  const fields = await deskFields(fresh);
   requireAllDeskFields(fields);
   return fields;
 }
