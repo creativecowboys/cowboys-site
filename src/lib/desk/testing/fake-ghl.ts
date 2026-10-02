@@ -32,6 +32,8 @@ export class FakeGhl {
   monday: MondayHandler | null = null;
   /** When true, /contacts/search answers from the last settle() snapshot — GoHighLevel's index lags writes by a few seconds. */
   lag = false;
+  /** Field NAME → max characters GoHighLevel "keeps" — to prove the desk notices a field that is too small instead of losing rows quietly. */
+  truncate = new Map<string, number>();
   /** One-shot failures: the first request whose "METHOD path" matches gets this status. */
   failures: { match: RegExp; status: number; body?: unknown }[] = [];
   private snapshot: GhlContact[] = [];
@@ -133,7 +135,9 @@ export class FakeGhl {
       if (!this.defs.some((d) => d.id === f.id)) throw new Error(`fake GHL: write to unknown custom field ${f.id}`);
       const list = (c.customFields ||= []);
       const hit = list.find((x) => x.id === f.id);
-      if (hit) hit.value = f.field_value; else list.push({ id: f.id, value: f.field_value });
+      const max = this.truncate.get(this.defs.find((d) => d.id === f.id)!.name);
+      const value = max !== undefined && typeof f.field_value === "string" ? f.field_value.slice(0, max) : f.field_value;
+      if (hit) hit.value = value; else list.push({ id: f.id, value });
     }
     c.dateUpdated = this.tick();
   }

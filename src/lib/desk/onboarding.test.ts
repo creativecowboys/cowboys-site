@@ -172,6 +172,20 @@ test("patches: every onboarding action lands in a desk field, guarded by the con
   assert.equal(row.lastTouch, todayEastern());
 });
 
+test("a checklist GoHighLevel did not keep whole is an error, never a quiet loss of rows", async () => {
+  addLead(ghl);
+  ghl.truncate.set("Desk Checklist", 300);
+  const r = await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
+  assert.deepEqual(r.pending, ["checklist"], "the handoff reports the checklist step as not done");
+  assert.equal(ghl.value(LEAD, "Desk Checklist"), "", "and puts back what was there (nothing) rather than leave half a list");
+  ghl.truncate.clear();
+  assert.deepEqual((await retryOnboardingGhl(LEAD, DAVE)).pending, []);
+  const row = (await onboardingDetailGhl(LEAD)).row;
+  assert.equal(row.checklist.length, checklistFor(["Local Growth — First Year $297"]).length);
+  ghl.truncate.set("Desk Checklist", 300);
+  await assert.rejects(patch({ action: "checklist", subitemId: row.checklist[0].id, status: "Done" }), (e: Error & { status?: number }) => e.status === 502 && /kept \d+ of \d+ checklist rows/.test(e.message));
+});
+
 test("ready for production is refused with the reasons until everything required is done, then moves the stage", async () => {
   addLead(ghl);
   await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);

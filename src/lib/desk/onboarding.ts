@@ -12,7 +12,7 @@ import type { HandoffForm, HandoffRecord, IntakeRecord, OnboardingDetail, Onboar
 import { accessFromCard, parseListingId } from "@/lib/gbp/state";
 import { gbpCard, listLocations, searchAtlasConnected } from "@/lib/gbp/searchatlas";
 import type { GbpCard } from "@/lib/gbp/types";
-import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus } from "./checklist-text";
+import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, type StoredItem } from "./checklist-text";
 import { assertOption, DESK_TAGS, deskList, deskText, type DeskFields } from "./fields";
 import { addDeskNote, toTimeline } from "./notes";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
@@ -51,6 +51,22 @@ export async function findHandoffRecord(c: GhlContact, f: DeskFields): Promise<H
     if (record && (!record.itemId || record.itemId === c.id || (!!mondayItem && record.itemId === mondayItem))) return record;
   }
   return null;
+}
+
+/**
+ * Save the checklist and prove GoHighLevel kept all of it. The whole list is one large-text field; if a length limit
+ * ever cut it short, rows would vanish quietly — so the contact is read back and a short read is an error, not a save.
+ */
+async function writeChecklist(id: string, f: DeskFields, items: StoredItem[], previous: string, extra: DeskValues = {}): Promise<GhlContact> {
+  await writeRecord(id, f, { ...extra, checklist: serializeChecklist(items) });
+  const saved = await readContact(id);
+  const kept = parseChecklist(deskText(saved, f, "checklist")).length;
+  if (kept !== items.length) {
+    // Put back what was there (it fit before), then say so.
+    await writeRecord(id, f, { checklist: previous }).catch((e) => console.error(`desk checklist: could not restore ${id}: ${e instanceof Error ? e.message : e}`));
+    throw new CallDeskError(`GoHighLevel kept ${kept} of ${items.length} checklist rows (the "Desk Checklist" field may be too small for this list). The checklist was put back as it was — tell an owner before changing it again.`, 502);
+  }
+  return saved;
 }
 
 /** Only a connected + verified listing changes the record on its own (→ Verified); anything else leaves the staff value alone. */
@@ -117,10 +133,10 @@ export async function patchOnboardingGhl(rawId: string, patch: DeskOnboardingPat
     case "health": assertOption(f, "obHealth", patch.value); await writeRecord(id, f, { ...touch, obHealth: patch.value }); break;
     case "owner": await writeRecord(id, f, { ...touch, obOwner: patch.ownerId }); break;
     case "checklist": {
-      const next = setItemStatus(parseChecklist(deskText(contact, f, "checklist")), deskList(contact, f, "packages"), patch.subitemId, patch.status || "Working on it");
+      const current = deskText(contact, f, "checklist");
+      const next = setItemStatus(parseChecklist(current), deskList(contact, f, "packages"), patch.subitemId, patch.status || "Working on it");
       if (!next) throw new CallDeskError("That checklist item does not belong to this client.", 400);
-      await writeRecord(id, f, { ...touch, checklist: serializeChecklist(next) });
-      break;
+      return mapOnboarding(await writeChecklist(id, f, next, current, touch), f);
     }
     case "gbp": assertOption(f, "gbpAccess", patch.value); await writeRecord(id, f, { ...touch, gbpAccess: patch.value, ...(patch.gbpUrl ? { gbpUrl: patch.gbpUrl } : {}) }); break;
     case "searchAtlasListing": {
@@ -207,8 +223,9 @@ async function runSteps(record: HandoffRecord, contactId: string, f: DeskFields,
   });
   await run("checklist", async () => {
     const contact = await readContact(contactId);
-    const merged = mergeTemplates(parseChecklist(deskText(contact, f, "checklist")), form.packages);
-    if (merged.added) await writeRecord(contactId, f, { checklist: serializeChecklist(merged.items) });
+    const current = deskText(contact, f, "checklist");
+    const merged = mergeTemplates(parseChecklist(current), form.packages);
+    if (merged.added) await writeChecklist(contactId, f, merged.items, current);
   });
   // The lead IS this contact (a lead imported from Monday was imported onto this same contact), so "mark the lead Won"
   // always lands in GoHighLevel — never on the Monday board, whatever kind of id the stored record carries.
