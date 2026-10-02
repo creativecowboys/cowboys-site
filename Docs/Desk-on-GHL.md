@@ -295,8 +295,10 @@ GoHighLevel (QuickBooks). On Oct 2 2026 that is the 17 Active Clients rows that 
   (one quiet line under Account) on a desk client. The panel always writes an explicit Yes or No, so a later re-import
   (even with `force`) never puts back a marker an owner took off. Nobody else can change it (403, checked on the server).
 - **The Clients tab.** A `Legacy` badge beside the name, a kind filter (All clients / Desk clients / Legacy clients)
-  that appears once there is a legacy client, and the header count: "18 on the desk · 17 legacy". With no legacy client
-  on the list the tab is exactly what it was. Desk clients are not changed by any of this.
+  that appears once there is a legacy client, and the header count: "18 on the desk · 17 legacy". Problems still come
+  first; among rows with the same flags the desk's clients are listed before the legacy ones. With no legacy client on
+  the list the tab is exactly what it was. Desk clients are not changed by any of this (the one addition: an owner sees
+  a single line, "Mark as legacy client", at the foot of a desk client's Account section).
 - **Money** is the same for everyone: a legacy client's packages and Custom $/mo count in the owners' monthly total, and
   amounts stay owners-only.
 - **Quiet flags** (`flagsFor`, `src/lib/clients/board.ts`). A legacy client is only flagged for what its record tracks;
@@ -332,16 +334,47 @@ tags `desk-client` + `monday-import`, and the desk fields the row carries (statu
 account manager, packages, notes, the Monday row id) plus `Desk Legacy Client` = Yes. A row's Monday updates, if it has
 any, are copied as notes like every other import. No onboarding stage, no checklist, no Lead Source, no task.
 
-A contact with no email and no phone is the one kind GoHighLevel will create twice, and its search — how a re-run
-finds "already imported" — runs a few seconds behind writes. So the import keeps **its own record** of every contact it
-creates from a name alone (private storage, `onboarding/import/client-<monday row id>.json`) and reads that contact by
-id, fresh, before it would create one: running a row again straight away finds the contact instead of making a second.
-Two rows with one business name are refused as one business (in the dry run too), and each row that creates a contact
-lists the contacts already in GoHighLevel that **look like** it (`similar`: the same name apart from Inc / LLC / The,
-one whole business name inside the other, the row's website or email domain, an email or website that spells the
-business name, or a business name that starts with the same uncommon word) — a hint to pin the row with `map` instead of
-creating a duplicate; it never changes a match. Another church is not a look-alike for a church, nor a person called
-Chris for a Christian academy: only the part of a name that is the business's own counts.
+**One board row, one contact — whatever goes wrong.** A contact with no email and no phone is the one kind GoHighLevel
+will create twice, and its search — how a re-run finds "already imported" — runs a few seconds behind writes. So for a
+contact made from a name alone the import does not lean on that search. It keeps its own records in private storage,
+written **before** the create is sent and completed after it (`onboarding/import/client-<monday row id>.json` and
+`onboarding/import/name-<business name>.json`), and reads them before it would create anything:
+- a finished record → the contact is read by id, fresh, and the row is `imported` (running a row again straight away
+  finds the contact instead of making a second);
+- an **unfinished** record — the create was sent and its answer never came back (a timeout, a 5xx) — means the contact
+  may exist, so the row is **held**: `BLOCKED … an earlier run started creating this contact at …`. If GoHighLevel did
+  create it, its search lists it within a minute or two and the row then reads `imported` and is finished; if it did
+  not, the row is free again ten minutes after the attempt. A create GoHighLevel *refused* (a 4xx) leaves nothing
+  behind and can be run again at once;
+- records that cannot be read → the row is `BLOCKED`, never created blind. With no storage at all a real run is refused.
+- A real run takes a lock (`onboarding/import/lock.json`, gone when the run ends): a second run posted while one is
+  going answers 409 before it reads a row. A run the platform cut off frees the lock six minutes after it started.
+- The same business name is one contact across runs too (the name record), however short the name; two rows with one
+  name are refused as one business, and a dry run compares the rows of that run with each other.
+- **A pin (`map`) never puts one row on two contacts:** if the row was already imported it is refused (or, once the
+  search lists the import, ignored with a warning).
+- **A row never lands on a live desk client by accident.** A contact that is already a client on the desk and did not
+  come from this row is refused (`unmatched`, with the reason) whether it was reached by name, email or phone. Pinned to
+  it on purpose with `map`, the row joins it and everything the client holds is kept — status, health, payment, manager —
+  the row only fills what was blank, and the client is **not** marked legacy (an owner does that from the panel). The
+  designated test contact is never imported onto.
+- **The request is checked strictly.** `onlyIds` that is not a list of item ids, a `map` entry that is not an id → an id
+  (a pasted link, say), a misspelt option name: each answers 400 "Nothing was run" — a filter that is malformed is never
+  quietly dropped, because "no filter" with `createNameOnly` means a new contact for every unmatched row.
+
+Each row that would create a contact also lists the contacts already in GoHighLevel that **look like** it (`similar`,
+strongest reason first, five at most: the same name apart from Inc / LLC / The — however short; one whole business
+name inside the other; a spelling a letter or two apart; an email or website that spells the business name; the row's
+website or email domain, sub-domains included; a business name that starts with the same uncommon word) — and the rows
+earlier in the same run. It is a hint to pin the row with `map` instead of creating a duplicate; it never changes a
+match. Another church is not a look-alike for a church, nor a person called Chris for a Christian academy: only the part
+of a name that is the business's own counts.
+
+**"Imported" means finished, and says what the contact holds.** A row answered `already imported` reports `legacy` as it
+is on the contact. If GoHighLevel did not keep the marker the first time, the next real run puts it right ("finished
+what an earlier run left: marked a legacy client") — only where the field is blank, never over an owner's Yes or No. A
+package the board has and the contact lacks is said in a warning and never written back (the desk is live; the board is
+history); for a Giveaway Winner label that warning starts "NOT PROTECTED".
 
 Every call is made from an owner's signed-in Chrome on the desk (see the cutover runbook above for how to post and read
 a report). They are all dry runs unless the body says `dryRun: false`. State on Oct 2 2026: step 1 is done (the field
@@ -358,7 +391,7 @@ exactly as written; nothing has been imported.
    new contact from the business name alone…", `contact` = `companyName` (+ `website` on four of them), `values` = the
    eight desk fields it writes (nine for Defoor Plumbing and Sconyers Concrete Inc, which carry `Desk Packages`
    Local Growth), `tags` `desk-client` + `monday-import`, `similar` empty, no `warnings`, `winners` empty. No row may
-   say `BLOCKED` (that means step 1 was skipped). **A non-empty `similar` is the thing to stop on:** look at those
+   say `BLOCKED` (step 1 skipped, or the import's records unreadable). **A non-empty `similar` is the thing to stop on:** look at those
    contacts in GoHighLevel, and if one is the same business add `"map":{"<monday row id>":"<contact id>"}` so the row
    uses it.
 3. **One row as a trial.** The same body plus `"dryRun":false,"onlyIds":["13125631516"]` (Whiten Pools, Inc.) →
@@ -369,10 +402,25 @@ exactly as written; nothing has been imported.
    GoHighLevel has the company name, the two tags and no owner; the Sales tab does not list it; the published workflows'
    "Total enrolled" counts have not moved. Running the same trial call again must answer `imported`, not create.
    If GoHighLevel refuses a contact that has a company name and nobody's name, the row says so and nothing is created:
-   run it again with `"businessAsContactName":true` (the business name also goes in the contact's own name).
+   run it again with `"businessAsContactName":true` (the business name also goes in the contact's own name). The same
+   option is the answer if the trial contact turns out hard to tell apart in GoHighLevel's own lists, where a contact
+   with no name shows blank: decide on the trial contact before running the rest (its own name can be set from the
+   panel's Contact field).
 4. **The rest.** The same body with `"dryRun":false` (no `onlyIds`) → `written` 16, `imported` 3, `failed` 0.
 5. **Dry run again a minute later** → all 19 `imported`, "already imported — skipped". The tab: "18 on the desk · 17
-   legacy". If a row failed with "GoHighLevel did not answer", wait a minute and do this dry run before anything else.
+   legacy". **Whenever a real run reports a failed row, the next call is a dry run, not a retry:** it says whether the
+   row is `imported` (the contact exists — a real run then finishes it), held (`BLOCKED … an earlier run started creating
+   this contact`: wait, the row sorts itself out or frees itself in ten minutes) or free to run again.
+
+The two Team-desk rows (Squirrel Made Products, Choice Pressure Washing) are in every one of these runs only to be
+answered "already imported — skipped"; nothing is written to them. To leave them out of the run altogether, add
+`"onlyIds"` with the 17 legacy rows (the counts then read `total` 17, `imported` 0):
+`["13125586889","13125631489","13125592629","13125561826","13125631516","13125631517","13125659187","13125596207","13125659954","13125593927","13125586601","13125562410","13125561403","13125595526","13125594270","13125595528","13125595851"]`
+— Chapelhill Church, Dunwoody Christian Academy, Law Office of John B. Jackson and Associates, Met Lane and Associates,
+P.C., Whiten Pools, Inc., Commercial Insurance Agency, Innovative Construction Group, McKinley Roofing and Restoration,
+The Grove at DeFoor Farm, Harmonic Production Services, Defoor Plumbing, Sconyers Concrete Inc, CDM Systems, Georgia
+Truck Parking, LEUCO, Southeastern PCG, Fire Bible. The names come over exactly as the board spells them; a company name
+is edited in GoHighLevel, a contact person from the panel's Contact field.
 
 After this the Monday Active Clients board holds nothing the desk does not. An owner un-marks a legacy client from its
 panel the day it becomes a normal desk client; nothing is automatic about that, including a later handoff or graduation.
@@ -394,7 +442,7 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
 - UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (98) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (112) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.

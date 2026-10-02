@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { billedOutside, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "./legacy";
+import { billedOutside, clientOrder, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "./legacy";
 import { flagsFor } from "@/lib/clients/board";
 import type { ClientRow } from "@/lib/clients/types";
 
@@ -99,4 +99,18 @@ test("Stripe is only followed for a legacy client once Stripe is part of its rec
   assert.equal(gbpTracked(desk({ gbpAccess: "" })), true);
   assert.equal(gbpTracked(legacy()), false); assert.equal(gbpTracked(legacy({ gbpAccess: "Not Requested" })), false);
   for (const over of [{ gbpAccess: "Requested" }, { gbpAccess: "Verified" }, { gbpAccess: "No GBP Exists" }, { gbpChecked: "2026-09-01" }, { searchAtlasListing: "94742" }, { gbpLive: live(false, false) }]) assert.equal(gbpTracked(legacy(over)), true, JSON.stringify(over));
+});
+
+test("the list order: problems first as always, then desk clients ahead of legacy ones", () => {
+  const r = (name: string, flags: ClientRow["flags"], isLegacy?: boolean) => ({ name, flags, legacy: isLegacy });
+  const names = (rows: ReturnType<typeof r>[]) => [...rows].sort(clientOrder).map((x) => x.name);
+  // No legacy client: exactly the order the tab always had (payment issue, most flags, name).
+  const old = (a: ReturnType<typeof r>, b: ReturnType<typeof r>) => Number(b.flags.includes("payment")) - Number(a.flags.includes("payment")) || b.flags.length - a.flags.length || a.name.localeCompare(b.name);
+  const deskOnly = [r("Zeta", []), r("Alpha", ["gbp"]), r("Mid", ["payment"]), r("Beta", ["gbp", "report"]), r("Aardvark", []), r("Late", ["report", "payment", "gbp"])];
+  assert.deepEqual(names(deskOnly), [...deskOnly].sort(old).map((x) => x.name));
+  assert.deepEqual(names(deskOnly), ["Late", "Mid", "Beta", "Alpha", "Aardvark", "Zeta"]);
+  // With legacy clients: nothing flagged → the desk's clients, then the legacy ones, each by name.
+  assert.deepEqual(names([r("Whiten Pools", [], true), r("Squirrel Made", [], false), r("Chapelhill", [], true), r("Arctic Law", [])]), ["Arctic Law", "Squirrel Made", "Chapelhill", "Whiten Pools"]);
+  // A problem still comes first, whoever has it.
+  assert.deepEqual(names([r("Squirrel Made", ["gbp", "report", "no-stripe"]), r("Whiten Pools", ["payment"], true), r("Chapelhill", [], true), r("Sconyers", ["gbp"], true), r("Choice", ["gbp"])]), ["Whiten Pools", "Squirrel Made", "Choice", "Sconyers", "Chapelhill"]);
 });

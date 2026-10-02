@@ -29,6 +29,15 @@ export function kindCounts(rows: readonly Kinded[]): { total: number; desk: numb
 /** The kind filter: "" = everyone, "desk" = clients run on the desk, "legacy" = legacy clients. */
 export const isKind = (row: Kinded, kind: ClientKind): boolean => !kind || (kind === "legacy") === isLegacyRow(row);
 
+/**
+ * The order of the list: problems first, as always (a payment issue, then the most flags) — then, among rows with the same
+ * flags, the clients run on the desk before the legacy ones, each by name. So with nothing flagged the tab reads as it did
+ * before legacy clients existed, with the legacy clients after. With no legacy client the order is exactly the old one.
+ */
+export function clientOrder(a: Pick<ClientRow, "flags" | "name" | "legacy">, b: Pick<ClientRow, "flags" | "name" | "legacy">): number {
+  return Number(b.flags.includes("payment")) - Number(a.flags.includes("payment")) || b.flags.length - a.flags.length || Number(isLegacyRow(a)) - Number(isLegacyRow(b)) || a.name.localeCompare(b.name);
+}
+
 /** The filter the list really applies: a "desk" / "legacy" choice only means something while there is a legacy client to tell apart. */
 export const effectiveKind = (kind: ClientKind, rows: readonly Kinded[]): ClientKind => (rows.some(isLegacyRow) ? kind : "");
 

@@ -1,5 +1,6 @@
 import { CallDeskError, MONDAY_ID } from "@/lib/calls/validation";
 import { TEST_CONTACT_ID } from "@/lib/calls/ghl";
+import { deskUrl } from "@/lib/desk-path";
 import { importMarker } from "@/lib/calls/markers";
 import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, GhlError, ghlLocationId, listNotes, normalizePhone, searchContacts, splitName, updateContact, type GhlContact, type GhlContactPatch } from "@/lib/ghl/client";
 import { ghlIdFromLink } from "@/lib/ghl/admin";
@@ -7,14 +8,14 @@ import { salesFields, type SalesFields } from "@/lib/ghl/fields";
 import { monday } from "@/lib/onboarding/api";
 import { COL, GIVEAWAY_WINNER, PIPELINE_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, isGiveawayWinner } from "@/lib/onboarding/config";
 import { splitNextAction } from "@/lib/onboarding/pipeline";
-import { readIntake, readJson, writeIntake, writeJson } from "@/lib/onboarding/store";
+import { deletePath, readIntake, readJson, writeIntake, writeJson } from "@/lib/onboarding/store";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS } from "@/lib/clients/config";
 import { snapshot, stripeConnected } from "@/lib/clients/stripe";
 import { parseChecklist, serializeChecklist, type StoredItem } from "./checklist-text";
 import { DESK_FIELDS, DESK_TAGS, deskList, deskText, deskWrites, type DeskFieldKey, type DeskFields } from "./fields";
 import { splitPackages } from "./money";
 import { summaryMarker } from "./onboarding";
-import { allDeskFields, type DeskValues } from "./record";
+import { allDeskFields, isClientRecord, isLegacyClient, stillOnboarding, type DeskValues } from "./record";
 import { isGhlRecordId } from "./switch";
 import { deskTeam, isTeamName, memberByName, nameForMondayId } from "./team";
 
@@ -46,6 +47,8 @@ import { deskTeam, isTeamName, memberByName, nameForMondayId } from "./team";
 // behind writes, so the import keeps its own record of every name-only contact it creates (storage, CREATED_PATH below):
 // a second run finds that contact by id even before GoHighLevel's search lists it. The import never creates a payment task.
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** The `source` GoHighLevel shows on a contact this import created — also how a later run knows the contact is one of its own. */
+const IMPORT_SOURCE = "Team desk (Monday import)";
 
 type Column = { id: string; text: string | null; value: string | null };
 type Update = { id: string; text_body: string | null; created_at: string; creator: { name: string } | null };
@@ -76,7 +79,7 @@ const parse = (v: string | null): unknown => { try { return JSON.parse(v || "nul
 const col = (row: MondayRow, id: string) => row.column_values.find((c) => c.id === id);
 const text = (row: MondayRow, id: string) => (col(row, id)?.text || "").trim();
 const link = (row: MondayRow, id: string) => { const v = parse(col(row, id)?.value || null) as { url?: unknown } | null; return typeof v?.url === "string" ? v.url.trim() : ""; };
-const checked = (row: MondayRow, id: string) => { const v = parse(col(row, id)?.value || null) as { checked?: unknown } | null; return v?.checked === true || v?.checked === "true"; };
+const checked = (row: MondayRow, id: string) => { const v = parse(col(row, id)?.value || null) as { checked?: unknown } | null; return v?.checked === true || String(v?.checked).toLowerCase() === "true"; };
 const date = (row: MondayRow, id: string) => /^\d{4}-\d{2}-\d{2}/.exec(text(row, id))?.[0] || "";
 /** A people column → a desk team name: by Monday person id first, then by the first name Monday shows. "" when nobody on the team matches. */
 export function personName(row: MondayRow, id: string): string {
@@ -107,7 +110,7 @@ export function indexForDesk(contacts: GhlContact[], f: DeskFields, sales: Sales
     first(ix.byMondayClient, deskText(c, f, "mondayClientId").trim(), c);
     first(ix.byMondayLead, fieldText(c, sales.mondayLeadId?.id).trim(), c);
     first(ix.byStripe, deskText(c, f, "stripeCustomer").trim(), c);
-    for (const w of new Set(wordsOf(c.companyName || c.businessName || ""))) ix.wordCount.set(w, (ix.wordCount.get(w) || 0) + 1);
+    for (const w of new Set(wordsOf(c.companyName || c.businessName))) ix.wordCount.set(w, (ix.wordCount.get(w) || 0) + 1);
   }
   return ix;
 }
@@ -123,32 +126,49 @@ export function indexForDesk(contacts: GhlContact[], f: DeskFields, sales: Sales
 // So a shared word only counts when it is the FIRST word of both names (the part of a name that is its own — Sconyers, Whiten,
 // McKinley) and few other businesses carry it; a person's name never counts unless it IS the business name.
 const LEGAL_WORDS = new Set(["inc", "llc", "llp", "pllc", "pc", "co", "corp", "ltd", "company", "the", "and", "of", "at"]);
-function wordsOf(v: string): string[] { return v.toLowerCase().replace(/&/g, " and ").replace(/['’.]/g, "").split(/[^a-z0-9]+/).filter(Boolean); }
-const coreKey = (v: string) => wordsOf(v).filter((w) => !LEGAL_WORDS.has(w)).join("");
-const hostOf = (u: string) => u.trim().toLowerCase().replace(/^[a-z]+:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0];
-const lettersOf = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, "");
+function wordsOf(v: unknown): string[] { return String(v ?? "").toLowerCase().replace(/&/g, " and ").replace(/['’.]/g, "").split(/[^a-z0-9]+/).filter(Boolean); }
+const coreKey = (v: unknown) => wordsOf(v).filter((w) => !LEGAL_WORDS.has(w)).join("");
+const hostOf = (u: unknown) => String(u ?? "").trim().toLowerCase().replace(/^[a-z]+:\/\//, "").replace(/^www\./, "").split(/[/?#]/)[0];
+const lettersOf = (v: unknown) => String(v ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+/** Are two names within two letters of each other ("whitenpools" / "whitenspools")? Only asked of names long enough for that to mean something. */
+function nearlySame(a: string, b: string): boolean {
+  if (a.length < 8 || b.length < 8 || Math.abs(a.length - b.length) > 2) return false;
+  let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j++) row[j] = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (Math.min(...row) > 2) return false;
+    prev = row;
+  }
+  return prev[b.length] <= 2;
+}
 export type Lookalike = { id: string; name: string; why: string };
+/** Contacts that look like this business, the strongest reason first (the same name, then a name inside the other, a near-miss spelling, an
+ *  email or website that spells it, its website or email domain, the same uncommon first word). */
 export function lookalikes(name: string, website: string, ix: DeskIndex): Lookalike[] {
   const core = coreKey(name);
-  const firstWord = (v: string) => wordsOf(v).find((w) => !LEGAL_WORDS.has(w)) || "";
+  const firstWord = (v: unknown) => wordsOf(v).find((w) => !LEGAL_WORDS.has(w)) || "";
   const first = firstWord(name);
   const own = first.length >= 4 && (ix.wordCount.get(first) || 0) <= 3 ? first : ""; // the business's own word, if few others carry it
   const site = hostOf(website);
-  const out: Lookalike[] = [];
+  const onSite = (v: string) => !!site && !!v && (v === site || v.endsWith(`.${site}`));
+  const out: (Lookalike & { rank: number })[] = [];
   for (const c of ix.all) {
     if (c.id === TEST_CONTACT_ID) continue;
-    const company = (c.companyName || c.businessName || "").trim();
+    const company = String(c.companyName || c.businessName || "").trim();
     const companyCore = coreKey(company);
-    const host = hostOf(c.website || ""); const domain = (c.email || "").split("@")[1]?.toLowerCase() || "";
-    let why = "";
-    if (core.length >= 5 && (companyCore === core || coreKey(contactDisplayName(c)) === core)) why = "the same name apart from Inc, LLC, The and the like";
-    else if ((core.length >= 5 && companyCore.includes(core)) || (companyCore.length >= 8 && core.includes(companyCore))) why = "one business name contains the other";
-    else if (site && (host === site || domain === site)) why = `the same website or email domain (${site})`;
-    else if (core.length >= 8 && [host, c.email || ""].some((v) => lettersOf(v).includes(core))) why = "its email or website spells this business name";
-    else if (own && firstWord(company) === own) why = `its business name starts with the same uncommon word, "${own}"`;
-    if (why) out.push({ id: c.id, name: [company, contactDisplayName(c)].filter(Boolean).join(" — ") || c.email || c.id, why });
+    const host = hostOf(c.website); const domain = String(c.email || "").split("@")[1]?.toLowerCase() || "";
+    let why = ""; let rank = 0;
+    // The very same name counts however short it is ("CDM", "ICG"): the exact-name match above only trusts names of four letters or more.
+    if (core.length >= 2 && (companyCore === core || coreKey(contactDisplayName(c)) === core)) { why = "the same name apart from Inc, LLC, The and the like"; rank = 1; }
+    else if ((core.length >= 5 && companyCore.includes(core)) || (companyCore.length >= 8 && core.includes(companyCore))) { why = "one business name contains the other"; rank = 2; }
+    else if (nearlySame(core, companyCore)) { why = "the two business names are a letter or two apart"; rank = 3; }
+    else if (core.length >= 8 && [host, String(c.email || "")].some((v) => lettersOf(v).includes(core))) { why = "its email or website spells this business name"; rank = 4; }
+    else if (onSite(host) || onSite(domain)) { why = `the same website or email domain (${site})`; rank = 5; }
+    else if (own && firstWord(company) === own) { why = `its business name starts with the same uncommon word, "${own}"`; rank = 6; }
+    if (why) out.push({ id: c.id, name: [company, contactDisplayName(c)].filter(Boolean).join(" — ") || c.email || c.id, why, rank });
   }
-  return out;
+  return out.sort((a, b) => a.rank - b.rank).map(({ id, name: n, why }) => ({ id, name: n, why }));
 }
 
 export type MatchKind = "imported" | "mapped" | "onboarding-record" | "ghl-link" | "lead" | "stripe" | "email" | "phone" | "company-name" | "create" | "create-name-only" | "unmatched";
@@ -265,7 +285,11 @@ export function planOnboarding(row: MondayRow, existing: GhlContact | null, f: D
   return { values, native, tags: [DESK_TAGS.onboarding], salesLeadId: MONDAY_ID.test(leadId) ? leadId : "", warnings, blockers };
 }
 
-export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskFields): Plan {
+/**
+ * `keep`: the row was pinned (map) to a contact that is ALREADY a client on the desk and did not come from this row. Nothing it holds is
+ * replaced — the row only fills what is blank, adds its packages and notes, and leaves the legacy marker to an owner.
+ */
+export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskFields, opts: { keep?: boolean } = {}): Plan {
   const warnings: string[] = []; const blockers: string[] = [];
   const values: DeskValues = { mondayClientId: row.id };
   const group = CLIENT_GROUPS.find((g) => g.group === row.group?.id);
@@ -297,12 +321,22 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
   // id anyway so the files are still found; it does not make the contact an onboarding record (that takes a stage or the tag).
   const onboardingItem = text(row, CCOL.onboardingItem);
   if (MONDAY_ID.test(onboardingItem) && !had("mondayOnboardingId")) values.mondayOnboardingId = onboardingItem;
+  if (opts.keep && existing) {
+    // Everything the contact already holds stays: status, health, payment, manager, dates, GBP. Packages were added to and notes appended above.
+    const kept = (Object.keys(values) as DeskFieldKey[]).filter((k) => !["mondayClientId", "packages", "notes"].includes(k) && had(k));
+    for (const k of kept) delete values[k];
+    warnings.push(`this contact is already a client on the desk: what it holds is kept${kept.length ? ` (${kept.map((k) => f[k]?.name || DESK_FIELDS[k].name).join(", ")})` : ""}; the row only fills what was blank`);
+  }
   // A row that never had "Team desk" ticked is a legacy client. The marker is only ever SET where the contact has none: an
   // owner's own Yes or No (the panel always writes one of the two) is left alone, even by force.
   let legacy = had("legacy").trim().toLowerCase() === "yes";
-  if (!checked(row, CCOL.teamDesk)) {
+  if (!col(row, CCOL.teamDesk)) {
+    // Monday did not hand back the checkbox at all: "not ticked" cannot be told from "not sent", and a desk client must never be marked legacy by accident.
+    blockers.push(`the row came back from the board without its "Team desk" column, so the import cannot tell a desk client from a legacy one — run it again; if it keeps happening the column was removed from the board`);
+  } else if (!checked(row, CCOL.teamDesk)) {
     const options = f.legacy?.options || [];
-    if (!f.legacy) blockers.push(`"${DESK_FIELDS.legacy.name}" does not exist in GoHighLevel yet, so this row cannot be marked a legacy client — an owner runs the desk field setup first (POST /api/team/ghl/setup with scope "desk")`);
+    if (opts.keep) { if (!legacy) warnings.push("not marked a legacy client: it is already a client on the desk — an owner marks it from its panel if that is what it is"); }
+    else if (!f.legacy) blockers.push(`"${DESK_FIELDS.legacy.name}" does not exist in GoHighLevel yet, so this row cannot be marked a legacy client — an owner runs the desk field setup first (POST /api/team/ghl/setup with scope "desk")`);
     else if (options.length && !options.includes("Yes")) blockers.push(`"${f.legacy.name}" in GoHighLevel has no option "Yes" — add it there (Settings → Custom Fields) before importing this row`);
     else if (!had("legacy")) { values.legacy = "Yes"; legacy = true; }
     else if (!legacy) warnings.push(`this contact was un-marked as a legacy client on the desk ("${f.legacy.name}" says ${had("legacy")}) — left as it is`);
@@ -311,21 +345,58 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
   return { values, native, tags: [DESK_TAGS.client], salesLeadId: "", warnings, blockers, legacy };
 }
 
-// ───────────────────────────── the import's own record of a contact it created from a name alone ─────────────────────────────
+// ───────────────────────────── the import's own records (private storage) ─────────────────────────────
 // A contact with no email and no phone is the one kind GoHighLevel will happily create twice, and its search — which is how a
-// re-run finds "already imported" — runs a few seconds behind writes. So the id of every such contact is kept in storage the
-// moment it exists, and a later run (a dry run too) reads the contact by that id, fresh, before deciding to create anything.
-const CREATED_PATH = (kind: "onboarding" | "client", mondayId: string) => `onboarding/import/${kind}-${mondayId}.json`;
-type CreatedRecord = { kind: "onboarding" | "client"; mondayId: string; contactId: string; name: string; createdAt: string };
-async function createdBefore(kind: "onboarding" | "client", mondayId: string): Promise<GhlContact | null> {
-  const record = await readJson<CreatedRecord>(CREATED_PATH(kind, mondayId)).catch(() => null); // storage not connected (a local run) → no record, as before
-  if (!record?.contactId || !isGhlRecordId(record.contactId)) return null;
-  try { return await getContact(record.contactId); }
-  catch (e) {
-    // The contact was deleted or merged away in GoHighLevel since: the record is stale, and a new contact is the right answer.
-    if ((e instanceof GhlError && [400, 404, 422].includes(e.ghlStatus)) || (e instanceof CallDeskError && e.status === 404)) return null;
-    throw e; // GoHighLevel did not answer: do not guess — the row fails and nothing is created
+// re-run finds "already imported" — runs a few seconds behind writes. So the import does not rely on that search for a contact it
+// makes from a name alone. For every such contact it keeps two small records, written BEFORE the create and completed after it:
+//   onboarding/import/<kind>-<monday row id>.json   this row is getting / got contact <id>
+//   onboarding/import/name-<business name>.json     a contact with this business name is being / was created (for row …)
+// A later run (a dry run too) reads them first:
+//   - a finished record → the contact is read by id, fresh, and the row is "imported" instead of created again;
+//   - an UNFINISHED record (the create was sent and its answer never came back — a timeout, a 5xx) → the contact may exist, so the
+//     row is held for ten minutes: by then GoHighLevel's search lists the contact if it was created, and the row reads "imported";
+//   - storage that cannot be read → the row is refused rather than created blind.
+// A real run also takes a lock, so two runs posted at once (a double submit, a retry while the first is still going) cannot both
+// reach the same row before either has written its record.
+const IMPORT_DIR = "onboarding/import";
+const ROW_RECORD = (kind: "onboarding" | "client", mondayId: string) => `${IMPORT_DIR}/${kind}-${mondayId}.json`;
+const NAME_RECORD = (key: string) => `${IMPORT_DIR}/name-${key}.json`;
+const LOCK_PATH = `${IMPORT_DIR}/lock.json`;
+const PENDING_MS = 10 * 60_000; // how long an unfinished create counts as "it may have happened" — GoHighLevel's search catches up in seconds
+const LOCK_MS = 6 * 60_000; // a run cannot outlive the route's five minutes
+type CreateRecord = { kind: "onboarding" | "client"; mondayId: string; name: string; contactId: string; startedAt: string; createdAt?: string };
+type Remembered = { state: "none" } | { state: "contact"; contact: GhlContact; record: CreateRecord } | { state: "pending"; record: CreateRecord; until: string };
+/** A GoHighLevel answer that means "this contact is not there any more" — and nothing else (a refusal or an outage is not "gone"). */
+const isGone = (e: unknown): boolean =>
+  (e instanceof GhlError && (e.ghlStatus === 404 || ([400, 422].includes(e.ghlStatus) && /not found|no contact|no such|does not exist|deleted|invalid/i.test(e.body)))) || (!(e instanceof GhlError) && e instanceof CallDeskError && e.status === 404);
+/** What the import remembers at a record path. Throws when storage cannot be read, or when GoHighLevel will not say whether the contact is still there. */
+async function rememberedAt(path: string): Promise<Remembered> {
+  const record = await readJson<CreateRecord>(path);
+  if (!record) return { state: "none" };
+  if (!record.contactId) {
+    const started = Date.parse(record.startedAt);
+    return Number.isFinite(started) && Date.now() - started < PENDING_MS ? { state: "pending", record, until: new Date(started + PENDING_MS).toISOString() } : { state: "none" };
   }
+  if (!isGhlRecordId(record.contactId)) return { state: "none" };
+  try { return { state: "contact", contact: await getContact(record.contactId), record }; }
+  catch (e) { if (isGone(e)) return { state: "none" }; throw e; } // deleted or merged away since: the record is stale and a new contact is the right answer
+}
+
+let runningSince = 0; // one real run at a time on this server (a run the platform cut off frees itself like the stored lock does); the lock in storage covers other servers
+/** Take the import lock for a real run. Refuses while another run holds it; returns the release. */
+async function takeLock(settleMs: number): Promise<() => Promise<void>> {
+  if (Date.now() - runningSince < LOCK_MS) throw new CallDeskError("Another import run is going right now. Wait for it to finish, then do a dry run before anything else.", 409);
+  runningSince = Date.now();
+  try {
+    const mine = { id: crypto.randomUUID(), startedAt: new Date().toISOString() };
+    const held = await readJson<{ id: string; startedAt: string }>(LOCK_PATH); // storage unreadable → no run: the records above are what keeps a contact from being made twice
+    if (held && Date.now() - Date.parse(held.startedAt) < LOCK_MS) throw new CallDeskError(`Another import run started at ${held.startedAt} and has not finished (a run that stopped without finishing frees itself six minutes after it started). Wait, then do a dry run before anything else.`, 409);
+    await writeJson(LOCK_PATH, mine);
+    if (settleMs) await pause(settleMs);
+    // Two runs posted in the same instant both see no lock and both write one: the last writer keeps it, the other stops here, before any row.
+    if ((await readJson<{ id: string }>(LOCK_PATH))?.id !== mine.id) throw new CallDeskError("Another import run started at the same moment. This one stopped before it wrote anything; do a dry run in a minute.", 409);
+    return async () => { runningSince = 0; await deletePath(LOCK_PATH); };
+  } catch (e) { runningSince = 0; throw e; }
 }
 
 // ───────────────────────────── the run ─────────────────────────────
@@ -335,6 +406,48 @@ export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number;
   businessAsContactName?: boolean;
   /** Pause between writes, in ms (default 120 — well inside GoHighLevel's rate limit). Tests pass 0; the route never sets it. */
   pauseMs?: number };
+/**
+ * The request body of the import, checked strictly. A filter that is malformed must never quietly become "no filter": `onlyIds` given as
+ * anything but a list of item ids, a `map` entry that is not an id → an id, a mistyped key — each is refused (400) instead of running the
+ * whole board. With createNameOnly, "the whole board" means a new contact for every unmatched row.
+ */
+const BODY_KEYS = ["dryRun", "offset", "limit", "force", "overwriteLiveDesk", "onlyIds", "map", "boards", "includeOffDesk", "createNameOnly", "businessAsContactName"];
+export function parseMigrateBody(input: unknown): Omit<MigrateOptions, "origin" | "pauseMs"> & { overwriteLiveDesk: boolean } {
+  const bad = (m: string) => new CallDeskError(m, 400);
+  if (input === null || typeof input !== "object" || Array.isArray(input)) throw bad("Send the import a JSON object (an empty one is a dry run of everything).");
+  const body = input as Record<string, unknown>;
+  const unknown = Object.keys(body).filter((k) => !BODY_KEYS.includes(k));
+  if (unknown.length) throw bad(`Unknown import option${unknown.length === 1 ? "" : "s"}: ${unknown.join(", ")}. Nothing was run. The options are ${BODY_KEYS.join(", ")}.`);
+  const flag = (k: string): boolean => { if (body[k] !== undefined && typeof body[k] !== "boolean") throw bad(`${k} must be true or false. Nothing was run.`); return body[k] === true; };
+  const count = (k: string, fallback: number): number => { const v = body[k]; if (v === undefined) return fallback; if (typeof v !== "number" || !Number.isInteger(v) || v < 0) throw bad(`${k} must be a whole number. Nothing was run.`); return v; };
+  if (body.dryRun !== undefined && typeof body.dryRun !== "boolean") throw bad("dryRun must be true or false. Nothing was run.");
+  let onlyIds: string[] | undefined;
+  if (body.onlyIds !== undefined) {
+    const list = Array.isArray(body.onlyIds) ? body.onlyIds.map((v) => (typeof v === "number" && Number.isSafeInteger(v) ? String(v) : v)) : null;
+    if (!list || !list.length || list.length > 100 || !list.every((v): v is string => typeof v === "string" && MONDAY_ID.test(v))) throw bad("onlyIds must be a list of 1 to 100 Monday item ids, each a string of digits. Nothing was run — leave onlyIds out to run every row.");
+    onlyIds = [...new Set(list)];
+  }
+  const map: Record<string, string> = {};
+  if (body.map !== undefined) {
+    if (body.map === null || typeof body.map !== "object" || Array.isArray(body.map)) throw bad("map must be an object of Monday item id to GoHighLevel contact id. Nothing was run.");
+    const entries = Object.entries(body.map as Record<string, unknown>);
+    if (entries.length > 100) throw bad("map takes at most 100 rows. Nothing was run.");
+    for (const [k, v] of entries) {
+      if (!MONDAY_ID.test(k) || typeof v !== "string" || !isGhlRecordId(v)) throw bad(`map entry ${JSON.stringify(k).slice(0, 40)} is not a Monday item id pointing at a GoHighLevel contact id (the id alone — not a link). Nothing was run.`);
+      map[k] = v;
+    }
+  }
+  let boards: ("onboarding" | "clients")[] | undefined;
+  if (body.boards !== undefined) {
+    if (!Array.isArray(body.boards) || !body.boards.length || !body.boards.every((b) => b === "onboarding" || b === "clients")) throw bad('boards must be a list holding "onboarding", "clients" or both. Nothing was run.');
+    boards = [...new Set(body.boards as ("onboarding" | "clients")[])];
+  }
+  return {
+    dryRun: body.dryRun !== false, offset: count("offset", 0), limit: count("limit", 25), force: flag("force"), overwriteLiveDesk: flag("overwriteLiveDesk"), onlyIds, map, boards,
+    includeOffDesk: flag("includeOffDesk"), createNameOnly: flag("createNameOnly"), businessAsContactName: flag("businessAsContactName"),
+  };
+}
+
 export type DeskMigrateRow = { board: "onboarding" | "clients"; mondayId: string; name: string; match: MatchKind; ghlId: string; ghlName: string; state: string; fields: string[]; contactFields: string[]; owner: boolean; tags: string[]; updates: number; checklist: number; storage: string[]; warnings: string[]; candidates?: { id: string; name: string }[]; detail?: string; done?: boolean; error?: string;
   /** Exactly what the row writes: every desk field with its value (long text is cut, with its full length), and the contact's own details it fills or — for a new contact — is created with. */
   values?: Record<string, unknown>; contact?: Record<string, unknown>;
@@ -362,8 +475,17 @@ async function readAllContacts(): Promise<GhlContact[]> {
 const fieldNames = (f: DeskFields, values: DeskValues) => (Object.keys(values) as DeskFieldKey[]).map((k) => f[k]?.name || DESK_FIELDS[k].name);
 /** A value as the report shows it: whole, unless it is long text (a checklist, a notes block) — then its start and its full length. */
 const shown = (v: unknown): unknown => (typeof v === "string" && v.length > 600 ? `${v.slice(0, 600)}… (${v.length} characters in all)` : v);
+/** Error text for a report: nothing shaped like a query string (the browser tool that reads these reports redacts it). */
+const plain = (e: unknown): string => (e instanceof Error ? e.message : String(e)).replace(/[=?&]/g, " ").slice(0, 300);
 
 export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateReport> {
+  if (opts.dryRun) return runMigration(opts);
+  // A real run: one at a time. (Tests pass pauseMs 0, which also skips the moment the lock waits to see whether another run took it.)
+  const release = await takeLock(opts.pauseMs === 0 ? 0 : 1200);
+  try { return await runMigration(opts); } finally { await release(); }
+}
+
+async function runMigration(opts: MigrateOptions): Promise<DeskMigrateReport> {
   const f = await allDeskFields(true); // fresh definitions: an option someone just added in GoHighLevel (Giveaway Winner, a business type) counts at once
   const sales = await salesFields();
   const boards = opts.boards?.length ? opts.boards : (["onboarding", "clients"] as const);
@@ -401,8 +523,10 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
     const other = holds && holds !== row.id && (kind === "client" || !!deskText(c, f, "obStage") || (c.tags || []).includes(DESK_TAGS.onboarding)) ? holds : inRun && inRun !== row.id ? inRun : "";
     return other ? `contact ${c.id} (${(c.companyName || contactDisplayName(c) || "no name").trim()}) already carries ${what(kind)} item ${other} from the old board, and one contact cannot be two ${what(kind)}s. Two businesses that share an email or phone need a contact each: make one in GoHighLevel for this business and pass map: { "${row.id}": "<contact id>" }. The same business listed twice on the board: import only one of the rows.` : "";
   };
-  const planFor = (kind: "onboarding" | "client", row: MondayRow, c: GhlContact | null): Plan => {
-    const plan = kind === "onboarding" ? planOnboarding(row, c, f, c && opts.origin ? `${opts.origin}/leads?tab=onboarding&client=${c.id}` : "") : planClient(row, c, f);
+  const planFor = (kind: "onboarding" | "client", row: MondayRow, c: GhlContact | null, keepClient = false): Plan => {
+    const plan = kind === "onboarding" ? planOnboarding(row, c, f, c && opts.origin ? deskUrl(opts.origin, { tab: "onboarding", client: c.id }) : "") : planClient(row, c, f, { keep: keepClient });
+    // A phone that is not a whole number is not written: GoHighLevel would refuse the contact, or keep a number nobody can dial.
+    if (plan.native.phone && plan.native.phone.replace(/\D/g, "").length < 10) { plan.warnings.push(`the board's phone (${plan.native.phone}) is not a whole number — left off`); delete plan.native.phone; }
     // GoHighLevel refuses an email or phone another contact already holds, and that refusal would fail the whole write:
     // leave this contact's blank as it is and say so (the dry run shows it too).
     if (c) {
@@ -419,8 +543,17 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
    * and the storage link. Run for every written row — and for a row that is already imported, so a run that stopped after the
    * fields were written is finished by the next one instead of being skipped as "imported". `apply: false` only reports.
    */
-  const finish = async (kind: "onboarding" | "client", row: MondayRow, c: GhlContact, tags: string[], out: DeskMigrateRow, apply: boolean): Promise<{ did: string[]; left: string[]; copied: number }> => {
+  const finish = async (kind: "onboarding" | "client", row: MondayRow, c: GhlContact, tags: string[], out: DeskMigrateRow, apply: boolean, marker = false): Promise<{ did: string[]; left: string[]; copied: number }> => {
     const did: string[] = []; const left: string[] = [];
+    // The legacy marker belongs to "imported" too: a row without "Team desk" whose contact has no marker at all (GoHighLevel did not keep it
+    // the first time) gets it now — and is read back. Only ever where the field is blank; an owner's own Yes or No never reaches here.
+    if (marker) {
+      if (apply) {
+        await updateContact(c.id, { customFields: deskWrites(f, { legacy: "Yes" }) });
+        if (!isLegacyClient(await getContact(c.id), f)) throw new Error(`GoHighLevel did not keep "Yes" in ${f.legacy?.name || DESK_FIELDS.legacy.name} on ${c.id}, so this client does not show as a legacy client. Fix that field in GoHighLevel (Settings → Custom Fields) and run this row again, or mark the client from its panel.`);
+        did.push("marked a legacy client");
+      } else left.push("mark as a legacy client");
+    }
     const missingTags = tags.filter((t) => !(c.tags || []).includes(t));
     if (missingTags.length) { if (apply) { await addTags(c.id, tags); did.push(`tag ${missingTags.join(", ")}`); } else left.push(`tag ${missingTags.join(", ")}`); }
     const have = await listNotes(c.id);
@@ -461,31 +594,71 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       // Plan from a FRESH read by id, never from the search copy: search results lag writes (an earlier row in this run may
       // have just written this contact) and can come without the name pair — and "fill only what is blank" must see the truth.
       let contact = found.contact ? await getContact(found.contact.id) : null;
-      // A row about to get a contact from its name alone: did an earlier run already make it? (GoHighLevel's search may not list it yet.)
+      const mondayKey: DeskFieldKey = kind === "onboarding" ? "mondayOnboardingId" : "mondayClientId";
+      const carries = (c: GhlContact) => deskText(c, f, mondayKey).trim() === row.id;
+      const labelOf = (c: GhlContact) => (c.companyName || contactDisplayName(c) || c.id).trim();
+      const pinned = opts.map?.[row.id] || "";
+      const key = nameKey(row.name).slice(0, 120); // the business name as the records and the twin check know it
+      const also: { warnings: string[]; blockers: string[] } = { warnings: [], blockers: [] }; // added to the plan once there is one
+      if (pinned && match === "imported" && contact && contact.id !== pinned) also.warnings.push(`the map for this row was ignored: the row is already imported on ${contact.id}`);
+      // The import's own records. Read for a row that would get a contact from its name alone (did an earlier run already make it,
+      // or start to?) and for a pinned row (was it already imported onto another contact that the search does not list yet?).
       let remembered = false;
-      if (!contact && match === "create-name-only") {
-        contact = await createdBefore(kind, row.id);
-        if (contact) {
-          remembered = true;
-          match = deskText(contact, f, kind === "onboarding" ? "mondayOnboardingId" : "mondayClientId").trim() === row.id ? "imported" : "mapped";
-          detail = undefined;
-          (kind === "onboarding" ? ix.byMondayOnboarding : ix.byMondayClient).set(row.id, contact);
+      if ((!contact && match === "create-name-only") || (pinned && match !== "imported")) {
+        let own: Remembered = { state: "none" }; let named: Remembered = { state: "none" };
+        try {
+          own = await rememberedAt(ROW_RECORD(kind, row.id));
+          if (own.state === "none" && match === "create-name-only" && key.length >= 2) named = await rememberedAt(NAME_RECORD(key));
+        } catch (e) {
+          // Without its records the import creates nothing from a name alone. A pinned row goes on (the pin is the operator's own word), and says what it could not check.
+          if (match === "create-name-only") also.blockers.push(`the import's own records could not be read (${plain(e)}), so it cannot tell whether an earlier run already made this contact — nothing is created until they can be read`);
+          else also.warnings.push(`the import's own record for this row could not be read (${plain(e)}), so it could not check whether the row was already imported onto another contact`);
+        }
+        const sameRow = (r: CreateRecord) => r.kind === kind && r.mondayId === row.id;
+        if (pinned && own.state === "contact" && own.contact.id !== pinned) {
+          candidates = [{ id: own.contact.id, name: labelOf(own.contact) }]; match = "unmatched"; contact = null;
+          detail = `this row is already imported: the import created contact ${own.contact.id} for it. Pinning it to ${pinned} as well would put one board row on two contacts. To move it, clear ${f[mondayKey]?.name || DESK_FIELDS[mondayKey].name} on ${own.contact.id} in GoHighLevel first, then run this again.`;
+        } else if (!contact && match === "create-name-only") {
+          if (own.state === "contact" || (named.state === "contact" && sameRow(named.record))) {
+            contact = own.state === "contact" ? own.contact : (named as Extract<Remembered, { state: "contact" }>).contact;
+            remembered = true; match = carries(contact) ? "imported" : "mapped"; detail = undefined;
+            also.warnings.push("found through the import's own record of the contact it created for this row — GoHighLevel's search does not list it yet");
+          } else if (own.state === "pending" || (named.state === "pending" && sameRow(named.record))) {
+            const p = own.state === "pending" ? own : (named as Extract<Remembered, { state: "pending" }>);
+            also.blockers.push(`an earlier run started creating this contact at ${p.record.startedAt} and never recorded how that ended, so the contact may exist. If it does, GoHighLevel's search lists it within a minute or two and this row then reads imported; if it does not, the row is free again at ${p.until}`);
+          } else if (named.state === "contact") {
+            // Another row with the very same business name already got a contact: the same business, exactly as a name match against GoHighLevel would say.
+            contact = named.contact; match = "company-name"; detail = undefined;
+            also.warnings.push(`matched through the import's own record: row ${named.record.mondayId} created a contact with this business name`);
+          } else if (named.state === "pending") {
+            also.blockers.push(`row ${named.record.mondayId} started creating a contact with this very business name at ${named.record.startedAt}; this row waits until that is settled (free again at ${named.until})`);
+          }
         }
       }
-      if (contact) ix.byId.set(contact.id, contact); // the winners list at the end reads these, so it too is decided on what the contact holds now
       let joins = ""; // dry run only: the row of the OTHER board whose new contact this row would land on
       if (contact) {
         const conflict = conflictOn(kind, row, contact);
-        if (conflict) { candidates = [{ id: contact.id, name: (contact.companyName || contactDisplayName(contact) || contact.id).trim() }]; match = "unmatched"; detail = conflict; contact = null; }
-      } else if (match === "create" || match === "create-name-only") {
-        // The business name counts too, exactly as it does against contacts GoHighLevel already has: a later row with the same name
-        // is the same business (the real run finds the contact the first row created; a dry run has only this to go by).
-        const keys = [email.trim() ? `e:${email.trim().toLowerCase()}` : "", phone && normalizePhone(phone).length >= 11 ? `p:${normalizePhone(phone)}` : "", nameKey(row.name).length >= 4 ? `n:${nameKey(row.name)}` : ""].filter(Boolean);
+        const refuse = (why: string) => { candidates = [{ id: contact!.id, name: labelOf(contact!) }]; match = "unmatched"; detail = why; contact = null; };
+        if (conflict) refuse(conflict);
+        else if (contact.id === TEST_CONTACT_ID) refuse("that is the designated test contact — nothing is ever imported onto it");
+        // A contact that is ALREADY a client on the desk and did not come from this row: importing would put the board's status, health and
+        // payment fields over a live record. Only an explicit pin goes on, and then nothing the contact holds is replaced (planClient, keep).
+        else if (kind === "client" && !pinned && !remembered && isClientRecord(contact, f) && !carries(contact)) refuse(`contact ${contact.id} (${labelOf(contact)}) is already a client on the desk and did not come from this board row. Importing the row would put the board's status, health and payment fields over what the desk holds. If it is the same business, pass map: { "${row.id}": "${contact.id}" } — the row then keeps everything the contact already has and only fills what is blank.`);
+      } else if (opts.dryRun && (match === "create" || match === "create-name-only")) {
+        // A dry run creates nothing, so an earlier row's new contact is not there to find: rows that would each create a contact are compared
+        // with each other instead. The business name counts too, exactly as it does against contacts GoHighLevel already has. (A real run
+        // needs none of this: a contact it creates is in the index — and in the import's records — before the next row is looked at.)
+        const keys = [email.trim() ? `e:${email.trim().toLowerCase()}` : "", phone && normalizePhone(phone).length >= 11 ? `p:${normalizePhone(phone)}` : "", key.length >= 2 ? `n:${key}` : ""].filter(Boolean);
         const twinKey = keys.find((k) => creating.has(k)); const twin = twinKey ? creating.get(twinKey) : undefined;
         const shared = twinKey?.startsWith("n:") ? "business name" : "email or phone";
         if (twin && twin.kind === kind) { match = "unmatched"; detail = `row ${twin.row} creates a contact with the same ${shared}, and one contact cannot be two ${what(kind)}s. ${twinKey?.startsWith("n:") ? "The same business listed twice on the board: import only one of the rows. Two different businesses with one name" : "Two businesses that share an email or phone"} need a contact each: make one in GoHighLevel for this business and pass map: { "${row.id}": "<contact id>" }.`; }
         else if (twin) { match = twinKey!.startsWith("e:") ? "email" : twinKey!.startsWith("p:") ? "phone" : "company-name"; joins = twin.row; }
         else for (const k of keys) creating.set(k, { row: row.id, kind });
+      }
+      if (contact) {
+        // The winners list at the end reads these, so it too is decided on what the contact holds now — and only for a row that really is on this contact.
+        ix.byId.set(contact.id, contact);
+        if (remembered && carries(contact)) (kind === "onboarding" ? ix.byMondayOnboarding : ix.byMondayClient).set(row.id, contact);
       }
       out.match = match; out.candidates = candidates; out.detail = detail; report.counts[match]++;
       out.ghlId = contact?.id || ""; out.ghlName = contact ? (contact.companyName || contactDisplayName(contact) || "").trim() : joins ? `(the contact row ${joins} creates in this run)` : "";
@@ -498,11 +671,14 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         report.rows.push(out); continue;
       }
       let creates = !contact && (match === "create" || match === "create-name-only"); // false again if GoHighLevel turns out to hold the contact already
-      let plan = planFor(kind, row, contact);
+      const nameOnly = creates && match === "create-name-only"; // nothing but a business name: GoHighLevel has no way to refuse a second one
+      // Pinned onto a contact that is already a client on the desk and did not come from this row: nothing it holds is replaced.
+      const keepClient = kind === "client" && !!contact && !!pinned && !remembered && isClientRecord(contact, f) && !carries(contact);
+      let plan = planFor(kind, row, contact, keepClient);
+      plan.warnings.push(...also.warnings); plan.blockers.push(...also.blockers);
       // Asked for by hand, and only for a contact made from a name alone: the business name also goes in the contact's own name.
-      const nameIt = (pl: Plan) => { if (creates && match === "create-name-only" && opts.businessAsContactName && !pl.native.firstName && row.name.trim()) pl.native.firstName = row.name.trim().slice(0, 100); };
-      nameIt(plan);
-      if (remembered) plan.warnings.push("found through the import's own record of the contact it created for this row — GoHighLevel's search does not list it yet");
+      if (nameOnly && opts.businessAsContactName && !plan.native.firstName && row.name.trim()) plan.native.firstName = row.name.trim().slice(0, 100);
+      if (kind === "client" && contact && stillOnboarding(contact, f)) plan.warnings.push("this contact is still in onboarding, so the client shows on the Onboarding tab — not on the Clients tab — until it is launched");
       if (kind === "client") {
         // The Monday desk kept an unlinked client's files under "c" + its row id. If this contact's files live under another key
         // (its onboarding record's), those would no longer show: say so now rather than after the switch.
@@ -510,21 +686,27 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         const own = scope === `c${row.id}` ? null : await readIntake(`c${row.id}`).catch(() => null);
         if (own?.files.length) plan.warnings.push(`${own.files.length} file${own.files.length === 1 ? "" : "s"} added on the Clients tab ${own.files.length === 1 ? "is" : "are"} stored under c${row.id}, but this contact's files live under ${scope} — ${own.files.length === 1 ? "it" : "they"} will not show on the desk after the switch unless moved`);
       }
-      // A contact the import made itself is tagged monday-import — also when a second run finishes what the first one left.
-      const tagsFor = (pl: Plan) => (creates || remembered ? [...pl.tags, DESK_TAGS.imported] : pl.tags);
+      // A contact the import made itself is tagged monday-import — also when a second run finishes what the first one left
+      // (it knows its own contacts by the record it kept, or by the source it gave them).
+      const ours = remembered || (contact?.source || "").trim().toLowerCase() === IMPORT_SOURCE.toLowerCase();
+      const tagsFor = (pl: Plan) => (creates || ours ? [...pl.tags, DESK_TAGS.imported] : pl.tags);
       const describe = () => {
         out.fields = fieldNames(f, plan.values); out.contactFields = Object.keys(plan.native).filter((k) => k !== "assignedTo"); out.owner = "assignedTo" in plan.native; out.tags = tagsFor(plan); out.warnings = plan.warnings;
-        out.values = Object.fromEntries((Object.keys(plan.values) as DeskFieldKey[]).map((k) => [f[k]?.name || DESK_FIELDS[k].name, shown(plan.values[k])]));
+        // The desk link is a web address with a query string; a report says what it is instead (the browser tool that reads reports redacts anything shaped like one).
+        out.values = Object.fromEntries((Object.keys(plan.values) as DeskFieldKey[]).map((k) => [f[k]?.name || DESK_FIELDS[k].name, k === "deskLink" ? "the link that opens this record on the desk" : shown(plan.values[k])]));
         out.contact = Object.fromEntries(Object.entries(plan.native).filter(([k]) => k !== "assignedTo").map(([k, v]) => [k, shown(v)]));
         if (kind === "client") out.legacy = !!plan.legacy;
       };
       describe();
       if (creates) {
-        // Before a contact is created: does GoHighLevel already hold this business under a slightly different name?
-        const alike = lookalikes(row.name, link(row, kind === "onboarding" ? COL.siteUrl : CCOL.website), ix);
+        // Before a contact is created: does GoHighLevel already hold this business under a slightly different name? (Rows earlier in this run count too.)
+        const site = link(row, kind === "onboarding" ? COL.siteUrl : CCOL.website);
+        const alike = lookalikes(row.name, site, ix);
         out.similar = alike.slice(0, 5);
-        if (alike.length) plan.warnings.push(`${alike.length} contact${alike.length === 1 ? "" : "s"} already in GoHighLevel look${alike.length === 1 ? "s" : ""} like this business (see similar) — if one is the same business, pin this row to it with map instead of creating a second contact`);
-        out.detail = match === "create-name-only" ? "creates a new contact from the business name alone (the row has no email or phone)" : "creates a new contact";
+        if (alike.length) plan.warnings.push(`${alike.length} contact${alike.length === 1 ? "" : "s"} already in GoHighLevel look${alike.length === 1 ? "s" : ""} like this business (see similar${alike.length > 5 ? ", which lists the five closest" : ""}) — if one is the same business, pin this row to it with map instead of creating a second contact`);
+        out.detail = nameOnly ? "creates a new contact from the business name alone (the row has no email or phone)" : "creates a new contact";
+        // A dry run creates nothing, so the next rows could not see this one: stand it in the list they are compared with.
+        if (opts.dryRun) ix.all.push({ id: `row ${row.id} of this run (not created yet)`, companyName: row.name, website: site });
       }
       if (plan.blockers.length) {
         if (!opts.dryRun) throw new Error(`not imported: ${plan.blockers.join("; ")}`);
@@ -534,7 +716,14 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         // Imported means FINISHED: fields, tags, notes and the storage link. A run that stopped part-way is completed here.
         // No field is written on this path, so the report does not list any as "what this row writes".
         out.values = undefined; out.contact = undefined;
-        const rest = await finish(kind, row, contact!, tagsFor(plan), out, !opts.dryRun);
+        // …and what it says about the record is what the CONTACT holds, not what the row would have written.
+        const marker = kind === "client" && plan.values.legacy === "Yes"; // a row without "Team desk" on a contact that has no marker at all
+        if (kind === "client") out.legacy = isLegacyClient(contact!, f);
+        const lacking = (Array.isArray(plan.values.packages) ? plan.values.packages : []).filter((p) => !deskList(contact!, f, "packages").includes(p));
+        if (lacking.includes(GIVEAWAY_WINNER)) plan.warnings.push(`NOT PROTECTED: the board row is a ${GIVEAWAY_WINNER} and the contact's Desk Packages does not carry that label, so the billing guard would let this client be billed. Add ${GIVEAWAY_WINNER} to Desk Packages on the contact, unless it was taken off on purpose`);
+        if (lacking.some((p) => p !== GIVEAWAY_WINNER)) plan.warnings.push(`the board row carries ${lacking.filter((p) => p !== GIVEAWAY_WINNER).join(", ")} and the contact does not — nothing was changed (force re-writes a row's fields from the board)`);
+        const rest = await finish(kind, row, contact!, tagsFor(plan), out, !opts.dryRun, marker);
+        if (rest.did.includes("marked a legacy client")) out.legacy = true;
         if (rest.did.length) { out.detail = `already imported — finished what an earlier run left: ${rest.did.join(", ")}`; out.done = true; report.counts.finished++; }
         else if (rest.left.length) out.detail = `already imported, but an earlier run did not finish: ${rest.left.join(", ")} — the next real run completes it`;
         else out.detail = "already imported — skipped (force re-writes it)";
@@ -546,19 +735,30 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       const fieldsFor = (c: GhlContact | null) => [...deskWrites(f, plan.values), ...(plan.salesLeadId && sales.mondayLeadId && !(c && fieldText(c, sales.mondayLeadId.id)) ? [{ id: sales.mondayLeadId.id, field_value: plan.salesLeadId as unknown }] : [])];
       let customFields = fieldsFor(contact);
       let created = false;
+      // A contact made from a name alone: the import says so in its own records BEFORE the create is sent (see "the import's own records").
+      const record: CreateRecord = { kind, mondayId: row.id, name: row.name, contactId: "", startedAt: new Date().toISOString() };
+      const records = nameOnly ? [ROW_RECORD(kind, row.id), ...(key.length >= 2 ? [NAME_RECORD(key)] : [])] : [];
       if (!contact) {
+        for (const path of records) await writeJson(path, record); // storage will not take it → the row fails here, and nothing was sent to GoHighLevel
         // A plain create, never an upsert: if GoHighLevel already has this email or phone (its search had not caught up with a
         // brand-new contact) it refuses and names the contact, and that contact is then treated as what it is — an existing one.
-        try { contact = await createContact({ locationId: ghlLocationId(), ...plan.native, customFields, source: "Team desk (Monday import)" }); created = true; }
+        try { contact = await createContact({ locationId: ghlLocationId(), ...plan.native, customFields, source: IMPORT_SOURCE }); created = true; }
         catch (e) {
           const dup = e instanceof GhlError ? /"contactId"\s*:\s*"([A-Za-z0-9]+)"/.exec(e.body)?.[1] : undefined;
+          // GoHighLevel said no (a 4xx): nothing was created, so the records come away and the row can be run again at once. Anything else — no
+          // answer, a 5xx, an answer that is not JSON — and the contact MAY exist: the records stay, and they hold the row until the search can say.
+          const refused = e instanceof GhlError && e.ghlStatus >= 400 && e.ghlStatus < 500 && e.ghlStatus !== 408;
+          if (refused) for (const path of records) await deletePath(path);
           if (!dup) {
-            if (match === "create-name-only" && e instanceof GhlError && [400, 422].includes(e.ghlStatus)) throw new Error(`GoHighLevel would not create a contact from the business name alone (${e.ghlStatus}): ${e.body.slice(0, 200)}. Nothing was created. If it is asking for a person's name, run this row again with businessAsContactName: true; otherwise make the contact by hand in GoHighLevel and pin the row to it with map.`);
+            if (nameOnly && refused && e instanceof GhlError && [400, 422].includes(e.ghlStatus)) throw new Error(`GoHighLevel would not create a contact from the business name alone (${e.ghlStatus}): ${e.body.slice(0, 200)}. Nothing was created. If it is asking for a person's name, run this row again with businessAsContactName: true; otherwise make the contact by hand in GoHighLevel and pin the row to it with map.`);
+            if (nameOnly && !refused) throw new Error(`${plain(e)} — the contact may or may not have been created. The import has noted that a create was started for this row: it is held until GoHighLevel's search can say (ten minutes at most). Do a dry run before anything else.`);
             throw e;
           }
           contact = await getContact(dup);
           const conflict = conflictOn(kind, row, contact);
           if (conflict) throw new Error(conflict);
+          if (contact.id === TEST_CONTACT_ID) throw new Error("GoHighLevel matched this row to the designated test contact by its email or phone — nothing is ever imported onto it.");
+          if (kind === "client" && isClientRecord(contact, f) && !carries(contact)) throw new Error(`GoHighLevel already has a contact with this email or phone (${contact.id}), and it is already a client on the desk that did not come from this board row. Nothing was written. If it is the same business, pass map: { "${row.id}": "${contact.id}" } — the row then keeps everything the contact already has and only fills what is blank.`);
           creates = false; out.similar = undefined;
           plan = planFor(kind, row, contact); describe();
           if (plan.blockers.length) throw new Error(`not imported: ${plan.blockers.join("; ")}`);
@@ -568,15 +768,15 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       }
       if (created) {
         out.tags = [...plan.tags, DESK_TAGS.imported];
-        // Remember a contact made from a name alone before anything else is done with it: nothing else stops a second run making it again.
-        if (match === "create-name-only") {
-          const record: CreatedRecord = { kind, mondayId: row.id, contactId: contact.id, name: row.name, createdAt: new Date().toISOString() };
-          try { await writeJson(CREATED_PATH(kind, row.id), record); out.storage.push(`import record: this row created contact ${contact.id}`); }
-          catch { out.warnings.push("could not record the new contact in storage — wait a minute before running this row again, so GoHighLevel's search lists the contact and a second one is not created"); }
+        // Finish the records with the contact's id before anything else is done with it.
+        if (records.length) {
+          const done: CreateRecord = { ...record, contactId: contact.id, createdAt: new Date().toISOString() };
+          try { for (const path of records) await writeJson(path, done); out.storage.push(`import record: this row created contact ${contact.id}`); }
+          catch { out.warnings.push("the import could not finish its own record of the new contact, so this row is held for ten minutes — by then GoHighLevel's search lists the contact and the row reads imported"); }
         }
         // The staff link back to the desk needs the new contact's id, so it is written once the contact exists.
         if (kind === "onboarding" && opts.origin) {
-          const link = deskWrites(f, { deskLink: `${opts.origin}/leads?tab=onboarding&client=${contact.id}` });
+          const link = deskWrites(f, { deskLink: deskUrl(opts.origin, { tab: "onboarding", client: contact.id }) });
           await updateContact(contact.id, { customFields: link });
           customFields.push(...link);
         }
@@ -596,6 +796,7 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       ix.byId.set(contactId, merged);
       const company = nameKey(merged.companyName || "");
       if (created && company.length >= 4 && !(ix.byCompany.get(company) || []).some((c) => c.id === contactId)) ix.byCompany.set(company, [...(ix.byCompany.get(company) || []), merged]);
+      if (created) ix.all.push(merged); // …and listed as a look-alike for the rows after it
       (kind === "onboarding" ? ix.byMondayOnboarding : ix.byMondayClient).set(row.id, merged);
       if (merged.email && !ix.byEmail.has(merged.email.toLowerCase())) ix.byEmail.set(merged.email.toLowerCase(), merged);
       if (merged.phone && !ix.byPhone.has(normalizePhone(merged.phone))) ix.byPhone.set(normalizePhone(merged.phone), merged);

@@ -7,7 +7,8 @@ import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from
 import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
-import { billedOutside, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
+import { billedOutside, clientOrder, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
+import { deskHref } from "@/lib/desk-path";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
 
@@ -65,7 +66,7 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
     (!group || r.group === group) &&
     (only !== "problems" || r.flags.length > 0) && (only !== "payment" || r.flags.includes("payment")) && (only !== "gbp" || r.flags.includes("gbp") || r.flags.includes("gbp-recheck")) &&
     `${r.name} ${r.contact} ${r.email} ${r.packages}`.toLowerCase().includes(search.toLowerCase()),
-  ).sort((a, b) => Number(b.flags.includes("payment")) - Number(a.flags.includes("payment")) || b.flags.length - a.flags.length || a.name.localeCompare(b.name));
+  ).sort(clientOrder); // problems first, as before; then desk clients ahead of legacy ones, by name
   // A client opened by id that the list does not have yet (just graduated — GoHighLevel's search runs a few seconds behind) joins the list.
   const update = useCallback((row: ClientRow) => setRows((prev) => prev.some((r) => r.id === row.id) ? prev.map((r) => r.id === row.id ? row : r) : [row, ...prev]), []);
   const mrr = rows.filter((r) => r.group !== "churned" && r.group !== "paused").reduce((sum, r) => sum + (Number(r.mrr) || 0), 0);
@@ -217,7 +218,7 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
         <label>Website<input value={contact.website} disabled={!!busy} onChange={(e) => setContact({ ...contact, website: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "reportSent" }, "report")}>Report sent today</button>{row.website && <a className="call-secondary" href={row.website} target="_blank" rel="noreferrer">Site ↗</a>}{row.ghlContact && system !== "ghl" && <a className="call-secondary" href={row.ghlContact} target="_blank" rel="noreferrer">GHL ↗</a>}{row.driveFolder && <a className="call-secondary" href={row.driveFolder} target="_blank" rel="noreferrer">Files ↗</a>}</div>
-      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{legacy && !row.lastReport && " (Not flagged for a legacy client until a report is logged here.)"}{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}${preview ? `&desk=${preview}` : ""}`}>open</a>.</>}</p>
+      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{legacy && !row.lastReport && " (Not flagged for a legacy client until a report is logged here.)"}{row.onboardingItem && <> Onboarding record: <a href={deskHref({ tab: "onboarding", client: row.onboardingItem, desk: preview })}>open</a>.</>}</p>
       {/* Legacy marker (GoHighLevel desk). A legacy client says so, and an owner can make it a desk client; on a desk client the only
           addition is one quiet line for owners — the way to mark a long-standing client legacy. Checked again on the server. */}
       {system === "ghl" && legacy && <div className="ob-kind">
