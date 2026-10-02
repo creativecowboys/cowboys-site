@@ -9,8 +9,10 @@ import Clients from "./clients";
 import Packages from "./packages";
 import type { CallLead } from "./types";
 import type { DeskSystem } from "./notes";
+import { DESK_PATH } from "@/lib/desk-path";
 import "./onboarding.css";
 
+// The team desk, served at /admin (src/app/admin/page.tsx renders this; the files stay in this folder for now).
 // Three tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
 // so switching tabs only hides it; nothing is unmounted while a save is running.
 // `?desk=ghl|monday` previews the Onboarding / Clients desk on the other system and is kept while moving between
@@ -32,7 +34,7 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
     if (next !== "sales") q.set("tab", next);
     if (clientId) q.set("client", clientId);
     if (preview) q.set("desk", preview);
-    router.replace(`/leads${q.toString() ? `?${q}` : ""}`);
+    router.replace(`${DESK_PATH}${q.toString() ? `?${q}` : ""}`);
   }, [router, preview]);
   return <div className="team-shell">
     <nav className="team-tabs" aria-label="Team desk sections">
