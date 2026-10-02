@@ -8,6 +8,7 @@ import { deletePath, deleteTokenIndex, FILE_PREFIX, readHandoff, readIntake, rea
 import type { HandoffForm, IntakeFile, IntakeForm, IntakeRecord, OnboardingRow } from "./types";
 import { safeFilename, uploadPath } from "./validation";
 import { isGhlRecordId, isLegacyScope } from "@/lib/desk/switch";
+import { deskUrl } from "@/lib/desk-path";
 
 // Client intake links are opaque, revocable and expiring. The token itself is never stored:
 // only its SHA-256 lives in the store, and the Monday board only ever sees a staff URL.
@@ -55,7 +56,7 @@ export async function issueIntakeLink(itemId: string, origin: string): Promise<{
   await writeIntake(record);
   if (old && old !== tokenHash) await deleteTokenIndex(old);
   try {
-    const staffUrl = `${origin}/leads?tab=onboarding&client=${itemId}`;
+    const staffUrl = deskUrl(origin, { tab: "onboarding", client: itemId });
     await setPipelineColumns(itemId, { [COL.intake]: { label: record.submittedAt ? "Client submitted" : "Link issued" }, [COL.onboardingLink]: { url: staffUrl, text: "Open in call desk" } });
   } catch { /* the link works regardless; Monday status is advisory and shows on the next refresh */ }
   return { url: `${origin}/onboarding/${token}`, expiresAt };

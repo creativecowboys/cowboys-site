@@ -6,6 +6,7 @@ import type { CallLead } from "@/app/leads/types";
 // helpers here (unit-tested); the routes do the Monday reads.
 import { TZ, zonedToUtc } from "./followup-time";
 import { isOffCallList } from "./roster";
+import { deskUrl } from "@/lib/desk-path";
 export { TZ, HOUR_OPTIONS, prettyTime, mondayDateValue, utcToZoned, zonedToUtc } from "./followup-time";
 export const REPS = [
   { slug: "dave", name: "Dave", mondayId: "39848115", email: "dave@creativecowboys.co" },
@@ -42,9 +43,9 @@ export function buildFeed(rep: Rep, leads: FollowupLead[], origin: string, now =
     if (!/^\d{4}-\d{2}-\d{2}$/.test(lead.nextFollowup) || closed.has(lead.outreach.trim().toLowerCase()) || isOffCallList(lead)) continue;
     const desc = [
       lead.contact && `Contact: ${lead.contact}`, lead.phone && `Phone: ${lead.phone}`, lead.email && `Email: ${lead.email}`, lead.city && `Location: ${lead.city}`,
-      lead.outreach && `Status: ${lead.outreach}`, lead.notes && `Notes: ${lead.notes.slice(0, 600)}`, `Open on the desk: ${origin}/leads?lead=${lead.id}`,
+      lead.outreach && `Status: ${lead.outreach}`, lead.notes && `Notes: ${lead.notes.slice(0, 600)}`, `Open on the desk: ${deskUrl(origin, { lead: lead.id })}`,
     ].filter(Boolean).join("\n");
-    const ev = ["BEGIN:VEVENT", `UID:followup-${lead.id}@creativecowboys.co`, `DTSTAMP:${stamp(now)}`, `SUMMARY:${esc(`Follow-up: ${lead.name}`)}`, `DESCRIPTION:${esc(desc)}`, `URL:${origin}/leads?lead=${lead.id}`, "CATEGORIES:Follow-up"];
+    const ev = ["BEGIN:VEVENT", `UID:followup-${lead.id}@creativecowboys.co`, `DTSTAMP:${stamp(now)}`, `SUMMARY:${esc(`Follow-up: ${lead.name}`)}`, `DESCRIPTION:${esc(desc)}`, `URL:${deskUrl(origin, { lead: lead.id })}`, "CATEGORIES:Follow-up"];
     if (lead.nextFollowupTime && /^\d{2}:\d{2}$/.test(lead.nextFollowupTime)) {
       const start = lead.nextFollowup.replace(/-/g, "") + "T" + lead.nextFollowupTime.replace(":", "") + "00";
       const [h, m] = lead.nextFollowupTime.split(":").map(Number); const endMins = h * 60 + m + 30;

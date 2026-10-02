@@ -23,7 +23,7 @@ test("a link issued on the GoHighLevel desk: token → record → the client sav
   const link = await issueIntakeLinkGhl(LEAD, ORIGIN);
   assert.match(link.url, /^https:\/\/www\.creativecowboys\.co\/onboarding\/[A-Za-z0-9_-]{43}$/);
   const token = tokenOf(link.url);
-  assert.equal(ghl.value(LEAD, "Desk Intake"), "Link issued"); assert.equal(ghl.value(LEAD, "Desk Link"), `${ORIGIN}/leads?tab=onboarding&client=${LEAD}`);
+  assert.equal(ghl.value(LEAD, "Desk Intake"), "Link issued"); assert.equal(ghl.value(LEAD, "Desk Link"), `${ORIGIN}/admin?tab=onboarding&client=${LEAD}`);
   assert.deepEqual(blobJson(`onboarding/tokens/${sha(token)}.json`), { itemId: LEAD });
   // The public intake page resolves the token exactly as before — the stored id is just a contact id now.
   const record = await resolveToken(token);

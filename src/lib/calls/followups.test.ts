@@ -40,7 +40,10 @@ test("the feed emits timed and all-day events and skips closed or undated leads"
   assert.match(ics, /SUMMARY:Follow-up: Won Client/, "won clients with a booked call stay on the calendar");
   assert.match(ics, /DTSTART;TZID=America\/New_York:20260930T133000/);
   assert.match(ics, /SUMMARY:Follow-up: Ladybug Hot Sauces/);
-  assert.match(ics, /leads\?lead=1/);
+  const unfolded = ics.replace(/\r\n /g, "");
+  assert.match(unfolded, /Open on the desk: https:\/\/www\.creativecowboys\.co\/admin\?lead=1\\n|Open on the desk: https:\/\/www\.creativecowboys\.co\/admin\?lead=1\r\n/, "the description links to the desk at /admin");
+  assert.match(unfolded, /\r\nURL:https:\/\/www\.creativecowboys\.co\/admin\?lead=1\r\n/, "so does the event's URL");
+  assert.doesNotMatch(unfolded, /\/leads/, "nothing new is built with the desk's old address");
   assert.ok(ics.split("\r\n").every((l) => l.length <= 75), "lines are folded");
 });
 
