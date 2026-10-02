@@ -8,18 +8,22 @@ import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
+import { NotesTimeline, type DeskSystem } from "./notes";
 
 // Madison's view: every client in onboarding, what is missing, and one-click updates that write to
-// Monday. Every change sends the record version it was based on; a 409 means reload and look first.
-async function json<T>(response: Response): Promise<T> {
+// the system that holds the record — Monday, or GoHighLevel once DESK_BACKEND=ghl (the server says which
+// with every list). Every change sends the record version it was based on; a 409 means reload and look first.
+const crmName = (system: DeskSystem) => (system === "ghl" ? "GoHighLevel" : "Monday");
+async function json<T>(response: Response, crm = "Monday"): Promise<T> {
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw Object.assign(new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again." : "Monday could not complete that request. Please try again.")), { status: response.status });
+  if (!response.ok) throw Object.assign(new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again." : `${crm} could not complete that request. Please try again.`)), { status: response.status });
   return data;
 }
 const stageLabel = (id: string) => STAGES.find((s) => s.id === id)?.label || "Unknown";
 const fmtDate = (v: string) => v ? new Date(`${v}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
 
-export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddClient }: { clientId: string; onOpenClient: (id: string) => void; onGraduated?: (clientRowId: string) => void; onAddClient?: () => void }) {
+export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddClient, system = "monday", preview = "", onSystem }: { clientId: string; onOpenClient: (id: string) => void; onGraduated?: (clientRowId: string) => void; onAddClient?: () => void; system?: DeskSystem; preview?: string; onSystem?: (system: DeskSystem) => void }) {
+  const crm = crmName(system);
   const [rows, setRows] = useState<OnboardingRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [board, setBoard] = useState("Onboarding Pipeline");
@@ -36,12 +40,15 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
     if (lock.current) return;
     lock.current = true; setLoading(true); setError("");
     try {
-      const data: OnboardingListData = await json(await fetch(`/api/team/onboarding${next ? `?cursor=${encodeURIComponent(next)}` : ""}`, { cache: "no-store" }));
+      // `?backend=ghl|monday` on the page URL previews the other system's desk without flipping DESK_BACKEND.
+      const q = new URLSearchParams(); if (next) q.set("cursor", next); if (preview) q.set("backend", preview);
+      const data: OnboardingListData = await json(await fetch(`/api/team/onboarding${q.toString() ? `?${q}` : ""}`, { cache: "no-store" }), crm);
       setRows((prev) => next ? [...new Map([...prev, ...data.rows].map((r) => [r.id, r])).values()] : data.rows);
-      setCursor(data.cursor); setBoard(data.boardName);
+      setCursor(data.cursor); setBoard(data.boardName); onSystem?.(data.system === "ghl" ? "ghl" : "monday");
     } catch (e) { setError(e instanceof Error ? e.message : "Could not load onboarding clients."); }
     finally { lock.current = false; setLoading(false); }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- crm only words an error message; onSystem is a stable setter
+  }, [preview]);
   useEffect(() => { void load(); }, [load]);
   const owners = useMemo(() => [...new Map(rows.flatMap((r) => r.onboardingOwnerIds.map((id, i) => [id, r.onboardingOwner.split(", ")[i] || id] as const))).entries()], [rows]);
   const filtered = rows.filter((r) =>
@@ -51,9 +58,10 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
     (only !== "overdue" || r.overdue) && (only !== "missing" || r.missing.length > 0) && (only !== "stalled" || r.stage === "hold" || r.health === "Blocked" || r.health === "Waiting on Client") &&
     `${r.name} ${r.contact} ${r.email} ${r.city} ${r.packages}`.toLowerCase().includes(search.toLowerCase()),
   ).sort((a, b) => Number(b.overdue) - Number(a.overdue) || (a.stage === "launched" ? 1 : 0) - (b.stage === "launched" ? 1 : 0) || b.missing.length - a.missing.length || a.name.localeCompare(b.name));
-  const update = (row: OnboardingRow) => setRows((prev) => prev.map((r) => r.id === row.id ? row : r));
+  // A record opened by id that the list does not have yet (a brand-new handoff — GoHighLevel's search runs a few seconds behind) joins the list.
+  const update = useCallback((row: OnboardingRow) => setRows((prev) => prev.some((r) => r.id === row.id) ? prev.map((r) => r.id === row.id ? row : r) : [row, ...prev]), []);
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><div className="ob-head-actions">{onAddClient && <button type="button" className="call-primary" onClick={onAddClient}>+ Add client</button>}<button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label="Refresh from Monday"><RefreshIcon /></button></div></header>
+    <header className="ob-head"><div><span className="call-eyebrow">ONBOARDING</span><h1>New clients, what&rsquo;s missing, who&rsquo;s next.</h1><p className="call-muted">{board} · overdue and incomplete first</p></div><div className="ob-head-actions">{onAddClient && <button type="button" className="call-primary" onClick={onAddClient}>+ Add client</button>}<button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label={`Refresh from ${crm}`}><RefreshIcon /></button></div></header>
     <div className="ob-toolbar">
       <input placeholder="Search business, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
       <select value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Filter by onboarding owner"><option value="">All owners</option>{owners.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
@@ -73,43 +81,49 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
         <span>{r.missing.length ? <b className="ob-missing">{r.missing.length} open</b> : <b className="ob-ok">Complete</b>}<small>Intake: {r.intake || "Not sent"}</small></span>
         <span>{r.nextAction || <em>None set</em>}<small className={r.overdue ? "ob-overdue" : ""}>{r.overdue ? "Overdue" : ""}{r.lastTouch && ` · touched ${fmtDate(r.lastTouch)}`}</small></span>
       </button>)}
-      {loading && <p role="status" className="call-roster-message">Loading from Monday…</p>}
+      {loading && <p role="status" className="call-roster-message">Loading from {crm}…</p>}
       {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients in onboarding yet. Hand one off from the Sales tab or add one here."}</p>}
     </div>
     {cursor && <button className="call-secondary call-load-more" disabled={loading} onClick={() => load(cursor)}>Load more clients</button>}
-    {clientId && <ClientPanel key={clientId} id={clientId} onClose={() => onOpenClient("")} onRow={update} onGraduated={onGraduated} />}
+    {clientId && <ClientPanel key={clientId} id={clientId} listSystem={system} onClose={() => onOpenClient("")} onRow={update} onGraduated={onGraduated} />}
   </main>;
 }
 
-function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose: () => void; onRow: (row: OnboardingRow) => void; onGraduated?: (clientRowId: string) => void }) {
+function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: string; listSystem: DeskSystem; onClose: () => void; onRow: (row: OnboardingRow) => void; onGraduated?: (clientRowId: string) => void }) {
   const [detail, setDetail] = useState<OnboardingDetail | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
-  const [note, setNote] = useState("");
   const [next, setNext] = useState({ action: "", due: "" });
+  // The record says which system holds it (a GoHighLevel contact id always opens in GoHighLevel, whatever the list showed).
+  const system: DeskSystem = detail ? (detail.system === "ghl" ? "ghl" : "monday") : listSystem;
+  const crm = crmName(system);
+  // Files and the intake record live under the record's storage key, which for a client imported from the old board is not the record id.
+  const scope = detail?.fileScope || id;
   const [link, setLink] = useState<{ url: string; expiresAt: string } | null>(null);
   const [gbpUrl, setGbpUrl] = useState("");
   const [uploading, setUploading] = useState<string[]>([]);
   const load = useCallback(async () => {
     setError("");
-    try { const d: OnboardingDetail = await json(await fetch(`/api/team/onboarding/${id}`, { cache: "no-store" })); setDetail(d); onRow(d.row); setNext({ action: d.row.nextAction, due: "" }); setGbpUrl(d.row.gbpUrl); }
+    try { const d: OnboardingDetail = await json(await fetch(`/api/team/onboarding/${id}`, { cache: "no-store" }), crm); setDetail(d); onRow(d.row); setNext({ action: d.row.nextAction, due: d.nextDue || "" }); setGbpUrl(d.row.gbpUrl); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not load this client."); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- crm only words an error message
   }, [id, onRow]);
   useEffect(() => { void load(); }, [load]);
-  const patch = async (body: Record<string, unknown>, label: string) => {
-    if (!detail || busy) return;
+  const patch = async (body: Record<string, unknown>, label: string): Promise<boolean> => {
+    if (!detail || busy) return false;
     setBusy(label); setError("");
     try {
-      const data: { row: OnboardingRow } = await json(await fetch(`/api/team/onboarding/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }));
+      const data: { row: OnboardingRow } = await json(await fetch(`/api/team/onboarding/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }), crm);
       setDetail({ ...detail, row: data.row }); onRow(data.row);
       if (body.action === "searchAtlasListing") await load(); // pick up the live card for the newly linked listing
-    } catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); }
+      return true;
+    } catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); return false; }
     finally { setBusy(""); }
   };
   const post = async (path: string, label: string, method = "POST") => {
     if (busy) return null;
     setBusy(label); setError("");
-    try { return await json<Record<string, unknown>>(await fetch(`/api/team/onboarding/${id}/${path}`, { method, headers: { "Content-Type": "application/json" } })); }
+    try { return await json<Record<string, unknown>>(await fetch(`/api/team/onboarding/${id}/${path}`, { method, headers: { "Content-Type": "application/json" } }), crm); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not complete that."); return null; }
     finally { setBusy(""); }
   };
@@ -119,8 +133,8 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
       if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB.`); continue; }
       setUploading((u) => [...u, file.name]);
       try {
-        const blob = await upload(uploadPath(id, category, file.name), file, { access: "private", handleUploadUrl: `/api/team/onboarding/${id}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
-        await json(await fetch(`/api/team/onboarding/${id}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }));
+        const blob = await upload(uploadPath(scope, category, file.name), file, { access: "private", handleUploadUrl: `/api/team/onboarding/${scope}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        await json(await fetch(`/api/team/onboarding/${scope}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }), crm);
       } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload.`); }
       finally { setUploading((u) => u.filter((n) => n !== file.name)); }
     }
@@ -128,7 +142,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
   };
   const removeFile = async (key: string) => {
     setError("");
-    try { await json(await fetch(`/api/team/onboarding/${id}/files?key=${encodeURIComponent(key)}`, { method: "DELETE" })); await load(); }
+    try { await json(await fetch(`/api/team/onboarding/${scope}/files?key=${encodeURIComponent(key)}`, { method: "DELETE" }), crm); await load(); }
     catch (e) { setError(e instanceof Error ? e.message : "Could not remove that file."); }
   };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
@@ -137,7 +151,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
   const problems = readinessProblems(row);
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
   return <aside className="ob-panel" aria-label={`${row.name} onboarding`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">Monday ↗</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {pending.length > 0 && <div className="call-alert" role="alert"><strong>Handoff steps still pending:</strong> {pending.join(", ")}.<button className="call-secondary" disabled={!!busy} onClick={async () => { const r = await post("retry", "retry") as StartResult | null; if (r) { if (r.pending.length) setError(`Still pending: ${r.pending.join(", ")}. Try again in a moment.`); await load(); } }}>{busy === "retry" ? "Retrying…" : "Retry pending steps"}</button></div>}
 
@@ -162,7 +176,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
         <label>Agreement<select value={row.agreement || "Unknown"} disabled={!!busy} onChange={(e) => patch({ action: "agreement", value: e.target.value }, "agreement")}>{AGREEMENT.map((a) => <option key={a}>{a}</option>)}</select></label>
         <label>Payment<select value={row.payment || "Unknown"} disabled={!!busy} onChange={(e) => patch({ action: "payment", value: e.target.value }, "payment")}>{PAYMENT.filter((a) => a !== PAYMENT_NO_CHARGE || isGiveawayWinner(row.packages) || row.payment === a).map((a) => <option key={a}>{a}</option>)}</select></label>
       </div>
-      <p className="call-muted ob-hint">Madison is not on Monday yet, so she cannot be assigned until Josh invites her (then add her id to ONBOARDING_EXTRA_OWNERS). Sales owner is never changed here.</p>
+      <p className="call-muted ob-hint">{system === "ghl" ? "Owners are saved by name on the contact in GoHighLevel, so anyone on the team can be assigned. Sales owner is never changed here." : "Madison is not on Monday yet, so she cannot be assigned until Josh invites her (then add her id to ONBOARDING_EXTRA_OWNERS). Sales owner is never changed here."}</p>
     </section>
 
     <section className="ob-section"><h3>Next action</h3>
@@ -185,7 +199,7 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
         <div className="ob-files-head"><strong>Files</strong><small>{intake?.files.length || 0} on file · up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each · private to the team</small></div>
         {FILE_CATEGORIES.map((cat) => <div key={cat} className="ob-files-cat">
           <div className="ob-files-cat-head"><span>{cat}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
-          <ul className="ob-files">{(intake?.files || []).filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${id}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
+          <ul className="ob-files">{(intake?.files || []).filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${scope}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
         </div>)}
       </div>
     </section>
@@ -212,14 +226,11 @@ function ClientPanel({ id, onClose, onRow, onGraduated }: { id: string; onClose:
     </section>
 
     <section className="ob-section"><h3>Launch</h3>
-      <p className="call-muted ob-hint">When the work is live, graduate the client to the Clients tab: one row on the Active Clients board (contact, package, owner, GBP state carried over), and this record moves to Launched. Safe to press twice.</p>
+      <p className="call-muted ob-hint">{system === "ghl" ? "When the work is live, graduate the client to the Clients tab: the same contact in GoHighLevel becomes the client (package, owner and GBP state stay with it), and this record moves to Launched. Safe to press twice." : "When the work is live, graduate the client to the Clients tab: one row on the Active Clients board (contact, package, owner, GBP state carried over), and this record moves to Launched. Safe to press twice."}</p>
       <button className="call-primary" disabled={!!busy || row.stage === "new" || row.stage === "collecting"} onClick={async () => { const r = await post("graduate", "graduate") as { id: string; created: boolean } | null; if (r) { await load(); onGraduated?.(r.id); } }}>{busy === "graduate" ? "Graduating…" : "Mark launched → Clients"}</button>
     </section>
 
-    <section className="ob-section"><h3>Notes</h3>
-      <div className="ob-next"><textarea rows={2} value={note} disabled={!!busy} placeholder="Append a note to the Monday record" onChange={(e) => setNote(e.target.value)} /><button className="call-secondary" disabled={!!busy || !note.trim()} onClick={async () => { await patch({ action: "note", text: note }, "note"); setNote(""); await load(); }}>Add note</button></div>
-      {history.map((h) => <article key={h.id} className="ob-history"><small>{h.author} · {new Date(h.createdAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}</small><p className="call-preserve">{h.text}</p></article>)}
-    </section>
+    <NotesTimeline history={history} busy={!!busy} system={system} onAdd={async (text, noteId) => { const ok = await patch(system === "ghl" ? { action: "note", text, noteId } : { action: "note", text }, "note"); if (ok) await load(); return ok; }} />
   </aside>;
 }
 

@@ -5,6 +5,8 @@ import { buildLines, monthlyTotal, type Selection } from "@/lib/packages/catalog
 import { addNote, addTask, ghl, GHL_APP, ghlLocationId, ghlUserId, INVOICE_HOST } from "@/lib/packages/ghl";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 import { listWinners, matchWinner, winnerMessage } from "@/lib/packages/winners";
+import { winnerForContactGhl, winnerMessageGhl } from "@/lib/desk/winners";
+import { deskDefault } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,13 +83,22 @@ export async function POST(req: Request) {
 
     // Giveaway winners are never charged (Dave, Oct 1 2026). Fresh Monday read, no cache, test mode included;
     // if Monday can't be read we refuse rather than risk billing a winner.
-    let winners;
-    try { winners = await listWinners(); }
-    catch { throw new CallDeskError("Couldn't check Monday for giveaway winners, so nothing was created in GHL. Try again in a minute.", 503); }
-    const winner = matchWinner({ id: contact.id, email: contact.email, phone: contact.phone, company: contact.companyName, name: personName }, winners);
+    // DESK_BACKEND=ghl: the winner list lives on the contacts themselves (Desk Packages). Same rule either way: a failed read refuses.
+    const deskOnGhl = deskDefault() === "ghl";
+    const keys = { id: contact.id, email: contact.email, phone: contact.phone, company: contact.companyName, name: personName };
+    let winner;
+    if (deskOnGhl) {
+      try { winner = await winnerForContactGhl(keys); }
+      catch { throw new CallDeskError("Couldn't check the team desk for giveaway winners, so nothing was created in GHL. Try again in a minute.", 503); }
+    } else {
+      let winners;
+      try { winners = await listWinners(); }
+      catch { throw new CallDeskError("Couldn't check Monday for giveaway winners, so nothing was created in GHL. Try again in a minute.", 503); }
+      winner = matchWinner(keys, winners);
+    }
     if (winner) {
       console.warn(`packages: refused — giveaway winner contact=${contact.id} item=${winner.itemId} board=${winner.board}`);
-      return NextResponse.json({ error: winnerMessage(winner), winner: { name: winner.name, board: winner.board, url: winner.url } }, { status: 409, headers: teamHeaders });
+      return NextResponse.json({ error: deskOnGhl ? winnerMessageGhl(winner) : winnerMessage(winner), winner: { name: winner.name, board: winner.board, url: winner.url, ...(deskOnGhl ? { system: "ghl" } : {}) } }, { status: 409, headers: teamHeaders });
     }
     const business = contact.companyName || personName;
     const { iso, day } = todayInET();

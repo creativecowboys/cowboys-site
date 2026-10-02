@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/validation";
 import { clientView, resolveToken, saveIntakeForm, submitIntake } from "@/lib/onboarding/intake";
 import { validateIntakeForm, validateToken } from "@/lib/onboarding/validation";
+import { submitIntakeGhl } from "@/lib/desk/intake";
+import { deskDefault, isGhlRecordId } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,6 +37,9 @@ export async function POST(req: Request, context: Context) {
     const record = await resolveToken(validateToken((await context.params).token));
     const body = await readCallBody(req) as { form?: unknown };
     if (body && typeof body === "object" && "form" in body) await saveIntakeForm(record, validateIntakeForm(body.form));
-    return NextResponse.json(clientView(await submitIntake(record)), { headers });
+    // The record is saved to storage either way; only the status the desk shows differs. A record issued on the GoHighLevel
+    // desk (its id is a contact id) can only be marked there; a Monday-era record follows DESK_BACKEND.
+    const ghl = deskDefault() === "ghl" || isGhlRecordId(record.itemId);
+    return NextResponse.json(clientView(ghl ? await submitIntakeGhl(record) : await submitIntake(record)), { headers });
   } catch (error) { return failure(error); }
 }

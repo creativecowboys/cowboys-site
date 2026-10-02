@@ -9,6 +9,10 @@ import { validateClientId, validateClientPatch } from "@/lib/clients/validation"
 import { onboardingOwners } from "@/lib/onboarding/config";
 import { readIntake } from "@/lib/onboarding/store";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
+import { clientDetailGhl, patchClientGhl } from "@/lib/desk/clients";
+import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
+import { actorFor } from "@/lib/desk/team";
+import { validateDeskClientPatch } from "@/lib/desk/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,7 +24,10 @@ export async function GET(_req: Request, context: Context) {
     const session = await teamSession();
     if (!session) return unauthorized();
     const canSeeMoney = isOwnerEmail(session.email);
-    const id = validateClientId((await context.params).id);
+    const rawId = (await context.params).id;
+    // A GoHighLevel contact id always goes to GoHighLevel; a Monday item id follows DESK_BACKEND (see src/lib/desk/switch.ts).
+    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await clientDetailGhl(validateRecordId(rawId), canSeeMoney), { headers: teamHeaders });
+    const id = validateClientId(rawId);
     const { row: stored, history } = await getClient(id);
     // Live Stripe read when we know the customer; a Stripe hiccup never hides the Monday record.
     const [stripe, live, gbpLocations] = await Promise.all([
@@ -41,8 +48,14 @@ export async function PATCH(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
     assertSameOrigin(req);
-    const id = validateClientId((await context.params).id);
+    const rawId = (await context.params).id;
     const session = await teamSession();
+    if (backendForRecordId(rawId) === "ghl") {
+      assertMayWriteGhl(isOwnerEmail(session?.email));
+      const patched = await patchClientGhl(validateRecordId(rawId), validateDeskClientPatch(await readCallBody(req)), actorFor(session?.email));
+      return NextResponse.json({ row: isOwnerEmail(session?.email) ? patched : withoutMoney(patched) }, { headers: teamHeaders });
+    }
+    const id = validateClientId(rawId);
     const row = await applyClientPatch(id, validateClientPatch(await readCallBody(req)));
     return NextResponse.json({ row: isOwnerEmail(session?.email) ? row : withoutMoney(row) }, { headers: teamHeaders });
   } catch (error) { return failure(error); }

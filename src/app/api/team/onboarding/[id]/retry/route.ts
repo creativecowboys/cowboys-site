@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
-import { isTeam } from "@/lib/team-auth";
+import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
 import { CallDeskError } from "@/lib/calls/validation";
 import { retryOnboarding } from "@/lib/onboarding/handoff";
 import { getOnboarding } from "@/lib/onboarding/pipeline";
 import { validateItemId } from "@/lib/onboarding/validation";
 import { assertOrigin, failure, unauthorized } from "@/lib/onboarding/http";
+import { retryOnboardingGhl } from "@/lib/desk/onboarding";
+import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
+import { actorFor } from "@/lib/desk/team";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,7 +19,14 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
   try {
     if (!(await isTeam())) return unauthorized();
     assertOrigin(req);
-    const id = validateItemId((await context.params).id);
+    const rawId = (await context.params).id;
+    if (backendForRecordId(rawId) === "ghl") {
+      const session = await teamSession();
+      assertMayWriteGhl(isOwnerEmail(session?.email));
+      const retried = await retryOnboardingGhl(validateRecordId(rawId), actorFor(session?.email));
+      return NextResponse.json(retried, { status: retried.pending.length ? 202 : 200, headers });
+    }
+    const id = validateItemId(rawId);
     const { row } = await getOnboarding(id);
     const key = row.leadId || (row.handoffId ? `manual-${row.handoffId}` : "");
     if (!key) throw new CallDeskError("This client was created in Monday by hand, so there is nothing to retry.", 400);

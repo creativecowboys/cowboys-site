@@ -9,8 +9,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };
 
-// Protected by middleware (admin sign-in cookie). The Sales tab is the giveaway call desk
-// (Monday Giveaway Leads board); the Onboarding tab works the Onboarding Pipeline board.
+// Protected by middleware (admin sign-in cookie). Three tabs: Sales (the call desk — LEADS_BACKEND),
+// Onboarding and Clients (DESK_BACKEND: the two Monday boards, or GoHighLevel contacts once it is "ghl").
+// The page is static, so DESK_BACKEND is read at build time; flipping it is an env change plus a redeploy,
+// which rebuilds. It only words the copy before the first list loads — every list response names its system.
 export default function LeadsPage() {
-  return <Suspense fallback={null}><Shell /></Suspense>;
+  return <Suspense fallback={null}><Shell deskDefault={process.env.DESK_BACKEND === "ghl" ? "ghl" : "monday"} /></Suspense>;
 }

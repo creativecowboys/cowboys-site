@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AGREEMENT, BUSINESS_TYPES, GIVEAWAY_WINNER, PACKAGES, PAYMENT, PAYMENT_NO_CHARGE, isGiveawayWinner } from "@/lib/onboarding/config";
 import type { HandoffForm, StartResult } from "@/lib/onboarding/types";
 import type { CallLead } from "./types";
+import type { DeskSystem } from "./notes";
 import { CloseIcon } from "./icons";
 
 // Sales → onboarding handoff. Opens over the call desk for the selected lead, keeps a draft per
@@ -28,7 +29,8 @@ function blank(lead: CallLead | null): HandoffForm {
 function readDrafts(): Drafts { try { return JSON.parse(sessionStorage.getItem(STORAGE) || "{}"); } catch { return {}; } }
 function writeDrafts(d: Drafts) { try { sessionStorage.setItem(STORAGE, JSON.stringify(d)); } catch { /* keep in memory only */ } }
 
-export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void }) {
+export default function Handoff({ lead, onClose, onDone, system = "monday", preview = "" }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void; system?: DeskSystem; preview?: string }) {
+  const ghl = system === "ghl"; // the onboarding record will live in GoHighLevel (DESK_BACKEND=ghl, or an owner previewing it)
   const draftKey = lead ? lead.id : MANUAL_KEY;
   // A saved draft keeps the lead version it was started against. If the lead changed since (a note,
   // a move between boards), adopt the current version so Confirm can work, and say so; the rep still
@@ -68,7 +70,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
     setBusy(true); setError("");
     try {
       // The version was captured when the panel opened; the server refuses if the lead changed since.
-      const res = await fetch("/api/team/onboarding", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: lead ? (form.expectedUpdatedAt || lead.updatedAt) : "" }) });
+      const res = await fetch(`/api/team/onboarding${preview ? `?backend=${preview}` : ""}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: lead ? (form.expectedUpdatedAt || lead.updatedAt) : "" }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || (res.status === 401 ? "Your team session expired. Sign in again; this handoff draft stays in this tab." : "The handoff could not be saved. Your draft is still here."));
       setResult(data as StartResult);
@@ -88,7 +90,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
       {result ? <div className={result.pending.length ? "call-alert" : "call-success"} role="status">
         <strong>{result.adopted ? "This client already has an onboarding record." : result.pending.length ? "Onboarding record created, with steps still pending." : lead ? "Handed off to onboarding." : "Client added to onboarding."}</strong>
         {result.pending.length > 0 && <p>Still pending: {result.pending.join(", ")}. Open the client on the Onboarding tab and press <b>Retry pending steps</b>; nothing will be duplicated.</p>}
-        <p><a href={result.itemUrl} target="_blank" rel="noreferrer">Open in Monday ↗</a></p>
+        <p><a href={result.itemUrl} target="_blank" rel="noreferrer">{(result.system || system) === "ghl" ? "Open in GoHighLevel ↗" : "Open in Monday ↗"}</a></p>
         <div><button type="button" className="call-primary" onClick={() => onDone(result.itemId)}>Open on the Onboarding tab</button></div>
       </div> : review ? <>
         <section className="ob-review">
@@ -108,7 +110,9 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
             <dt>Agreement · Payment</dt><dd>{form.agreement} · {form.payment}</dd>
             <dt>Next action</dt><dd>{[form.nextOwner, form.nextAction, form.nextDue && `due ${form.nextDue}`].filter(Boolean).join(" — ") || "Madison sends the intake link"}</dd>
           </dl>
-          <p className="call-save-explainer">{lead ? "Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the lead Won where it lives (its call history stays put) and prepares the client intake. Nothing is emailed to the client." : "This creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client."}</p>
+          <p className="call-save-explainer">{ghl
+            ? (lead ? "Handing off turns this lead's contact in GoHighLevel into the onboarding record: it posts this summary as a note on the contact, builds the checklist for these packages, marks the lead Won (its call history stays on the same contact) and prepares the client intake. Nothing is emailed to the client." : "This creates the onboarding record on the client's contact in GoHighLevel (a new contact if this email and phone are not there yet), posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client.")
+            : (lead ? "Handing off creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages, marks the lead Won where it lives (its call history stays put) and prepares the client intake. Nothing is emailed to the client." : "This creates one record on the Onboarding Pipeline board, posts this summary as a note, builds the checklist for these packages and prepares the client intake. Nothing is emailed to the client.")}</p>
         </section>
         {error && <div className="call-alert" role="alert"><strong>Your draft is still here.</strong><p>{error}</p></div>}
         <footer className="call-form-footer"><span>{busy ? "Handing off… keep this page open." : "Nothing is sent to the client."}</span><div><button type="button" className="call-secondary" disabled={busy} onClick={() => setReview(false)}>Back</button><button type="button" className="call-primary" disabled={busy || problems.length > 0} onClick={submit}>{busy ? "Saving…" : lead ? "Confirm handoff" : "Add client"}</button></div></footer>
@@ -123,7 +127,7 @@ export default function Handoff({ lead, onClose, onDone }: { lead: CallLead | nu
               {prizes.map((p) => <label key={p}><input type="checkbox" checked={form.packages.includes(p)} onChange={() => togglePackage(p)} /> {p}</label>)}
               {/* Dave, Oct 1 2026: Giveaway Winner is the last tile, after Growth Strategy Session. */}
               <label className="ob-winner"><input type="checkbox" checked={winner} onChange={toggleWinner} /> {GIVEAWAY_WINNER}<small>No charge. Tick it together with what they won, e.g. Local Growth.</small></label>
-            </div><small>These names match the Onboarding Pipeline board. Pick what was sold, not what was discussed.</small></div>
+            </div><small>{ghl ? "These are the desk's package names. Pick what was sold, not what was discussed." : "These names match the Onboarding Pipeline board. Pick what was sold, not what was discussed."}</small></div>
             {winner ? <>
               <label className="ob-field">Monthly amount agreed ($)<input type="text" value="0" disabled readOnly /><small className="ob-winner-note">Giveaway winner — no charge</small></label>
               <label className="ob-field">Setup / one-time amount agreed ($)<input type="text" value="0" disabled readOnly /><small className="ob-winner-note">Giveaway winner — no charge</small></label>

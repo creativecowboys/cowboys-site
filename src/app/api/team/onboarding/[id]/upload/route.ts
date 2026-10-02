@@ -3,10 +3,11 @@ import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { isTeam } from "@/lib/team-auth";
 import { CallDeskError } from "@/lib/calls/validation";
 import { UPLOAD_MAX_BYTES, UPLOAD_TYPES } from "@/lib/onboarding/config";
-import { ensureIntake, filePathFor, indexFile } from "@/lib/onboarding/intake";
+import { filePathFor, indexFile } from "@/lib/onboarding/intake";
 import { FILE_PREFIX } from "@/lib/onboarding/store";
-import { validateFileCategory, validateFileScope } from "@/lib/onboarding/validation";
+import { validateFileCategory } from "@/lib/onboarding/validation";
 import { teamHeaders } from "@/lib/onboarding/http";
+import { assertMayChangeFiles, ensureIntakeFor, fileScope } from "@/lib/desk/http";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,17 +17,18 @@ export const dynamic = "force-dynamic";
 // is authenticated by handleUpload's own signature instead.
 export async function POST(req: Request, context: { params: Promise<{ id: string }> }) {
   try {
-    const id = validateFileScope((await context.params).id);
+    const id = fileScope((await context.params).id);
     const body = (await req.json()) as HandleUploadBody;
     if (body.type === "blob.generate-client-token") {
       if (!(await isTeam())) return NextResponse.json({ error: "Please sign in to the team area." }, { status: 401, headers: teamHeaders });
       const origin = req.headers.get("origin");
       if (origin && origin !== new URL(req.url).origin) throw new CallDeskError("Uploads must come from the team desk.", 403);
+      await assertMayChangeFiles(id);
     }
     const result = await handleUpload({
       request: req, body, token: process.env.BLOB_READ_WRITE_TOKEN,
       onBeforeGenerateToken: async (pathname, clientPayload) => {
-        const record = await ensureIntake(id);
+        const record = await ensureIntakeFor(id);
         let payload: { category?: unknown; name?: unknown } = {};
         try { payload = JSON.parse(clientPayload || "{}"); } catch { throw new CallDeskError("Choose where this file belongs.", 400); }
         const category = validateFileCategory(payload.category);

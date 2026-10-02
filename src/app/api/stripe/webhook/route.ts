@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { findClientByStripeCustomer, syncClientFromStripe } from "@/lib/clients/board";
 import { verifyStripeSignature } from "@/lib/clients/stripe";
+import { findClientByStripeCustomerGhl, syncClientFromStripeGhl } from "@/lib/desk/clients";
+import { deskDefault } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +26,13 @@ export async function POST(req: Request) {
   if (!/^cus_[A-Za-z0-9]+$/.test(customerId)) return NextResponse.json({ ignored: "no customer" });
   const email = typeof obj.customer_email === "string" ? obj.customer_email : typeof obj.email === "string" ? obj.email : null;
   try {
+    if (deskDefault() === "ghl") {
+      // DESK_BACKEND=ghl: the client is a GoHighLevel contact and payment state lands in its desk fields (never an LSE field or tag).
+      const contact = await findClientByStripeCustomerGhl(customerId, email);
+      if (!contact) return NextResponse.json({ ignored: "customer is not a client on the team desk" });
+      const synced = await syncClientFromStripeGhl(contact.id);
+      return NextResponse.json({ ok: true, client: contact.id, changed: synced.changed });
+    }
     const client = await findClientByStripeCustomer(customerId, email);
     if (!client) return NextResponse.json({ ignored: "customer not on the Team desk board" });
     const r = await syncClientFromStripe(client.id);

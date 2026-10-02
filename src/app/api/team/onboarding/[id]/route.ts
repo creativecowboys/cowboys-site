@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isTeam } from "@/lib/team-auth";
+import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
 import { assertSameOrigin, readCallBody } from "@/lib/calls/validation";
 import { onboardingOwners } from "@/lib/onboarding/config";
 import { linkActive } from "@/lib/onboarding/intake";
@@ -9,6 +9,10 @@ import { readHandoff, readIntake } from "@/lib/onboarding/store";
 import type { OnboardingDetail } from "@/lib/onboarding/types";
 import { validateItemId, validatePatch } from "@/lib/onboarding/validation";
 import { failure, unauthorized } from "@/lib/onboarding/http";
+import { onboardingDetailGhl, patchOnboardingGhl } from "@/lib/desk/onboarding";
+import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
+import { actorFor } from "@/lib/desk/team";
+import { validateDeskPatch } from "@/lib/desk/validation";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +25,10 @@ function stripToken(record: NonNullable<Awaited<ReturnType<typeof readIntake>>>)
 export async function GET(_req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
-    const id = validateItemId((await context.params).id);
+    const rawId = (await context.params).id;
+    // A GoHighLevel contact id always goes to GoHighLevel; a Monday item id follows DESK_BACKEND (see src/lib/desk/switch.ts).
+    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await onboardingDetailGhl(validateRecordId(rawId)), { headers });
+    const id = validateItemId(rawId);
     const { row: stored, history } = await getOnboarding(id);
     const key = stored.leadId || (stored.handoffId ? `manual-${stored.handoffId}` : "");
     const [record, intake, live, gbpLocations] = await Promise.all([
@@ -45,7 +52,13 @@ export async function PATCH(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
     assertSameOrigin(req);
-    const id = validateItemId((await context.params).id);
+    const rawId = (await context.params).id;
+    if (backendForRecordId(rawId) === "ghl") {
+      const session = await teamSession();
+      assertMayWriteGhl(isOwnerEmail(session?.email));
+      return NextResponse.json({ row: await patchOnboardingGhl(validateRecordId(rawId), validateDeskPatch(await readCallBody(req)), actorFor(session?.email)) }, { headers });
+    }
+    const id = validateItemId(rawId);
     const patch = validatePatch(await readCallBody(req));
     return NextResponse.json({ row: await applyPatch(id, patch) }, { headers });
   } catch (error) { return failure(error); }

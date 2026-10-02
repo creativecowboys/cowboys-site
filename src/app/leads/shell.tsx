@@ -8,23 +8,32 @@ import Onboarding from "./onboarding";
 import Clients from "./clients";
 import Packages from "./packages";
 import type { CallLead } from "./types";
+import type { DeskSystem } from "./notes";
 import "./onboarding.css";
 
-// Two tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
+// Three tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
 // so switching tabs only hides it; nothing is unmounted while a save is running.
-export default function Shell() {
+// `?backend=ghl|monday` previews the other system (the Sales roster and the Onboarding / Clients desk) and is
+// kept while moving between tabs and clients.
+export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSystem }) {
   const params = useSearchParams();
   const router = useRouter();
   const tab = params.get("tab") === "onboarding" ? "onboarding" : params.get("tab") === "clients" ? "clients" : "sales";
   const client = params.get("client") || "";
+  const backend = params.get("backend");
+  const preview = backend === "ghl" || backend === "monday" ? backend : "";
+  // Which system the Onboarding / Clients desk is on: what the last list response said, else the preview, else the build-time default.
+  const [reported, setReported] = useState<DeskSystem | "">("");
+  const deskSystem: DeskSystem = reported || preview || deskDefault;
   const [handoff, setHandoff] = useState<{ lead: CallLead | null } | null>(null);
   const [packages, setPackages] = useState<{ lead: CallLead | null } | null>(null);
   const go = useCallback((next: "sales" | "onboarding" | "clients", clientId?: string) => {
     const q = new URLSearchParams();
     if (next !== "sales") q.set("tab", next);
     if (clientId) q.set("client", clientId);
+    if (preview) q.set("backend", preview);
     router.replace(`/leads${q.toString() ? `?${q}` : ""}`);
-  }, [router]);
+  }, [router, preview]);
   return <div className="team-shell">
     <nav className="team-tabs" aria-label="Team desk sections">
       <button type="button" className={tab === "sales" ? "is-active" : ""} aria-current={tab === "sales" ? "page" : undefined} onClick={() => go("sales")}>Sales</button>
@@ -32,9 +41,9 @@ export default function Shell() {
       <button type="button" className={tab === "clients" ? "is-active" : ""} aria-current={tab === "clients" ? "page" : undefined} onClick={() => go("clients")}>Clients</button>
     </nav>
     <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} onOpenPackages={(lead) => setPackages({ lead })} /></div>
-    {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} />}
-    {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} />}
+    {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} system={deskSystem} preview={preview} onSystem={setReported} />}
+    {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} system={deskSystem} preview={preview} onSystem={setReported} />}
     {packages && <Packages lead={packages.lead} onClose={() => setPackages(null)} />}
-    {handoff && <Handoff lead={handoff.lead} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
+    {handoff && <Handoff lead={handoff.lead} system={deskSystem} preview={preview} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
   </div>;
 }

@@ -8,8 +8,8 @@ import type { CallLead } from "./types";
 // Package builder slide-out (Dave, Sep 25 2026): the onboarding.creativecowboys.co/team/packages builder,
 // reachable from the Sales tab. Same catalog, same GHL recurring-invoice flow; opens prefilled with the
 // selected lead's details so the customer search is one keystroke away.
-/** `winner` is set by the server when this contact is tagged Giveaway Winner on Monday — never billed (Oct 1 2026). */
-type Contact = { id: string; name: string; email: string; phone: string; company: string; winner?: { name: string; board: string; url: string } };
+/** `winner` is set by the server when this contact is tagged Giveaway Winner (on the Monday boards, or on the GoHighLevel desk when `system` is "ghl") — never billed (Oct 1 2026). */
+type Contact = { id: string; name: string; email: string; phone: string; company: string; winner?: { name: string; board: string; url: string; system?: string } };
 type Result = { url: string; invoiceNumber?: string; total: number; lines: { name: string; amount: number }[]; liveMode: boolean; emailed: boolean; emailRequested?: boolean; to: string; ghlUrl?: string };
 /** A failed desk call, with whatever GHL already created (Sep 30 2026: the desk used to show a bare "Error 502"). */
 type Fail = { message: string; step?: string; ghlUrl?: string; url?: string };
@@ -87,7 +87,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
     {err && <div className="call-alert" role="alert"><strong>{err.step ? `The plan was NOT finished (failed at: ${err.step}).` : "Nothing was created."}</strong> {err.message}{(err.ghlUrl || err.url) && <div className="ob-buttons">{err.ghlUrl && <a className="call-secondary" href={err.ghlUrl} target="_blank" rel="noreferrer">Open the recurring template in GHL ↗</a>}{err.url && <a className="call-secondary" href={err.url} target="_blank" rel="noreferrer">Open the invoice ↗</a>}</div>}</div>}
 
     <section className="ob-section"><h3>1. Customer <small>from GoHighLevel</small></h3>
-      {contact?.winner && <div className="call-alert pk-winner" role="alert"><strong>Giveaway winner — no charge.</strong> {contact.winner.name} is tagged Giveaway Winner on the {contact.winner.board} board, so the package builder won&apos;t create a plan or invoice for them. <a href={contact.winner.url} target="_blank" rel="noreferrer">Open in Monday ↗</a></div>}
+      {contact?.winner && <div className="call-alert pk-winner" role="alert"><strong>Giveaway winner — no charge.</strong> {contact.winner.name} is tagged Giveaway Winner on the {contact.winner.system === "ghl" ? `team desk (${contact.winner.board} tab)` : `${contact.winner.board} board`}, so the package builder won&apos;t create a plan or invoice for them. <a href={contact.winner.url} target="_blank" rel="noreferrer">{contact.winner.system === "ghl" ? "Open in GoHighLevel ↗" : "Open in Monday ↗"}</a></div>}
       {contact ? <div className="pk-contact"><div><b>{contact.company || contact.name}</b><small>{contact.company ? `${contact.name} · ` : ""}{contact.email}{contact.phone ? ` · ${contact.phone}` : ""}</small></div><button type="button" className="call-secondary" onClick={() => { setContact(null); setResult(null); }}>Change</button></div>
       : showNew ? <div className="ob-controls">
           <label>First name *<input value={nc.firstName} onChange={(e) => setNc({ ...nc, firstName: e.target.value })} /></label>

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { isTeam } from "@/lib/team-auth";
-import { assertSameOrigin } from "@/lib/calls/validation";
+import { isOwnerEmail, isTeam, teamSession } from "@/lib/team-auth";
 import { issueIntakeLink, revokeIntakeLink } from "@/lib/onboarding/intake";
 import { validateItemId } from "@/lib/onboarding/validation";
 import { assertOrigin, failure, unauthorized } from "@/lib/onboarding/http";
+import { issueIntakeLinkGhl, scopeForRecord } from "@/lib/desk/intake";
+import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,8 +16,13 @@ export async function POST(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
     assertOrigin(req);
-    const id = validateItemId((await context.params).id);
+    const rawId = (await context.params).id;
     const origin = new URL(req.url).origin;
+    if (backendForRecordId(rawId) === "ghl") {
+      assertMayWriteGhl(isOwnerEmail((await teamSession())?.email));
+      return NextResponse.json(await issueIntakeLinkGhl(validateRecordId(rawId), origin), { headers });
+    }
+    const id = validateItemId(rawId);
     return NextResponse.json(await issueIntakeLink(id, origin), { headers });
   } catch (error) { return failure(error); }
 }
@@ -25,7 +31,13 @@ export async function DELETE(req: Request, context: Context) {
   try {
     if (!(await isTeam())) return unauthorized();
     assertOrigin(req);
-    const id = validateItemId((await context.params).id);
+    const rawId = (await context.params).id;
+    if (backendForRecordId(rawId) === "ghl") {
+      assertMayWriteGhl(isOwnerEmail((await teamSession())?.email));
+      await revokeIntakeLink(await scopeForRecord(validateRecordId(rawId))); // the link lives in storage under the client's file scope
+      return NextResponse.json({ revoked: true }, { headers });
+    }
+    const id = validateItemId(rawId);
     await revokeIntakeLink(id);
     return NextResponse.json({ revoked: true }, { headers });
   } catch (error) { return failure(error); }

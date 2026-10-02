@@ -163,3 +163,10 @@
 
 
 .ob-gbp-card{margin-top:12px;border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}.ob-gbp-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}.ob-gbp-head b{font-weight:600}.ob-gbp code{font-size:11px;background:#efe6d6;padding:1px 4px;border-radius:3px}
+
+/* Notes timeline (GoHighLevel desk): a small label for where each note came from. */
+.ob-history small .ob-note-source { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; background: #ece7dc; color: #5b5445; vertical-align: 1px; }
+.ob-history small .ob-note-source-sales-call, .ob-history small .ob-note-source-sales, .ob-history small .ob-note-source-handoff { background: #fde3d6; color: #9a3a12; }
+.ob-history small .ob-note-source-onboarding { background: #dbeafb; color: #1c5a94; }
+.ob-history small .ob-note-source-client { background: #dff3e4; color: #1f6b3a; }
+.ob-history small .ob-note-source-billing { background: #f3ecd0; color: #7a5b00; }
