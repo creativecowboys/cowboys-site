@@ -57,3 +57,20 @@
 .call-offlist p{flex-basis:100%;margin:2px 0 0}
 .call-off-hint{font-size:11px;line-height:1.6;color:#71665a;margin:0 0 11px}
 .call-off-hint button{background:none;border:0;padding:0;color:#a8462b;text-decoration:underline;font-size:inherit}
+
+/* What they told us (Dave, Oct 2 2026): the answers on the form that brought a lead in, at the top of the opened lead, and a small
+   chip beside the Lead Source tag on the roster row ("HVAC · Tier C"). Read from GoHighLevel; display only. */
+.call-person-told{display:inline-block;margin-top:9px;padding:1px 7px;border:1px solid #c9b89e;border-radius:999px;color:#5a4a37;font-size:9px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
+.call-person-source+.call-person-told{margin-left:5px}
+.call-told{margin:18px 0 0;padding:15px 18px;border:1px solid #c9b89e;border-left:4px solid #e8603c;background:#fffaf2;border-radius:4px}
+.call-told-head{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap}
+.call-told-head>span:last-child{font-size:11px;color:#71665a}
+.call-told-section+.call-told-section{border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+.call-told h3{font-size:15px;font-weight:600;line-height:1.45;margin:7px 0 0;color:#2c211a;overflow-wrap:anywhere}
+.call-told dl{display:flex;flex-wrap:wrap;gap:6px 18px;margin:9px 0 0}
+.call-told dl>div{display:flex;align-items:baseline;gap:6px;min-width:0}
+.call-told dt{flex-shrink:0;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:#756451}
+.call-told dd{margin:0;font-size:12px;font-weight:600;overflow-wrap:anywhere}
+.call-told dd a{color:#a8462b}
+.call-told blockquote{margin:10px 0 0;padding:10px 14px;border-left:3px solid #d6cab8;background:#f6efe3;border-radius:0 4px 4px 0;font-size:13px;line-height:1.7}
+@media(max-width:760px){.call-told{padding:14px}.call-told h3{font-size:14px}.call-told dl{gap:6px 14px}}
