@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, DeskLeave, LeadsBackend, SaveCallResult, SignedIn } from "./types";
 import { CALL_OUTCOMES, isCallOutcome, mondayOutcome, outreachStatus, type CallOutcome } from "@/lib/calls/outcomes";
 import { CALL_OWNERS, filterRoster, isOffCallList, mergeRoster, offListReasons, OFF_LIST_LABELS, OFF_LIST_VIEW, type OffListReason } from "@/lib/calls/roster";
@@ -227,11 +227,48 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
   useEffect(() => { void loadList(); }, [loadList]);
   // Calendar events link to /admin?lead=<id> (older ones to /leads?lead=<id>, which forwards): select that lead once, after the first load.
   const deepLinked = useRef(false);
+  const revealLinked = useRef(false); // …and bring its card into sight in the list (see the list effect below the filters)
   useEffect(() => {
     if (deepLinked.current || demo || !ready || !leads.length) return;
     const wanted = new URLSearchParams(window.location.search).get("lead");
-    if (wanted && /^[A-Za-z0-9]{1,64}$/.test(wanted) && leads.some(l => l.id === wanted)) { deepLinked.current = true; setSelected(wanted); }
+    if (wanted && /^[A-Za-z0-9]{1,64}$/.test(wanted) && leads.some(l => l.id === wanted)) { deepLinked.current = true; revealLinked.current = true; setSelected(wanted); }
   }, [leads, ready, demo]);
+  // On two-column widths the roster is pinned in the window (calls.css, "Pinned roster") and is as tall as the window below whatever
+  // part of the header is still on screen. That part is measured here, on scroll and on any change of size, and handed to the CSS as
+  // --call-roster-gap. Without this script the roster is simply a full window tall. Phone widths stack the columns and ignore it.
+  const layoutRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const layout = layoutRef.current;
+    if (!layout) return;
+    const wide = window.matchMedia("(min-width: 761px)");
+    let frame = 0; let last = "";
+    const measure = () => {
+      frame = 0;
+      // A hidden Sales tab (Onboarding or Clients open) has no box: leave the value alone until it is shown again.
+      if (!layout.getClientRects().length) return;
+      const gap = wide.matches ? `${Math.max(0, layout.getBoundingClientRect().top)}px` : "";
+      if (gap === last) return;
+      last = gap;
+      if (gap) layout.style.setProperty("--call-roster-gap", gap); else layout.style.removeProperty("--call-roster-gap");
+    };
+    const soon = () => { if (!frame) frame = window.requestAnimationFrame(measure); };
+    measure();
+    window.addEventListener("scroll", soon, { passive: true });
+    window.addEventListener("resize", soon);
+    wide.addEventListener("change", soon);
+    // Something above the desk changing height (an alert under the top bar) resizes the page; the Sales tab coming back into
+    // view, or opening on another tab first, resizes the layout itself.
+    const resized = new ResizeObserver(soon);
+    resized.observe(document.body);
+    resized.observe(layout);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", soon);
+      window.removeEventListener("resize", soon);
+      wide.removeEventListener("change", soon);
+      resized.disconnect();
+    };
+  }, []);
   useEffect(() => {
     if (!selected || !ready) return;
     const controller = new AbortController(); let current = true;
@@ -284,6 +321,27 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
   // Off the call list (Not Interested, or a do-not-contact / fake-lead tag in GHL): out of every view except "Not interested / do not call".
   const offView = queue === OFF_LIST_VIEW;
   const filtered = filterRoster(leads, { view: queue, owner, status, source, search });
+  // The list scrolls inside the roster. After a filter change it shows the opened lead's card if the new list has it, otherwise it
+  // starts again from the top; while a search is typed the results always start from the top (a search is looking for someone else).
+  // A calendar link (?lead=) brings that lead's card into sight. Only the list moves, never the page, and a lead picked by clicking
+  // its card is left where it is.
+  const listRef = useRef<HTMLDivElement>(null);
+  const filterKey = JSON.stringify([queue, owner, status, source, search]);
+  const searching = search.trim() !== "";
+  const shownFilters = useRef(filterKey);
+  useLayoutEffect(() => {
+    const changed = shownFilters.current !== filterKey;
+    shownFilters.current = filterKey;
+    const linked = revealLinked.current;
+    revealLinked.current = false;
+    const list = listRef.current;
+    if (!list || (!changed && !linked)) return;
+    const card = selected && !(changed && searching) ? list.querySelector<HTMLElement>(".call-person.is-active") : null;
+    if (!card) { if (changed) list.scrollTop = 0; return; }
+    const box = list.getBoundingClientRect(); const at = card.getBoundingClientRect();
+    if (at.top >= box.top && at.bottom <= box.bottom) return; // already in sight
+    list.scrollTop += at.top - box.top - Math.max(0, (box.height - at.height) / 2); // centred in the list
+  }, [filterKey, searching, selected]);
   const offCount = leads.filter(isOffCallList).length;
   // Status choices come from the leads this view can show, so the normal list never offers a status that only off-list leads have.
   const statusOptions = [...new Set(leads.filter(l => isOffCallList(l) === offView).map(x => x.outreach).filter(Boolean))].sort();
@@ -301,7 +359,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
     <header className="call-header"><Link className="call-brand" href="/"><Image src="/cowboys-logo-stacked-orange.png" alt="Creative Cowboys" width={150} height={64} priority /><span>TEAM FIELD GUIDE</span></Link><div className="call-header-title"><span className="call-eyebrow">CHRISTMAS IN SEPTEMBER</span><h1>Good conversations.<br className="call-mobile-break" /> Real next steps.</h1></div><div className="call-mode">{onOpenPackages && !demo ? <button type="button" className="call-header-button" onClick={() => onOpenPackages(detail)}>Package builder →</button> : (demo ? "FICTIONAL DEMO" : `${crm.toUpperCase()} CALL WORKSPACE`)}<span>{onOpenPackages && !demo ? "Build a plan, get a pay link." : "Ask. Listen. Find the right fit."}</span></div></header>
     {demo && <div className="call-demo-banner">Preview workspace · All businesses below are fictional. Demo saves stay in this browser tab.</div>}
     {storageError && <div role="alert" className="call-alert">{storageError}</div>}
-    <div className="call-layout"><aside className="call-roster" aria-label="Giveaway entrants">
+    <div className="call-layout" ref={layoutRef}><aside className="call-roster" aria-label="Giveaway entrants">
       <div className="call-roster-heading"><div><span className="call-eyebrow">YOUR STARTING POINT</span><h2>The people.</h2></div><button className={`call-icon-button ${spin || listLoading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void loadList(); }} disabled={listLoading || saving || assigning} aria-label={demo ? "Refresh sample entrant list" : `Refresh ${crm} lead list`}><RefreshIcon /></button></div>
       <p className="call-muted call-board-name">{board}</p>
       <label className="call-search"><span className="call-sr-only">Search loaded entrants</span><input placeholder="Search a name or business…" value={search} onChange={e => setSearch(e.target.value)} /></label>
@@ -313,11 +371,11 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
       {!tagsRead && <div className="call-alert" role="alert">GoHighLevel sent this list without contact tags, so a lead tagged do-not-contact or fake-lead may still be showing. Check the lead in GoHighLevel before you call.</div>}
       {hiddenMatches > 0 && <p className="call-off-hint">{hiddenMatches} {filtered.length ? "more " : ""}{hiddenMatches === 1 ? "match is" : "matches are"} off the call list. <button type="button" onClick={() => { setQueue(OFF_LIST_VIEW); setStatus(""); }}>Show not interested / do not call</button></p>}
       {listError && <div className="call-alert" role="alert">{listError}<button onClick={() => loadList(cursor || undefined)}>Try again</button></div>}
-      <div className="call-person-list">{filtered.map(lead => { const chip = toldChip(lead); return <button key={lead.id} onClick={() => choose(lead.id)} disabled={saving || assigning} className={`call-person ${selected === lead.id ? "is-active" : ""}`} aria-pressed={selected === lead.id}><span className="call-person-top"><span>{businessShown(lead.name, lead.contact)}</span><span aria-hidden="true">↗</span></span><span className="call-person-contact">{contactLine(lead.name, lead.contact, [lead.city], "Contact not supplied")}</span><span className="call-person-bottom"><span className="call-status">{lead.outreach || "No status"}</span><span>{entries[lead.id]?.dirty ? "Draft saved here" : lead.owner || "Unassigned"}</span></span><OffBadges lead={lead} />{lead.leadSource && <span className="call-person-source">{lead.leadSource}</span>}{chip && <span className="call-person-told" title="What they told us on the form">{chip}</span>}</button>; })}</div>
+      <div className="call-person-list" ref={listRef}>{filtered.map(lead => { const chip = toldChip(lead); return <button key={lead.id} onClick={() => choose(lead.id)} disabled={saving || assigning} className={`call-person ${selected === lead.id ? "is-active" : ""}`} aria-pressed={selected === lead.id}><span className="call-person-top"><span>{businessShown(lead.name, lead.contact)}</span><span aria-hidden="true">↗</span></span><span className="call-person-contact">{contactLine(lead.name, lead.contact, [lead.city], "Contact not supplied")}</span><span className="call-person-bottom"><span className="call-status">{lead.outreach || "No status"}</span><span>{entries[lead.id]?.dirty ? "Draft saved here" : lead.owner || "Unassigned"}</span></span><OffBadges lead={lead} />{lead.leadSource && <span className="call-person-source">{lead.leadSource}</span>}{chip && <span className="call-person-told" title="What they told us on the form">{chip}</span>}</button>; })}</div>
       {listLoading && <p role="status" className="call-roster-message">Loading entrants…</p>}
       {!listLoading && !filtered.length && <p className="call-roster-message">{!leads.length ? "No entrants are available yet." : offView ? (offCount ? "No off-list leads match these filters." : "Nobody is off the call list.") : "No leads match these filters. Try All leads or another owner."}</p>}
       {cursor && <button className="call-secondary call-load-more" disabled={listLoading} onClick={() => loadList(cursor)}>Load more entrants</button>}
-      <CalendarFeed /><div className="call-roster-foot"><span>01 — PEOPLE FIRST</span><p>Start with their business. A useful conversation is a win, even when the answer is “not right now.”</p></div>
+      <CalendarFeed />
     </aside><section className="call-workspace" aria-label="Guided conversation">
       {!selected ? <div className="call-welcome"><span className="call-eyebrow">A LITTLE CURIOSITY GOES A LONG WAY</span><h2>Pick a person.<br />Find out what’s next.</h2><p>Select an entrant to bring their business, past notes, and your conversation guide into one place.</p><div className="call-welcome-steps">{steps.map((s, i) => <span key={s}><b>0{i + 1}</b>{s}</span>)}</div><p className="call-muted">Your notes stay in this tab until you choose to save them to {crm}.</p></div> : detailLoading ? <div className="call-empty" role="status">Loading this business and its {crm} history…</div> : detailError ? <div className="call-empty"><div role="alert">{detailError}</div><button className="call-secondary" onClick={() => setRevision(x => x + 1)}>Try again</button><a href="/team/login?next=/team/calls">Team sign in</a></div> : detail && draft ? <>
         <div className="call-contact"><div><span className="call-eyebrow">{detail.group || "GIVEAWAY ENTRY"}{detail.city && ` / ${detail.city}`}</span><h2>{businessShown(detail.name, detail.contact)}</h2><p>{detail.contact ? personShown(detail.name, detail.contact) : "Contact name not supplied"}<span className="call-contact-owner">Assigned to <select className="call-assign" value={detail.ownerName || ownerNameFor(detail.ownerId)} disabled={assigning || saving || !!entry?.result || conflict} onChange={e => void assign(e.target.value as AssignName)} aria-label="Assign this lead"><option value="">Unassigned</option>{reps.map(r => <option key={r} value={r}>{r}</option>)}</select>{assigning && <em> saving…</em>}{assignError && <em className="call-assign-error" role="alert"> {assignError}</em>}</span></p></div><div className="call-contact-actions">{detail.phone && <a className="call-phone" href={`tel:${detail.phone.replace(/[^+\d]/g, "")}`}>{detail.phone}</a>}{!detail.phone && <span className="call-muted">No phone on file</span>}{detail.email && <span className="call-email">{detail.email}</span>}<div>{link(detail.website, "Website")}{link(detail.auditReport, "Audit")}{link(detail.recordUrl, system === "ghl" ? "Open in GoHighLevel" : "Monday")}</div>{onStartOnboarding && !demo && <button type="button" className="call-secondary call-handoff-button" disabled={saving || assigning} onClick={() => onStartOnboarding(detail)}>{detail.outreach === "Won" ? "View onboarding" : "Start onboarding →"}</button>}</div></div>
