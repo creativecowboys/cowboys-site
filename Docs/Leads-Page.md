@@ -226,3 +226,34 @@ GoHighLevel holds it. Details: `Docs/Desk-on-GHL.md`, "Names on the lists, and c
 
 The roster answer (`GET /api/team/calls`) also carries `me`, who is signed in, for the Sign out control on the desk's
 bar: `Docs/Admin.md`, "Sign out".
+
+## What they told us — the form answers on a lead (October 2, 2026)
+Dave: "if I click on Ansel … he came from an ebook download. I can't see what he was interested in from our page." The
+answers were already in GoHighLevel; the desk now shows them. An opened lead starts with a **What they told us** block,
+above the Lead Source strip: an ebook lead reads "Downloaded the HVAC playbook (7-Day Google Business Profile Fix)" with
+Crew, Typical job, Website and Fit (the tier in plain words: A = best fit: a crew of 2 to 15, jobs of $2,000+, no
+website · B = a crew, or jobs of $500+ · C = solo, small jobs), plus the campaign it came from when the link carried one;
+a giveaway entrant reads "Entered the Big Giveaway" with the business type, website or "None yet", the campaign, the site
+audit score with its report, and Interested In; a website form lead reads "Filled out a form on our website" with the form,
+the service, the industry, the day it was sent and their message. "Came in" is the day the contact was created in
+GoHighLevel. Only answers that exist are shown, and a lead with none (a referral typed in by hand, any Monday lead) has no
+block. The roster row carries a small chip beside the Lead Source tag: trade and tier for an ebook lead ("HVAC · Tier C"),
+a short business type and whether they have a site for an entrant ("Trades · no site").
+
+- **Where the answers live.** Ebook: the contact fields Playbook Trade, Playbook Crew Size, Playbook Typical Job, Playbook
+  Has Website, Playbook Tier and Playbook City, GoHighLevel's own source line ("Playbook: HVAC GBP Fix (facebook / fall)"),
+  and the tags `playbook-lead`, `playbook-<trade>-gbp`, `pb-tier-<a|b|c>` (written by `src/lib/ghl-playbook.ts`). Giveaway:
+  Giveaway Business Type, Giveaway Source and the `giveaway-has-site` / `giveaway-no-site` tags (`src/lib/ghl-giveaway.ts`).
+  Website form: the source line "Website form: Contact Page", the `website-form` tag, and the note
+  `src/lib/ghl-website-form.ts` writes with the service, industry and message; the block reads that note from the lead's
+  history, where it also shows under Latest saved notes / Before you call.
+- **Read by name, never written.** The intake fields are a read-only catalog (`INTAKE_FIELDS` in `src/lib/ghl/fields.ts`),
+  resolved by field key or name with the desk's own fields and cached the same way, so the roster and the lead make
+  exactly the requests they made before. They are not in `SALES_FIELDS`, so the field setup never creates or edits them,
+  and nothing on the desk writes a field, a tag or a note for this. When a field is blank (an older contact) the tags and
+  the source line stand in. "direct" (ebook) and "organic" (giveaway) are what the forms write when the link had no
+  campaign; they are left out.
+- **Code.** `src/lib/calls/told.ts` builds the values from a contact (`toldFromContact`, called by `mapLead`, so the
+  roster, the lead and the lead an assignment returns all carry `told`) and words the block and the chip (`toldView`,
+  `toldChip`); it is pure, so the desk imports it. Tests: `src/lib/calls/told.test.ts` (each source, empty answers, tag
+  and source-line fallbacks, tier wording, ordering, the chip, and that the roster and lead requests are unchanged).
