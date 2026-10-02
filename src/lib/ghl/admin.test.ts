@@ -25,11 +25,11 @@ test("migrationPatch: desk fields verbatim from Monday, owner mapped to the GHL 
   assert.equal(cf[F.ii], "Website, local search"); assert.equal(cf[F.sn], "Josh's notes"); assert.equal(cf[F.as], 62); assert.equal(cf[F.ar], "https://audit.example/r"); assert.equal(cf[F.ls], "The Big Giveaway");
   assert.equal(p.assignedTo, ghlRepIds().Dave);
   assert.equal(p.firstName, "Freddy"); assert.equal(p.lastName, "Sumbay"); assert.equal(p.companyName, "Bourbon Leather Company"); assert.equal(p.email, "freddy@example.com"); assert.equal(p.phone, "+13865895606"); assert.equal(p.city, "Villa Rica");
-  assert.equal(p.tags, undefined);
+  assert.deepEqual(p.tags, ["sales-lead"]); // the curated Monday set stays addressable by one tag
   const existing: GhlContact = { id: "x", firstName: "F", companyName: "Keep me", email: "keep@example.com", phone: "+10000000000", website: "https://keep", city: "Keep", customFields: [{ id: F.ls, value: "Facebook" }, { id: F.as, value: 90 }] };
   const q = migrationPatch(lead({ group: "Won", outreach: "Won" }), "", existing, fields);
   const qf = Object.fromEntries((q.customFields || []).map((f) => [f.id, f.field_value]));
-  assert.equal(qf[F.os], "Won"); assert.deepEqual(q.tags, [WON_TAG]);
+  assert.equal(qf[F.os], "Won"); assert.deepEqual(q.tags, ["sales-lead", WON_TAG]);
   assert.equal(qf[F.ls], undefined); assert.equal(qf[F.as], undefined); // existing GHL values win
   for (const k of ["firstName", "companyName", "email", "phone", "website", "city"] as const) assert.equal(q[k], undefined);
   const unowned = migrationPatch(lead({ ownerIds: [] }), "", null, fields);

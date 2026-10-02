@@ -26,9 +26,19 @@ const todayEastern = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America
 // A Monday item id is all digits and must never be sent to GHL as a contact id.
 const requireGhlId = (id: string) => { if (!GHL_ID.test(id) || MONDAY_ID.test(id)) throw new CallDeskError("Invalid lead.", 400); return id; };
 
-export function rosterFilters(leadSourceFieldId?: string): SearchFilter[] {
-  const any: SearchFilter[] = LEAD_TAGS.map((t) => ({ field: "tags", operator: "eq", value: t }));
-  if (leadSourceFieldId) any.push({ field: `customFields.${leadSourceFieldId}`, operator: "exists" });
+/**
+ * LEADS_GHL_TAGS narrows the roster without a code change: a comma list of tags, e.g. "sales-lead,playbook-lead,website-form"
+ * shows only the leads imported from the Monday board plus new ebook and website leads (the import tags every Monday lead
+ * `sales-lead`). When it is set, "has a Lead Source" no longer pulls a contact in — the tags are the whole rule.
+ */
+export function rosterTags(env = process.env.LEADS_GHL_TAGS): { tags: string[]; custom: boolean } {
+  const list = (env || "").split(",").map((s) => s.trim()).filter((s) => /^[\w .-]{1,60}$/.test(s));
+  return list.length ? { tags: list, custom: true } : { tags: [...LEAD_TAGS], custom: false };
+}
+export function rosterFilters(leadSourceFieldId?: string, env = process.env.LEADS_GHL_TAGS): SearchFilter[] {
+  const { tags, custom } = rosterTags(env);
+  const any: SearchFilter[] = tags.map((t) => ({ field: "tags", operator: "eq", value: t }));
+  if (leadSourceFieldId && !custom) any.push({ field: `customFields.${leadSourceFieldId}`, operator: "exists" });
   return [{ group: "OR", filters: any }];
 }
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
+import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
 import { validateAssign, validateLeadId } from "./validation";
 import { forgetCustomFields } from "@/lib/ghl/client";
 import { resolveFromDefs } from "@/lib/ghl/fields";
@@ -64,6 +64,12 @@ test("mapLead: business name, person, owner by GHL user id, custom fields, group
 test("roster filters: an OR of the lead tags plus 'has a Lead Source'", () => {
   assert.deepEqual(rosterFilters("fLeadSource"), [{ group: "OR", filters: [...LEAD_TAGS.map((t) => ({ field: "tags", operator: "eq", value: t })), { field: "customFields.fLeadSource", operator: "exists" }] }]);
   assert.equal((rosterFilters(undefined)[0] as { filters: unknown[] }).filters.length, LEAD_TAGS.length);
+});
+test("LEADS_GHL_TAGS narrows the roster to exactly those tags (no Lead Source clause); junk entries are ignored", () => {
+  assert.deepEqual(rosterTags("sales-lead, playbook-lead ,,"), { tags: ["sales-lead", "playbook-lead"], custom: true });
+  assert.deepEqual(rosterTags(""), { tags: [...LEAD_TAGS], custom: false });
+  assert.deepEqual(rosterTags("<script>"), { tags: [...LEAD_TAGS], custom: false });
+  assert.deepEqual(rosterFilters("fLeadSource", "sales-lead,website-form"), [{ group: "OR", filters: [{ field: "tags", operator: "eq", value: "sales-lead" }, { field: "tags", operator: "eq", value: "website-form" }] }]);
 });
 test("getCallsPage: one request for a small roster, owners and lead-source options come back with it", async () => {
   queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "second00000000000000", companyName: "Second" })], total: 2 } });

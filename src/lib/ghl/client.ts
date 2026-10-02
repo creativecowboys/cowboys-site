@@ -181,6 +181,14 @@ export async function createCustomField(def: NewFieldDef): Promise<GhlFieldDef> 
   return r.customField;
 }
 
+// ───────────────────────────── workflows ─────────────────────────────
+export type GhlWorkflow = { id: string; name?: string; status?: string };
+/** Names and status only (the API does not expose triggers). Needs workflows.readonly. */
+export async function listWorkflows(): Promise<GhlWorkflow[]> {
+  const r = await ghl<{ workflows?: GhlWorkflow[] }>("GET", `/workflows/?locationId=${encodeURIComponent(ghlLocationId())}`);
+  return r.workflows ?? [];
+}
+
 // ───────────────────────────── users ─────────────────────────────
 export type GhlUser = { id: string; name?: string; firstName?: string; lastName?: string; email?: string };
 /** Needs users.readonly — the current token does not have it (401). Kept for the diag route and the day the scope is added. */

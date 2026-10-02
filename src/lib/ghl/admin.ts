@@ -2,10 +2,10 @@ import { CallDeskError } from "@/lib/calls/validation";
 import { monday } from "@/lib/onboarding/api";
 import { GIVEAWAY_BOARD_ID, mapLead as mapMondayLead } from "@/lib/calls/monday";
 import type { CallLead } from "@/app/leads/types";
-import { addNote, addTags, contactDisplayName, fieldText, getContact, ghlConfigured, listNotes, listUsers, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
+import { addNote, addTags, contactDisplayName, fieldText, getContact, ghlConfigured, listNotes, listUsers, listWorkflows, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
 import { ensureSalesFields, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
 import { ghlRepIds, MONDAY_IDS, REP_NAMES, type RepName } from "./reps";
-import { LEAD_TAGS, rosterFilters, WON_TAG } from "@/lib/calls/ghl";
+import { LEAD_TAGS, rosterFilters, rosterTags, WON_TAG } from "@/lib/calls/ghl";
 import { importMarker } from "@/lib/calls/markers";
 
 // One-time / operator tooling behind the owner-only /api/team/ghl/* routes (Oct 1 2026):
@@ -20,7 +20,7 @@ const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // ───────────────────────────── diag ─────────────────────────────
 export type Probe = { ok: boolean; detail: string };
 export async function diagnose(): Promise<Record<string, unknown>> {
-  const out: Record<string, unknown> = { configured: ghlConfigured(), leadsBackend: process.env.LEADS_BACKEND === "ghl" ? "ghl" : "monday", repIds: ghlRepIds(), leadTags: LEAD_TAGS };
+  const out: Record<string, unknown> = { configured: ghlConfigured(), leadsBackend: process.env.LEADS_BACKEND === "ghl" ? "ghl" : "monday", repIds: ghlRepIds(), leadTags: LEAD_TAGS, rosterTags: rosterTags() };
   if (!ghlConfigured()) return { ...out, note: "GHL_API_TOKEN / GHL_LOCATION_ID not set on this deployment." };
   const probe = async (name: string, fn: () => Promise<string>) => { try { out[name] = { ok: true, detail: await fn() } satisfies Probe; } catch (e) { out[name] = { ok: false, detail: e instanceof Error ? e.message : String(e) } satisfies Probe; } };
   let fields: SalesFields = {};
@@ -32,6 +32,8 @@ export async function diagnose(): Promise<Record<string, unknown>> {
   await probe("searchRoster", async () => { const r = await searchContacts({ filters: rosterFilters(fields.leadSource?.id), pageLimit: 1 }); return `${r.total} leads would show on the desk`; });
   for (const tag of LEAD_TAGS) await probe(`tag:${tag}`, async () => { const r = await searchContacts({ filters: [{ field: "tags", operator: "eq", value: tag }], pageLimit: 1 }); return `${r.total}`; });
   await probe("testContact", async () => { const c = await getContact(TEST_CONTACT_ID); return `${contactDisplayName(c) || c.id} · dateUpdated ${c.dateUpdated || "?"} · ${(await listNotes(c.id)).length} notes`; });
+  // Names + status only — GHL's API does not say what triggers a workflow. Listed so a person can check that nothing published fires on plain "Contact Created".
+  await probe("workflows", async () => { const w = await listWorkflows(); const live = w.filter((x) => x.status === "published"); return `${w.length} workflows, ${live.length} published: ${live.map((x) => x.name).join(" · ")}`; });
   await probe("usersScope", async () => { const u = await listUsers(); return `${u.length} users (${u.map((x) => `${x.name || x.email}:${x.id}`).join(", ")})`; });
   return out;
 }
@@ -168,7 +170,8 @@ export function migrationPatch(lead: CallLead, mondayNotes: string, existing: Gh
   if (!existing?.phone && lead.phone) patch.phone = normalizePhone(lead.phone);
   if (!existing?.website && lead.website) patch.website = lead.website;
   if (!existing?.city && lead.city) patch.city = lead.city.split(",")[0].trim();
-  if (outreach === "Won") patch.tags = [WON_TAG];
+  // Every imported Monday lead gets `sales-lead`: the curated board stays one tag in GHL (and LEADS_GHL_TAGS can narrow the desk to it).
+  patch.tags = outreach === "Won" ? ["sales-lead", WON_TAG] : ["sales-lead"];
   return patch;
 }
 
@@ -200,7 +203,7 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
       let contactId = existing?.id || "";
       if (existing) await updateContact(existing.id, contactPatch);
       else {
-        const { contact } = await upsertContact({ locationId: process.env.GHL_LOCATION_ID!, ...contactPatch, source: "Big Giveaway (Monday import)", tags: ["monday-import"] });
+        const { contact } = await upsertContact({ locationId: process.env.GHL_LOCATION_ID!, ...contactPatch, source: "Big Giveaway (Monday import)", tags: ["monday-import", ...(tags || [])] });
         contactId = contact.id; row.ghlId = contactId;
         ix.byId.set(contact.id, contact); ix.byMondayId.set(item.id, contact);
         if (contactPatch.email) ix.byEmail.set(contactPatch.email, contact);

@@ -113,8 +113,12 @@ Owner = `assignedTo` (GHL user ids in `src/lib/ghl/reps.ts`, override `GHL_REP_I
 same `[CC-CALL:…] [CC-PAYLOAD:…]` markers Monday updates did (idempotent retries). Version token = the contact's
 `dateUpdated`. "Won" on handoff = Outreach Status Won + Last Contact + tag `sales-won` + one handoff note.
 Which contacts count as leads: anything tagged `giveaway-entrant`, `playbook-lead`, `website-form` or `sales-lead` (add
-that tag in GHL to push any contact onto the desk), or anything with a Lead Source. Not chosen: an Opportunities pipeline —
-it needs nothing the contact model can't do for Phase 1, and it can be layered on later.
+that tag in GHL to push any contact onto the desk), or anything with a Lead Source. On Oct 1 2026 that is 802 contacts
+(787 giveaway entrants + 15 ebook leads) against the 264 Josh had put on the Monday board. To show a narrower roster set
+`LEADS_GHL_TAGS` on Vercel to a comma list of tags — e.g. `sales-lead,playbook-lead,website-form` = the leads imported
+from the Monday board (the import tags each one `sales-lead`) plus new ebook and website leads; when it is set the tags
+are the whole rule. Not chosen: an Opportunities pipeline — it needs nothing the contact model can't do for Phase 1, and
+it can be layered on later. Outreach Status carries all 11 labels of the Monday column.
 
 ### Lead Source
 A GHL dropdown custom field, options seeded as `The Big Giveaway`, `Facebook`, `Ebook download`, `Website form`, `Referral`,
