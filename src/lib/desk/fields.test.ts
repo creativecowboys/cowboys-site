@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { assertOption, DESK_FIELDS, DESK_FIELD_KEYS, DESK_TAG_LIST, deskFields, deskList, deskNumber, deskText, deskWrites, ensureDeskFields, isDeskFieldName, LSE_OVERLAPS, requireAllDeskFields, resolveDeskFields, STAGE_LABELS, toFieldValue } from "./fields";
+import { assertOption, DESK_FIELDS, DESK_FIELD_KEYS, DESK_TAG_LIST, deskFields, deskList, deskNumber, deskText, deskWrites, ensureDeskFields, isDeskFieldName, LSE_OVERLAPS, OPTIONAL_DESK_FIELDS, REQUIRED_DESK_FIELD_KEYS, requireAllDeskFields, resolveDeskFields, STAGE_LABELS, toFieldValue } from "./fields";
 import { SALES_FIELDS } from "@/lib/ghl/fields";
 import { LEAD_TAGS, WON_TAG } from "@/lib/calls/ghl";
 import { AGREEMENT, HEALTH, INTAKE, PAYMENT, STAGES } from "@/lib/onboarding/config";
@@ -27,7 +27,7 @@ test("every desk field is named \"Desk …\", is unique, and collides with no LS
     assert.ok(!Object.values(SALES_FIELDS).some((s) => norm(s.name) === norm(name)), `${name} collides with a sales field`);
     assert.ok(!norm(name).startsWith("lse"), name);
   }
-  assert.equal(names.length, 43);
+  assert.equal(names.length, 44);
   assert.equal(isDeskFieldName("LSE Health"), false); assert.equal(isDeskFieldName("desk notes"), true); assert.equal(isDeskFieldName("Desktop"), false);
 });
 test("desk tags are the desk's own: never an lse: tag, never one of the lead-intake tags", () => {
@@ -49,7 +49,7 @@ test("option lists are the desk's labels, byte for byte", () => {
 test("definitions resolve by field key, then by name; nothing else on the location is picked up", () => {
   ghl.addLseFields().addAllFields();
   const fields = resolveDeskFields(ghl.defs);
-  assert.equal(Object.keys(fields).length, 43);
+  assert.equal(Object.keys(fields).length, 44);
   assert.equal(fields.obStage!.id, ghl.fieldId("Desk Onboarding Stage")); assert.deepEqual(fields.obStage!.options, STAGE_LABELS);
   assert.doesNotThrow(() => requireAllDeskFields(fields));
   const renamed = resolveDeskFields([{ id: "x1", name: "desk  onboarding stage", dataType: "SINGLE_OPTIONS" }, { id: "x2", name: "Totally different", fieldKey: "contact.desk_client_status", dataType: "SINGLE_OPTIONS" }]);
@@ -61,16 +61,34 @@ test("setup is a dry run by default, creates only what is missing, and never edi
   ghl.addLseFields();
   ghl.addField("Desk Notes", "LARGE_TEXT"); ghl.addField("Desk Agreement", "SINGLE_OPTIONS", ["Unknown", "Signed"]);
   const dry = await ensureDeskFields();
-  assert.equal(dry.dryRun, true); assert.equal(dry.missing.length, 41); assert.equal(dry.present.length, 2); assert.equal(ghl.writes().length, 0);
+  assert.equal(dry.dryRun, true); assert.equal(dry.missing.length, 42); assert.equal(dry.present.length, 2); assert.equal(ghl.writes().length, 0);
   assert.deepEqual(dry.present.find((p) => p.key === "agreement")!.missingOptions, ["Pending", "Not required"], "an existing field's missing options are reported, not changed");
   const real = await ensureDeskFields(false, 0);
-  assert.equal(real.created.length, 41); assert.equal(real.failed.length, 0);
+  assert.equal(real.created.length, 42); assert.equal(real.failed.length, 0);
   const posts = ghl.writes();
-  assert.equal(posts.length, 41);
+  assert.equal(posts.length, 42);
   assert.ok(posts.every((r) => r.method === "POST" && /\/customFields$/.test(r.path) && isDeskFieldName(String((r.body as { name: string }).name)) && (r.body as { model: string }).model === "contact"));
   const again = await ensureDeskFields(false, 0);
-  assert.equal(again.created.length, 0); assert.equal(again.present.length, 43);
+  assert.equal(again.created.length, 0); assert.equal(again.present.length, 44);
   assert.doesNotThrow(async () => requireAllDeskFields(await deskFields(true)));
+});
+test("a field added after the cutover is optional: the live desk keeps working until setup creates it, and setup creates exactly that one", async () => {
+  // GoHighLevel as it was on Oct 2 2026: the 43 fields the cutover created, and no "Desk Legacy Client" yet.
+  assert.deepEqual([...OPTIONAL_DESK_FIELDS], ["legacy"]); assert.equal(REQUIRED_DESK_FIELD_KEYS.length, 43); assert.ok(!REQUIRED_DESK_FIELD_KEYS.includes("legacy"));
+  assert.deepEqual(DESK_FIELDS.legacy, { name: "Desk Legacy Client", dataType: "SINGLE_OPTIONS", options: ["Yes", "No"], position: 354 });
+  for (const key of REQUIRED_DESK_FIELD_KEYS) ghl.addField(DESK_FIELDS[key].name, DESK_FIELDS[key].dataType, DESK_FIELDS[key].options);
+  const fields = await deskFields(true);
+  assert.equal(fields.legacy, undefined);
+  assert.doesNotThrow(() => requireAllDeskFields(fields), "every desk route still passes its all-fields check");
+  assert.equal(deskText(ghl.addContact({ fields: { "Desk Client Status": "Active" } }), fields, "legacy"), "", "a read of the missing field is simply blank");
+  assert.throws(() => deskWrites(fields, { legacy: "Yes" }), (e: Error & { status?: number }) => e.status === 503 && /"Desk Legacy Client" does not exist yet/.test(e.message), "only a write to that one field asks for it, by name");
+  assert.doesNotThrow(() => deskWrites(fields, { clientHealth: "Green" }));
+  // The setup call finds exactly one field missing and creates it; nothing that exists is touched.
+  const dry = await ensureDeskFields();
+  assert.deepEqual(dry.missing.map((m) => [m.name, m.dataType, m.options]), [["Desk Legacy Client", "SINGLE_OPTIONS", ["Yes", "No"]]]); assert.equal(dry.present.length, 43); assert.equal(ghl.writes().length, 0);
+  const real = await ensureDeskFields(false, 0);
+  assert.deepEqual(real.created.map((c) => c.name), ["Desk Legacy Client"]); assert.equal(ghl.writes().length, 1);
+  assert.deepEqual((await deskFields(true)).legacy!.options, ["Yes", "No"]);
 });
 
 test("values are shaped by the field's live type; empty clears", () => {

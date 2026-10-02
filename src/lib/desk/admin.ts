@@ -3,9 +3,9 @@ import { addTags, contactDisplayName, getContact, ghl, GhlError, ghlConfigured, 
 import { SALES_FIELDS } from "@/lib/ghl/fields";
 import { todayEastern } from "@/lib/onboarding/api";
 import { mergeTemplates, parseChecklist, serializeChecklist } from "./checklist-text";
-import { DESK_FIELDS, DESK_FIELD_KEYS, DESK_TAG_LIST, DESK_TAGS, deskFields, deskList, deskNumber, deskText, deskWrites, ensureDeskFields, isDeskFieldName, LSE_OVERLAPS, resolveDeskFields, toFieldValue, type DeskFieldKey, type DeskFields, type DeskSetupReport, type DeskValue } from "./fields";
+import { DESK_FIELDS, DESK_FIELD_KEYS, REQUIRED_DESK_FIELD_KEYS, DESK_TAG_LIST, DESK_TAGS, deskFields, deskList, deskNumber, deskText, deskWrites, ensureDeskFields, isDeskFieldName, LSE_OVERLAPS, resolveDeskFields, toFieldValue, type DeskFieldKey, type DeskFields, type DeskSetupReport, type DeskValue } from "./fields";
 import { addDeskNote, noteMarker } from "./notes";
-import { listRecords } from "./record";
+import { isLegacyClient, listRecords } from "./record";
 import { deskDefault } from "./switch";
 import { deskTeam, type Actor } from "./team";
 
@@ -71,9 +71,10 @@ export async function deskDiagnose(): Promise<Record<string, unknown>> {
     const all = await listLocationTags();
     return { onLocation: all.length, lseOwned: all.filter((t) => t.startsWith("lse:")), deskOwned: DESK_TAG_LIST.map((name) => ({ name, exists: all.includes(name) })), salesDesk: SALES_TAGS.filter((t) => all.includes(t)), other: all.filter((t) => !t.startsWith("lse:") && !DESK_TAG_LIST.includes(t) && !SALES_TAGS.includes(t)) };
   });
-  if (DESK_FIELD_KEYS.every((k) => fields[k])) {
+  if (REQUIRED_DESK_FIELD_KEYS.every((k) => fields[k])) {
     await probe("onboardingRecords", async () => (await listRecords("onboarding", fields)).length);
     await probe("clients", async () => (await listRecords("client", fields)).length);
+    await probe("legacyClients", async () => (fields.legacy ? (await listRecords("client", fields)).filter((c) => isLegacyClient(c, fields)).length : "Desk Legacy Client does not exist yet — the setup call with scope desk creates it"));
   } else out.records = "not counted — the desk fields are not all there yet";
   return out;
 }

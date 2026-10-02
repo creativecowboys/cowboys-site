@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { timingSafeEqual } from "node:crypto";
 import { listClients, syncClientFromStripe } from "@/lib/clients/board";
 import { stripeConnected } from "@/lib/clients/stripe";
-import { listClientsGhl, syncClientFromStripeGhl } from "@/lib/desk/clients";
+import { listClientsGhl, reconcilable, syncClientFromStripeGhl } from "@/lib/desk/clients";
 import { deskDefault } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
@@ -26,11 +26,12 @@ export async function GET(req: Request) {
   const results: { id: string; name: string; changed?: string[]; error?: string }[] = [];
   if (deskDefault() === "ghl") {
     // The desk is on GoHighLevel: same rule (every client with a Stripe id or an email), written to the contact's desk fields.
+    // A legacy client billed outside Stripe is left alone: the desk does not go looking for it in Stripe by email.
     let rows;
     try { rows = (await listClientsGhl()).rows; }
     catch (e) { return NextResponse.json({ error: e instanceof Error ? e.message : "client list failed" }, { status: 502 }); }
     for (const row of rows) {
-      if (!row.stripeCustomer && !row.email) continue;
+      if (!reconcilable(row)) continue;
       try { const r = await syncClientFromStripeGhl(row.id); results.push({ id: row.id, name: row.name, changed: r.changed }); }
       catch (e) { results.push({ id: row.id, name: row.name, error: e instanceof Error ? e.message : "failed" }); }
     }

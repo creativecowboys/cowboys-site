@@ -12,6 +12,8 @@ import { isTeamName } from "./team";
 //   owner / manager  — the id is a team NAME ("Madison"), not a Monday person id
 //   checklist        — the item id is the hash id from the Desk Checklist field, not a Monday subitem id
 //   note             — may carry `noteId` (a browser-minted id that makes a retry safe)
+// One action exists only here (the Monday desk has no such thing):
+//   legacy           — `value: true | false` marks or un-marks a legacy client; the route lets only an owner send it
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 const CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/;
 const bad = (m: string) => new CallDeskError(m, 400);
@@ -66,11 +68,17 @@ export function validateDeskPatch(input: unknown): DeskOnboardingPatch {
   return validatePatch(input) as DeskOnboardingPatch;
 }
 
-export type DeskClientPatch = (Exclude<ClientPatch, { action: "note" }> | DeskNote) & { expectedUpdatedAt: string };
+export type DeskLegacy = { action: "legacy"; value: boolean };
+export type DeskClientPatch = (Exclude<ClientPatch, { action: "note" }> | DeskNote | DeskLegacy) & { expectedUpdatedAt: string };
 export function validateDeskClientPatch(input: unknown): DeskClientPatch {
   const raw = object(input);
   const action = str(raw, "action", 20);
   if (action === "note") return { action, ...noteOf(raw), expectedUpdatedAt: versionOf(raw, false) };
   if (action === "manager") return { action, ownerId: ownerOf(raw), expectedUpdatedAt: versionOf(raw, true) };
+  if (action === "legacy") {
+    only(raw, ["value"]);
+    if (typeof raw.value !== "boolean") throw bad("Say whether this is a legacy client.");
+    return { action, value: raw.value, expectedUpdatedAt: versionOf(raw, true) };
+  }
   return validateClientPatch(input) as DeskClientPatch;
 }

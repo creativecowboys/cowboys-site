@@ -25,14 +25,22 @@ const daysBetween = (a: string, b: string) => Math.round((Date.parse(`${b}T12:00
 
 export function flagsFor(row: Omit<ClientRow, "flags">, today = todayEastern()): ClientFlag[] {
   const flags: ClientFlag[] = [];
+  // A legacy client (GoHighLevel desk, Oct 2 2026) was never onboarded through the desk and is billed outside GoHighLevel, so it is
+  // only flagged for what its record actually tracks: a blank is "not tracked here", not a problem. For everyone else — every
+  // Monday row and every desk client — `legacy` is not set and each rule below is exactly what it was.
+  const legacy = row.legacy === true;
   if (row.group === "issue" || ["Overdue", "Card Failed"].includes(row.payStatus)) flags.push("payment");
   // A successful live Search Atlas read is the truth: verified → no GBP flags at all (the 90-day recheck is moot);
   // connected but unverified → "gbp". A failed read (or no link) falls back to the Monday state.
+  // Legacy: GBP is tracked once the listing is linked (above) or someone set Requested / Lost / recheck; a blank or Not Requested is quiet.
   if (row.gbpLive?.ok) { if (!row.gbpLive.verified) flags.push("gbp"); }
-  else if (!["Verified", "No GBP Exists"].includes(row.gbpAccess)) flags.push("gbp");
-  else if (row.gbpAccess === "Verified" && (!row.gbpChecked || daysBetween(row.gbpChecked, today) > GBP_RECHECK_DAYS)) flags.push("gbp-recheck");
-  if (row.group !== "churned" && row.group !== "paused" && (!row.lastReport || daysBetween(row.lastReport, today) > REPORT_STALE_DAYS)) flags.push("report");
+  else if (legacy ? ["Requested", "Lost / recheck"].includes(row.gbpAccess) : !["Verified", "No GBP Exists"].includes(row.gbpAccess)) flags.push("gbp");
+  // Legacy: a recheck is only asked for once a check has been stamped (and is then 90 days old); "never checked" is quiet.
+  else if (row.gbpAccess === "Verified" && (row.gbpChecked ? daysBetween(row.gbpChecked, today) > GBP_RECHECK_DAYS : !legacy)) flags.push("gbp-recheck");
+  // Legacy: a report is only "late" once one has been logged here; "never" is quiet.
+  if (row.group !== "churned" && row.group !== "paused" && (row.lastReport ? daysBetween(row.lastReport, today) > REPORT_STALE_DAYS : !legacy)) flags.push("report");
   if (row.termEnds && daysBetween(today, row.termEnds) <= TERM_SOON_DAYS && daysBetween(today, row.termEnds) >= 0) flags.push("term");
+  // Same for everyone: only a Stripe method with no customer id. A client billed by QuickBooks invoice (every legacy client today) never gets it.
   if (row.payMethod.startsWith("Stripe") && !row.stripeCustomer) flags.push("no-stripe");
   return flags;
 }

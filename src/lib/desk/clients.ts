@@ -10,6 +10,7 @@ import { accessFromCard, parseListingId } from "@/lib/gbp/state";
 import { gbpCard, listLocations, searchAtlasConnected } from "@/lib/gbp/searchatlas";
 import type { GbpCard } from "@/lib/gbp/types";
 import { assertOption, type DeskFields } from "./fields";
+import { stripeFollowed } from "./legacy";
 import { addDeskNote, toTimeline } from "./notes";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, isClientRecord, listRecords, mapClient, readContact, resolveRecordId, stillOnboarding, version, writeRecord, type DeskValues } from "./record";
 import { memberByName, teamOwners, type Actor } from "./team";
@@ -117,10 +118,12 @@ function contactPatch(contact: GhlContact, patch: { contact: string; email: stri
   return native;
 }
 
-export async function patchClientGhl(rawId: string, patch: DeskClientPatch, actor: Actor): Promise<ClientRow> {
+export async function patchClientGhl(rawId: string, patch: DeskClientPatch, actor: Actor, opts: { owner?: boolean } = {}): Promise<ClientRow> {
   const f = await allDeskFields();
   const contact = await clientContact(rawId, f);
   const id = contact.id;
+  // Whether a client is "legacy" decides what the tab flags for it, so only an owner changes it (checked before anything is read as stale or written).
+  if (patch.action === "legacy" && !opts.owner) throw new CallDeskError("Only an owner can change whether a client is a legacy client.", 403);
   if (patch.action !== "note" && version(contact) !== patch.expectedUpdatedAt) throw new CallDeskError(STALE, 409);
   const before = mapClient(contact, f);
   const today = todayEastern();
@@ -159,6 +162,8 @@ export async function patchClientGhl(rawId: string, patch: DeskClientPatch, acto
       break;
     }
     case "note": await addDeskNote(id, { text: patch.text, noteId: patch.noteId || crypto.randomUUID(), source: "client", actor }); break;
+    // Always an explicit Yes or No — never a blank — so a later re-import of the old board (which marks blank rows only) leaves an owner's choice alone.
+    case "legacy": { const value = patch.value ? "Yes" : "No"; assertOption(f, "legacy", value); await write({ legacy: value }); break; }
   }
   return mapClient(await readContact(id), f);
 }
@@ -191,12 +196,16 @@ export async function syncClientFromStripeGhl(rawId: string): Promise<{ row: Cli
   return { row: mapClient(await readContact(contact.id), f), stripe: snap, changed };
 }
 
-/** Webhook / reconcile entry: which client owns this Stripe customer? By the stored id first, then by email among clients with no id yet. */
+/** Webhook / reconcile entry: which client owns this Stripe customer? By the stored id first, then by email among clients with no id yet.
+ *  A legacy client billed outside Stripe is never picked by its email (see stripeFollowed) — only by a customer id someone stored on it. */
 export async function findClientByStripeCustomerGhl(customerId: string, email?: string | null): Promise<ClientRow | null> {
   const f = await allDeskFields();
   const contacts = await listRecords("client", f);
   const byId = contacts.map((c) => mapClient(c, f)).find((r) => r.stripeCustomer === customerId);
   if (byId) return byId;
   if (!email) return null;
-  return contacts.filter((c) => !stillOnboarding(c, f)).map((c) => mapClient(c, f)).find((r) => r.email.toLowerCase() === email.toLowerCase() && !r.stripeCustomer) || null;
+  return contacts.filter((c) => !stillOnboarding(c, f)).map((c) => mapClient(c, f)).find((r) => r.email.toLowerCase() === email.toLowerCase() && !r.stripeCustomer && stripeFollowed(r)) || null;
 }
+
+/** The clients the nightly Stripe reconcile re-reads: a stored customer id, or an email to find one by — and, for a legacy client, only when Stripe is part of its record. */
+export const reconcilable = (row: ClientRow): boolean => (!!row.stripeCustomer || !!row.email) && stripeFollowed(row);

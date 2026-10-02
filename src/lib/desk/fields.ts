@@ -26,7 +26,9 @@ export type DeskFieldKey =
   | "dnsPath" | "nextAction" | "nextDue" | "setup" | "agreement" | "obPayment" | "intake" | "handoffId" | "checklist" | "deskLink" | "mondayOnboardingId"
   // clients
   | "clientStatus" | "clientHealth" | "accountManager" | "payStatus" | "payMethod" | "billingDay" | "nextBill" | "lastPayment" | "clientSince" | "termEnds" | "lastReport"
-  | "stripeCustomer" | "mondayClientId";
+  | "stripeCustomer" | "mondayClientId"
+  // added Oct 2 2026, after the cutover: the marker for a legacy client (see OPTIONAL_DESK_FIELDS below)
+  | "legacy";
 
 export const DESK_PREFIX = "Desk ";
 /** The write guard: a field the desk may write is named "Desk …" in GoHighLevel (whatever the capitalisation). */
@@ -82,8 +84,18 @@ export const DESK_FIELDS: Record<DeskFieldKey, NewFieldDef> = {
   lastReport: { name: "Desk Last Report Sent", dataType: "DATE", position: 351 },
   stripeCustomer: { name: "Desk Stripe Customer ID", dataType: "TEXT", placeholder: "cus_… — set by the desk", position: 352 },
   mondayClientId: { name: "Desk Monday Client ID", dataType: "TEXT", placeholder: "Active Clients item this record was imported from", position: 353 },
+  legacy: { name: "Desk Legacy Client", dataType: "SINGLE_OPTIONS", options: [...YES_NO], position: 354 },
 };
 export const DESK_FIELD_KEYS = Object.keys(DESK_FIELDS) as DeskFieldKey[];
+/**
+ * Fields added AFTER the desk went live on GoHighLevel. The desk must keep working in the minutes between a deploy that
+ * knows such a field and the setup call that creates it, so these are not part of "every desk field must exist": a read
+ * treats a missing one as unset, and only a write to that one field asks for it by name.
+ *   legacy — "Desk Legacy Client" (Dave, Oct 2 2026): a long-standing client that was never onboarded through the desk and is
+ *            billed outside GoHighLevel. Yes = legacy; No or blank = a normal desk client.
+ */
+export const OPTIONAL_DESK_FIELDS: readonly DeskFieldKey[] = ["legacy"];
+export const REQUIRED_DESK_FIELD_KEYS: DeskFieldKey[] = DESK_FIELD_KEYS.filter((k) => !OPTIONAL_DESK_FIELDS.includes(k));
 
 /** The only tags the desk adds to a contact in Phase 2. Never an `lse:` tag, never a tag that already means something else.
  *  `monday-import` is the desk's own Phase-1 tag ("this contact was created by a Monday import") and keeps that one meaning. */
@@ -141,9 +153,10 @@ export function requireDeskField(fields: DeskFields, key: DeskFieldKey): Resolve
   if (!f) throw new CallDeskError(`The GoHighLevel custom field "${DESK_FIELDS[key].name}" does not exist yet. An owner creates the desk fields first (POST /api/team/ghl/setup with scope "desk"), or adds it in GoHighLevel → Settings → Custom Fields with that exact name.`, 503);
   return f;
 }
-/** Every desk field must exist before the desk writes a record — a half-set-up location would save half a client. */
+/** Every desk field must exist before the desk writes a record — a half-set-up location would save half a client.
+ *  (Fields added after the cutover are the exception — see OPTIONAL_DESK_FIELDS.) */
 export function requireAllDeskFields(fields: DeskFields): void {
-  const missing = DESK_FIELD_KEYS.filter((k) => !fields[k]).map((k) => DESK_FIELDS[k].name);
+  const missing = REQUIRED_DESK_FIELD_KEYS.filter((k) => !fields[k]).map((k) => DESK_FIELDS[k].name);
   if (missing.length) throw new CallDeskError(`GoHighLevel is missing ${missing.length} desk field${missing.length === 1 ? "" : "s"} (${missing.slice(0, 6).join(", ")}${missing.length > 6 ? ", …" : ""}). An owner runs the desk field setup first (POST /api/team/ghl/setup with scope "desk").`, 503);
 }
 

@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { clientDetailGhl, findClientByStripeCustomerGhl, listClientsGhl, patchClientGhl, syncClientFromStripeGhl } from "./clients";
+import { clientDetailGhl, findClientByStripeCustomerGhl, listClientsGhl, patchClientGhl, reconcilable, syncClientFromStripeGhl } from "./clients";
 import { addDeskNote, classifyNote, formatDeskNote, readableNote, toTimeline } from "./notes";
 import { validateDeskClientPatch } from "./validation";
 import { forgetWinnersGhl, listWinnersGhl, listWinnersGhlCached, winnerForContactGhl, winnerMessageGhl } from "./winners";
 import { readableHistory } from "@/lib/calls/markers";
+import { forgetCustomFields } from "@/lib/ghl/client";
+import { resetDeskFieldCheck } from "./fields";
 import { todayEastern } from "@/lib/onboarding/api";
 import type { FakeGhl } from "./testing/fake-ghl";
 import { assertOnlyDeskWrites, DAVE, MADISON, reps, setUp, tearDown } from "./testing/harness";
@@ -255,4 +257,97 @@ test("giveaway winners: the contact itself, or another contact for the same busi
   assert.equal((await listWinnersGhlCached()).length, 3);
   ghl.failures.push({ match: /^POST \/contacts\/search$/, status: 500 }, { match: /^POST \/contacts\/search$/, status: 500 }, { match: /^POST \/contacts\/search$/, status: 500 });
   await assert.rejects(winnerForContactGhl({ id: "DuplicateContact0001", email: "x@y.co" }), "GoHighLevel down → the guard throws, and the package route refuses to bill");
+});
+
+// ───────────────────────────── legacy clients (Oct 2 2026) ─────────────────────────────
+// A long-standing client as the import brings it over: a contact made from the business name alone (no person, email or phone),
+// billed by QuickBooks invoice, with nothing on file about GBP or reports.
+const LEGACY = "LegacyWhitenPools001";
+const addLegacy = (fields: Record<string, unknown> = {}, over: Record<string, unknown> = {}, id = LEGACY) => ghl.addContact({
+  id, companyName: "Whiten Pools, Inc.", website: "https://whiten-pools.com", tags: ["desk-client", "monday-import"],
+  fields: { "Desk Client Status": "Active", "Desk Client Health": "Too New", "Desk Pay Status": "No Billing Set Up", "Desk Pay Method": "QuickBooks invoice", "Desk Account Manager": "Josh", "Desk Monday Client ID": "13125631516", "Desk Notes": "Search Atlas location 97647, GBP locked.", "Desk Legacy Client": "Yes", ...fields }, ...over,
+});
+
+test("legacy clients sit on the Clients tab next to desk clients: marked, quiet, and counted in the money like anyone", async () => {
+  addClient(); addLegacy();
+  addLegacy({ "Desk Packages": ["Local Growth"], "Desk Monday Client ID": "13125562410" }, { companyName: "Sconyers Concrete Inc", website: "" }, "LegacySconyers000001");
+  const rows = (await listClientsGhl()).rows;
+  const squirrel = rows.find((r) => r.id === CLIENT)!; const whiten = rows.find((r) => r.id === LEGACY)!; const sconyers = rows.find((r) => r.id === "LegacySconyers000001")!;
+  // The desk client is exactly what it was before legacy clients existed.
+  assert.equal(squirrel.legacy, false); assert.deepEqual(squirrel.flags, ["gbp", "report", "no-stripe"]); assert.equal(squirrel.mrr, "297");
+  // A legacy client: the business name is the client, nobody is the contact, nothing nags.
+  assert.equal(whiten.legacy, true); assert.equal(whiten.name, "Whiten Pools, Inc."); assert.equal(whiten.contact, ""); assert.equal(whiten.email, ""); assert.equal(whiten.website, "https://whiten-pools.com");
+  assert.equal(whiten.group, "active"); assert.equal(whiten.payStatus, "No Billing Set Up"); assert.equal(whiten.payMethod, "QuickBooks invoice"); assert.equal(whiten.accountManager, "Josh"); assert.equal(whiten.gbpAccess, "");
+  assert.deepEqual(whiten.flags, []); assert.deepEqual(sconyers.flags, []);
+  // Money: a legacy client's packages count at list price, for owners only — the same rule as every client.
+  assert.equal(whiten.mrr, "0"); assert.equal(sconyers.mrr, "497");
+  assert.equal(rows.reduce((sum, r) => sum + Number(r.mrr), 0), 794);
+  assert.equal((await clientDetailGhl("LegacySconyers000001", false)).row.mrr, "", "not shown to someone who is not an owner");
+  assert.equal((await clientDetailGhl("LegacySconyers000001", true)).row.mrr, "497");
+  // The panel opens by contact id and by the old board's row id, with its file store under the old key.
+  const detail = await clientDetailGhl("13125631516", true);
+  assert.equal(detail.row.id, LEGACY); assert.equal(detail.row.legacy, true); assert.equal(detail.fileScope, "c13125631516"); assert.equal(detail.row.notes, "Search Atlas location 97647, GBP locked.");
+  assert.equal(ghl.writes().length, 0, "looking at the tab and a panel wrote nothing");
+});
+
+test("only an owner marks or un-marks a legacy client; un-marking puts the desk rules back, marking again quiets them", async () => {
+  addLegacy();
+  const asOwner = (body: Record<string, unknown>) => patchClientGhl(LEGACY, validateDeskClientPatch({ expectedUpdatedAt: v(LEGACY), ...body }), DAVE, { owner: true });
+  await assert.rejects(patch({ action: "legacy", value: false }, MADISON, LEGACY), (e: Error & { status?: number }) => e.status === 403 && /Only an owner/.test(e.message));
+  await assert.rejects(patchClientGhl(LEGACY, validateDeskClientPatch({ action: "legacy", value: false, expectedUpdatedAt: v(LEGACY) }), DAVE), { status: 403 }, "the owner flag comes from the route, never from the request");
+  assert.equal(ghl.writes().length, 0);
+  assert.throws(() => validateDeskClientPatch({ action: "legacy", value: "no", expectedUpdatedAt: v(LEGACY) }), { status: 400 });
+  assert.throws(() => validateDeskClientPatch({ action: "legacy", value: true }), { status: 400 }, "needs the record version like every change");
+  assert.throws(() => validateDeskClientPatch({ action: "legacy", value: true, extra: 1, expectedUpdatedAt: v(LEGACY) }), { status: 400 });
+  await assert.rejects(patchClientGhl(LEGACY, validateDeskClientPatch({ action: "legacy", value: false, expectedUpdatedAt: "2026-09-30T00:00:00.000Z" }), DAVE, { owner: true }), { status: 409 });
+  let row = await asOwner({ action: "legacy", value: false });
+  assert.equal(row.legacy, false); assert.equal(ghl.value(LEGACY, "Desk Legacy Client"), "No", "an explicit No, so a re-import of the old board leaves the owner's choice alone");
+  assert.deepEqual(row.flags, ["gbp", "report"], "now a desk client: GBP and reports are expected (QuickBooks invoice: still no Stripe flag)");
+  row = await asOwner({ action: "legacy", value: true });
+  assert.equal(row.legacy, true); assert.equal(ghl.value(LEGACY, "Desk Legacy Client"), "Yes"); assert.deepEqual(row.flags, []);
+  // A desk client can be marked legacy the same way.
+  addClient();
+  const squirrel = await patchClientGhl(CLIENT, validateDeskClientPatch({ action: "legacy", value: true, expectedUpdatedAt: v() }), DAVE, { owner: true });
+  assert.equal(squirrel.legacy, true); assert.deepEqual(squirrel.flags, ["no-stripe"], "its Stripe method with no customer id is still a fact on the record");
+  // Every other change on a legacy client is open to the whole team, as on any client — and tracking something starts its flag.
+  row = await patch({ action: "gbp", value: "Requested", gbpUrl: "" }, MADISON, LEGACY); assert.deepEqual(row.flags, ["gbp"]);
+  row = await patch({ action: "gbpChecked" }, MADISON, LEGACY); assert.deepEqual(row.flags, []);
+  row = await patch({ action: "reportSent" }, MADISON, LEGACY); assert.deepEqual(row.flags, []);
+  row = await patch({ action: "contact", contact: "Kelli Whiten", email: "kelli@whiten.example", phone: "", website: "https://whiten-pools.com" }, MADISON, LEGACY);
+  assert.equal(row.contact, "Kelli Whiten"); assert.equal(ghl.get(LEGACY).companyName, "Whiten Pools, Inc.", "naming the person never touches the business name");
+});
+
+test("the desk keeps working on a location where Desk Legacy Client does not exist yet: nobody is legacy, and marking one says what is missing", async () => {
+  ghl.defs = ghl.defs.filter((d) => d.name !== "Desk Legacy Client"); forgetCustomFields(); resetDeskFieldCheck();
+  addClient();
+  const row = (await listClientsGhl()).rows[0];
+  assert.equal(row.legacy, false); assert.deepEqual(row.flags, ["gbp", "report", "no-stripe"]);
+  assert.equal((await patch({ action: "health", value: "Green" })).health, "Green", "every other change still saves");
+  await assert.rejects(patchClientGhl(CLIENT, validateDeskClientPatch({ action: "legacy", value: true, expectedUpdatedAt: v() }), DAVE, { owner: true }), (e: Error & { status?: number }) => e.status === 503 && /"Desk Legacy Client" does not exist yet/.test(e.message));
+});
+
+test("Stripe leaves a legacy client alone unless Stripe is part of its record", async () => {
+  addLegacy({}, { email: "office@whiten.example" });
+  const row = (await listClientsGhl()).rows[0];
+  // Nightly reconcile: it has an email, but it is billed by QuickBooks invoice — not looked up.
+  assert.equal(reconcilable(row), false);
+  // A Stripe event for a customer with the same email is not matched to it either.
+  assert.equal(await findClientByStripeCustomerGhl("cus_999", "office@whiten.example"), null);
+  // Once Stripe is on the record — the method, or a customer id someone stored — it is followed like any client.
+  await patch({ action: "payMethod", value: "Stripe via GHL" }, DAVE, LEGACY);
+  assert.equal((await findClientByStripeCustomerGhl("cus_999", "office@whiten.example"))?.id, LEGACY); assert.equal(reconcilable((await listClientsGhl()).rows[0]), true);
+  await patch({ action: "payMethod", value: "QuickBooks invoice" }, DAVE, LEGACY); await patch({ action: "stripeCustomer", customerId: "cus_ABC" }, DAVE, LEGACY);
+  assert.equal((await findClientByStripeCustomerGhl("cus_ABC"))?.id, LEGACY); assert.equal(reconcilable((await listClientsGhl()).rows[0]), true);
+  // A desk client is reconciled as before: a customer id or an email is enough.
+  addClient();
+  const squirrel = (await listClientsGhl()).rows.find((r) => r.id === CLIENT)!;
+  assert.equal(reconcilable(squirrel), true); assert.equal(reconcilable({ ...squirrel, email: "", stripeCustomer: "" }), false);
+  assert.equal(ghl.tasks.length, 0);
+});
+
+test("a payment problem someone records on a legacy client is still a payment problem", async () => {
+  addLegacy();
+  const row = await patch({ action: "payStatus", value: "Overdue" }, DAVE, LEGACY);
+  assert.equal(row.group, "issue"); assert.deepEqual(row.flags, ["payment"]);
+  assert.equal(ghl.tasks.length, 1); assert.equal(ghl.tasks[0].title, "Whiten Pools, Inc. is overdue on payment. Chase it before the service lapses."); assert.equal(ghl.tasks[0].assignedTo, reps.Josh);
 });
