@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { indexForDesk, lookalikes, matchRow, migrateDesk, personName, planClient, planOnboarding, type MondayRow } from "./migrate";
+import { indexForDesk, lookalikes, matchRow, migrateDesk, parseMigrateBody, personName, planClient, planOnboarding, type MondayRow } from "./migrate";
 import { deskDiagnose, deskSelfTest, deskSetup, deskWriteList } from "./admin";
 import { resolveDeskFields } from "./fields";
 import { listOnboardingGhl, onboardingDetailGhl } from "./onboarding";
@@ -16,6 +16,7 @@ import { COL, STAGES } from "@/lib/onboarding/config";
 import { CCOL, CLIENT_GROUPS } from "@/lib/clients/config";
 import type { IntakeRecord } from "@/lib/onboarding/types";
 import { createHash } from "node:crypto";
+import * as blobStub from "./testing/blob-stub";
 import { blobJson, blobKeys, blobSeed } from "./testing/blob-stub";
 import type { FakeGhl } from "./testing/fake-ghl";
 import { DAVE, reps, setUp, tearDown } from "./testing/harness";
@@ -127,7 +128,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(blobJson<IntakeRecord>(`onboarding/intake/${CHOICE_OB}.json`)!.contactId, choiceId);
   assert.equal((await resolveToken(token)).itemId, CHOICE_OB);
   assert.deepEqual(byMonday(r.rows, CHOICE_OB).storage, [`intake/${CHOICE_OB}: contactId set`]);
-  assert.equal(ghl.value(choiceId, "Desk Link"), `https://www.creativecowboys.co/leads?tab=onboarding&client=${choiceId}`, "a contact the import creates gets its desk link once it has an id");
+  assert.equal(ghl.value(choiceId, "Desk Link"), `https://www.creativecowboys.co/admin?tab=onboarding&client=${choiceId}`, "a contact the import creates gets its desk link once it has an id");
   // Bourbon: matched to the lead Phase 1 imported; nothing GoHighLevel already had was overwritten; Madison mapped by Monday id.
   const bourbon = ghl.get("LeadBourbon0000000A1");
   assert.equal(bourbon.companyName, "Bourbon Leather Co"); assert.equal(bourbon.assignedTo, reps.Dave); assert.equal(ghl.value(bourbon.id, "LSE Health"), "green");
@@ -142,7 +143,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   const lady = "LadybugGhlContact001";
   assert.deepEqual(ghl.value(lady, "Desk Packages"), ["Local Growth", "Social Ads $1,200"]); assert.equal(ghl.value(lady, "Desk Custom Monthly"), 50); assert.equal(ghl.value(lady, "Desk Onboarding Stage"), "Collecting assets / access"); assert.equal(ghl.value(lady, "Desk Baseline Captured"), "Yes"); assert.equal(ghl.value(lady, "Desk Search Atlas Listing"), "94266");
   assert.equal(ghl.get(lady).email, "erin@ladybug.example"); assert.equal(ghl.get(lady).assignedTo, reps.Dave, "an existing owner is never replaced by the board's sales owner");
-  assert.equal(ghl.value(lady, "Desk Link"), `https://www.creativecowboys.co/leads?tab=onboarding&client=${lady}`);
+  assert.equal(ghl.value(lady, "Desk Link"), `https://www.creativecowboys.co/admin?tab=onboarding&client=${lady}`);
   // Squirrel Made: a client with no onboarding record.
   assert.equal(ghl.value("SquirrelMadeJeremy01", "Desk Client Status"), "Active"); assert.deepEqual(ghl.get("SquirrelMadeJeremy01").tags, ["desk-client"]); assert.equal(ghl.notesFor("SquirrelMadeJeremy01")[0].body.startsWith("From the old board (Josh Pack, 2026-09-24): [CC-MONDAY-UPDATE:903] [CC-SRC:client]\n"), true);
   assert.equal(ghl.get("SomeoneElse000000001").customFields!.length, 0, "a contact that is not on either board is not touched");
@@ -310,11 +311,11 @@ test("a run that stopped after the fields were written is finished by the next o
   const id = [...ghl.contacts.values()].find((c) => c.companyName === "Half Done Co")!.id;
   assert.equal(ghl.value(id, "Desk Monday Onboarding ID"), "611"); assert.deepEqual(ghl.get(id).tags, []); assert.equal(ghl.notesFor(id).length, 0);
   const dry = await migrateDesk({ dryRun: true });
-  assert.equal(dry.rows[0].match, "imported"); assert.match(dry.rows[0].detail!, /^already imported, but an earlier run did not finish: tag desk-onboarding, 2 updates to copy as notes, storage link intake\/611 — the next real run completes it$/);
+  assert.equal(dry.rows[0].match, "imported"); assert.match(dry.rows[0].detail!, /^already imported, but an earlier run did not finish: tag desk-onboarding, monday-import, 2 updates to copy as notes, storage link intake\/611 — the next real run completes it$/);
   const second = await migrateDesk({ pauseMs: 0, dryRun: false });
   assert.equal(second.counts.finished, 1); assert.equal(second.counts.written, 0); assert.equal(second.counts.failed, 0);
-  assert.match(second.rows[0].detail!, /^already imported — finished what an earlier run left: tag desk-onboarding, 2 updates copied as notes, storage link intake\/611$/);
-  assert.deepEqual(ghl.get(id).tags, ["desk-onboarding"]); assert.equal(ghl.notesFor(id).length, 2); assert.equal(blobJson<IntakeRecord>("onboarding/intake/611.json")!.contactId, id);
+  assert.match(second.rows[0].detail!, /^already imported — finished what an earlier run left: tag desk-onboarding, monday-import, 2 updates copied as notes, storage link intake\/611$/);
+  assert.deepEqual(ghl.get(id).tags, ["desk-onboarding", "monday-import"], "the contact was created by the import (its source says so), so finishing it adds the import tag too"); assert.equal(ghl.notesFor(id).length, 2); assert.equal(blobJson<IntakeRecord>("onboarding/intake/611.json")!.contactId, id);
   const writes = ghl.writes().length;
   const third = await migrateDesk({ pauseMs: 0, dryRun: false });
   assert.equal(third.rows[0].detail, "already imported — skipped (force re-writes it)"); assert.equal(ghl.writes().length, writes);
@@ -461,6 +462,21 @@ const legacyBoard = (): MondayRow[] => [
 ];
 const LEGACY_RUN = { boards: ["clients" as const], includeOffDesk: true, createNameOnly: true };
 const createdKey = (id: string) => `onboarding/import/client-${id}.json`;
+const nameRecord = (name: string) => `onboarding/import/name-${name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]/g, "")}.json`;
+const carrying = (mondayId: string) => [...ghl.contacts.values()].filter((c) => (c.customFields || []).some((x) => x.id === ghl.fieldId("Desk Monday Client ID") && x.value === mondayId));
+/** GoHighLevel applies the next create and the answer never arrives (a timeout), or arrives as a gateway error. */
+const loseNextCreateAnswer = (as: "timeout" | 504) => {
+  const inner = global.fetch; let armed = true;
+  global.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+    const res = await inner(input, init);
+    if (armed && String(input).endsWith("/contacts/") && (init?.method || "GET") === "POST") {
+      armed = false; global.fetch = inner;
+      if (as === "timeout") throw Object.assign(new Error("The operation was aborted due to timeout"), { name: "TimeoutError" });
+      return new Response("upstream request timeout", { status: 504 });
+    }
+    return res;
+  }) as typeof fetch;
+};
 
 test("legacy clients: the dry run says exactly what each row creates and writes, and writes nothing", async () => {
   boards([], legacyBoard());
@@ -520,7 +536,7 @@ test("legacy clients: one row as a trial, then the rest — and a second run nev
   // The desk client imported in the same run is untouched by any of this: no marker, no import tag, its own contact.
   assert.equal(ghl.value("SquirrelMadeJeremy01", "Desk Legacy Client"), undefined); assert.deepEqual(ghl.get("SquirrelMadeJeremy01").tags, ["desk-client"]); assert.equal(ghl.get("SquirrelMadeJeremy01").firstName, "Jeremy");
   assert.equal(ghl.tasks.length, 0, "the import never leaves a payment task");
-  assert.deepEqual(blobKeys(), [createdKey(SCONYERS), createdKey(CHAPEL), createdKey(WHITEN)].sort());
+  assert.deepEqual(blobKeys(), [createdKey(SCONYERS), createdKey(CHAPEL), createdKey(WHITEN), nameRecord("Sconyers Concrete Inc"), nameRecord("Chapelhill Church"), nameRecord("Whiten Pools, Inc.")].sort(), "one record per row and one per business name — and the run's lock is gone");
   // The Clients tab: four clients, three of them legacy and quiet; the money counts them.
   const list = (await listClientsGhl()).rows;
   assert.deepEqual(list.map((x) => [x.name, x.legacy, x.flags.join(","), x.mrr]).sort(), [["Chapelhill Church", true, "", "0"], ["Sconyers Concrete Inc", true, "", "497"], ["Squirrel Made Products", false, "gbp,report,no-stripe", "297"], ["Whiten Pools, Inc.", true, "", "0"]]);
@@ -611,7 +627,7 @@ test("legacy clients: contacts that look like the business are listed before one
   const r = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
   const similar = (id: string) => byMonday(r.rows, id).similar!.map((x) => [x.id, x.why]);
   assert.deepEqual(similar(SCONYERS), [["SconyersNoInc0000001", "the same name apart from Inc, LLC, The and the like"]]);
-  assert.deepEqual(similar(WHITEN), [["WhitenPerson00000001", "the same website or email domain (whiten-pools.com)"]]);
+  assert.deepEqual(similar(WHITEN), [["WhitenPerson00000001", "its email or website spells this business name"]]);
   assert.deepEqual(similar(CHAPEL), [["ChapelSite0000000001", "the same website or email domain (chapelhill.cc)"]]);
   assert.deepEqual(similar("905"), [["GmailLocal0000000001", "its email or website spells this business name"]]);
   assert.deepEqual(similar("906"), [["McKinleyOther0000001", 'its business name starts with the same uncommon word, "mckinley"']], "another roofer is not a look-alike: only the business's own first word counts");
@@ -655,6 +671,23 @@ test("legacy clients: if GoHighLevel will not take a contact with nobody's name,
   assert.equal(ghl.get("SquirrelMadeJeremy01").firstName, "Jeremy"); assert.equal(ghl.get(byMonday(others.rows, "908").ghlId).firstName, "Dana"); assert.equal(ghl.get(byMonday(others.rows, "908").ghlId).lastName, "Smith");
 });
 
+test("legacy clients: a create that stops before its tags is finished by the next run — with both tags, whether or not the search has caught up", async () => {
+  boards([], [legacyRow("921", "Tagless One LLC"), legacyRow("922", "Tagless Two LLC")]);
+  ghl.failures.push({ match: /^POST \/contacts\/[^/]+\/tags$/, status: 500 }, { match: /^POST \/contacts\/[^/]+\/tags$/, status: 500 });
+  const first = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(first.counts.failed, 2); assert.equal(ghl.contacts.size, 7, "both contacts exist, with their fields and their record");
+  const ids = ["921", "922"].map((m) => blobJson<{ contactId: string }>(createdKey(m))!.contactId);
+  for (const id of ids) { assert.deepEqual(ghl.get(id).tags, []); assert.equal(ghl.value(id, "Desk Legacy Client"), "Yes"); }
+  // 921: the search has caught up (found as imported by its Monday id). 922: it has not (found through the import's record).
+  ghl.settle(); ghl.lag = true;
+  const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+  assert.deepEqual(dry.rows.map((x) => x.detail), Array(2).fill("already imported, but an earlier run did not finish: tag desk-client, monday-import — the next real run completes it"));
+  const second = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(second.counts.finished, 2); assert.equal(second.counts.written, 0); assert.equal(second.counts.failed, 0); assert.equal(ghl.contacts.size, 7);
+  for (const id of ids) assert.deepEqual([...ghl.get(id).tags!].sort(), ["desk-client", "monday-import"]);
+  assert.deepEqual((await listClientsGhl()).rows.map((x) => [x.name, x.legacy]).sort(), [["Tagless One LLC", true], ["Tagless Two LLC", true]]);
+});
+
 test("legacy clients: a giveaway winner among them arrives protected, and a marker GoHighLevel did not keep fails the row", async () => {
   boards([], [legacyRow("911", "Legacy Winner Co", { [CCOL.package]: "Giveaway Winner, Local Growth" }), legacyRow("912", "Marker Lost Co")]);
   const ok = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["911"] });
@@ -664,4 +697,256 @@ test("legacy clients: a giveaway winner among them arrives protected, and a mark
   ghl.truncate.set("Desk Legacy Client", 0);
   const lost = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["912"] });
   assert.equal(lost.counts.failed, 1); assert.match(lost.rows[0].error!, /^GoHighLevel did not keep "Yes" in Desk Legacy Client on /);
+});
+
+// ───────────────────────────── one board row, one contact — whatever goes wrong (review, Oct 2 2026) ─────────────────────────────
+test("a create whose answer never comes back holds the row instead of making a second contact; when the search catches up the row is simply finished", async () => {
+  for (const how of ["timeout", 504] as const) {
+    const id = how === "timeout" ? "931" : "932";
+    boards([], [legacyRow(id, `Lost Answer ${id} LLC`)]);
+    ghl.settle(); ghl.lag = true; // GoHighLevel's search answers from before the create for as long as this lasts
+    loseNextCreateAnswer(how);
+    const first = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+    assert.equal(first.counts.failed, 1); assert.equal(carrying(id).length, 1, "GoHighLevel did create the contact");
+    assert.match(first.rows[0].error!, /the contact may or may not have been created\. The import has noted that a create was started for this row: it is held until GoHighLevel's search can say \(ten minutes at most\)\. Do a dry run before anything else\.$/);
+    assert.equal(blobJson<{ contactId: string }>(createdKey(id))!.contactId, "", "the record written BEFORE the create is still there, unfinished");
+    // Straight away again, dry and real: the row is held — nothing is created, nothing is written.
+    const writes = ghl.writes().length;
+    const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+    assert.match(dry.rows[0].detail!, /^BLOCKED — a real run will refuse this row: an earlier run started creating this contact at \S+ and never recorded how that ended, so the contact may exist\./);
+    const again = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+    assert.equal(again.counts.failed, 1); assert.match(again.rows[0].error!, /^not imported: an earlier run started creating this contact/);
+    assert.equal(carrying(id).length, 1, "no second contact"); assert.equal(ghl.writes().length, writes);
+    // The search catches up: the contact is found by the row id it carries, and the run finishes it (both tags — it is the import's own contact).
+    ghl.settle(); ghl.lag = false;
+    const later = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+    assert.deepEqual([later.rows[0].match, later.counts.finished, later.counts.failed], ["imported", 1, 0]);
+    assert.deepEqual([...carrying(id)[0].tags!].sort(), ["desk-client", "monday-import"]); assert.equal(carrying(id).length, 1);
+    assert.ok(!/[=?&]/.test(JSON.stringify([first.rows[0].error, dry.rows[0].detail, again.rows[0].error])));
+  }
+});
+
+test("an unfinished create that never happened frees the row after ten minutes; a refusal frees it at once", async () => {
+  boards([], [legacyRow("933", "Never Made LLC")]);
+  // A record left by a run that died before GoHighLevel ever saw the create, eleven minutes ago: the search (not lagging) has no such contact.
+  const stale = { kind: "client", mondayId: "933", name: "Never Made LLC", contactId: "", startedAt: new Date(Date.now() - 11 * 60_000).toISOString() };
+  blobSeed(createdKey("933"), stale); blobSeed(nameRecord("Never Made LLC"), stale);
+  assert.equal((await migrateDesk({ dryRun: true, ...LEGACY_RUN })).rows[0].detail, "creates a new contact from the business name alone (the row has no email or phone)");
+  // The same record two minutes old: held.
+  blobSeed(createdKey("933"), { ...stale, startedAt: new Date(Date.now() - 2 * 60_000).toISOString() });
+  assert.match((await migrateDesk({ dryRun: true, ...LEGACY_RUN })).rows[0].detail!, /^BLOCKED — a real run will refuse this row: an earlier run started creating this contact/);
+  blobSeed(createdKey("933"), stale);
+  // GoHighLevel refuses the create outright: nothing exists, so nothing is held — the very next run goes through.
+  ghl.failures.push({ match: /^POST \/contacts\/$/, status: 422, body: { message: "refused" } });
+  const refused = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(refused.counts.failed, 1); assert.deepEqual(blobKeys(), [], "the records of a create GoHighLevel refused are taken away");
+  const ok = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(ok.counts.written, 1); assert.equal(carrying("933").length, 1);
+  assert.equal(blobJson<{ contactId: string }>(nameRecord("Never Made LLC"))!.contactId, ok.rows[0].ghlId);
+});
+
+test("two real runs at once: the second is refused before it reads a row; a run that died frees the import six minutes after it started", async () => {
+  boards([], [legacyRow("941", "Lock One LLC"), legacyRow("942", "Lock Two LLC"), legacyRow("943", "Lock Three LLC")]);
+  const both = await Promise.allSettled([migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN }), migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN })]);
+  assert.deepEqual(both.map((r) => r.status).sort(), ["fulfilled", "rejected"]);
+  assert.equal((both.find((r) => r.status === "rejected") as PromiseRejectedResult).reason.status, 409);
+  assert.deepEqual(["941", "942", "943"].map((id) => carrying(id).length), [1, 1, 1], "one contact per row");
+  assert.ok(!blobKeys().includes("onboarding/import/lock.json"), "the lock is released");
+  // A lock left by a run on another server, two minutes old: refused, and nothing is read or written.
+  blobSeed("onboarding/import/lock.json", { id: "someone-else", startedAt: new Date(Date.now() - 2 * 60_000).toISOString() });
+  const requests = ghl.requests.length;
+  await assert.rejects(migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN }), (e: Error & { status?: number }) => e.status === 409 && /Another import run started at/.test(e.message) && !/[=?&]/.test(e.message));
+  assert.equal(ghl.requests.length, requests);
+  assert.equal((await migrateDesk({ dryRun: true, ...LEGACY_RUN })).total, 3, "a dry run never needs the lock");
+  // Seven minutes old: that run is long dead.
+  blobSeed("onboarding/import/lock.json", { id: "someone-else", startedAt: new Date(Date.now() - 7 * 60_000).toISOString() });
+  assert.equal((await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN })).counts.failed, 0);
+  assert.ok(!blobKeys().includes("onboarding/import/lock.json"));
+});
+
+test("without its records the import creates nothing: storage that cannot be read blocks the row, storage that is not there refuses the run", async () => {
+  boards([], [legacyRow("951", "No Storage LLC")]);
+  ghl.settle(); ghl.lag = true;
+  const first = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(first.counts.written, 1);
+  // The re-run cannot read storage (a passing outage) while the search still does not list the contact.
+  const stub = blobStub as unknown as Record<string, unknown>; const realGet = stub.get;
+  stub.get = async () => { throw Object.assign(new Error("blob store unavailable"), { statusCode: 503 }); };
+  try {
+    const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+    assert.match(dry.rows[0].detail!, /^BLOCKED — a real run will refuse this row: the import's own records could not be read \(.*\), so it cannot tell whether an earlier run already made this contact/);
+    await assert.rejects(migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN }), "a real run cannot even take its lock");
+  } finally { stub.get = realGet; }
+  assert.equal(carrying("951").length, 1);
+  // No storage at all on this deployment.
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  assert.match((await migrateDesk({ dryRun: true, ...LEGACY_RUN })).rows[0].detail!, /^BLOCKED — a real run will refuse this row: the import's own records could not be read/);
+  await assert.rejects(migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN }), { status: 503 });
+  assert.equal(carrying("951").length, 1); assert.equal(ghl.contacts.size, 6);
+});
+
+test("a pin never puts one row on two contacts, and never lands on a live desk client by accident", async () => {
+  boards([], [legacyRow("961", "Whiten Pools, Inc."), legacyRow("962", "DeFoor Plumbing"), legacyRow("963", "Onboarding Co"), legacyRow("964", "Test Co")]);
+  ghl.addContact({ id: "WhitenRealContact001", firstName: "Kelli", companyName: "Whiten Pools" });
+  // A client born on the GoHighLevel desk (no board row behind it), with live values; and a record still in onboarding.
+  const live = { "Desk Client Status": "At risk", "Desk Client Health": "Red", "Desk Pay Status": "Paid / Current", "Desk Pay Method": "Stripe via GHL", "Desk Account Manager": "Dave", "Desk Packages": ["Max Growth"] };
+  ghl.addContact({ id: "DefoorLiveClient0001", firstName: "Dan", companyName: "Defoor Plumbing", tags: ["desk-client"], fields: live });
+  ghl.addContact({ id: "StillOnboarding00001", companyName: "Onboarding Co", tags: ["desk-onboarding"], fields: { "Desk Onboarding Stage": "In progress" } });
+  ghl.addContact({ id: "C8FHl1LIfXEMI9isByB2", companyName: "Test Co" });
+  ghl.settle(); ghl.lag = true;
+  // 961 is created (the look-alike was listed, the operator went ahead) — and then pinned to the look-alike after all.
+  const made = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["961"] });
+  assert.deepEqual(made.rows[0].similar!.map((x) => x.id), ["WhitenRealContact001"]);
+  for (const dryRun of [true, false]) {
+    const pinned = await migrateDesk({ pauseMs: 0, dryRun, ...LEGACY_RUN, onlyIds: ["961"], map: { "961": "WhitenRealContact001" } });
+    assert.equal(pinned.rows[0].match, "unmatched"); assert.match(pinned.rows[0].detail!, /^this row is already imported: the import created contact \S+ for it\. Pinning it to WhitenRealContact001 as well would put one board row on two contacts\./);
+  }
+  assert.equal(carrying("961").length, 1); assert.equal(ghl.get("WhitenRealContact001").customFields!.length, 0);
+  ghl.settle(); ghl.lag = false; // …and once the search lists it, the pin is simply ignored — and the report says so.
+  const ignored = await migrateDesk({ dryRun: true, ...LEGACY_RUN, onlyIds: ["961"], map: { "961": "WhitenRealContact001" } });
+  assert.equal(ignored.rows[0].match, "imported"); assert.ok(ignored.rows[0].warnings.some((w) => /^the map for this row was ignored: the row is already imported on /.test(w)));
+  // 962: its name is exactly a live desk client's. Not matched onto it — refused, dry run and real run, and nothing is written.
+  const writes = ghl.writes().length;
+  for (const dryRun of [true, false]) {
+    const r = await migrateDesk({ pauseMs: 0, dryRun, ...LEGACY_RUN, onlyIds: ["962"] });
+    assert.equal(r.rows[0].match, "unmatched"); assert.match(r.rows[0].detail!, /^contact DefoorLiveClient0001 \(Defoor Plumbing\) is already a client on the desk and did not come from this board row\./);
+  }
+  assert.equal(ghl.writes().length, writes);
+  // Pinned on purpose: the row joins it, and everything the live client holds stays. It is not marked legacy.
+  const kept = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["962"], map: { "962": "DefoorLiveClient0001" } });
+  assert.deepEqual([kept.rows[0].match, kept.rows[0].done, kept.rows[0].legacy], ["mapped", true, false]);
+  for (const [name, value] of Object.entries(live)) assert.deepEqual(ghl.value("DefoorLiveClient0001", name), value, name);
+  assert.equal(ghl.value("DefoorLiveClient0001", "Desk Monday Client ID"), "962"); assert.equal(ghl.value("DefoorLiveClient0001", "Desk Legacy Client"), undefined);
+  assert.ok(kept.rows[0].warnings.some((w) => /^this contact is already a client on the desk: what it holds is kept \(Desk Client Status, Desk Client Health, Desk Pay Status, Desk Pay Method, Desk Account Manager\)/.test(w)));
+  assert.ok(kept.rows[0].warnings.some((w) => /^not marked a legacy client: it is already a client on the desk/.test(w)));
+  assert.deepEqual((await listClientsGhl()).rows.find((x) => x.id === "DefoorLiveClient0001")!.flags, ["gbp", "report", "no-stripe"], "still a desk client, flagged as one");
+  // A record still in onboarding takes the row (as Choice's did) — and the report says where it will show.
+  const onboarding = await migrateDesk({ dryRun: true, ...LEGACY_RUN, onlyIds: ["963"] });
+  assert.equal(onboarding.rows[0].match, "company-name"); assert.ok(onboarding.rows[0].warnings.some((w) => /still in onboarding, so the client shows on the Onboarding tab/.test(w)));
+  // The designated test contact is never imported onto, pinned or not.
+  for (const map of [undefined, { "964": "C8FHl1LIfXEMI9isByB2" }]) {
+    const t = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["964"], map });
+    assert.equal(t.rows[0].match, "unmatched"); assert.match(t.rows[0].detail!, /designated test contact/);
+  }
+  assert.equal(ghl.get("C8FHl1LIfXEMI9isByB2").customFields!.length, 0);
+});
+
+test("one business name is one contact across runs too, however short the name; near-twin rows are pointed out to each other", async () => {
+  ghl.addContact({ id: "ShortNameContact0001", firstName: "Sam", companyName: "ICG" });
+  boards([], [legacyRow("971", "Twin Legacy Co"), legacyRow("972", "Twin Legacy Co."), legacyRow("973", "CDM"), legacyRow("974", "CDM"), legacyRow("975", "ICG"), legacyRow("976", "Sconyers Concrete Inc"), legacyRow("977", "Sconyers Concrete")]);
+  const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+  assert.deepEqual(dry.rows.map((x) => x.match), ["create-name-only", "unmatched", "create-name-only", "unmatched", "create-name-only", "create-name-only", "create-name-only"]);
+  assert.match(byMonday(dry.rows, "974").detail!, /^row 973 creates a contact with the same business name/);
+  // A three-letter name is too short for the exact-name match, so the contact that carries it is at least pointed out.
+  assert.deepEqual(byMonday(dry.rows, "975").similar, [{ id: "ShortNameContact0001", name: "ICG — Sam", why: "the same name apart from Inc, LLC, The and the like" }]);
+  // Two rows that are the same business but for "Inc": the second is shown the first, in the dry run and in the real run.
+  assert.deepEqual(byMonday(dry.rows, "977").similar!.map((x) => [x.id, x.why]), [["row 976 of this run (not created yet)", "the same name apart from Inc, LLC, The and the like"]]);
+  // One row per run, each straight after the other while the search lags: the business-name record stands in for the search.
+  ghl.settle(); ghl.lag = true;
+  const one = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["971"] });
+  const two = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["972"] });
+  assert.equal(one.counts.written, 1); assert.equal(two.rows[0].match, "unmatched"); assert.match(two.rows[0].detail!, /already carries client item 971 from the old board/);
+  const cdm = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["973", "974"] });
+  assert.deepEqual(cdm.rows.map((x) => [x.match, !!x.done]), [["create-name-only", true], ["unmatched", false]]);
+  const sconyers = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN, onlyIds: ["976", "977"] });
+  assert.deepEqual(byMonday(sconyers.rows, "977").similar!.map((x) => x.id), [byMonday(sconyers.rows, "976").ghlId]);
+  assert.deepEqual(["971", "972", "973", "974"].map((id) => carrying(id).length), [1, 0, 1, 0]);
+});
+
+test("a row on each board with one name: if the onboarding row's create fails, the client row's own create is recorded like any other", async () => {
+  ghl.monday = (_q, v) => ({ boards: [{ items_page: { cursor: null, items: (v.board as string[])[0] === "18431157561" ? [row("701", "Both Boards Co", stage("new"), {})] : [legacyRow("981", "Both Boards Co")] } }] });
+  const run = { includeOffDesk: true, createNameOnly: true };
+  assert.deepEqual((await migrateDesk({ dryRun: true, ...run })).rows.map((x) => [x.match, x.ghlName]), [["create-name-only", ""], ["company-name", "(the contact row 701 creates in this run)"]]);
+  ghl.settle(); ghl.lag = true;
+  ghl.failures.push({ match: /^POST \/contacts\/$/, status: 422, body: { message: "refused" } });
+  const first = await migrateDesk({ pauseMs: 0, dryRun: false, ...run });
+  assert.deepEqual(first.rows.map((x) => [x.match, !!x.done, !!x.error]), [["create-name-only", false, true], ["create-name-only", true, false]]);
+  assert.deepEqual(first.rows[1].storage, [`import record: this row created contact ${first.rows[1].ghlId}`]);
+  // Straight away again: the client row is found through its record; the onboarding row joins the same contact through the name record.
+  const again = await migrateDesk({ pauseMs: 0, dryRun: false, ...run });
+  assert.deepEqual(again.rows.map((x) => [x.match, x.ghlId]), [["company-name", first.rows[1].ghlId], ["imported", first.rows[1].ghlId]]);
+  assert.equal(ghl.contacts.size, 6, "one contact for the business"); assert.equal(carrying("981").length, 1);
+});
+
+test("a row that is skipped as imported reports what the contact holds — and a marker GoHighLevel never kept is put right, not papered over", async () => {
+  boards([], [legacyRow("991", "Marker Lost Co", { [CCOL.package]: "Local Growth, Max Growth" })]);
+  ghl.truncate.set("Desk Legacy Client", 0);
+  const first = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(first.counts.failed, 1); assert.match(first.rows[0].error!, /^GoHighLevel did not keep "Yes" in Desk Legacy Client/);
+  const id = carrying("991")[0].id;
+  // Still not kept: the next run does not call it done.
+  const stuck = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(stuck.counts.failed, 1); assert.match(stuck.rows[0].error!, /^GoHighLevel did not keep "Yes" in Desk Legacy Client/); assert.equal(stuck.rows[0].legacy, false, "the report says what the contact holds");
+  ghl.truncate.clear();
+  const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+  assert.deepEqual([dry.rows[0].match, dry.rows[0].legacy], ["imported", false]); assert.match(dry.rows[0].detail!, /^already imported, but an earlier run did not finish: mark as a legacy client, tag desk-client, monday-import — the next real run completes it$/);
+  const fixed = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(fixed.counts.finished, 1); assert.equal(fixed.rows[0].legacy, true); assert.equal(ghl.value(id, "Desk Legacy Client"), "Yes");
+  assert.match(fixed.rows[0].detail!, /^already imported — finished what an earlier run left: marked a legacy client, tag desk-client, monday-import$/);
+  // An owner then takes the marker off (an explicit No): no later run puts it back.
+  ghl.get(id).customFields!.find((x) => x.id === ghl.fieldId("Desk Legacy Client"))!.value = "No";
+  const after = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.deepEqual([after.rows[0].detail, after.rows[0].legacy], ["already imported — skipped (force re-writes it)", false]); assert.equal(ghl.value(id, "Desk Legacy Client"), "No");
+  // A package the board has and the contact no longer does is said, never written back (the desk is live; the board is history).
+  ghl.get(id).customFields!.find((x) => x.id === ghl.fieldId("Desk Packages"))!.value = ["Local Growth"];
+  const lacking = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.ok(lacking.rows[0].warnings.some((w) => /^the board row carries Max Growth and the contact does not — nothing was changed/.test(w))); assert.deepEqual(ghl.value(id, "Desk Packages"), ["Local Growth"]);
+  // A giveaway winner whose label GoHighLevel dropped while the read-back could not be made: the next run does not pass over it in silence.
+  boards([], [legacyRow("992", "Legacy Winner Co", { [CCOL.package]: "Giveaway Winner, Local Growth" })]);
+  ghl.drop.set("Desk Packages", ["Giveaway Winner"]);
+  ghl.failures.push({ match: /^GET \/contacts\/n/, status: 403 });
+  const broken = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(broken.counts.failed, 1);
+  ghl.drop.clear();
+  const next = await migrateDesk({ pauseMs: 0, dryRun: false, ...LEGACY_RUN });
+  assert.equal(next.rows[0].match, "imported"); assert.ok(next.rows[0].warnings.some((w) => /^NOT PROTECTED: the board row is a Giveaway Winner and the contact's Desk Packages does not carry that label/.test(w)));
+  assert.deepEqual(next.winners, [{ board: "clients", mondayId: "992", name: "Legacy Winner Co", imported: true, protected: false }]);
+});
+
+test("the look-alike list leads with the strongest reason, and says when there are more than it shows", async () => {
+  for (let i = 0; i < 6; i++) ghl.addContact({ id: `SameSiteContact00000${i}`, firstName: `Person ${i}`, email: `person${i}@whiten-pools.example` });
+  ghl.addContact({ id: "WhitenNearMiss000001", companyName: "Whiten's Pools" });
+  ghl.addContact({ id: "WhitenSameName000001", companyName: "The Whiten Pools Company" });
+  ghl.addContact({ id: "WhitenSubdomain00001", firstName: "Office", email: "office@app.whiten-pools.example" });
+  boards([], [legacyRow("995", "Whiten Pools, Inc.", { [CCOL.website]: url("https://whiten-pools.example") })]);
+  const r = (await migrateDesk({ dryRun: true, ...LEGACY_RUN })).rows[0];
+  assert.deepEqual(r.similar!.slice(0, 2).map((x) => [x.id, x.why]), [["WhitenSameName000001", "the same name apart from Inc, LLC, The and the like"], ["WhitenNearMiss000001", "the two business names are a letter or two apart"]]);
+  assert.equal(r.similar!.length, 5); assert.ok(r.similar!.slice(2).every((x) => x.why === "its email or website spells this business name"), "then the addresses that spell the name");
+  assert.ok(r.warnings.some((w) => /^9 contacts already in GoHighLevel look like this business \(see similar, which lists the five closest\)/.test(w)), "the two names, and seven people at the business's own domain or a sub-domain of it");
+  // A domain that does not spell the name still counts when it is the row's own website, sub-domains included.
+  boards([], [legacyRow("994", "Chapelhill Church", { [CCOL.website]: url("https://chapelhill.example") })]);
+  ghl.addContact({ id: "ChapelSubdomain00001", firstName: "Office", email: "office@app.chapelhill.example" });
+  assert.deepEqual((await migrateDesk({ dryRun: true, ...LEGACY_RUN })).rows[0].similar!.map((x) => [x.id, x.why]), [["ChapelSubdomain00001", "the same website or email domain (chapelhill.example)"]]);
+});
+
+test("the request is checked strictly: a filter that is malformed is refused, never quietly dropped", () => {
+  assert.deepEqual(parseMigrateBody({}), { dryRun: true, offset: 0, limit: 25, force: false, overwriteLiveDesk: false, onlyIds: undefined, map: {}, boards: undefined, includeOffDesk: false, createNameOnly: false, businessAsContactName: false });
+  const full = parseMigrateBody({ dryRun: false, boards: ["clients"], includeOffDesk: true, createNameOnly: true, onlyIds: ["13125631516", 13125586889, "13125631516"], map: { "13125562410": "SconyersNoInc0000001" }, offset: 5, limit: 10, businessAsContactName: true });
+  assert.deepEqual(full.onlyIds, ["13125631516", "13125586889"], "ids typed as numbers are read as the ids they are"); assert.equal(full.dryRun, false); assert.deepEqual(full.map, { "13125562410": "SconyersNoInc0000001" }); assert.deepEqual(full.boards, ["clients"]);
+  const refused = (body: unknown, what: RegExp) => assert.throws(() => parseMigrateBody(body), (e: Error & { status?: number }) => e.status === 400 && what.test(e.message) && /Nothing was run|JSON object/.test(e.message) && !/[=?&]/.test(e.message), JSON.stringify(body));
+  refused({ onlyIds: [] }, /onlyIds must be a list of 1 to 100/); refused({ onlyIds: "13125631516" }, /onlyIds/); refused({ onlyIds: [null] }, /onlyIds/); refused({ onlyIds: ["13125631516", "abc"] }, /onlyIds/); refused({ onlyIds: [1.5] }, /onlyIds/);
+  refused({ onlyId: ["13125631516"] }, /Unknown import option: onlyId\./); refused({ createNameonly: true, includeOffdesk: true }, /Unknown import options: createNameonly, includeOffdesk\./);
+  refused({ map: { "13125562410": "https://app.gohighlevel.com/v2/location/x/contacts/detail/SconyersNoInc0000001" } }, /map entry "13125562410" is not a Monday item id pointing at a GoHighLevel contact id/);
+  refused({ map: { abc: "SconyersNoInc0000001" } }, /map entry/); refused({ map: { "13125562410": "13125562410" } }, /map entry/); refused({ map: ["x"] }, /map must be an object/);
+  refused({ boards: ["client"] }, /boards must be a list/); refused({ boards: [] }, /boards/); refused({ boards: "clients" }, /boards/);
+  refused({ dryRun: "false" }, /dryRun must be true or false/); refused({ createNameOnly: "yes" }, /createNameOnly must be true or false/); refused({ limit: "17" }, /limit must be a whole number/); refused({ offset: -1 }, /offset/);
+  refused(null, /JSON object/); refused([], /JSON object/); refused("x", /JSON object/);
+});
+
+test("a board row that came back without its Team desk column, or with a phone that is not a number, is never guessed at", async () => {
+  const noColumn = row("996", "No Column Co", group("active"), { [CCOL.payMethod]: "QuickBooks invoice" });
+  boards([], [noColumn, legacyRow("997", "Short Phone Co", { [CCOL.phone]: "555-0199" }), row("998", "Odd Casing Co", group("active"), { [CCOL.teamDesk]: { text: "v", value: { checked: "TRUE" } }, [CCOL.email]: "odd@casing.example" })]);
+  const dry = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
+  assert.match(byMonday(dry.rows, "996").detail!, /^BLOCKED — a real run will refuse this row: the row came back from the board without its "Team desk" column/);
+  const phone = byMonday(dry.rows, "997");
+  assert.equal(phone.match, "create-name-only"); assert.deepEqual(phone.contact, { companyName: "Short Phone Co" }); assert.ok(phone.warnings.some((w) => /^the board's phone \(5550199\) is not a whole number — left off$/.test(w)));
+  assert.equal(byMonday(dry.rows, "998").legacy, false, "a ticked box is ticked however the board spells true");
+  const f = resolveDeskFields(ghl.defs);
+  assert.equal(planClient(noColumn, null, f).values.legacy, undefined); assert.equal(planClient(noColumn, null, f).blockers.length, 1);
+});
+
+test("an onboarding row's report names its desk link instead of spelling a web address with a query string", async () => {
+  const r = await migrateDesk({ dryRun: true, onlyIds: [BOURBON_OB], origin: "https://www.creativecowboys.co" });
+  assert.equal(r.rows[0].values!["Desk Link"], "the link that opens this record on the desk");
+  assert.ok(!/[=?&]/.test(JSON.stringify([Object.keys(r.rows[0].values!), r.rows[0].values!["Desk Link"], r.rows[0].detail, r.rows[0].tags])));
 });

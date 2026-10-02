@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { isOwnerEmail, teamSession } from "@/lib/team-auth";
 import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/validation";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
-import { migrateDesk } from "@/lib/desk/migrate";
+import { migrateDesk, parseMigrateBody } from "@/lib/desk/migrate";
 import { assertForceAllowed } from "@/lib/desk/switch";
 
 export const runtime = "nodejs";
@@ -29,21 +29,10 @@ export async function POST(req: Request) {
     if (!session) return unauthorized();
     if (!isOwnerEmail(session.email)) throw new CallDeskError("Only an owner can run the Monday → GoHighLevel desk import.", 403);
     assertSameOrigin(req);
-    const body = (await readCallBody(req)) as Record<string, unknown>;
-    const ids = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === "string" && /^\d{1,20}$/.test(x)).slice(0, 100) : undefined);
-    const map: Record<string, string> = {};
-    if (body?.map && typeof body.map === "object" && !Array.isArray(body.map)) {
-      for (const [k, v] of Object.entries(body.map as Record<string, unknown>).slice(0, 100)) if (/^\d{1,20}$/.test(k) && typeof v === "string" && /^[A-Za-z0-9]{10,64}$/.test(v)) map[k] = v;
-    }
-    assertForceAllowed({ dryRun: body?.dryRun !== false, force: body?.force === true, overwriteLiveDesk: body?.overwriteLiveDesk === true });
-    const boards = Array.isArray(body?.boards) ? body.boards.filter((b): b is "onboarding" | "clients" => b === "onboarding" || b === "clients") : undefined;
-    return NextResponse.json(await migrateDesk({
-      dryRun: body?.dryRun !== false,
-      offset: typeof body?.offset === "number" ? body.offset : 0,
-      limit: typeof body?.limit === "number" ? body.limit : 25,
-      force: body?.force === true, onlyIds: ids(body?.onlyIds), map, boards,
-      includeOffDesk: body?.includeOffDesk === true, createNameOnly: body?.createNameOnly === true, businessAsContactName: body?.businessAsContactName === true,
-      origin: new URL(req.url).origin,
-    }), { headers: teamHeaders });
+    // Checked strictly (parseMigrateBody): a malformed onlyIds / map / option name is refused, never quietly dropped — a filter that
+    // silently became "no filter" would run, and with createNameOnly create contacts for, the whole board.
+    const { overwriteLiveDesk, ...options } = parseMigrateBody(await readCallBody(req));
+    assertForceAllowed({ dryRun: options.dryRun, force: !!options.force, overwriteLiveDesk });
+    return NextResponse.json(await migrateDesk({ ...options, origin: new URL(req.url).origin }), { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }

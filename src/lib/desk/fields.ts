@@ -137,10 +137,12 @@ export function resolveDeskFields(defs: GhlFieldDef[]): DeskFields {
 }
 
 let lastFreshCheck = 0;
-/** Live definitions. If some desk field is missing from the cached list (another instance may have just created it), re-read once a minute at most. */
+/** Live definitions. If a REQUIRED desk field is missing from the cached list (another instance may have just created it), re-read once a minute
+ *  at most. A missing optional field never forces a re-read — the desk runs without it, and the ten-minute cache picks it up once it exists —
+ *  so a location without one costs nothing extra and a failed re-read can never fail a request that did not need it. */
 export async function deskFields(fresh = false): Promise<DeskFields> {
   let fields = resolveDeskFields(await listCustomFields(fresh));
-  if (!fresh && DESK_FIELD_KEYS.some((k) => !fields[k]) && Date.now() - lastFreshCheck > 60_000) {
+  if (!fresh && REQUIRED_DESK_FIELD_KEYS.some((k) => !fields[k]) && Date.now() - lastFreshCheck > 60_000) {
     lastFreshCheck = Date.now();
     fields = resolveDeskFields(await listCustomFields(true));
   }
