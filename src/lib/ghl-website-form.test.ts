@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 import { pushWebsiteFormToGHL, websiteFormNote, websiteFormPayload } from "./ghl-website-form";
 import { forgetCustomFields } from "./ghl/client";
+import { resetIntakeLookup } from "./ghl/fields";
 
 type Req = { method: string; path: string; body: unknown };
 let requests: Req[];
 let queue: { status: number; body: unknown }[];
 const originalFetch = global.fetch;
 beforeEach(() => {
-  requests = []; queue = []; forgetCustomFields();
+  requests = []; queue = []; forgetCustomFields(); resetIntakeLookup();
   process.env.GHL_API_TOKEN = "nonfunctional-test-token"; process.env.GHL_LOCATION_ID = "LOCtest000000000000";
   global.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     requests.push({ method: init?.method || "GET", path: String(url).replace("https://services.leadconnectorhq.com", ""), body: init?.body ? JSON.parse(String(init.body)) : undefined });
@@ -35,12 +36,17 @@ test("push: resolves Lead Source by name, upserts, then adds the note; the conta
   assert.equal(requests[1].path, "/contacts/upsert"); assert.deepEqual((requests[1].body as { customFields: unknown[] }).customFields, [{ id: "fLS", field_value: "Website form" }]);
   assert.equal(requests[2].path, "/contacts/newContact0000000000/notes");
 });
-test("push never throws: a failed field read still upserts (without Lead Source); a failed upsert returns empty", async () => {
-  queue.push({ status: 500, body: {} }, { status: 500, body: {} }, { status: 500, body: {} }); // field read retries ×3 then gives up
+test("push never throws: a failed field read is ONE attempt, still upserts (without Lead Source), and is not asked again for a minute", async () => {
+  queue.push({ status: 500, body: {} }); // the intake lookup does not retry
   queue.push({ status: 200, body: { new: false, contact: { id: "existing000000000000" } } });
   assert.equal(await pushWebsiteFormToGHL({ name: "A B", email: "a@b.co" }), "existing000000000000");
+  assert.equal(requests.length, 2);
   assert.deepEqual((requests.at(-1)!.body as { customFields: unknown[] }).customFields, []);
-  forgetCustomFields();
+  queue.push({ status: 200, body: { new: false, contact: { id: "existing000000000000" } } }); // second submission: no field read at all
+  await pushWebsiteFormToGHL({ name: "A B", email: "a@b.co" });
+  assert.equal(requests.length, 3); assert.equal(requests[2].path, "/contacts/upsert");
+});
+test("push never throws: a failed upsert returns empty", async () => {
   queue.push({ status: 200, body: { customFields: [] } }, { status: 422, body: { message: "bad" } });
   assert.equal(await pushWebsiteFormToGHL({ name: "A B", email: "a@b.co" }), "");
 });

@@ -9,7 +9,7 @@
  */
 
 import { addNote, ghlConfigured, normalizePhone, splitName, upsertContact } from "./ghl/client";
-import { LEAD_SOURCE, salesFields } from "./ghl/fields";
+import { LEAD_SOURCE, leadSourceIdForIntake } from "./ghl/fields";
 
 const TIMEOUT_MS = 8_000;
 
@@ -47,7 +47,7 @@ export function websiteFormNote(lead: WebsiteFormLead): string {
 export async function pushWebsiteFormToGHL(lead: WebsiteFormLead): Promise<string> {
     if (!ghlConfigured()) { console.warn("website form → GHL skipped: GHL_API_TOKEN / GHL_LOCATION_ID not set"); return ""; }
     try {
-        const leadSourceId = await salesFields().then((f) => f.leadSource?.id).catch(() => undefined);
+        const leadSourceId = await leadSourceIdForIntake();
         if (!leadSourceId) console.warn("website form → GHL: Lead Source field not resolved; lead pushed without it");
         const { contact } = await upsertContact(websiteFormPayload(lead, process.env.GHL_LOCATION_ID!, leadSourceId), { timeoutMs: TIMEOUT_MS, retries: 0 });
         if (lead.message?.trim() || lead.service || lead.industry) {

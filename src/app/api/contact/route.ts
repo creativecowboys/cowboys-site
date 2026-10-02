@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { pushWebsiteFormToGHL } from "@/lib/ghl-website-form";
 
@@ -126,13 +126,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Mirror the lead into GoHighLevel (tag website-form, Lead Source "Website form") so it shows on the
-    // sales desk. Awaited so the lambda isn't frozen mid-request; it can never fail the submission.
-    await pushWebsiteFormToGHL({
+    // sales desk. Runs AFTER the response is sent (Next `after`, kept alive by the platform), so the
+    // visitor's submit is exactly as fast as before and a GHL problem can never fail or slow it.
+    const lead = {
       name: String(name), email: String(email), phone: typeof phone === "string" ? phone : undefined,
       company: typeof (company || business) === "string" ? String(company || business) : undefined,
       message: typeof message === "string" ? message : undefined, service: typeof service === "string" ? service : undefined,
       industry: typeof industry === "string" ? industry : undefined, source: typeof source === "string" ? source : undefined,
-    });
+    };
+    after(() => pushWebsiteFormToGHL(lead).then(() => undefined));
 
     return NextResponse.json({ success: true });
   } catch (err) {

@@ -42,5 +42,7 @@
 
 /* Lead Source (GHL dropdown, Oct 1 2026): a small tag on each roster row, and a select in the context strip. */
 .call-person-source{display:inline-block;margin-top:9px;padding:2px 7px;border-radius:999px;background:#e7dcc9;color:#5a4a37;font-size:9px;font-weight:600;letter-spacing:.04em}
+.call-context-source{grid-template-columns:1.2fr 1.2fr 1fr 1fr 1fr}
+@media(max-width:1150px){.call-context-source{grid-template-columns:1fr 1fr}}
 .call-context .call-assign{margin-left:0;max-width:100%;font-size:11px}
 .call-context em{display:block;font-size:10px;color:#766955;margin-top:4px}

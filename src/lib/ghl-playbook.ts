@@ -10,7 +10,7 @@
 
 import { normalizePhone, tierFor, type Playbook, type Submission } from "./playbooks";
 import { ghlConfigured, upsertContact } from "./ghl/client";
-import { LEAD_SOURCE, salesFields } from "./ghl/fields";
+import { LEAD_SOURCE, leadSourceIdForIntake } from "./ghl/fields";
 
 const TIMEOUT_MS = 8_000;
 
@@ -64,7 +64,7 @@ export async function pushPlaybookLeadToGHL(
         return false;
     }
     try {
-        const leadSourceId = await salesFields().then((f) => f.leadSource?.id).catch(() => undefined);
+        const leadSourceId = await leadSourceIdForIntake();
         if (!leadSourceId) console.warn("playbook → GHL: Lead Source field not resolved; lead pushed without it");
         await upsertContact(playbookContactPayload(pb, s, process.env.GHL_LOCATION_ID!, utm, leadSourceId), { timeoutMs: TIMEOUT_MS, retries: 0 });
         return true;

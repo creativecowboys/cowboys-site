@@ -9,7 +9,7 @@
  */
 
 import { ghlConfigured, upsertContact } from "./ghl/client";
-import { LEAD_SOURCE, salesFields } from "./ghl/fields";
+import { LEAD_SOURCE, leadSourceIdForIntake } from "./ghl/fields";
 
 const FIELD_BUSINESS_TYPE = "AeSdXgSyDcUHh4NtPxfE"; // contact.giveaway_business_type
 const FIELD_SOURCE = "wQFw6yjQ4c4bRq705N6O";        // contact.giveaway_source
@@ -64,7 +64,7 @@ export async function pushGiveawayEntryToGHL(entry: GiveawayEntry): Promise<void
     }
     try {
         // Lead Source is best-effort: a missing field or an unreadable definition list must never cost the entry.
-        const leadSourceId = await salesFields().then((f) => f.leadSource?.id).catch(() => undefined);
+        const leadSourceId = await leadSourceIdForIntake();
         if (!leadSourceId) console.warn("giveaway → GHL: Lead Source field not resolved; entry pushed without it");
         await upsertContact(giveawayContactPayload(entry, process.env.GHL_LOCATION_ID!, leadSourceId), { timeoutMs: TIMEOUT_MS, retries: 0 });
     } catch (err) {

@@ -161,9 +161,9 @@ export type GhlFieldDef = { id: string; name: string; fieldKey?: string; dataTyp
 let fieldCache: { at: number; fields: GhlFieldDef[] } | null = null;
 const FIELD_TTL_MS = 10 * 60 * 1000;
 /** Contact custom-field definitions for the location (cached 10 min; `fresh` forces a read). Needs locations/customFields.readonly. */
-export async function listCustomFields(fresh = false): Promise<GhlFieldDef[]> {
+export async function listCustomFields(fresh = false, opts?: GhlOptions): Promise<GhlFieldDef[]> {
   if (!fresh && fieldCache && Date.now() - fieldCache.at < FIELD_TTL_MS) return fieldCache.fields;
-  const r = await ghl<{ customFields?: GhlFieldDef[] }>("GET", `/locations/${encodeURIComponent(ghlLocationId())}/customFields?model=contact`);
+  const r = await ghl<{ customFields?: GhlFieldDef[] }>("GET", `/locations/${encodeURIComponent(ghlLocationId())}/customFields?model=contact`, undefined, opts);
   const fields = (r.customFields ?? []).filter((f) => !f.model || f.model === "contact");
   fieldCache = { at: Date.now(), fields };
   return fields;

@@ -54,6 +54,18 @@ export async function salesFields(fresh = false): Promise<SalesFields> {
   const defs = await listCustomFields(fresh);
   return resolveFromDefs(defs);
 }
+/**
+ * Lead Source field id for the PUBLIC intake routes (giveaway, playbook, website forms). Best effort and
+ * bounded: uses the warm cache when there is one, otherwise ONE 3-second read with no retries, and after
+ * a failure it stops asking for a minute — a GHL slowdown must never hold up a visitor's form.
+ */
+let intakeBlockedUntil = 0;
+export async function leadSourceIdForIntake(): Promise<string | undefined> {
+  if (Date.now() < intakeBlockedUntil) return undefined;
+  try { return resolveFromDefs(await listCustomFields(false, { timeoutMs: 3000, retries: 0 })).leadSource?.id; }
+  catch { intakeBlockedUntil = Date.now() + 60_000; return undefined; }
+}
+export const resetIntakeLookup = () => { intakeBlockedUntil = 0; };
 export function requireField(fields: SalesFields, key: SalesFieldKey): ResolvedField {
   const f = fields[key];
   if (!f) throw new CallDeskError(`The GoHighLevel custom field "${SALES_FIELDS[key].name}" does not exist yet. An owner runs Set up GoHighLevel fields on the desk (POST /api/team/ghl/setup), or creates it in GHL Settings → Custom Fields with that exact name.`, 503);
