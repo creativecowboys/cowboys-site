@@ -163,7 +163,7 @@ export function addTask(contactId: string, title: string, body: string, dueInDay
 }
 
 // ───────────────────────────── custom fields ─────────────────────────────
-export type GhlFieldDef = { id: string; name: string; fieldKey?: string; dataType: string; picklistOptions?: string[]; model?: string; position?: number };
+export type GhlFieldDef = { id: string; name: string; fieldKey?: string; dataType: string; picklistOptions?: string[]; model?: string; position?: number; placeholder?: string };
 let fieldCache: { at: number; fields: GhlFieldDef[] } | null = null;
 const FIELD_TTL_MS = 10 * 60 * 1000;
 /** Contact custom-field definitions for the location (cached 10 min; `fresh` forces a read). Needs locations/customFields.readonly. */
@@ -185,6 +185,23 @@ export async function createCustomField(def: NewFieldDef): Promise<GhlFieldDef> 
   if (!r.customField?.id) throw new CallDeskError(`GoHighLevel did not confirm the custom field "${def.name}".`, 502);
   fieldCache = null;
   return r.customField;
+}
+/**
+ * Send a dropdown its option list (PUT /locations/{id}/customFields/{fieldId}). Needs locations/customFields.write.
+ * `options` is the property the create call takes; GoHighLevel's published spec lists no option property for the update
+ * call, and on Oct 2 2026 this call had not been run against the live API. So the one caller (ensureSalesOptions in
+ * ./fields.ts) treats the answer as unproven: it sends the COMPLETE list (what the field has now, in its order, plus the
+ * additions — a PUT that replaces the list must not lose anything), reads the field back, and reports what GoHighLevel
+ * really holds. The field's own name, position and placeholder are sent back unchanged so the call cannot move or rename it.
+ */
+export async function setCustomFieldOptions(field: Pick<GhlFieldDef, "id" | "name" | "position" | "placeholder">, options: string[]): Promise<GhlFieldDef | null> {
+  const body: Record<string, unknown> = { name: field.name, model: "contact", options };
+  if (typeof field.position === "number" && Number.isFinite(field.position)) body.position = field.position;
+  if (field.placeholder) body.placeholder = field.placeholder;
+  try {
+    const r = await ghl<{ customField?: GhlFieldDef }>("PUT", `/locations/${encodeURIComponent(ghlLocationId())}/customFields/${encodeURIComponent(field.id)}`, body);
+    return r.customField?.id ? r.customField : null;
+  } finally { fieldCache = null; } // whatever happened, the next read comes from GoHighLevel, not from memory
 }
 
 // ───────────────────────────── workflows ─────────────────────────────

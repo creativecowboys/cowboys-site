@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { addNote, contactDisplayName, createCustomField, fieldText, forgetCustomFields, ghl, GhlError, listCustomFields, normalizePhone, searchContacts, splitName, updateContact } from "./client";
+import { addNote, contactDisplayName, createCustomField, fieldText, forgetCustomFields, ghl, GhlError, listCustomFields, normalizePhone, searchContacts, setCustomFieldOptions, splitName, updateContact } from "./client";
 
 // Mocked fetch: each test queues responses; every request (method, path, body) is recorded.
 type Req = { method: string; path: string; body: unknown; headers: Record<string, string> };
@@ -87,6 +87,27 @@ test("createCustomField posts the same shape the LSE setup script used (model co
   const f = await createCustomField({ name: "Lead Source", dataType: "SINGLE_OPTIONS", options: ["A", "B"], position: 201 });
   assert.equal(f.id, "new1");
   assert.deepEqual(requests[0].body, { name: "Lead Source", dataType: "SINGLE_OPTIONS", model: "contact", position: 201, options: ["A", "B"] });
+});
+test("setCustomFieldOptions PUTs the field its own name and position back with the list it is given, and forgets the cached definitions", async () => {
+  queue.push({ status: 200, body: { customFields: [{ id: "f1", name: "Outreach Status", dataType: "SINGLE_OPTIONS", picklistOptions: ["A"] }] } });
+  await listCustomFields(); // warm the cache
+  queue.push({ status: 200, body: { customField: { id: "f1", name: "Outreach Status", dataType: "SINGLE_OPTIONS", picklistOptions: ["A", "B"] } } });
+  const f = await setCustomFieldOptions({ id: "f1", name: "Outreach Status", position: 202, placeholder: "Pick one" }, ["A", "B"]);
+  assert.equal(f?.id, "f1");
+  assert.equal(requests[1].method, "PUT"); assert.equal(requests[1].path, "/locations/LOCtest000000000000/customFields/f1");
+  assert.deepEqual(requests[1].body, { name: "Outreach Status", model: "contact", options: ["A", "B"], position: 202, placeholder: "Pick one" });
+  queue.push({ status: 200, body: { customFields: [] } });
+  assert.equal((await listCustomFields()).length, 0); assert.equal(requests.length, 3); // read again from GoHighLevel, not from memory
+  queue.push({ status: 200, body: {} });
+  assert.equal(await setCustomFieldOptions({ id: "f1", name: "Outreach Status" }, ["A"]), null); // no field in the answer: the caller reads it back anyway
+  assert.deepEqual(requests[3].body, { name: "Outreach Status", model: "contact", options: ["A"] }); // nothing invented for a position or placeholder it was not given
+  queue.push({ status: 200, body: { customFields: [{ id: "f1", name: "Outreach Status", dataType: "SINGLE_OPTIONS" }] } });
+  await listCustomFields();
+  queue.push({ status: 422, body: { message: ["property options should not exist"] } });
+  await assert.rejects(setCustomFieldOptions({ id: "f1", name: "Outreach Status" }, ["A"]), (e: unknown) => e instanceof GhlError && e.ghlStatus === 422);
+  assert.equal(requests.filter((r) => r.method === "PUT").length, 3); // a refused write is not retried
+  queue.push({ status: 200, body: { customFields: [] } });
+  await listCustomFields(); assert.equal(requests.at(-1)!.method, "GET"); // a refusal also drops the cache
 });
 test("helpers: field values, names and phones", () => {
   const c = { id: "c", customFields: [{ id: "a", value: "x" }, { id: "b", field_value: 5 }, { id: "d", value: ["one", "two"] }, { id: "e", value: { nested: true } }] };

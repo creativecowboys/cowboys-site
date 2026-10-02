@@ -3,14 +3,15 @@ import { monday } from "@/lib/onboarding/api";
 import { GIVEAWAY_BOARD_ID, mapLead as mapMondayLead } from "@/lib/calls/monday";
 import type { CallLead } from "@/app/leads/types";
 import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, ghlConfigured, listNotes, listUsers, listWorkflows, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
-import { ensureSalesFields, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
+import { ensureSalesFields, ensureSalesOptions, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
 import { ghlRepIds, MONDAY_IDS, REP_NAMES, type RepName } from "./reps";
 import { LEAD_TAGS, rosterFilters, rosterTags, TEST_CONTACT_ID, WON_TAG } from "@/lib/calls/ghl";
 import { importMarker } from "@/lib/calls/markers";
 
 // One-time / operator tooling behind the owner-only /api/team/ghl/* routes (Oct 1 2026):
 //   diag     — read-only probe of what the token can do and whether the desk's fields exist
-//   setup    — ensureSalesFields (dry-run by default)
+//   setup    — ensureSalesFields (dry-run by default); with scope "sales-options", ensureSalesOptions: add the options the desk
+//              writes to its own dropdowns when GoHighLevel lacks them (also dry-run by default, add-only)
 //   backfill — Lead Source for contacts already in GHL (giveaway-entrant → The Big Giveaway, playbook-lead → Ebook download, website-form → Website form)
 //   migrate  — the Monday Giveaway Leads board → GHL contacts (owner, status, interest, notes, follow-up, quote, audit, call history)
 // Every write path takes dryRun (default true) and a batch limit, and is idempotent so a re-run finishes what a timeout left.
@@ -40,6 +41,7 @@ export async function diagnose(): Promise<Record<string, unknown>> {
 
 // ───────────────────────────── setup ─────────────────────────────
 export const setupFields = (dryRun: boolean) => ensureSalesFields(dryRun);
+export const setupSalesOptions = (dryRun: boolean) => ensureSalesOptions(dryRun);
 
 // ───────────────────────────── backfill ─────────────────────────────
 const BACKFILL: { tag: string; source: string; unless: string[] }[] = [
