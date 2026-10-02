@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { CallLead } from "@/app/leads/types";
 import { CALL_OUTCOMES, mondayOutcome } from "./outcomes";
-import { CALL_OWNERS, compareLeads, contactStage, matchesOwner } from "./roster";
+import { CALL_OWNERS, compareLeads, contactStage, filterRoster, inRosterView, isOffCallList, matchesOwner, mergeRoster, NO_CALL_TAGS, noCallTagsOf, OFF_LIST_LABELS, OFF_LIST_VIEW, offListReasons } from "./roster";
 
 function lead(id: string, changes: Partial<CallLead> & { ownerIds?: string[] } = {}): CallLead & { ownerIds?: string[] } {
   return {
@@ -87,4 +87,101 @@ test("multi-owner records appear for each assigned caller and explicit empty ass
   const cleared = lead("cleared", { ownerId: CALL_OWNERS[0].id, ownerIds: [] });
   assert.equal(matchesOwner(cleared, "unassigned"), true);
   assert.equal(matchesOwner(cleared, CALL_OWNERS[0].id), false);
+});
+
+// ── Off the call list (Dave, Oct 1 2026): Not Interested, or a do-not-contact / fake-lead tag in GoHighLevel ──
+const view = (leads: CallLead[], v: string, search = "") => filterRoster(leads, { view: v, owner: "", status: "", source: "", search }).map(({ id }) => id);
+
+test("a lead is off the call list when it is Not Interested or carries a no-call tag, and for no other reason", () => {
+  assert.deepEqual(offListReasons(lead("ni", { outreach: "Not Interested" })), ["not-interested"]);
+  assert.deepEqual(offListReasons(lead("ni2", { outreach: " not interested " })), ["not-interested"]);
+  assert.deepEqual(offListReasons(lead("dnc", { outreach: "Replied", noCallTags: ["do-not-contact"] })), ["do-not-contact"]);
+  assert.deepEqual(offListReasons(lead("fake", { noCallTags: ["fake-lead"] })), ["fake-lead"]);
+  assert.deepEqual(offListReasons(lead("all", { outreach: "Not Interested", noCallTags: ["fake-lead", "do-not-contact"] })), ["not-interested", "do-not-contact", "fake-lead"]);
+  for (const outreach of ["", "Not Contacted", "Contacted", "Replied", "Call Booked", "Call Held", "No answer / left voicemail", "Booked followup", "Proposal Sent", "Bad contact number", "Won"]) {
+    assert.equal(isOffCallList(lead("on", { outreach })), false, `${outreach || "a blank status"} stays on the call list`);
+  }
+  // Tags nobody has explained (Dave's concept-* and AI tags) are not acted on; neither is a Monday lead, which has no tags at all.
+  assert.equal(isOffCallList(lead("other", { noCallTags: ["concept-not-interested", "spoke-to-ai", "ai-booked", "giveaway-entrant"] })), false);
+  assert.equal(isOffCallList(lead("monday")), false);
+  for (const reason of ["not-interested", ...NO_CALL_TAGS] as const) assert.ok(OFF_LIST_LABELS[reason], `${reason} has a badge label`);
+  assert.deepEqual([OFF_LIST_LABELS["not-interested"], OFF_LIST_LABELS["do-not-contact"], OFF_LIST_LABELS["fake-lead"]], ["Not interested", "Do not contact", "Fake lead"]);
+});
+
+test("noCallTagsOf picks exactly the two no-call tags out of a contact's tags, whatever their case or order", () => {
+  assert.deepEqual(noCallTagsOf(["giveaway-entrant", "Fake-Lead ", "DO-NOT-CONTACT", "concept-not-interested"]), ["do-not-contact", "fake-lead"]);
+  assert.deepEqual(noCallTagsOf(["do-not-contact-later", "not-a-fake-lead", "do not contact", "donotcontact"]), []);
+  for (const empty of [undefined, null, [], "do-not-contact" as unknown as string[]]) assert.deepEqual(noCallTagsOf(empty), []);
+});
+
+test("Show leads: an off-list lead is in no view but 'Not interested / do not call', which lists exactly those", () => {
+  const leads = [
+    lead("new"), lead("active", { outreach: "Replied", lastContact: "2026-09-30" }), lead("won", { outreach: "Won" }), lead("bad", { outreach: "Bad contact number" }),
+    lead("ni", { outreach: "Not Interested", lastContact: "2026-10-01" }),
+    lead("dnc", { outreach: "Not Contacted", noCallTags: ["do-not-contact"] }),
+    lead("fake", { outreach: "Replied", lastContact: "2026-09-29", noCallTags: ["fake-lead"] }),
+  ];
+  assert.deepEqual(view(leads, "all"), ["new", "active", "bad", "won"]);
+  assert.deepEqual(view(leads, "new"), ["new"]); // a tagged Not Contacted lead is not offered as a first call
+  assert.deepEqual(view(leads, "active"), ["active"]);
+  assert.deepEqual(view(leads, "closed"), ["bad", "won"]); // Won and Bad contact number are where they were; Not Interested moved out
+  assert.deepEqual(view(leads, OFF_LIST_VIEW).sort(), ["dnc", "fake", "ni"]);
+  assert.equal(view(leads, "all").length + view(leads, OFF_LIST_VIEW).length, leads.length);
+  for (const l of leads) assert.notEqual(inRosterView(l, "all"), inRosterView(l, OFF_LIST_VIEW), `${l.id} is on exactly one of the two lists`);
+  assert.deepEqual(view([lead("only")], OFF_LIST_VIEW), []);
+});
+
+test("search finds an off-list lead only when the off-list view is on", () => {
+  const leads = [
+    lead("1", { name: "Vintage Vault Antiques", outreach: "Not Interested" }), lead("2", { name: "Vintage Vinyl" }),
+    lead("3", { name: "Faux Co", contact: "Vince Vintage", email: "vince@example.com", noCallTags: ["fake-lead"] }),
+  ];
+  assert.deepEqual(view(leads, "all", "vintage"), ["2"]);
+  assert.deepEqual(view(leads, "all", "Vintage Vault"), []);
+  assert.deepEqual(view(leads, "closed", "vault"), []);
+  assert.deepEqual(view(leads, "all", "vince@example.com"), []);
+  assert.deepEqual(view(leads, OFF_LIST_VIEW, "vintage").sort(), ["1", "3"]);
+  assert.deepEqual(view(leads, OFF_LIST_VIEW, "VINTAGE VAULT"), ["1"]);
+});
+
+test("changing the status back puts a lead back on the list; a tag keeps it off until the tag is gone", () => {
+  const marked = lead("x", { outreach: "Not Interested", lastContact: "2026-10-01" });
+  assert.equal(inRosterView(marked, "all"), false);
+  const undone = { ...marked, outreach: "Booked followup" };
+  assert.equal(inRosterView(undone, "all"), true); assert.equal(inRosterView(undone, "active"), true); assert.equal(inRosterView(undone, OFF_LIST_VIEW), false);
+  const tagged = { ...undone, noCallTags: ["do-not-contact"] };
+  assert.equal(inRosterView(tagged, "all"), false); assert.deepEqual(offListReasons(tagged), ["do-not-contact"]);
+  assert.equal(inRosterView({ ...tagged, noCallTags: [] }, "all"), true);
+});
+
+test("owner, status and lead-source filters still apply inside every view", () => {
+  const dave = CALL_OWNERS[0].id, josh = CALL_OWNERS[1].id;
+  const leads = [
+    lead("a", { ownerId: dave, outreach: "Replied", lastContact: "2026-09-30", leadSource: "Facebook" }),
+    lead("b", { ownerId: josh, outreach: "Replied", lastContact: "2026-09-29", leadSource: "Referral" }),
+    lead("c", { ownerId: dave, outreach: "Not Interested", leadSource: "Facebook" }),
+    lead("d", { ownerId: josh, outreach: "Call Booked", noCallTags: ["do-not-contact"] }),
+  ];
+  const pick = (f: Partial<Parameters<typeof filterRoster>[1]>) => filterRoster(leads, { view: "all", owner: "", status: "", source: "", search: "", ...f }).map(({ id }) => id);
+  assert.deepEqual(pick({ owner: dave }), ["a"]); assert.deepEqual(pick({ status: "Replied" }), ["b", "a"]); assert.deepEqual(pick({ source: "Referral" }), ["b"]);
+  assert.deepEqual(pick({ status: "Not Interested" }), []); // only the off-list view has them
+  assert.deepEqual(pick({ view: OFF_LIST_VIEW, owner: dave }), ["c"]); assert.deepEqual(pick({ view: OFF_LIST_VIEW, status: "Call Booked" }), ["d"]);
+  assert.deepEqual(pick({ view: OFF_LIST_VIEW, source: "none" }), ["d"]); assert.deepEqual(pick({ view: OFF_LIST_VIEW, owner: "unassigned" }), []);
+});
+
+test("a roster reload keeps the newer copy of a lead, so a lagging search cannot put a just-marked lead back on the list", () => {
+  const stale = lead("x", { outreach: "Not Contacted", updatedAt: "2026-10-01T14:00:00.000Z" });
+  const saved = lead("x", { outreach: "Not Interested", updatedAt: "2026-10-01T14:05:00.000Z" });
+  const other = lead("y", { updatedAt: "2026-10-01T10:00:00.000Z" });
+  assert.deepEqual(mergeRoster([saved, other], [stale, other]).map((l) => l.outreach), ["Not Interested", ""]); // search still lagging: keep what the tab knows
+  assert.equal(view(mergeRoster([saved, other], [stale, other]), "all").includes("x"), false);
+  assert.equal(mergeRoster([stale], [saved])[0].outreach, "Not Interested"); // search caught up: take the new row
+  const later = lead("x", { outreach: "Booked followup", updatedAt: "2026-10-01T15:00:00.000Z" });
+  assert.equal(mergeRoster([saved], [later])[0].outreach, "Booked followup"); // someone changed it back since: the newer row wins
+  assert.equal(mergeRoster([saved], [{ ...stale, updatedAt: saved.updatedAt }])[0].outreach, "Not Contacted"); // same version: the server's row
+  assert.deepEqual(mergeRoster([saved, other], [other]).map(({ id }) => id), ["y"]); // gone from the roster: dropped
+  assert.equal(mergeRoster([lead("x", { outreach: "Won", updatedAt: "not a date" })], [stale])[0].outreach, "Not Contacted");
+  assert.deepEqual(mergeRoster([], [stale, other]).map(({ id }) => id), ["x", "y"]);
+  // "Load more" appends a page and keeps the order, with the same rule for a lead both pages carry.
+  assert.deepEqual(mergeRoster([saved, other], [stale, lead("z")], true).map((l) => `${l.id}:${l.outreach}`), ["x:Not Interested", "y:", "z:"]);
 });

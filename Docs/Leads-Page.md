@@ -93,7 +93,7 @@ saves refresh detail/history and move the lead into the contacted queue.
 Dave: "we should add a loose time to the client. So while we personally are looking at our calendar, we can say to them, does around 9am work?" and follow-ups should land "on a calendar for each of us that we subscribe to — not the normal Cowboys calendar."
 
 - **Wrap-up step** has "Around what time?" next to the follow-up date: half-hours 8:00am–5:30pm Eastern, or "No set time (all-day)". The banner reads "Follow-up booked for Monday, September 28 around 9:00am". The time is written into the board's **Next Follow-up** date column (Monday stores date-column times in UTC; `src/lib/calls/followup-time.ts` converts both ways, DST-aware). The lead detail shows `date · time`.
-- **Feeds**: `GET /api/team/followups/<dave|josh|keaton>.ics?key=…` — private iCalendar, no cookie (calendar apps can't sign in). The key is an HMAC of the rep slug under `NEXTAUTH_SECRET`, so nothing is stored and rotating that secret rotates every feed. Timed follow-ups are a 30-minute block with a 15-minute alarm; date-only ones are all-day with an 8:30am alarm. Leads marked Not Interested / Bad Contact Number / Won are skipped. Event UID = `followup-<leadId>@creativecowboys.co`, so a changed date moves the event instead of duplicating it. Monday errors return 503 + Retry-After so the calendar app keeps the subscription.
+- **Feeds**: `GET /api/team/followups/<dave|josh|keaton>.ics?key=…` — private iCalendar, no cookie (calendar apps can't sign in). The key is an HMAC of the rep slug under `NEXTAUTH_SECRET`, so nothing is stored and rotating that secret rotates every feed. Timed follow-ups are a 30-minute block with a 15-minute alarm; date-only ones are all-day with an 8:30am alarm. Leads marked Not Interested / Bad contact number are skipped, and so is anything else off the call list (see "Off the call list" below); Won leads stay on the calendar (Dave, Sep 28 2026). Event UID = `followup-<leadId>@creativecowboys.co`, so a changed date moves the event instead of duplicating it. Monday errors return 503 + Retry-After so the calendar app keeps the subscription.
 - **Where to get the link**: the roster's "📅 My follow-up calendar" button calls `GET /api/team/followups` (cookie) and shows the signed-in rep's link with Copy and an Apple Calendar `webcal:` link; Dave and Josh see all three. Google Calendar: Other calendars → + → From URL. Google refreshes subscribed feeds every few hours (not adjustable); Apple/iPhone can refresh hourly. Reps whose email is not one of the three (Madison) get "No calendar for this sign-in."
 - **Deep link**: events link to `/leads?lead=<id>`; the desk selects that lead after the first load.
 - Code: `src/lib/calls/followups.ts` (REPS, feed key, ICS builder), `src/lib/calls/followup-time.ts` (client-safe: HOUR_OPTIONS, prettyTime, ET↔UTC — keep `node:crypto` out of anything the desk imports or the webpack client build fails), routes under `src/app/api/team/followups/`. Tests in `followups.test.ts` (`npm run test:call-owner`).
@@ -161,3 +161,30 @@ Each of steps 2 and 3 is safe to repeat. Follow-up calendar feeds re-issue event
 subscribed calendar shows the old Monday-id events until its next refresh). GHL search results lag writes by a few
 seconds, so a roster refresh right after a save can briefly show the old status; the lead detail is always fresh.
 To go back: unset `LEADS_BACKEND` and redeploy — the Monday board is untouched by all of the above.
+
+## Off the call list — Not Interested and do-not-call leads (October 1, 2026)
+Dave: "when we mark a client we followed up with as not interested. I want to keep their contact in go high level for
+email campaigns and news letters. But I don't want them in the sales list to call again."
+
+- **Rule** (`src/lib/calls/roster.ts`, `offListReasons`): a lead is off the call list when its Outreach Status is
+  **Not Interested**, or its GHL contact carries the tag **`do-not-contact`** or **`fake-lead`** (Dave's own tags from his
+  calling). Tags nobody has explained (`concept-*`, `spoke-to-ai`, `ai-booked`) are not acted on.
+- **Nothing changes in GoHighLevel.** No delete, no DND, no tag added or removed. Saving a call as Not interested writes
+  what it always did — the call note, Outreach Status and Last Contact — so the contact stays available to email campaigns
+  and newsletters.
+- **Desk**: an off-list lead is in none of the normal "Show leads" views (All leads, Not contacted yet, Contacted / working
+  on, Closed / bad number), and a search there never returns one — it only says "N more matches are off the call list".
+  The view **Not interested / do not call** lists exactly those leads, each with a reason badge (Not interested / Do not
+  contact / Fake lead), and search works inside it. The count line reads `N shown · N loaded · N off the call list`.
+- **Saving a call as Not interested** drops the row at once and the saved notice adds "Off the call list. Still in
+  GoHighLevel for email." A refresh inside GHL's search lag cannot bring the row back: `mergeRoster` keeps the newer copy
+  of a lead (by `updatedAt`) when the search hands back an older one.
+- **Undo**: open the lead under Not interested / do not call → Start another conversation → save with a different outcome,
+  or change Outreach Status on the contact in GHL. A `do-not-contact` / `fake-lead` tag is removed in GHL, never from the
+  desk; a lead with a tag stays off the list until the tag is gone, whatever its status.
+- **Calendar feeds** skip off-list leads (`buildFeed`), whatever their status.
+- **Unchanged**: Won and Bad contact number. Both still show under All leads (sorted last) and under Closed / bad number;
+  the calendar feeds still skip Bad contact number and still keep Won. The roster API still returns every lead (with
+  `noCallTags` on each) and the split happens in the browser, so the Not Interested rule applies on the Monday backend too.
+- Tests: `roster.test.ts` (rule, views, search, undo, reload merge), `followups.test.ts` (feeds), `ghl.test.ts` (tags on the
+  lead, read-only roster search, the Not interested save writes no tag or DND).

@@ -8,7 +8,8 @@ export const maxDuration = 30;
 
 // Private iCalendar feed: /api/team/followups/<rep>.ics?key=<feed key>. No cookie (calendar apps can't
 // sign in); the key is the credential. Reads the lead roster (Monday board or GHL contacts, per
-// LEADS_BACKEND) and emits one event per owned lead with a Next Follow-up. Calendar apps poll this on
+// LEADS_BACKEND) and emits one event per owned lead with a Next Follow-up — except leads that are off the
+// call list (Not Interested, or a do-not-contact / fake-lead tag in GHL), which buildFeed skips. Calendar apps poll this on
 // their own schedule. Event UIDs carry the lead id, so a lead keeps its event across the cutover only
 // if its id is the same — after the Monday → GHL import the events are re-issued under the GHL ids.
 export async function GET(req: Request, context: { params: Promise<{ rep: string }> }) {
