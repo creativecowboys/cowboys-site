@@ -370,6 +370,7 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       // Plan from a FRESH read by id, never from the search copy: search results lag writes (an earlier row in this run may
       // have just written this contact) and can come without the name pair — and "fill only what is blank" must see the truth.
       let contact = found.contact ? await getContact(found.contact.id) : null;
+      if (contact) ix.byId.set(contact.id, contact); // the winners list at the end reads these, so it too is decided on what the contact holds now
       let joins = ""; // dry run only: the row of the OTHER board whose new contact this row would land on
       if (contact) {
         const conflict = conflictOn(kind, row, contact);

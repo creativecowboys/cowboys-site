@@ -228,9 +228,14 @@ the same contact.
 4. `POST /api/team/ghl/desk-migrate {}` (dry) → six rows. Read every match and warning. A row reported `unmatched` needs
    `map` (Squirrel Made Products has no email or phone on the board: it matches only if exactly one contact carries that
    business name). No row may say `BLOCKED`.
-5. **Canary:** `POST /api/team/ghl/desk-migrate {"dryRun":false,"onlyIds":["13149876739"]}` (Bourbon Leather). Open
+5. **Canary, twice.** First a business the LSE automations do not know:
+   `POST /api/team/ghl/desk-migrate {"dryRun":false,"onlyIds":["13149876739"]}` (Bourbon Leather). Open
    `/leads?tab=onboarding&desk=ghl`, open the record, read the panel and the notes; open the contact in GoHighLevel;
-   compare the enrollment counts; give it a few minutes.
+   compare the enrollment counts; give it a few minutes. Then the one they are most likely to know — Choice Pressure
+   Washing's board row was made from the LSE template, so its contact is the likeliest to carry `lse:` tags and LSE
+   fields, which makes it the real test of "the desk writes to a contact those automations watch":
+   `{"dryRun":false,"onlyIds":["13052279909","13125631264"]}` (its onboarding row and its client row). Compare the LSE
+   workflows' enrollment counts before and after, and again a few minutes later. Nothing may have enrolled.
 6. `POST /api/team/ghl/desk-migrate {"dryRun":false}` (with `map` if step 4 asked for one) → every row `done`. Run the dry
    run again a minute later → every row `imported` with "already imported — skipped", and every entry in `winners` is
    `protected: true`. A row that says "an earlier run did not finish" is completed by running step 6 once more.
