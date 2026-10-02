@@ -145,7 +145,7 @@ that writes it back.
   switch and dispatch. Routes import from `backend.ts` only. Lead ids pick their system by shape (digits = Monday, else GHL),
   so drafts, calendar deep links and handoffs keep working across the cutover.
 - Owner-only tooling: `GET /api/team/ghl/diag` (read-only probe), `POST /api/team/ghl/setup` `{dryRun}` (create missing
-  fields), `POST /api/team/ghl/backfill` `{dryRun, limit}` (Lead Source for existing tagged contacts), `POST
+  fields; `{scope:"sales-options"}` adds a missing dropdown option, see "In progress" below), `POST /api/team/ghl/backfill` `{dryRun, limit}` (Lead Source for existing tagged contacts), `POST
   /api/team/ghl/migrate` `{dryRun, offset, limit, force, onlyIds}` (Monday Giveaway Leads → GHL, idempotent on Monday Lead ID).
 - Tests: `npm run test:call-owner` (Monday + GHL backends, switch, client, fields, admin) and `npm run test:onboarding`.
 
@@ -200,3 +200,19 @@ email campaigns and news letters. But I don't want them in the sales list to cal
   `noCallTags` on each) and the split happens in the browser, so the Not Interested rule applies on the Monday backend too.
 - Tests: `roster.test.ts` (rule, views, search, undo, reload merge), `followups.test.ts` (feeds), `ghl.test.ts` (tags on the
   lead, read-only roster search, the Not interested save writes no tag or DND).
+
+## In progress — a fifth call outcome (October 2, 2026)
+Dave: "We need to add one that says something like, in progress. Cause most of these we are still working on." The wrap-up
+step offers **In progress** first, for a lead the rep talked to and is still working. Saving it writes the call note,
+Outreach Status **In progress** and Last Contact; the follow-up date and time stay optional. The lead stays on the call
+list under Contacted / working on, and shows in the status filter and, with a follow-up date, on the rep's calendar feed.
+The GoHighLevel dropdown has to have the option: owner-only `POST /api/team/ghl/setup {"scope":"sales-options"}` says
+which option it would add to which field, and `{"scope":"sales-options","dryRun":false}` appends it. It looks at Outreach
+Status and Interest only (never Lead Source) and adds only the options the desk itself writes (`WRITTEN_OPTIONS` in
+`src/lib/ghl/fields.ts`), sending the existing options back in their order and reading the field back. That update call is
+not in GoHighLevel's published spec, so if it is refused the report says so and the option is added by hand in GoHighLevel
+(Settings → Custom Fields → Outreach Status); the desk reads the list live, no deploy, and either capitalisation works.
+Every save checks its status against the options the live field has (`outcomeOption` in `src/lib/calls/ghl.ts`) and
+refuses a missing one in plain words before anything is written, then reads the status back after the write and warns if
+GoHighLevel did not keep it. On the Monday rollback path In progress is recorded with the board's existing **Contacted**
+label (`mondayOutcome`), so nothing new is written to the frozen board.
