@@ -11,6 +11,8 @@ import { billedOutside, clientOrder, deskCountLabel, effectiveKind, gbpTracked, 
 import { deskHref } from "@/lib/desk-path";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
+import { RowLine } from "./row-line";
+import { contactLine, personShown, sameName } from "@/lib/desk/names";
 
 // Clients tab, problems first: the Team-desk rows of Josh's Active Clients board on Monday, or the desk's
 // client contacts in GoHighLevel once DESK_BACKEND=ghl (the server says which with every list).
@@ -84,7 +86,7 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
     <div className="ob-table" role="table" aria-label="Clients">
       <div className="ob-row ob-row-head" role="row"><span>Client</span><span>Package</span><span>Manager</span><span>Payment</span><span>GBP</span><span>Flags</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.flags.includes("payment") ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
-        <span><b>{r.name}</b>{isLegacyRow(r) && <i className="ob-legacy">Legacy</i>}<small>{r.contact || "no contact"}{r.clientSince && ` · since ${r.clientSince}`}</small></span>
+        <span><b>{r.name}</b>{isLegacyRow(r) && <i className="ob-legacy">Legacy</i>}<RowLine text={contactLine(r.name, r.contact, [r.clientSince && `since ${r.clientSince}`])} /></span>
         <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : money && !(isLegacyRow(r) && !Number(r.mrr)) ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
         <span>{r.accountManager || <em>Unassigned</em>}<small>{groupLabel(r.group)} · {r.health || "—"}</small></span>
         <span>{billedOutside(r) && !r.flags.includes("payment")
@@ -123,7 +125,8 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
     try {
       const d: ClientDetail = await json(await fetch(`/api/team/clients/${id}`, { cache: "no-store" }), crm);
       setDetail(d); onRow(d.row); setCustomerId(d.row.stripeCustomer); setGbpUrl(d.row.gbpUrl);
-      setContact({ contact: d.row.contact, email: d.row.email, phone: d.row.phone, website: d.row.website });
+      // A contact that only repeats the business name (a legacy client was imported that way) is shown as an empty field.
+      setContact({ contact: sameName(d.row.name, d.row.contact) ? "" : d.row.contact, email: d.row.email, phone: d.row.phone, website: d.row.website });
       setDates({ nextBill: d.row.nextBill, termEnds: d.row.termEnds, billingDay: d.row.billingDay });
     } catch (e) { setError(e instanceof Error ? e.message : "Could not load this client."); }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- crm only words an error message
@@ -168,8 +171,12 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
   const legacy = isLegacyRow(row);
   const outsideStripe = legacy && !stripeFollowed(row); // a legacy client billed outside GoHighLevel: the Stripe prompts do not apply
   const isOwner = canSeeMoney; // the server says yes for owners only; marking a legacy client is theirs (and is checked again on the server)
+  // Display only. The Contact box is empty while the record's "contact" is just the business name again. Left empty, a blur
+  // sends the stored name back unchanged, exactly what it sent before, so nothing is written; a name typed in saves as ever.
+  const contactRepeats = sameName(row.name, row.contact);
+  const saveContact = () => patch({ action: "contact", ...contact, contact: contact.contact || (contactRepeats ? row.contact : "") }, "contact");
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {row.flags.length > 0 && <div className="call-alert" role="status"><strong>Needs a look:</strong> {row.flags.map((f) => FLAG[f]).join(" · ")}</div>}
 
@@ -212,10 +219,10 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
         <label>Account manager<select value={row.accountManagerIds[0] || ""} disabled={!!busy} onChange={(e) => patch({ action: "manager", ownerId: e.target.value }, "manager")}><option value="">Unassigned</option>{owners.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
         <label>Group<select value={row.group} disabled={!!busy} onChange={(e) => patch({ action: "group", group: e.target.value }, "group")}>{CLIENT_GROUPS.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}{row.group === "unknown" && <option value="unknown">Unknown</option>}</select></label>
         <label>Health<select value={row.health || "Too New"} disabled={!!busy} onChange={(e) => patch({ action: "health", value: e.target.value }, "health")}>{CLIENT_HEALTH.map((h) => <option key={h}>{h}</option>)}</select></label>
-        <label>Contact<input value={contact.contact} disabled={!!busy} onChange={(e) => setContact({ ...contact, contact: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
-        <label>Email<input type="email" value={contact.email} disabled={!!busy} onChange={(e) => setContact({ ...contact, email: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
-        <label>Phone<input value={contact.phone} disabled={!!busy} onChange={(e) => setContact({ ...contact, phone: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
-        <label>Website<input value={contact.website} disabled={!!busy} onChange={(e) => setContact({ ...contact, website: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
+        <label>Contact<input value={contact.contact} placeholder={!row.contact || contactRepeats ? "No contact person yet" : undefined} disabled={!!busy} onChange={(e) => setContact({ ...contact, contact: e.target.value })} onBlur={saveContact} /></label>
+        <label>Email<input type="email" value={contact.email} disabled={!!busy} onChange={(e) => setContact({ ...contact, email: e.target.value })} onBlur={saveContact} /></label>
+        <label>Phone<input value={contact.phone} disabled={!!busy} onChange={(e) => setContact({ ...contact, phone: e.target.value })} onBlur={saveContact} /></label>
+        <label>Website<input value={contact.website} disabled={!!busy} onChange={(e) => setContact({ ...contact, website: e.target.value })} onBlur={saveContact} /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "reportSent" }, "report")}>Report sent today</button>{row.website && <a className="call-secondary" href={row.website} target="_blank" rel="noreferrer">Site ↗</a>}{row.ghlContact && system !== "ghl" && <a className="call-secondary" href={row.ghlContact} target="_blank" rel="noreferrer">GHL ↗</a>}{row.driveFolder && <a className="call-secondary" href={row.driveFolder} target="_blank" rel="noreferrer">Files ↗</a>}</div>
       <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{legacy && !row.lastReport && " (Not flagged for a legacy client until a report is logged here.)"}{row.onboardingItem && <> Onboarding record: <a href={deskHref({ tab: "onboarding", client: row.onboardingItem, desk: preview })}>open</a>.</>}</p>

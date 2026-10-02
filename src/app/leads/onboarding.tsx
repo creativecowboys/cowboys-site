@@ -9,6 +9,8 @@ import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult }
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
 import { NotesTimeline, type DeskSystem } from "./notes";
+import { RowLine } from "./row-line";
+import { contactLine, personShown } from "@/lib/desk/names";
 
 // Madison's view: every client in onboarding, what is missing, and one-click updates that write to
 // the system that holds the record — Monday, or GoHighLevel once DESK_BACKEND=ghl (the server says which
@@ -74,7 +76,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
     <div className="ob-table" role="table" aria-label="Onboarding clients">
       <div className="ob-row ob-row-head" role="row"><span>Business</span><span>Package</span><span>Owner</span><span>Stage</span><span>Missing</span><span>Next action</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.overdue ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
-        <span><b>{r.name}</b><small>{r.contact || "no contact"}{r.city && ` · ${r.city}`}</small></span>
+        <span><b>{r.name}</b><RowLine text={contactLine(r.name, r.contact, [r.city])} /></span>
         <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : r.monthly && r.monthly !== "0" ? `$${r.monthly}/mo list` : ""}</small></span>
         <span>{r.onboardingOwner || <em>Unassigned</em>}<small>Sales: {r.salesOwner || "—"}</small></span>
         <span><i className={`ob-stage ob-stage-${r.stage}`}>{stageLabel(r.stage)}</i><small>{r.health}</small></span>
@@ -151,7 +153,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
   const problems = readinessProblems(row);
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
   return <aside className="ob-panel" aria-label={`${row.name} onboarding`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {pending.length > 0 && <div className="call-alert" role="alert"><strong>Handoff steps still pending:</strong> {pending.join(", ")}.<button className="call-secondary" disabled={!!busy} onClick={async () => { const r = await post("retry", "retry") as StartResult | null; if (r) { if (r.pending.length) setError(`Still pending: ${r.pending.join(", ")}. Try again in a moment.`); await load(); } }}>{busy === "retry" ? "Retrying…" : "Retry pending steps"}</button></div>}
 
