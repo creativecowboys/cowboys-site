@@ -4,6 +4,7 @@ import { CallDeskError, GHL_ID, MONDAY_ID } from "./validation";
 import { isCallOutcome, outreachStatus, type CallOutcome } from "./outcomes";
 import { prettyTime } from "./followup-time";
 import { noCallTagsOf } from "./roster";
+import { toldFromContact } from "./told";
 import { callMarker, handoffMarker, payloadMarker, readableHistory } from "./markers";
 import { addNote, addTags, contactDisplayName, contactUrl, fieldText, forgetCustomFields, getContact, listNotes, searchContacts, updateContact, type GhlContact, type GhlNote, type SearchFilter } from "@/lib/ghl/client";
 import { INTEREST_OPTIONS, leadSourceOptions, liveOption, missingOptionMessage, requireField, salesFields, type SalesFields } from "@/lib/ghl/fields";
@@ -80,6 +81,12 @@ export function mapLead(c: GhlContact, fields: SalesFields): CallLead {
     nextFollowup: isoDate(f("nextFollowup")), nextFollowupTime: /^\d{2}:\d{2}$/.test(f("nextFollowupTime")) ? f("nextFollowupTime") : "",
     quotedMonthly: quoted, interestedIn: f("interestedIn"), auditScore: f("auditScore"), auditReport: f("auditReport"),
     group: outreach === "Won" ? "Won" : leadSource || "Leads", leadSource, noCallTags: noCallTagsOf(c.tags),
+    // What they told us on the form that brought them in (read only; ./told.ts). The intake fields are resolved by name with the
+    // desk's own (src/lib/ghl/fields.ts INTAKE_FIELDS); a blank one falls back to the contact's tags and GoHighLevel's source line.
+    told: toldFromContact({ tags: c.tags, source: c.source, dateAdded: c.dateAdded, values: {
+      playbookTrade: f("playbookTrade"), playbookCrew: f("playbookCrew"), playbookJob: f("playbookJob"), playbookHasWebsite: f("playbookHasWebsite"),
+      playbookTier: f("playbookTier"), playbookCity: f("playbookCity"), giveawayBusinessType: f("giveawayBusinessType"), giveawaySource: f("giveawaySource"),
+    } }),
     updatedAt: c.dateUpdated || c.dateAdded || "", recordUrl: contactUrl(c.id),
   };
 }

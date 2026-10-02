@@ -34,22 +34,37 @@ export const SALES_FIELDS: Record<SalesFieldKey, NewFieldDef & { reuse?: boolean
   auditReport: { name: "Audit Report URL", dataType: "TEXT", reuse: true },
 };
 
+/**
+ * Contact fields the PUBLIC intake routes write: the playbook (ebook) form (src/lib/ghl-playbook.ts) and the Big Giveaway entry
+ * (src/lib/ghl-giveaway.ts), both made on the location in September 2026. The Sales desk only READS them, to show a rep what the
+ * person told us on the form (Dave, Oct 2 2026: "I can't see what he was interested in from our page"; see src/lib/calls/told.ts).
+ * They are deliberately NOT in SALES_FIELDS: the field setup never creates them, never edits them and never adds an option to
+ * them, and nothing on the desk writes to them. The intake routes keep writing them by id, as they always have.
+ */
+export type IntakeFieldKey = "playbookTrade" | "playbookCrew" | "playbookJob" | "playbookHasWebsite" | "playbookTier" | "playbookCity" | "giveawayBusinessType" | "giveawaySource";
+export const INTAKE_FIELDS: Record<IntakeFieldKey, string> = {
+  playbookTrade: "Playbook Trade", playbookCrew: "Playbook Crew Size", playbookJob: "Playbook Typical Job", playbookHasWebsite: "Playbook Has Website",
+  playbookTier: "Playbook Tier", playbookCity: "Playbook City", giveawayBusinessType: "Giveaway Business Type", giveawaySource: "Giveaway Source",
+};
+
 export type ResolvedField = { id: string; name: string; dataType: string; options: string[] };
-export type SalesFields = Partial<Record<SalesFieldKey, ResolvedField>>;
+/** Every contact field the Sales desk reads: its own (SALES_FIELDS, which it also writes) and the intake fields (read only). */
+export type SalesFields = Partial<Record<SalesFieldKey | IntakeFieldKey, ResolvedField>>;
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
+const fieldName = (key: SalesFieldKey | IntakeFieldKey): string => (key in SALES_FIELDS ? SALES_FIELDS[key as SalesFieldKey].name : INTAKE_FIELDS[key as IntakeFieldKey]);
 /** A definition's options as plain text. Anything else GoHighLevel might put in that list is left out rather than turned into text
  *  ("[object Object]" is not an option), so a list the desk cannot read comes out empty and is treated as "no list". */
 const textOptions = (d: Pick<GhlFieldDef, "picklistOptions"> | undefined): string[] => (Array.isArray(d?.picklistOptions) ? (d.picklistOptions as unknown[]) : []).filter((o): o is string => typeof o === "string");
 /** Match a GHL definition to a catalog entry by field key first, then by normalized name. */
-export function matchField(defs: GhlFieldDef[], key: SalesFieldKey): GhlFieldDef | undefined {
-  const want = SALES_FIELDS[key].name;
+export function matchField(defs: GhlFieldDef[], key: SalesFieldKey | IntakeFieldKey): GhlFieldDef | undefined {
+  const want = fieldName(key);
   const wantKey = `contact.${norm(want)}`;
   return defs.find((d) => d.fieldKey && norm(d.fieldKey) === norm(wantKey)) || defs.find((d) => norm(d.name) === norm(want));
 }
 export function resolveFromDefs(defs: GhlFieldDef[]): SalesFields {
   const out: SalesFields = {};
-  for (const key of Object.keys(SALES_FIELDS) as SalesFieldKey[]) {
+  for (const key of [...Object.keys(SALES_FIELDS), ...Object.keys(INTAKE_FIELDS)] as (SalesFieldKey | IntakeFieldKey)[]) {
     const d = matchField(defs, key);
     if (d) out[key] = { id: d.id, name: d.name, dataType: d.dataType, options: textOptions(d) };
   }

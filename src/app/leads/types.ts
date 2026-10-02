@@ -1,4 +1,5 @@
 import type { CallOutcome } from "@/lib/calls/outcomes";
+import type { LeadTold } from "@/lib/calls/told";
 import type { RepName } from "@/lib/ghl/reps";
 
 export type LeadsBackend = "monday" | "ghl";
@@ -13,6 +14,9 @@ export type CallLead = {
   leadSource: string; // GHL "Lead Source" dropdown ("" on the Monday backend)
   /** GHL tags that take a lead off the call list (`do-not-contact`, `fake-lead` — see src/lib/calls/roster.ts). Computed server-side; absent on Monday leads. */
   noCallTags?: string[];
+  /** What the person told us on the form that brought them in (ebook, Big Giveaway, website form), read from GoHighLevel. Display only.
+   *  Built server-side by src/lib/calls/told.ts on every GHL lead (roster, detail and the lead a change returns); absent on Monday leads. */
+  told?: LeadTold;
   updatedAt: string; recordUrl: string; // link to the record in whichever system holds it
   /** @deprecated alias of recordUrl on Monday leads, for desk tabs still running the pre-GHL build across the deploy. Remove after cutover. */
   mondayUrl?: string;
