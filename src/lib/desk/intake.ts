@@ -8,7 +8,7 @@ import { deleteTokenIndex, readIntake, writeIntake, writeTokenIndex } from "@/li
 import type { HandoffForm, IntakeRecord } from "@/lib/onboarding/types";
 import { deskText, type DeskFields } from "./fields";
 import { findHandoffRecord } from "./onboarding";
-import { allDeskFields, businessName, fileScopeFor, listRecords, readContact, resolveRecordId, writeRecord } from "./record";
+import { allDeskFields, businessName, fileScopeFor, isClientRecord, isOnboardingRecord, listRecords, readContact, resolveRecordId, writeRecord } from "./record";
 import { isGhlRecordId, isLegacyScope } from "./switch";
 
 // Client intake on the GoHighLevel desk. The intake record, the hashed token, the token → record index and the
@@ -43,6 +43,7 @@ export async function ensureIntakeGhl(scope: string): Promise<IntakeRecord> {
   const contactId = await contactIdForScope(scope, f);
   if (!contactId) throw new CallDeskError("No client on the desk owns that file store.", 404);
   const contact = await readContact(contactId);
+  if (!isOnboardingRecord(contact, f) && !isClientRecord(contact, f)) throw new CallDeskError("No client on the desk owns that file store.", 404); // any other contact in GoHighLevel is not the desk's business
   if (fileScopeFor(contact, f) !== scope) throw new CallDeskError("That file store does not belong to this client.", 400);
   const handoff = await findHandoffRecord(contact, f).catch(() => null);
   const seed: IntakeRecord = { ...emptyIntake(scope, handoff?.leadId || contact.id, handoff?.handoff || seedForm(contact)), contactId };
@@ -55,6 +56,7 @@ export async function issueIntakeLinkGhl(rawId: string, origin: string): Promise
   const f = await allDeskFields();
   const id = await resolveRecordId(rawId, "onboarding", f);
   const contact = await readContact(id);
+  if (!isOnboardingRecord(contact, f)) throw new CallDeskError("This contact has no onboarding record, so there is no intake to send.", 404);
   const scope = fileScopeFor(contact, f);
   const record = await ensureIntakeGhl(scope);
   const token = randomBytes(32).toString("base64url");

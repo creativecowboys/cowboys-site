@@ -12,10 +12,11 @@ import { isGhlRecordId } from "./switch";
 // exact business name). Either read failing throws; the package route refuses to bill rather than guess.
 const toWinner = (c: GhlContact, f: DeskFields): Winner => ({ itemId: c.id, name: businessName(c), board: isClientRecord(c, f) ? "Clients" : "Onboarding", url: contactUrl(c.id), email: c.email || "", phone: c.phone || "", ghl: c.id });
 
-/** Every onboarding record and client tagged Giveaway Winner. Throws if GoHighLevel can't be read. */
+/** Every onboarding record and client tagged Giveaway Winner. Throws if GoHighLevel can't be read — or can only be read
+ *  through the weaker tag-only list, which could miss a winner: the billing guard refuses rather than work from that. */
 export async function listWinnersGhl(): Promise<Winner[]> {
   const f = await allDeskFields();
-  const [onboarding, clients] = await Promise.all([listRecords("onboarding", f), listRecords("client", f)]);
+  const [onboarding, clients] = await Promise.all([listRecords("onboarding", f, { strict: true }), listRecords("client", f, { strict: true })]);
   return [...new Map([...onboarding, ...clients].map((c) => [c.id, c])).values()].filter((c) => isGiveawayWinner(deskList(c, f, "packages"))).map((c) => toWinner(c, f));
 }
 

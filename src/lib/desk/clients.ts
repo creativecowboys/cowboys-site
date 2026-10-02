@@ -1,5 +1,5 @@
 import { CallDeskError } from "@/lib/calls/validation";
-import { addTask, contactDisplayName, GhlError, listNotes, normalizePhone, splitName, type GhlContact, type GhlContactPatch } from "@/lib/ghl/client";
+import { addTask, contactDisplayName, ghl, GhlError, listNotes, normalizePhone, splitName, type GhlContact, type GhlContactPatch } from "@/lib/ghl/client";
 import { ghlRepIds } from "@/lib/ghl/reps";
 import { todayEastern } from "@/lib/onboarding/api";
 import { readIntake } from "@/lib/onboarding/store";
@@ -36,7 +36,7 @@ async function clientContact(rawId: string, f: DeskFields): Promise<GhlContact> 
 }
 
 /** Only a connected + verified listing changes the record on its own: GBP access → Verified and the recheck stamp → today (once a day). */
-async function liveGbp(row: ClientRow, f: DeskFields, opts: { fresh?: boolean } = {}): Promise<{ card: GbpCard | null; row: ClientRow }> {
+async function liveGbp(row: ClientRow, f: DeskFields, opts: { fresh?: boolean; mayWrite?: boolean } = {}): Promise<{ card: GbpCard | null; row: ClientRow }> {
   const listing = parseListingId(row.searchAtlasListing);
   if (!listing) return { card: null, row };
   const card = await gbpCard(listing, { detail: true, fresh: !!opts.fresh });
@@ -44,7 +44,8 @@ async function liveGbp(row: ClientRow, f: DeskFields, opts: { fresh?: boolean } 
   try {
     const live = accessFromCard(card, row.gbpAccess);
     const today = todayEastern();
-    if (live.live && live.value === "Verified" && (live.changed || row.gbpChecked !== today)) {
+    // `mayWrite: false` = someone who may not change the preview is only looking: show the live card, write nothing.
+    if (opts.mayWrite !== false && live.live && live.value === "Verified" && (live.changed || row.gbpChecked !== today)) {
       await writeRecord(row.id, f, { gbpAccess: "Verified", gbpChecked: today });
       fresh = mapClient(await readContact(row.id), f);
     }
@@ -53,7 +54,7 @@ async function liveGbp(row: ClientRow, f: DeskFields, opts: { fresh?: boolean } 
   return { card, row: { ...withLive, flags: flagsFor(withLive) } };
 }
 
-export async function clientDetailGhl(rawId: string, canSeeMoney: boolean): Promise<ClientDetail> {
+export async function clientDetailGhl(rawId: string, canSeeMoney: boolean, opts: { mayWrite?: boolean } = {}): Promise<ClientDetail> {
   const f = await allDeskFields();
   const contact = await clientContact(rawId, f);
   const stored = mapClient(contact, f);
@@ -62,12 +63,14 @@ export async function clientDetailGhl(rawId: string, canSeeMoney: boolean): Prom
   const [notes, stripe, live, gbpLocations, intake] = await Promise.all([
     listNotes(contact.id),
     stripeConnected() && stored.stripeCustomer ? snapshot(stored.stripeCustomer).catch(() => null) : Promise.resolve(null),
-    liveGbp(stored, f),
+    liveGbp(stored, f, { mayWrite: opts.mayWrite }),
     searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
     readIntake(fileScope).catch(() => null),
   ]);
   const files = intake?.files.map((x) => ({ key: x.key, name: x.name, size: x.size, category: x.category, uploadedAt: x.uploadedAt })) || [];
-  return { fileScope, files, row: canSeeMoney ? live.row : withoutMoney(live.row), history: toTimeline(notes), stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: teamOwners(), canSeeMoney, gbpLocations, searchAtlasConnected: searchAtlasConnected(), system: "ghl" };
+  // Owners-only money covers the timeline too: the package builder's notes list plan line items and totals.
+  const history = toTimeline(notes).filter((n) => canSeeMoney || n.source !== "Billing");
+  return { fileScope, files, row: canSeeMoney ? live.row : withoutMoney(live.row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: teamOwners(), canSeeMoney, gbpLocations, searchAtlasConnected: searchAtlasConnected(), system: "ghl" };
 }
 
 /**
@@ -88,6 +91,12 @@ async function paymentAlert(contact: GhlContact, f: DeskFields, before: string, 
   const name = businessName(contact);
   const title = after === "Card Failed" ? `Payment failed for ${name} — card declined. Reach out before the service lapses.` : `${name} is overdue on payment. Chase it before the service lapses.`;
   const assignee = memberByName(mapClient(contact, f).accountManager)?.ghlUserId || ghlRepIds().Josh;
+  // Events can also land on two instances at once: if the same heads-up is already open on the contact, one is enough.
+  // (A failed or unreadable task list never blocks the heads-up.)
+  try {
+    const open = await ghl<{ tasks?: { title?: string; completed?: boolean }[] }>("GET", `/contacts/${encodeURIComponent(contact.id)}/tasks`, undefined, { retries: 0, timeoutMs: 8000 });
+    if ((open.tasks || []).some((t) => !t.completed && t.title === title.slice(0, 200))) return;
+  } catch { /* create it */ }
   try { await addTask(contact.id, title.slice(0, 200), `Payment status on the team desk changed from ${before || "not set"} to ${after}. Open the client on the Clients tab for the Stripe details.`, 0, assignee); }
   catch (e) { console.error(`desk payment alert: task failed for ${contact.id}: ${e instanceof Error ? e.message : e}`); }
 }
@@ -102,8 +111,9 @@ function contactPatch(contact: GhlContact, patch: { contact: string; email: stri
   if (email && email !== (contact.email || "").toLowerCase()) native.email = email;
   if (!patch.phone && contact.phone) throw new CallDeskError("A phone number can be corrected here but not removed. To remove it, edit the contact in GoHighLevel.", 400);
   if (patch.phone && normalizePhone(patch.phone) !== normalizePhone(contact.phone || "")) native.phone = normalizePhone(patch.phone);
-  const website = patch.website ? (patch.website.includes(":") ? patch.website : `https://${patch.website}`) : "";
-  if (website !== (contact.website || "")) native.website = website;
+  // Unchanged text is never written — GoHighLevel may hold "example.com" with no scheme, and a blur must not turn it into a change.
+  const bare = (u: string) => u.trim().replace(/^https?:\/\//i, "").replace(/\/+$/, "").toLowerCase();
+  if (bare(patch.website) !== bare(contact.website || "")) native.website = patch.website ? (patch.website.includes(":") ? patch.website : `https://${patch.website}`) : "";
   return native;
 }
 

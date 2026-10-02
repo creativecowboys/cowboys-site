@@ -95,6 +95,20 @@ test("storage is the truth for a submitted intake: a status write that was misse
   assert.equal((await onboardingDetailGhl(LEAD)).row.intake, "Reviewed"); assert.equal(ghl.writes().length, writes);
 });
 
+test("a client brought over without an onboarding record can still be sent an intake link (its files stay under the client key)", async () => {
+  ghl.addContact({ id: "SquirrelMadeClient01", companyName: "Squirrel Made Products", firstName: "Jeremy", email: "jeremy@squirrel.example", tags: ["desk-client"], fields: { "Desk Client Status": "Active", "Desk Packages": ["Local Growth"], "Desk Monday Client ID": "13125661635" } });
+  blobSeed("onboarding/intake/c13125661635.json", { version: 1, itemId: "c13125661635", leadId: "", business: "Squirrel Made Products", tokenHash: null, tokenIssuedAt: null, tokenExpiresAt: null, revokedAt: null, form: { business: "Squirrel Made Products" }, lastSavedAt: null, submittedAt: null, reviewedAt: null, files: [{ key: "onboarding/files/c13125661635/Brand/logo.png", name: "logo.png", size: 10, type: "image/png", category: "Brand", uploadedAt: "2026-09-25T10:00:00.000Z" }], createdAt: "", updatedAt: "" });
+  const started = await startOnboardingGhl(validateHandoff(handoffForm(ghl, { handoffId: "66666666-7777-4888-8999-aaaaaaaaaaaa", leadId: "", manual: true, business: "Squirrel Made Products", contact: "Jeremy", email: "jeremy@squirrel.example", phone: "", packages: ["Local Growth"], monthlyAgreed: "", setupAgreed: "" })), { origin: ORIGIN, actor: DAVE });
+  assert.equal(started.itemId, "SquirrelMadeClient01");
+  const link = await issueIntakeLinkGhl("SquirrelMadeClient01", ORIGIN);
+  assert.deepEqual(blobJson(`onboarding/tokens/${sha(tokenOf(link.url))}.json`), { itemId: "c13125661635" });
+  const record = await resolveToken(tokenOf(link.url));
+  assert.equal(record.itemId, "c13125661635"); assert.equal(record.contactId, "SquirrelMadeClient01"); assert.equal(record.files.length, 1, "the files the team already added are on the same record");
+  assert.equal(clientView(record).folder, "c13125661635");
+  await submitIntakeGhl(record);
+  assert.equal(ghl.value("SquirrelMadeClient01", "Desk Intake"), "Client submitted");
+});
+
 test("file stores: a client that never had an onboarding record, an unknown scope, and scope → contact", async () => {
   const fields = resolveDeskFields(ghl.defs);
   ghl.addContact({ id: "SquirrelMadeClient01", companyName: "Squirrel Made Products", firstName: "Jeremy", email: "jeremy@squirrel.example", tags: ["desk-client"], fields: { "Desk Client Status": "Active", "Desk Monday Client ID": "13125661635" } });
@@ -108,4 +122,9 @@ test("file stores: a client that never had an onboarding record, an unknown scop
   await assert.rejects(ensureIntakeGhl("c999"), { status: 404 });
   // A contact's files live under ONE scope: asking for the contact id of an imported client is refused rather than starting a second store.
   await assert.rejects(ensureIntakeGhl("SquirrelMadeClient01"), { status: 400 });
+  // A contact that is not on the desk at all has no file store, and a client with no onboarding record has no intake to send.
+  ghl.addContact({ id: "JustSomeLead00000001", companyName: "Not A Client", email: "lead@example.com", tags: ["sales-lead"] });
+  await assert.rejects(ensureIntakeGhl("JustSomeLead00000001"), { status: 404 });
+  await assert.rejects(issueIntakeLinkGhl("BornOnGhlClient00001", ORIGIN), { status: 404 });
+  assert.equal(ghl.writes().length, 0);
 });

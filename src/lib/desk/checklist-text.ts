@@ -51,8 +51,9 @@ export function parseChecklist(text: string | null | undefined): StoredItem[] {
   return items;
 }
 
+/** One line per item. An item with no name is not written (a line without one would not be read back as an item either). */
 export function serializeChecklist(items: StoredItem[]): string {
-  return items.map((i) => [`[${STATUS_TO_MARK[i.status] ?? " "}] ${clean(i.name)}`, i.phase && PHASES.includes(i.phase) ? i.phase : "", i.owner ? `@${clean(i.owner)}` : "", /^\d{4}-\d{2}-\d{2}$/.test(i.due) ? `due ${i.due}` : ""].filter(Boolean).join(" | ")).join("\n");
+  return items.filter((i) => clean(i.name)).map((i) => [`[${STATUS_TO_MARK[i.status] ?? " "}] ${clean(i.name)}`, i.phase && PHASES.includes(i.phase) ? i.phase : "", i.owner ? `@${clean(i.owner)}` : "", /^\d{4}-\d{2}-\d{2}$/.test(i.due) ? `due ${i.due}` : ""].filter(Boolean).join(" | ")).join("\n");
 }
 
 /** What the desk shows: stored items with ids and the "required" flag for these packages. Two items with the same name get distinct ids. */

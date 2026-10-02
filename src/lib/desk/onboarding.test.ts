@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 import { graduateGhl, listOnboardingGhl, onboardingDetailGhl, patchOnboardingGhl, retryOnboardingGhl, startOnboardingGhl } from "./onboarding";
 import { listClientsGhl } from "./clients";
+import { winnerForContactGhl } from "./winners";
+import { forgetCustomFields } from "@/lib/ghl/client";
 import { validateDeskPatch } from "./validation";
 import { parseChecklist } from "./checklist-text";
 import { checklistFor } from "@/lib/onboarding/checklist";
@@ -116,6 +118,83 @@ test("Add client (no lead): creates a contact, or reuses the one GoHighLevel alr
   assert.equal(k.companyName, "Squirrel Made Products", "the business name the rep typed is the record's name");
 });
 
+test("a first attempt that failed part-way is finished on the same contact: no second contact, no missing tag, nothing left pending", async () => {
+  // Add client by name alone (no email or phone to find the contact by); GoHighLevel fails right after the contact is created.
+  const manual = validateHandoff(handoffForm(ghl, { handoffId: "44444444-5555-4666-8777-888888888888", leadId: "", manual: true, business: "Name Only Roofing", contact: "", email: "", phone: "", website: "", city: "", packages: ["Local Growth"], monthlyAgreed: "", setupAgreed: "" }));
+  ghl.failures.push({ match: /^PUT \/contacts\//, status: 500 });
+  await assert.rejects(startOnboardingGhl(manual, ctx));
+  assert.equal(ghl.contacts.size, 1);
+  const r = await startOnboardingGhl(manual, ctx);
+  assert.equal(ghl.contacts.size, 1, "the retry finished the contact the first attempt made"); assert.deepEqual(r.pending, []);
+  assert.equal(ghl.value(r.itemId, "Desk Onboarding Stage"), "New handoff"); assert.deepEqual(ghl.get(r.itemId).tags, ["desk-onboarding"]);
+  // The stored contact was deleted in GoHighLevel since: the next attempt makes a new one rather than failing forever.
+  ghl.contacts.delete(r.itemId);
+  const afterDelete = await startOnboardingGhl(manual, ctx);
+  assert.notEqual(afterDelete.itemId, r.itemId); assert.equal(ghl.contacts.size, 1); assert.equal(ghl.value(afterDelete.itemId, "Desk Onboarding Stage"), "New handoff");
+
+  // Handoff from a lead: the fields are written, then GoHighLevel fails on the tag. The rep presses Confirm again with the same draft.
+  addLead(ghl);
+  const form = validateHandoff(handoffForm(ghl));
+  ghl.failures.push({ match: new RegExp(`^POST /contacts/${LEAD}/tags$`), status: 500 });
+  await assert.rejects(startOnboardingGhl(form, ctx));
+  assert.equal(ghl.value(LEAD, "Desk Onboarding Stage"), "New handoff"); assert.ok(!ghl.get(LEAD).tags!.includes("desk-onboarding"));
+  const again = await startOnboardingGhl(form, ctx);
+  assert.deepEqual([again.itemId, again.pending, again.adopted], [LEAD, [], false]);
+  assert.ok(ghl.get(LEAD).tags!.includes("desk-onboarding"), "the tag the first attempt missed is added");
+  const record = blobJson<HandoffRecord>(`onboarding/handoffs/${LEAD}.json`)!;
+  assert.equal(record.itemId, LEAD); assert.equal(record.steps.item.state, "done");
+  assert.equal(ghl.notesFor(LEAD).filter((n) => n.body.includes("[CC-HANDOFF-SUMMARY:")).length, 1);
+  assert.deepEqual(ghl.value(LEAD, "Desk Packages"), ["Local Growth — First Year $297"]);
+});
+
+test("onboarding started on a contact that is already a client keeps what the client record holds — a Giveaway Winner stays one", async () => {
+  const c = ghl.addContact({ id: "ClientSquirrel000001", firstName: "Jeremy", lastName: "Nutt", companyName: "Squirrel Made Products", email: "jeremy@squirrel.example", tags: ["desk-client"],
+    fields: { "Desk Client Status": "Active", "Desk Packages": ["Giveaway Winner", "Local Growth"], "Desk Notes": "Sept 24: Josh confirmed this IS an active monthly client.", "Desk GBP Access": "Verified", "Desk Intake": "Reviewed", "Desk Monday Client ID": "13125661635", "Desk Pay Status": "No Billing Set Up", "Desk Client Since": "2026-09-15" } });
+  assert.ok(await winnerForContactGhl({ id: c.id }));
+  // Someone adds the same business by hand (same email) with an upsell.
+  const r = await startOnboardingGhl(validateHandoff(handoffForm(ghl, { handoffId: "55555555-6666-4777-8888-999999999999", leadId: "", manual: true, business: "Squirrel Made Products", contact: "Jeremy Nutt", email: "jeremy@squirrel.example", phone: "", packages: ["Social Ads $300"], monthlyAgreed: "300", setupAgreed: "" })), ctx);
+  assert.equal(r.itemId, c.id); assert.equal(ghl.contacts.size, 1);
+  assert.deepEqual(ghl.value(c.id, "Desk Packages"), ["Giveaway Winner", "Local Growth", "Social Ads $300"], "packages are added to, never replaced");
+  assert.equal(ghl.value(c.id, "Desk Notes"), "Sept 24: Josh confirmed this IS an active monthly client.\n\nMonthly agreed: $300 · Setup agreed: not recorded\nScope: Local SEO and a new site\nGoals: New site");
+  assert.equal(ghl.value(c.id, "Desk GBP Access"), "Verified"); assert.equal(ghl.value(c.id, "Desk Intake"), "Reviewed");
+  assert.equal(ghl.value(c.id, "Desk Client Status"), "Active"); assert.equal(ghl.value(c.id, "Desk Client Since"), "2026-09-15"); assert.equal(ghl.value(c.id, "Desk Onboarding Stage"), "New handoff");
+  assert.ok(await winnerForContactGhl({ id: c.id }), "still a giveaway winner: the package builder still refuses to bill them");
+  assert.deepEqual((await listClientsGhl()).rows, [], "one place at a time: back on the Onboarding tab until it launches again");
+  const row = (await listOnboardingGhl()).rows[0];
+  assert.equal(row.id, c.id); assert.equal(row.monthly, "0");
+});
+
+test("Add client for a business whose onboarding is already open adopts that record and applies nothing of the new draft", async () => {
+  addLead(ghl);
+  await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
+  const before = { notes: ghl.notesFor(LEAD).length, checklist: ghl.value(LEAD, "Desk Checklist"), packages: ghl.value(LEAD, "Desk Packages"), version: v(), puts: ghl.writes().filter((w) => w.method !== "GET").length };
+  // Someone on the Onboarding tab adds "the same" client by hand, with other packages.
+  const r = await startOnboardingGhl(validateHandoff(handoffForm(ghl, { handoffId: "99999999-aaaa-4bbb-8ccc-dddddddddddd", leadId: "", manual: true, business: "Bourbon Leather", contact: "Freddy", email: "FREDDY@bourbon.example", phone: "", packages: ["Max Growth", "Google Ads $500"], monthlyAgreed: "", setupAgreed: "" })), ctx);
+  assert.deepEqual([r.itemId, r.adopted, r.pending], [LEAD, true, []]);
+  assert.deepEqual({ notes: ghl.notesFor(LEAD).length, checklist: ghl.value(LEAD, "Desk Checklist"), packages: ghl.value(LEAD, "Desk Packages"), version: v(), puts: ghl.writes().filter((w) => w.method !== "GET").length }, before, "the record is exactly as it was");
+  assert.equal(ghl.contacts.size, 1); assert.equal(ghl.get(LEAD).companyName, "Bourbon Leather Company");
+});
+
+test("a handoff onto a record that came from the old board with no stored handoff is adopted and applies nothing", async () => {
+  // Choice Pressure Washing: made by hand on the Monday board, imported — an open onboarding record with no handoff in storage.
+  addLead(ghl, { tags: ["sales-lead", "desk-onboarding"], fields: { "Lead Source": "The Big Giveaway", "Outreach Status": "Call Booked", "Desk Onboarding Stage": "Collecting assets / access", "Desk Packages": ["Local Growth — First Year $297"], "Desk Checklist": "[x] Welcome email + onboarding link delivered (LSE-01) | Onboard", "Desk Monday Onboarding ID": "13052279909" } });
+  const writes = ghl.writes().length;
+  const r = await startOnboardingGhl(validateHandoff(handoffForm(ghl, { packages: ["Max Growth"] })), ctx);
+  assert.deepEqual(r, { itemId: LEAD, itemUrl: `https://app.gohighlevel.com/v2/location/LOCtest000000000000/contacts/detail/${LEAD}`, pending: [], adopted: true, system: "ghl" });
+  assert.equal(ghl.writes().length, writes, "no note, no checklist rows, no Won mark, no field");
+  assert.equal(ghl.value(LEAD, "Outreach Status"), "Call Booked"); assert.equal(ghl.value(LEAD, "Desk Checklist"), "[x] Welcome email + onboarding link delivered (LSE-01) | Onboard");
+  assert.deepEqual(blobKeys(), [], "and nothing is left in storage for a handoff that did not happen");
+});
+
+test("a package GoHighLevel's Desk Packages list does not have is refused before anything is saved", async () => {
+  addLead(ghl);
+  const def = ghl.defs.find((d) => d.name === "Desk Packages")!;
+  def.picklistOptions = (def.picklistOptions || []).filter((o) => o !== "Giveaway Winner"); forgetCustomFields();
+  const form = validateHandoff(handoffForm(ghl, { packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "", setupAgreed: "" }));
+  await assert.rejects(startOnboardingGhl(form, ctx), (e: Error & { status?: number }) => e.status === 409 && /"Giveaway Winner" is not on the "Desk Packages" list in GoHighLevel, so nothing was saved/.test(e.message));
+  assert.equal(ghl.writes().length, 0); assert.deepEqual(blobKeys(), []);
+});
+
 test("the list and the panel: rows, what is missing, overdue, the whole history, the stored handoff", async () => {
   addLead(ghl);
   ghl.notes.push({ id: "callnote000000000001", contactId: LEAD, userId: reps.Josh, dateAdded: "2026-09-28T15:00:00.000Z", body: "Call note — Creative Cowboys desk\nRep: Josh\nOutcome: Booked followup\nConversation notes: wants a new site\n\n[CC-CALL:6f1c2a4e-3b7d-4c8e-9f01-23456789abcd] [CC-PAYLOAD:" + "a".repeat(64) + "]" });
@@ -221,6 +300,81 @@ test("graduation: the same contact becomes a client; pressing twice changes noth
   const note = (await onboardingDetailGhl(LEAD)).history[0];
   assert.equal(note.source, "Desk"); assert.equal(note.author, "Madison"); assert.match(note.text, /^Launched\. Bourbon Leather Company is now on the Clients tab\.$/);
   assert.equal((await listOnboardingGhl()).rows[0].stage, "launched");
+});
+
+test("new work for a client whose onboarding is finished starts a new round on the same contact; while it is still open a second handoff is only adopted", async () => {
+  addLead(ghl);
+  await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
+  await patch({ action: "stage", stage: "building" });
+  await graduateGhl(LEAD, { managerId: "Josh", expectedUpdatedAt: v() }, DAVE);
+  assert.deepEqual((await listClientsGhl()).rows.map((r) => r.id), [LEAD]);
+  const before = ghl.notesFor(LEAD).length;
+  // The upsell: a new handoff (new draft id) for the same, launched, client.
+  const upsell = validateHandoff(handoffForm(ghl, { handoffId: "77777777-8888-4999-8aaa-bbbbbbbbbbbb", packages: ["Google Ads $500"], monthlyAgreed: "500", setupAgreed: "", scope: "Add Google Ads" }));
+  const r = await startOnboardingGhl(upsell, ctx);
+  assert.deepEqual([r.itemId, r.adopted, r.pending], [LEAD, false, []]);
+  assert.equal(ghl.value(LEAD, "Desk Onboarding Stage"), "New handoff"); assert.equal(ghl.value(LEAD, "Desk Handoff ID"), upsell.handoffId);
+  assert.deepEqual(ghl.value(LEAD, "Desk Packages"), ["Local Growth — First Year $297", "Google Ads $500"], "the new package is added to what the client already has");
+  assert.match(String(ghl.value(LEAD, "Desk Notes")), /Scope: Local SEO and a new site[\s\S]*\n\nMonthly agreed: \$500 · Setup agreed: not recorded\nScope: Add Google Ads/);
+  assert.equal(ghl.value(LEAD, "Desk Client Status"), "Active"); assert.equal(ghl.value(LEAD, "Desk Account Manager"), "Josh");
+  assert.equal(ghl.notesFor(LEAD).length, before + 1, "one new handoff summary");
+  assert.ok(parseChecklist(String(ghl.value(LEAD, "Desk Checklist"))).length > checklistFor(["Local Growth — First Year $297"]).length, "the checklist grew by what the new package needs");
+  assert.deepEqual((await listClientsGhl()).rows, [], "one place at a time: on the Onboarding tab until it launches again");
+  // While that round is open, yet another draft is adopted and changes nothing.
+  const writes = ghl.writes().length;
+  const third = await startOnboardingGhl(validateHandoff(handoffForm(ghl, { handoffId: "88888888-9999-4aaa-8bbb-cccccccccccc", packages: ["Max Growth"] })), ctx);
+  assert.equal(third.adopted, true); assert.deepEqual(ghl.value(LEAD, "Desk Packages"), ["Local Growth — First Year $297", "Google Ads $500"]);
+  assert.equal(ghl.writes().filter((w) => w.method === "PUT").length, ghl.writes().slice(0, writes).filter((w) => w.method === "PUT").length, "no field is written by an adopted handoff");
+  // Launch it again: back on the Clients tab, with the client values it always had.
+  await patch({ action: "stage", stage: "building" });
+  await graduateGhl(LEAD, { managerId: "", expectedUpdatedAt: v() }, DAVE);
+  const client = (await listClientsGhl()).rows[0];
+  assert.equal(client.id, LEAD); assert.equal(client.mrr, "797"); assert.equal(client.accountManager, "Josh");
+});
+
+test("a package GoHighLevel did not keep is an error at the handoff, and again on every retry until it is there", async () => {
+  addLead(ghl);
+  ghl.drop.set("Desk Packages", ["Giveaway Winner"]);
+  const form = validateHandoff(handoffForm(ghl, { packages: ["Giveaway Winner", "Local Growth"], monthlyAgreed: "", setupAgreed: "" }));
+  const lost = (e: Error & { status?: number }) => e.status === 502 && /GoHighLevel did not keep "Giveaway Winner" in "Desk Packages" on this contact \(it has: Local Growth\)/.test(e.message);
+  await assert.rejects(startOnboardingGhl(form, ctx), lost);
+  await assert.rejects(startOnboardingGhl(form, ctx), lost, "the retry does not paper over it");
+  assert.equal(blobJson<HandoffRecord>(`onboarding/handoffs/${LEAD}.json`)!.steps.item.state, "pending");
+  // Someone sets the packages on the contact in GoHighLevel; the next press finishes the handoff.
+  ghl.drop.clear();
+  ghl.get(LEAD).customFields!.find((x) => x.id === ghl.fieldId("Desk Packages"))!.value = ["Giveaway Winner", "Local Growth"];
+  const done = await startOnboardingGhl(form, ctx);
+  assert.deepEqual([done.pending, done.adopted], [[], false]);
+  assert.ok(await winnerForContactGhl({ id: LEAD }));
+});
+
+test("looking is not changing: someone who may not change the preview opens a record and nothing is written", async () => {
+  addLead(ghl);
+  await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
+  // Storage says the client submitted; the contact still says otherwise.
+  const intake = blobJson<IntakeRecord>(`onboarding/intake/${LEAD}.json`)!;
+  blobSeed(`onboarding/intake/${LEAD}.json`, { ...intake, submittedAt: "2026-10-01T15:00:00.000Z" });
+  const writes = ghl.writes().length;
+  const seen = await onboardingDetailGhl(LEAD, { mayWrite: false });
+  assert.equal(seen.row.intake, "Client submitted", "the panel still shows the truth"); assert.equal(ghl.writes().length, writes); assert.equal(ghl.value(LEAD, "Desk Intake"), "Not sent");
+  await onboardingDetailGhl(LEAD);
+  assert.equal(ghl.value(LEAD, "Desk Intake"), "Client submitted", "someone who may change it repairs it by opening it");
+});
+
+test("a graduation that stopped before the tag is finished by the next press, without touching a field", async () => {
+  addLead(ghl);
+  await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
+  await patch({ action: "stage", stage: "building" });
+  ghl.failures.push({ match: new RegExp(`^POST /contacts/${LEAD}/tags$`), status: 500 });
+  await assert.rejects(graduateGhl(LEAD, { managerId: "", expectedUpdatedAt: v() }, DAVE));
+  assert.equal(ghl.value(LEAD, "Desk Client Status"), "Active"); assert.ok(!ghl.get(LEAD).tags!.includes("desk-client")); assert.equal(ghl.notesFor(LEAD).filter((n) => n.body.includes("Launched.")).length, 0);
+  const puts = ghl.writes().filter((w) => w.method === "PUT").length;
+  const g = await graduateGhl(LEAD, { managerId: "", expectedUpdatedAt: "" }, DAVE);
+  assert.equal(g.id, LEAD); assert.ok(ghl.get(LEAD).tags!.includes("desk-client")); assert.equal(ghl.notesFor(LEAD).filter((n) => n.body.includes("Launched.")).length, 1);
+  assert.equal(ghl.writes().filter((w) => w.method === "PUT").length, puts, "the second press only adds what was missing");
+  const writes = ghl.writes().length;
+  await graduateGhl(LEAD, { managerId: "", expectedUpdatedAt: "" }, DAVE);
+  assert.equal(ghl.writes().length, writes, "and a third press does nothing");
 });
 
 test("a client brought over from the old board that is still onboarding keeps its client values when it graduates", async () => {

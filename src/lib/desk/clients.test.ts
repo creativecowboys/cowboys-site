@@ -79,6 +79,11 @@ test("the contact's own details: corrected on the contact, never blanked, and a 
   await assert.rejects(patch({ ...same, email: "" }), { status: 400 }); await assert.rejects(patch({ ...same, email: "jeremy@squirrelmade.example", phone: "" }), { status: 400 });
   assert.equal((await patch({ action: "contact", contact: "", email: "jeremy@squirrelmade.example", phone: "+14045550199", website: "" })).contact, "Jeremy R Nutt", "a blank name is ignored; a blank website clears it");
   assert.equal(ghl.get(CLIENT).website, "");
+  // GoHighLevel holds a website with no scheme: tabbing out of the untouched field is still not a change.
+  ghl.get(CLIENT).website = "PlainCo.example/";
+  const before = [ghl.writes().length, v()];
+  await patch({ action: "contact", contact: "Jeremy R Nutt", email: "jeremy@squirrelmade.example", phone: "+14045550199", website: "PlainCo.example/" });
+  assert.deepEqual([ghl.writes().length, v()], before); assert.equal(ghl.get(CLIENT).website, "PlainCo.example/");
   ghl.failures.push({ match: /^PUT \/contacts\//, status: 400, body: { message: "This location does not allow duplicated contacts.", meta: { contactId: "x" } } });
   await assert.rejects(patch({ action: "contact", contact: "Jeremy R Nutt", email: "taken@example.com", phone: "+14045550199", website: "" }), (e: Error & { status?: number }) => e.status === 409 && /another contact already uses/.test(e.message));
 });
@@ -132,6 +137,29 @@ test("Stripe sync writes payment state to desk fields: finds the customer by ema
   stripeUp({ ...activeSub, status: "canceled" }, paidInvoice);
   assert.equal((await syncClientFromStripeGhl(CLIENT)).row.group, "churned");
 });
+test("owners-only money covers the timeline: the package builder's notes are not shown to anyone else", async () => {
+  addClient();
+  ghl.notes.push({ id: "noteBilling000000001", contactId: CLIENT, dateAdded: "2026-09-25T15:00:00.000Z", body: "Package builder (call desk): Monthly plan for Squirrel Made Products\nLocal Growth — First Year $297\nTotal $297.00 / month" });
+  await addDeskNote(CLIENT, { text: "Called about the logo.", noteId: UUID, source: "client", actor: DAVE });
+  assert.deepEqual((await clientDetailGhl(CLIENT, true)).history.map((h) => h.source), ["Client", "Billing"]);
+  assert.deepEqual((await clientDetailGhl(CLIENT, false)).history.map((h) => h.source), ["Client"]);
+});
+
+test("the billing guard never works from a list that may be short: if GoHighLevel refuses the desk's filter, the tabs fall back and billing is refused", async () => {
+  addClient({ "Desk Packages": ["Giveaway Winner", "Local Growth"] });
+  ghl.get(CLIENT).tags = ["lse:client"]; // a winner whose desk tag was never added: only the field filter finds it
+  ghl.addContact({ id: "DuplicateContact0001", companyName: "Squirrel Made", email: "jeremy@squirrel.example" });
+  assert.equal((await winnerForContactGhl({ id: "DuplicateContact0001", email: "jeremy@squirrel.example" }))?.itemId, CLIENT);
+  for (const status of [400, 422]) {
+    ghl.failures.push({ match: /^POST \/contacts\/search/, status });
+    assert.deepEqual((await listClientsGhl()).rows, [], `the Clients tab still loads on a ${status}, from the tag alone`);
+    ghl.failures.push({ match: /^POST \/contacts\/search/, status });
+    await assert.rejects(listWinnersGhl(), { status: 503 });
+    ghl.failures.push({ match: /^POST \/contacts\/search/, status });
+    await assert.rejects(winnerForContactGhl({ id: "DuplicateContact0001", email: "jeremy@squirrel.example" }), { status: 503 }, "refused, not waved through");
+  }
+});
+
 test("a burst of Stripe events for one failed payment leaves one task, not one per event", async () => {
   addClient({ "Desk Pay Status": "Paid / Current", "Desk Stripe Customer ID": "cus_123" });
   stripeUp({ ...activeSub, status: "past_due" }, { ...paidInvoice, id: "in_2", status: "open", attempted: true, status_transitions: { paid_at: null } });

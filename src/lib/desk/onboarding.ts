@@ -15,7 +15,7 @@ import type { GbpCard } from "@/lib/gbp/types";
 import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, type StoredItem } from "./checklist-text";
 import { assertOption, DESK_TAGS, deskList, deskText, type DeskFields } from "./fields";
 import { addDeskNote, toTimeline } from "./notes";
-import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
+import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, hasTag, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageIdForLabel, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
 import { isGhlRecordId } from "./switch";
 import { isTeamName, memberByName, teamOwners, type Actor } from "./team";
 import type { DeskOnboardingPatch } from "./validation";
@@ -60,8 +60,10 @@ export async function findHandoffRecord(c: GhlContact, f: DeskFields): Promise<H
 async function writeChecklist(id: string, f: DeskFields, items: StoredItem[], previous: string, extra: DeskValues = {}): Promise<GhlContact> {
   await writeRecord(id, f, { ...extra, checklist: serializeChecklist(items) });
   const saved = await readContact(id);
-  const kept = parseChecklist(deskText(saved, f, "checklist")).length;
-  if (kept !== items.length) {
+  const back = parseChecklist(deskText(saved, f, "checklist"));
+  const kept = back.length;
+  // The same rows, whole: a cut inside the last row keeps the count and loses its owner or due date.
+  if (serializeChecklist(back) !== serializeChecklist(items)) {
     // Put back what was there (it fit before), then say so.
     await writeRecord(id, f, { checklist: previous }).catch((e) => console.error(`desk checklist: could not restore ${id}: ${e instanceof Error ? e.message : e}`));
     throw new CallDeskError(`GoHighLevel kept ${kept} of ${items.length} checklist rows (the "Desk Checklist" field may be too small for this list). The checklist was put back as it was — tell an owner before changing it again.`, 502);
@@ -76,10 +78,11 @@ async function promoteFromLive(id: string, f: DeskFields, manual: string, card: 
   await writeRecord(id, f, { gbpAccess: "Verified", lastTouch: todayEastern() });
   return true;
 }
-async function liveGbp(row: OnboardingRow, f: DeskFields, opts: { fresh?: boolean } = {}): Promise<{ card: GbpCard | null; row: OnboardingRow }> {
+async function liveGbp(row: OnboardingRow, f: DeskFields, opts: { fresh?: boolean; mayWrite?: boolean } = {}): Promise<{ card: GbpCard | null; row: OnboardingRow }> {
   const listing = parseListingId(row.searchAtlasListing);
   if (!listing) return { card: null, row };
   const card = await gbpCard(listing, { detail: true, fresh: !!opts.fresh });
+  if (opts.mayWrite === false) return { card, row }; // a look at the preview by someone who may not change it: show the live card, write nothing
   let promoted = false;
   try { promoted = await promoteFromLive(row.id, f, row.gbpAccess, card); }
   catch (error) { console.error(`[gbp] could not write Verified to onboarding contact ${row.id}: ${error instanceof Error ? error.message : error}`); }
@@ -89,14 +92,16 @@ async function liveGbp(row: OnboardingRow, f: DeskFields, opts: { fresh?: boolea
 function stripToken(record: IntakeRecord): Omit<IntakeRecord, "tokenHash"> { const copy = { ...record } as Partial<IntakeRecord>; delete copy.tokenHash; return copy as Omit<IntakeRecord, "tokenHash">; }
 const linkActive = (r: IntakeRecord) => !!r.tokenHash && !r.revokedAt && !!r.tokenExpiresAt && Date.parse(r.tokenExpiresAt) > Date.now();
 
-export async function onboardingDetailGhl(rawId: string): Promise<OnboardingDetail> {
+/** `mayWrite: false` (a non-owner looking at the preview before the flip) reads only: no auto-promotion, no status repair. */
+export async function onboardingDetailGhl(rawId: string, opts: { mayWrite?: boolean } = {}): Promise<OnboardingDetail> {
+  const mayWrite = opts.mayWrite !== false;
   const f = await allDeskFields();
   const contact = await onboardingContact(rawId, f);
   const scope = fileScopeFor(contact, f);
   const stored = mapOnboarding(contact, f);
   const [notes, record, intake, live, gbpLocations] = await Promise.all([
     listNotes(contact.id), findHandoffRecord(contact, f).catch(() => null), readIntake(scope).catch(() => null),
-    liveGbp(stored, f), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
+    liveGbp(stored, f, { mayWrite }), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
     searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
   ]);
   // The client's Submit is saved in storage first and the status on the contact second. If that second write was missed
@@ -104,8 +109,11 @@ export async function onboardingDetailGhl(rawId: string): Promise<OnboardingDeta
   // storage is the truth: show it and put it on the contact.
   let row = live.row;
   if (intake?.submittedAt && ["", "Not sent", "Link issued"].includes(row.intake)) {
-    try { await writeRecord(contact.id, f, { intake: "Client submitted" }); row = mapOnboarding(await readContact(contact.id), f); }
-    catch (e) { console.error(`desk intake: could not mark ${contact.id} Client submitted: ${e instanceof Error ? e.message : e}`); row = { ...row, intake: "Client submitted" }; }
+    if (!mayWrite) row = { ...row, intake: "Client submitted" };
+    else {
+      try { await writeRecord(contact.id, f, { intake: "Client submitted" }); row = mapOnboarding(await readContact(contact.id), f); }
+      catch (e) { console.error(`desk intake: could not mark ${contact.id} Client submitted: ${e instanceof Error ? e.message : e}`); row = { ...row, intake: "Client submitted" }; }
+    }
   }
   return {
     row, history: toTimeline(notes), record,
@@ -211,6 +219,39 @@ async function contactForManual(form: HandoffForm): Promise<GhlContact> {
   }
 }
 
+/**
+ * A contact that already carries desk data (it is a client, or was onboarded before) keeps it: packages are added to —
+ * so a Giveaway Winner stays one and is never billed by accident — notes are appended, and GBP access and the intake
+ * status are never stepped back. Everything else is the new handoff's.
+ */
+export function keepShared(values: DeskValues, contact: GhlContact, f: DeskFields): DeskValues {
+  const merged: DeskValues = { ...values };
+  const have = deskList(contact, f, "packages");
+  if (have.length && Array.isArray(merged.packages)) merged.packages = [...new Set([...have, ...merged.packages])];
+  const notes = deskText(contact, f, "notes");
+  if (notes && typeof merged.notes === "string") merged.notes = notes.includes(merged.notes) ? notes : `${notes}\n\n${merged.notes}`;
+  if (deskText(contact, f, "gbpAccess")) delete merged.gbpAccess;
+  if (deskText(contact, f, "intake")) delete merged.intake;
+  return merged;
+}
+/** A package GoHighLevel's "Desk Packages" list does not have would be dropped on save — refuse the handoff instead of losing it (a lost Giveaway Winner label would let a winner be billed). */
+function assertPackagesKnown(f: DeskFields, packages: readonly string[]): void {
+  const options = f.packages?.options || [];
+  const unknown = options.length ? packages.filter((p) => !options.includes(p)) : [];
+  if (unknown.length) throw new CallDeskError(`${unknown.map((p) => `"${p}"`).join(", ")} ${unknown.length === 1 ? "is" : "are"} not on the "Desk Packages" list in GoHighLevel, so nothing was saved. Add ${unknown.length === 1 ? "it" : "them"} there (Settings → Custom Fields → Desk Packages) and try again.`, 409);
+}
+/** After the write: GoHighLevel must actually hold every package of this handoff. A dropped label — above all Giveaway Winner — is an error, not a detail. */
+async function assertPackagesKept(contactId: string, f: DeskFields, packages: readonly string[]): Promise<void> {
+  const kept = deskList(await readContact(contactId), f, "packages");
+  const lost = packages.filter((p) => !kept.includes(p));
+  if (lost.length) throw new CallDeskError(`GoHighLevel did not keep ${lost.map((p) => `"${p}"`).join(", ")} in "Desk Packages" on this contact (it has: ${kept.join(", ") || "nothing"}). Set the packages on the contact in GoHighLevel, then press the button again — the handoff is not finished until they are there.`, 502);
+}
+/** The stored record's contact, when it still exists. A contact deleted in GoHighLevel is "none", not an error; anything else (GoHighLevel down) is. */
+async function contactIfThere(id: string): Promise<GhlContact | null> {
+  try { return await readContact(id); }
+  catch (e) { if (e instanceof CallDeskError && !(e instanceof GhlError) && e.status === 404) return null; throw e; }
+}
+
 async function runSteps(record: HandoffRecord, contactId: string, f: DeskFields, actor: Actor): Promise<HandoffRecord> {
   const form = record.handoff;
   const run = async (name: StepName, fn: () => Promise<void>) => {
@@ -246,7 +287,7 @@ async function runSteps(record: HandoffRecord, contactId: string, f: DeskFields,
 }
 
 export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: string; actor: Actor }): Promise<StartResult> {
-  if (!form.manual && !isGhlRecordId(form.leadId)) throw new CallDeskError("This draft points at a lead from the old board. Open the lead on the Sales tab and start the handoff again from there.", 409);
+  if (!form.manual && !isGhlRecordId(form.leadId)) throw new CallDeskError("This lead is on the old Monday board, and onboarding now lives in GoHighLevel. Find the same business on the Sales tab's GoHighLevel roster (every Monday lead was brought over) and hand it off from there.", 409);
   const key = recordKey(form);
   if (inflight.has(key)) throw new CallDeskError("This client is already being handed off. Wait a moment, then reload to see the record.", 409);
   inflight.add(key);
@@ -255,35 +296,62 @@ export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: strin
     let record = await readHandoff(key);
     let contact: GhlContact | null = null;
     if (!form.manual) contact = await readContact(form.leadId);
-    else if (record?.itemId && isGhlRecordId(record.itemId)) contact = await readContact(record.itemId);
+    else if (record?.itemId && isGhlRecordId(record.itemId)) contact = await contactIfThere(record.itemId); // an earlier attempt already has (or made) the contact
     else {
       // A crash after the contact was written but before the record was: the handoff id on the contact finds it again.
       const prior = (await listRecords("onboarding", f)).find((c) => deskText(c, f, "handoffId").trim() === form.handoffId);
       contact = prior ? await readContact(prior.id) : null;
     }
     let adopted = false;
-    if (contact && isOnboardingRecord(contact, f)) {
-      // Already an onboarding record: a second click, a reload, a retry, or another rep. Adopt it; never write the fields twice.
-      adopted = deskText(contact, f, "handoffId").trim() !== form.handoffId && record?.handoffId !== form.handoffId;
+    // The same handoff again (a second click, a reload, a retry), or a different one while this client's onboarding is still
+    // open: adopt the record, never write the fields twice. A different handoff for a client whose onboarding is FINISHED
+    // (Launched) is new work — an upsell — and starts a new round on the same contact (below), adding to what is there.
+    const sameHandoff = !!contact && (deskText(contact, f, "handoffId").trim() === form.handoffId || record?.handoffId === form.handoffId);
+    const finished = !!contact && stageIdForLabel(deskText(contact, f, "obStage")) === "launched";
+    if (contact && isOnboardingRecord(contact, f) && (sameHandoff || !finished)) {
+      adopted = !sameHandoff;
       // A record handed off in the Monday era is stored under its old key: use it, so its finished steps are not run again.
       if (!record) record = await findHandoffRecord(contact, f);
-      if (!record) { record = freshRecord(form); record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); record.steps.item = { state: "done", at: now() }; await writeHandoff(record); }
+      // An earlier attempt can stop between the field write and the tag, or before the record was marked: finish that here.
+      await ensureTag(contact, DESK_TAGS.onboarding);
+      if (sameHandoff) await assertPackagesKept(contact.id, f, form.packages); // a retry never papers over a package GoHighLevel dropped
+      // A different draft adopting a record that has no stored handoff of its own (brought over from the old board, made by hand):
+      // nothing of this draft is applied — no summary note, no checklist rows, no Won mark. There is nothing to run.
+      if (!record && !sameHandoff) return { itemId: contact.id, itemUrl: contactUrl(contact.id), pending: [], adopted: true, system: "ghl" };
+      if (!record) record = freshRecord(form);
+      if (record.steps.item.state !== "done" || !record.itemId) { record.itemId = record.itemId || contact.id; record.itemUrl = record.itemUrl || contactUrl(contact.id); record.steps.item = { state: "done", at: now() }; record.updatedAt = now(); await writeHandoff(record); }
     } else {
       if (!form.manual && version(contact!) !== form.expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your handoff draft is safe. Reload the lead and review before handing it off.", 409);
+      assertPackagesKnown(f, form.packages);
       record = freshRecord(form);
+      if (contact) { record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); }
       await writeHandoff(record); // durable "in progress" marker before anything is written to GoHighLevel
-      if (!contact) contact = await contactForManual(form);
-      if (isOnboardingRecord(contact, f)) adopted = true; // the email or phone belongs to a client already in onboarding
-      else {
+      if (!contact) {
+        contact = await contactForManual(form);
+        // Before anything else: a retry must find THIS contact (a client added by name alone has no email or phone to find it by).
+        record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); record.updatedAt = now();
+        await writeHandoff(record);
+      }
+      if (isOnboardingRecord(contact, f) && stageIdForLabel(deskText(contact, f, "obStage")) !== "launched") {
+        // The email or phone belongs to a client whose onboarding is still open: adopt that record. NOTHING of this draft is
+        // applied to it — no second summary note, no extra checklist rows — so "already has an onboarding record" is the whole truth.
+        adopted = true;
+        await ensureTag(contact, DESK_TAGS.onboarding);
+        const t = now(); const done = { state: "done" as const, at: t };
+        const closed: HandoffRecord = { ...record, itemId: contact.id, itemUrl: contactUrl(contact.id), updatedAt: t, steps: { item: done, summary: done, checklist: done, sourceLead: done, intake: done } };
+        await writeHandoff(closed); // this draft's own marker: closed, nothing left to run
+        record = (await findHandoffRecord(contact, f)) || closed; // the record's own handoff, whose unfinished steps (if any) are its to finish
+      } else {
         const owner = memberByName(form.salesOwner);
-        await writeRecord(contact.id, f, handoffValues(form, todayEastern(), `${ctx.origin}/leads?tab=onboarding&client=${contact.id}`), {
+        await writeRecord(contact.id, f, keepShared(handoffValues(form, todayEastern(), `${ctx.origin}/leads?tab=onboarding&client=${contact.id}`), contact, f), {
           ...handoffNative(form, contact),
           ...(!contact.assignedTo && owner?.ghlUserId ? { assignedTo: owner.ghlUserId } : {}), // never take a contact away from whoever GoHighLevel says owns it
         });
         await ensureTag(contact, DESK_TAGS.onboarding);
+        await assertPackagesKept(contact.id, f, form.packages);
+        record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); record.steps.item = { state: "done", at: now() }; record.updatedAt = now();
+        await writeHandoff(record);
       }
-      record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); record.steps.item = { state: "done", at: now() }; record.updatedAt = now();
-      await writeHandoff(record);
     }
     record = await runSteps(record, contact!.id, f, ctx.actor);
     return { itemId: contact!.id, itemUrl: contactUrl(contact!.id), pending: pendingSteps(record), adopted, system: "ghl" };
@@ -300,6 +368,7 @@ export async function retryOnboardingGhl(rawId: string, actor: Actor): Promise<S
   if (inflight.has(key)) throw new CallDeskError("A retry is already running for this client.", 409);
   inflight.add(key);
   try {
+    await ensureTag(contact, DESK_TAGS.onboarding); // a first attempt can stop right after the fields were written
     if (record.steps.item.state !== "done") { record.steps.item = { state: "done", at: now() }; if (!record.itemId) { record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); } await writeHandoff(record); }
     const done = await runSteps(record, contact.id, f, actor);
     return { itemId: contact.id, itemUrl: contactUrl(contact.id), pending: STEPS.filter((s) => done.steps[s].state !== "done"), adopted: false, system: "ghl" };
@@ -320,7 +389,8 @@ export async function graduateGhl(rawId: string, input: { managerId: string; exp
   const row = mapOnboarding(contact, f);
   if (row.stage === "new" || row.stage === "collecting") throw new CallDeskError("Mark the client ready for production first; graduation is for clients that are built or launching.", 409);
   const wasClient = isClientRecord(contact, f);
-  if (wasClient && row.stage === "launched" && deskText(contact, f, "clientStatus")) return { id, url: contactUrl(id), created: false };
+  const launched = wasClient && row.stage === "launched" && !!deskText(contact, f, "clientStatus");
+  if (launched && hasTag(contact, DESK_TAGS.client)) return { id, url: contactUrl(id), created: false }; // nothing left to do
   const today = todayEastern();
   const blank = (key: Parameters<typeof deskText>[2]) => !deskText(contact, f, key);
   const manager = isTeamName(input.managerId) ? input.managerId : row.onboardingOwner;
@@ -334,9 +404,10 @@ export async function graduateGhl(rawId: string, input: { managerId: string; exp
   if (!["Verified", "No GBP Exists", "Requested", "Lost / recheck"].includes(row.gbpAccess)) values.gbpAccess = "Not Requested";
   if (row.gbpAccess === "Verified" && blank("gbpChecked")) values.gbpChecked = today;
   if (blank("accountManager") && manager) values.accountManager = manager;
-  await writeRecord(id, f, values);
+  // `launched` without the tag = an earlier press wrote the fields and stopped before the tag: finish it, change no field.
+  if (!launched) await writeRecord(id, f, values);
   await ensureTag(contact, DESK_TAGS.client);
-  await addDeskNote(id, { text: `Launched. ${businessName(contact)} is now on the Clients tab.`, noteId: `graduated-${id}`, source: "system", actor })
+  await addDeskNote(id, { text: `Launched. ${businessName(contact)} is now on the Clients tab.`, noteId: `graduated-${id}-${today}`, source: "system", actor })
     .catch((e) => console.error(`desk graduate: note failed for ${id}: ${e instanceof Error ? e.message : e}`)); // the client fields are the durable part
   return { id, url: contactUrl(id), created: !wasClient };
 }

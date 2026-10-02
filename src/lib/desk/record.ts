@@ -133,15 +133,18 @@ async function searchAll(filters: SearchFilter[]): Promise<GhlContact[]> {
  * The designated test contact never shows in a list (it stays reachable by id). Search results lag writes by a
  * few seconds — anything that must be fresh reads the contact by id instead.
  */
-export async function listRecords(kind: DeskKind, f: DeskFields): Promise<GhlContact[]> {
+export async function listRecords(kind: DeskKind, f: DeskFields, opts: { strict?: boolean } = {}): Promise<GhlContact[]> {
   const tag = kind === "onboarding" ? DESK_TAGS.onboarding : DESK_TAGS.client;
   const fieldId = f[kind === "onboarding" ? "obStage" : "clientStatus"]?.id;
   const byTag: SearchFilter = { field: "tags", operator: "eq", value: tag };
   let found: GhlContact[];
   try { found = await searchAll(fieldId ? [{ group: "OR", filters: [byTag, { field: `customFields.${fieldId}`, operator: "exists" }] }] : [byTag]); }
   catch (e) {
-    if (!(e instanceof GhlError) || e.ghlStatus !== 400 || !fieldId) throw e;
-    console.error(`desk ${kind} list: custom-field filter rejected by GoHighLevel, retrying with the tag only`);
+    if (!(e instanceof GhlError) || ![400, 422].includes(e.ghlStatus) || !fieldId) throw e;
+    // The tag-only list can miss a record whose tag was never added. Good enough to show a tab; not good enough to decide
+    // that nobody is a giveaway winner — a strict caller gets an error instead of a shorter list.
+    if (opts.strict) throw new CallDeskError("GoHighLevel refused the filter the desk uses to list its records, so the list may be incomplete.", 503);
+    console.error(`desk ${kind} list: custom-field filter rejected by GoHighLevel (${e.ghlStatus}), retrying with the tag only`);
     found = await searchAll([byTag]);
   }
   const member = kind === "onboarding" ? isOnboardingRecord : isClientRecord;

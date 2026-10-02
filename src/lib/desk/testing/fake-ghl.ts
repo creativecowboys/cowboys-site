@@ -34,6 +34,10 @@ export class FakeGhl {
   lag = false;
   /** Field NAME → max characters GoHighLevel "keeps" — to prove the desk notices a field that is too small instead of losing rows quietly. */
   truncate = new Map<string, number>();
+  /** Field NAME → option values GoHighLevel silently "drops" from a multi-select on save (an option the field does not have, a label it cannot hold). */
+  drop = new Map<string, string[]>();
+  /** When true, /contacts/search returns contacts the way the real API sometimes does: no firstName / lastName / contactName, only the lower-cased pair. */
+  searchOmitsNames = false;
   /** Field NAMES GoHighLevel "refuses": any PUT that carries one is a 422 and changes nothing — a value shape the real API does not take. */
   refuse = new Set<string>();
   /** One-shot failures: the first request whose "METHOD path" matches gets this status. */
@@ -137,8 +141,9 @@ export class FakeGhl {
       if (!this.defs.some((d) => d.id === f.id)) throw new Error(`fake GHL: write to unknown custom field ${f.id}`);
       const list = (c.customFields ||= []);
       const hit = list.find((x) => x.id === f.id);
-      const max = this.truncate.get(this.defs.find((d) => d.id === f.id)!.name);
-      const value = max !== undefined && typeof f.field_value === "string" ? f.field_value.slice(0, max) : f.field_value;
+      const name = this.defs.find((d) => d.id === f.id)!.name;
+      const max = this.truncate.get(name); const dropped = this.drop.get(name);
+      const value = max !== undefined && typeof f.field_value === "string" ? f.field_value.slice(0, max) : dropped && Array.isArray(f.field_value) ? f.field_value.filter((v) => !dropped.includes(String(v))) : f.field_value;
       if (hit) hit.value = value; else list.push({ id: f.id, value });
     }
     c.dateUpdated = this.tick();
@@ -180,7 +185,12 @@ export class FakeGhl {
       const dir = ((body?.sort as { direction?: string }[] | undefined)?.[0]?.direction || "desc") === "asc" ? 1 : -1;
       pool.sort((a, b) => dir * String(a.dateAdded).localeCompare(String(b.dateAdded)));
       const limit = Number(body?.pageLimit) || 100; const page = Number(body?.page) || 1;
-      return json(200, { contacts: pool.slice((page - 1) * limit, page * limit).map((c) => structuredClone(c)), total: pool.length });
+      const shape = (c: GhlContact): GhlContact => {
+        const copy = structuredClone(c);
+        if (this.searchOmitsNames) { copy.firstNameLowerCase = (copy.firstName || "").toLowerCase(); copy.lastNameLowerCase = (copy.lastName || "").toLowerCase(); delete copy.firstName; delete copy.lastName; delete copy.contactName; }
+        return copy;
+      };
+      return json(200, { contacts: pool.slice((page - 1) * limit, page * limit).map(shape), total: pool.length });
     }
     if (path === "/contacts/" && method === "GET") { // the older free-text list endpoint (name, email, phone, company)
       const q = (u.searchParams.get("query") || "").toLowerCase(); const digits = q.replace(/\D/g, "");
@@ -229,6 +239,7 @@ export class FakeGhl {
       c.dateUpdated = this.tick();
       return json(201, { tags: c.tags });
     }
+    if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "GET") return json(200, { tasks: this.tasks.filter((t) => t.contactId === m![1]) });
     if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "POST") {
       if (!this.contacts.has(m[1])) return json(400, { message: "Contact with id not found" });
       const task: FakeTask = { id: this.newId("task"), title: String(body?.title || ""), body: body?.body ? String(body.body) : undefined, dueDate: String(body?.dueDate || ""), completed: !!body?.completed, assignedTo: body?.assignedTo ? String(body.assignedTo) : undefined, contactId: m[1] };
