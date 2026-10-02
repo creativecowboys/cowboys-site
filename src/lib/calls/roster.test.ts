@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { CallLead } from "@/app/leads/types";
-import { CALL_OUTCOMES, mondayOutcome } from "./outcomes";
+import { CALL_OUTCOMES, mondayOutcome, outreachStatus } from "./outcomes";
 import { CALL_OWNERS, compareLeads, contactStage, filterRoster, inRosterView, isOffCallList, matchesOwner, mergeRoster, NO_CALL_TAGS, noCallTagsOf, OFF_LIST_LABELS, OFF_LIST_VIEW, offListReasons } from "./roster";
 
 function lead(id: string, changes: Partial<CallLead> & { ownerIds?: string[] } = {}): CallLead & { ownerIds?: string[] } {
@@ -33,6 +33,7 @@ test("contact date keeps a lead out of the first-call queue even if its status i
 test("each saved call outcome removes first-call eligibility before its date arrives", () => {
   for (const outcome of CALL_OUTCOMES) {
     assert.notEqual(contactStage(lead("saved", { outreach: mondayOutcome(outcome) })), "new");
+    assert.notEqual(contactStage(lead("saved", { outreach: outreachStatus(outcome) })), "new");
   }
   for (const outreach of ["Not interested", "Not Interested", "Bad contact number", "Won"]) {
     assert.equal(contactStage(lead("closed", { outreach })), "closed");
@@ -98,7 +99,7 @@ test("a lead is off the call list when it is Not Interested or carries a no-call
   assert.deepEqual(offListReasons(lead("dnc", { outreach: "Replied", noCallTags: ["do-not-contact"] })), ["do-not-contact"]);
   assert.deepEqual(offListReasons(lead("fake", { noCallTags: ["fake-lead"] })), ["fake-lead"]);
   assert.deepEqual(offListReasons(lead("all", { outreach: "Not Interested", noCallTags: ["fake-lead", "do-not-contact"] })), ["not-interested", "do-not-contact", "fake-lead"]);
-  for (const outreach of ["", "Not Contacted", "Contacted", "Replied", "Call Booked", "Call Held", "No answer / left voicemail", "Booked followup", "Proposal Sent", "Bad contact number", "Won"]) {
+  for (const outreach of ["", "Not Contacted", "Contacted", "Replied", "Call Booked", "Call Held", "No answer / left voicemail", "Booked followup", "Proposal Sent", "Bad contact number", "Won", "In progress"]) {
     assert.equal(isOffCallList(lead("on", { outreach })), false, `${outreach || "a blank status"} stays on the call list`);
   }
   // Tags nobody has explained (Dave's concept-* and AI tags) are not acted on; neither is a Monday lead, which has no tags at all.
@@ -184,4 +185,42 @@ test("a roster reload keeps the newer copy of a lead, so a lagging search cannot
   assert.deepEqual(mergeRoster([], [stale, other]).map(({ id }) => id), ["x", "y"]);
   // "Load more" appends a page and keeps the order, with the same rule for a lead both pages carry.
   assert.deepEqual(mergeRoster([saved, other], [stale, lead("z")], true).map((l) => `${l.id}:${l.outreach}`), ["x:Not Interested", "y:", "z:"]);
+});
+
+// ── "In progress" (Dave, Oct 2 2026): the rep talked to the lead and is still working it ──
+test("In progress is a working lead: active whatever its dates, on the call list, never a first call and never closed", () => {
+  for (const outreach of ["In progress", "In Progress", " in progress "]) for (const lastContact of ["2026-10-02", ""]) {
+    const l = lead("wip", { outreach, lastContact });
+    assert.equal(contactStage(l), "active", `${outreach} / ${lastContact || "no contact date"}`);
+    assert.equal(isOffCallList(l), false); assert.deepEqual(offListReasons(l), []);
+    assert.deepEqual(["all", "new", "active", "closed", OFF_LIST_VIEW].map((v) => inRosterView(l, v)), [true, false, true, false, false]);
+  }
+  // On the Monday board the same outcome is recorded as Contacted, which is a working status too.
+  assert.equal(contactStage(lead("monday", { outreach: mondayOutcome("In progress"), lastContact: "2026-10-02" })), "active");
+});
+
+test("In progress in the roster: under Contacted / working on, pickable in the status filter, ordered by oldest contact like any working lead", () => {
+  const leads = [
+    lead("fresh", { name: "Never Called" }),
+    lead("wip-today", { name: "Talked Today", outreach: "In progress", lastContact: "2026-10-02", nextFollowup: "2026-10-09", nextFollowupTime: "09:30" }),
+    lead("wip-old", { name: "Talked Last Week", outreach: "In progress", lastContact: "2026-09-25" }),
+    lead("booked", { name: "Booked", outreach: "Booked followup", lastContact: "2026-09-30" }),
+    lead("won", { name: "Won Co", outreach: "Won", lastContact: "2026-10-01" }),
+    lead("ni", { name: "Said No", outreach: "Not Interested", lastContact: "2026-10-01" }),
+  ];
+  assert.deepEqual(view(leads, "all"), ["fresh", "wip-old", "booked", "wip-today", "won"]); // new first, then working leads oldest contact first, closed last
+  assert.deepEqual(view(leads, "active"), ["wip-old", "booked", "wip-today"]);
+  assert.deepEqual(view(leads, "new"), ["fresh"]); assert.deepEqual(view(leads, "closed"), ["won"]); assert.deepEqual(view(leads, OFF_LIST_VIEW), ["ni"]);
+  assert.deepEqual(filterRoster(leads, { view: "all", owner: "", status: "In progress", source: "", search: "" }).map(({ id }) => id), ["wip-old", "wip-today"]);
+  assert.deepEqual(filterRoster(leads, { view: OFF_LIST_VIEW, owner: "", status: "In progress", source: "", search: "" }), []);
+  // The desk builds its status filter from the statuses of the leads a view can show: In progress is offered on the normal list once a lead has it.
+  assert.ok([...new Set(leads.filter((l) => !isOffCallList(l)).map((l) => l.outreach).filter(Boolean))].includes("In progress"));
+});
+
+test("saving a Not interested lead as In progress puts it back on the call list; saving In progress as Not interested takes it off", () => {
+  const off = lead("x", { outreach: "Not Interested", lastContact: "2026-10-01" });
+  const back = { ...off, outreach: "In progress", lastContact: "2026-10-02" };
+  assert.equal(inRosterView(off, "all"), false); assert.equal(inRosterView(back, "all"), true); assert.equal(inRosterView(back, "active"), true);
+  assert.equal(inRosterView({ ...back, outreach: "Not Interested" }, "all"), false);
+  assert.equal(inRosterView({ ...back, noCallTags: ["do-not-contact"] }, "all"), false); // a no-call tag still wins over any status
 });

@@ -86,6 +86,25 @@ for (const outcome of CALL_OUTCOMES) test(`notes save after assignment with outc
   assert.equal(JSON.parse(fields?.variables.values as string).outreach.label, mondayOutcome(outcome));
 });
 
+test('In progress on the Monday board (the rollback path): the note says In progress, the status is the existing Contacted label, and no label is created', async () => {
+  const assigned = item(String(TEAM.Dave), newVersion);
+  const draft: CallDraft = {
+    callId: '88f205d3-abc0-4e10-812f-ccb149629725', leadId: '12345', expectedUpdatedAt: newVersion, rep: 'Dave',
+    goal: '', currentMarketing: '', challenge: '', budget: '', timing: '', recommendation: '', notes: 'Talked it through; they are thinking about it.',
+    nextStep: '', outcome: 'In progress', interest: '', followupDate: '2026-10-09', followupTime: '09:30', quotedMonthly: '',
+  };
+  queue.push({ items: [assigned] }, { items: [assigned] }, { items: [assigned] }, { create_update: { id: '790' } }, { items: [assigned] }, { change_multiple_column_values: { id: '12345' } });
+  const result = await saveCall(validateCallDraft(draft, '12345'));
+  assert.equal(result.saved, true); assert.equal(result.warning, undefined);
+  assert.ok(String(requests.find(r => r.query.includes('mutation SaveCallNote'))?.variables.body).includes('<strong>Outcome:</strong> In progress'));
+  const fields = requests.find(r => r.query.includes('mutation SaveCallFields'));
+  const values = JSON.parse(fields?.variables.values as string);
+  assert.deepEqual(values.outreach, { label: 'Contacted' });
+  assert.deepEqual(values.last_contact.date.length, 10);
+  assert.deepEqual(values.next_followup, { date: '2026-10-09', time: '13:30:00' }); // 9:30am Eastern, stored by Monday in UTC
+  assert.equal(JSON.stringify(values).includes('In progress'), false); // the new words never reach a board column
+  assert.equal(requests.some(r => /create_labels_if_missing/.test(r.query) || 'create_labels_if_missing' in r.variables), false);
+});
 
 test('reopening a lead returns newest-first saved notes with call markers removed', async () => {
   const record = { ...item(), updates: [

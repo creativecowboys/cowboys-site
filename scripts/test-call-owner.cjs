@@ -15,7 +15,7 @@ const sources = {
   'ghl-client': '../src/lib/ghl/client.ts', 'ghl-fields': '../src/lib/ghl/fields.ts', 'ghl-reps': '../src/lib/ghl/reps.ts', 'ghl-links': '../src/lib/ghl/links.ts',
   'ghl-website-form': '../src/lib/ghl-website-form.ts', 'ghl-admin': '../src/lib/ghl/admin.ts', 'onboarding-api': '../src/lib/onboarding/api.ts',
   'desk-path': '../src/lib/desk-path.ts', 'desk-path.test': '../src/lib/desk-path.test.ts',
-  'roster.test': '../src/lib/calls/roster.test.ts', 'owner.test': '../src/lib/calls/owner.test.ts', 'followups.test': '../src/lib/calls/followups.test.ts',
+  'roster.test': '../src/lib/calls/roster.test.ts', 'owner.test': '../src/lib/calls/owner.test.ts', 'followups.test': '../src/lib/calls/followups.test.ts', 'outcomes.test': '../src/lib/calls/outcomes.test.ts',
   'ghl.test': '../src/lib/calls/ghl.test.ts', 'switch.test': '../src/lib/calls/switch.test.ts',
   'ghl-client.test': '../src/lib/ghl/client.test.ts', 'ghl-fields.test': '../src/lib/ghl/fields.test.ts', 'ghl-admin.test': '../src/lib/ghl/admin.test.ts', 'ghl-website-form.test': '../src/lib/ghl-website-form.test.ts',
 };
@@ -39,7 +39,7 @@ try {
     const result = ts.transpileModule(input, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } });
     fs.writeFileSync(path.join(output, `${name}.js`), result.outputText);
   }
-  const tests = ['owner.test', 'roster.test', 'followups.test', 'ghl.test', 'switch.test', 'ghl-client.test', 'ghl-fields.test', 'ghl-admin.test', 'ghl-website-form.test', 'desk-path.test'].filter((t) => present.has(t)).map((t) => path.join(output, `${t}.js`));
+  const tests = ['outcomes.test', 'owner.test', 'roster.test', 'followups.test', 'ghl.test', 'switch.test', 'ghl-client.test', 'ghl-fields.test', 'ghl-admin.test', 'ghl-website-form.test', 'desk-path.test'].filter((t) => present.has(t)).map((t) => path.join(output, `${t}.js`));
   process.exitCode = spawnSync(process.execPath, ['--test', ...tests], { stdio: 'inherit' }).status ?? 1;
 } finally {
   fs.rmSync(output, { recursive: true, force: true });

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, isoDate, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
-import { validateAssign, validateLeadId } from "./validation";
-import { filterRoster, OFF_LIST_VIEW, offListReasons } from "./roster";
+import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, isoDate, LEAD_TAGS, mapLead, markSourceLead, outcomeOption, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, statusConfirm, unwrapCursor, WON_TAG } from "./ghl";
+import { validateAssign, validateCallDraft, validateLeadId } from "./validation";
+import { contactStage, filterRoster, isOffCallList, OFF_LIST_VIEW, offListReasons } from "./roster";
 import { forgetCustomFields } from "@/lib/ghl/client";
 import { resolveFromDefs } from "@/lib/ghl/fields";
 import { ghlRepIds } from "@/lib/ghl/reps";
@@ -13,7 +13,7 @@ import type { CallDraft } from "@/app/leads/types";
 const F = { ls: "fLeadSource", os: "fOutreach", it: "fInterest", lc: "fLastContact", nf: "fNextFollowup", nt: "fNextFollowupTime", qm: "fQuoted", ii: "fInterestedIn", sn: "fSalesNotes", ml: "fMondayId", as: "fAuditScore", ar: "fAuditReport" };
 const DEFS = { customFields: [
   { id: F.ls, name: "Lead Source", fieldKey: "contact.lead_source", dataType: "SINGLE_OPTIONS", picklistOptions: ["The Big Giveaway", "Facebook", "Ebook download", "Website form", "Referral", "Other"] },
-  { id: F.os, name: "Outreach Status", dataType: "SINGLE_OPTIONS", picklistOptions: ["Not Contacted", "Call Booked", "No answer / left voicemail", "Booked followup", "Not Interested", "Bad contact number", "Won"] },
+  { id: F.os, name: "Outreach Status", dataType: "SINGLE_OPTIONS", picklistOptions: ["Not Contacted", "Call Booked", "No answer / left voicemail", "Booked followup", "Not Interested", "Bad contact number", "Won", "In progress"] },
   { id: F.it, name: "Interest", dataType: "SINGLE_OPTIONS", picklistOptions: ["Cold", "Warm", "Hot"] }, { id: F.lc, name: "Last Contact", dataType: "DATE" },
   { id: F.nf, name: "Next Follow-up", dataType: "DATE" }, { id: F.nt, name: "Next Follow-up Time", dataType: "TEXT" }, { id: F.qm, name: "Quoted Monthly", dataType: "MONETORY" },
   { id: F.ii, name: "Interested In", dataType: "TEXT" }, { id: F.sn, name: "Sales Notes", dataType: "LARGE_TEXT" }, { id: F.ml, name: "Monday Lead ID", dataType: "TEXT" },
@@ -30,7 +30,7 @@ let requests: Req[];
 let queue: { status: number; body: unknown }[];
 const originalFetch = global.fetch;
 beforeEach(() => {
-  requests = []; queue = []; forgetCustomFields();
+  requests = []; queue = []; forgetCustomFields(); statusConfirm.retryMs = 0;
   process.env.GHL_API_TOKEN = "nonfunctional-test-token"; process.env.GHL_LOCATION_ID = "LOCtest000000000000"; process.env.NEXTAUTH_SECRET = "test-secret";
   global.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     requests.push({ method: init?.method || "GET", path: String(url).replace("https://services.leadconnectorhq.com", ""), body: init?.body ? JSON.parse(String(init.body)) : undefined });
@@ -44,6 +44,9 @@ const defs = () => ({ status: 200, body: DEFS });
 const got = (c: unknown) => ({ status: 200, body: { contact: c } });
 const notes = (list: { id: string; body: string; userId?: string; dateAdded?: string }[]) => ({ status: 200, body: { notes: list } });
 const put = (c: unknown) => ({ status: 200, body: { succeded: true, contact: c } });
+/** The contact as GoHighLevel returns it when the desk reads the status back after a save. */
+const holds = (status: string, over: Record<string, unknown> = {}) => got(contact({ dateUpdated: v2, customFields: [{ id: F.os, value: status }], ...over }));
+const paths = () => requests.map((r) => `${r.method} ${r.path.split("?")[0]}`);
 
 test("ids: GHL contact ids and Monday item ids both validate; junk does not", () => {
   assert.equal(validateLeadId(ID), ID); assert.equal(validateLeadId("13149403716"), "13149403716");
@@ -189,17 +192,18 @@ test("formatCallNote carries every answered field and both markers", () => {
   assert.match(text, /\[CC-CALL:6f1c2a4e-3b7d-4c8e-9f01-23456789abcd\] \[CC-PAYLOAD:[0-9a-f]{64}\]$/);
   assert.doesNotMatch(text, /Budget discussed/);
 });
-test("saveCall: note first, then the fields, with the version checked before anything is written", async () => {
-  queue.push(defs(), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()));
+test("saveCall: note first, then the fields, then the status is read back; the version is checked before anything is written", async () => {
+  queue.push(defs(), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("Booked followup"));
   const r = await saveCall(draft());
   assert.deepEqual(r, { saved: true, updateId: "n9", recordUrl: `https://app.gohighlevel.com/v2/location/LOCtest000000000000/contacts/detail/${ID}` });
+  assert.deepEqual(paths(), ["GET /locations/LOCtest000000000000/customFields", `GET /contacts/${ID}`, `GET /contacts/${ID}/notes`, `POST /contacts/${ID}/notes`, `GET /contacts/${ID}`, `PUT /contacts/${ID}`, `GET /contacts/${ID}`]);
   const writes = requests.filter((x) => x.method !== "GET");
   assert.equal(writes[0].path, `/contacts/${ID}/notes`); assert.ok(String((writes[0].body as { body: string }).body).includes("[CC-CALL:6f1c2a4e"));
   assert.equal(writes[1].method, "PUT"); assert.deepEqual((writes[1].body as { customFields: unknown[] }).customFields, callFields(draft(), new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date()), fields));
 });
 test("saveCall as Not interested writes one note and the status + last-contact fields — no tag, no DND, nothing removed", async () => {
   const tagged = contact({ tags: ["giveaway-entrant", "newsletter"] });
-  queue.push(defs(), got(tagged), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(tagged), put(tagged));
+  queue.push(defs(), got(tagged), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(tagged), put(tagged), holds("Not Interested", { tags: tagged.tags }));
   const r = await saveCall(draft({ outcome: "Not interested", interest: "", followupDate: "", followupTime: "", quotedMonthly: "" }));
   assert.equal(r.saved, true); assert.equal(r.warning, undefined);
   const writes = requests.filter((x) => x.method !== "GET");
@@ -245,4 +249,129 @@ test("readLeadVersion uses dateUpdated and the business name", async () => {
   queue.push(got(contact()));
   assert.deepEqual(await readLeadVersion(ID), { updatedAt: v1, name: "Juniper & Co." });
   await assert.rejects(readLeadVersion("13149403716"), { status: 400 }); // a Monday id never reaches GHL
+});
+
+// ── "In progress" (Dave, Oct 2 2026): a lead the rep talked to and is still working ──
+const today = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
+/** The field definitions with a different option list on Outreach Status (undefined = GoHighLevel sends no list at all). */
+const defsWithOutreach = (options: string[] | undefined) => ({ status: 200, body: { customFields: DEFS.customFields.map((d) => (d.id === F.os ? { ...d, picklistOptions: options } : d)) } });
+const BEFORE_SETUP = ["Not Contacted", "Contacted", "Replied", "Call Booked", "Call Held", "No answer / left voicemail", "Booked followup", "Proposal Sent", "Not Interested", "Bad contact number", "Won"]; // the live field on Oct 2 2026, before the option was added
+const working = (over: Partial<CallDraft> = {}) => draft({ outcome: "In progress", interest: "", followupDate: "", followupTime: "", quotedMonthly: "", ...over });
+
+test("In progress: a valid outcome with or without a follow-up date; the date is never required", () => {
+  assert.equal(validateCallDraft(working(), ID).outcome, "In progress");
+  assert.equal(validateCallDraft(working({ followupDate: "2026-10-09", followupTime: "09:30" }), ID).followupDate, "2026-10-09");
+  assert.throws(() => validateCallDraft(working({ followupTime: "09:30" }), ID), { status: 400 }); // a time still needs its date, as for every outcome
+  for (const near of ["in progress", "In Progress", "Inprogress", "Contacted"]) assert.throws(() => validateCallDraft({ ...working(), outcome: near }, ID), { status: 400 });
+});
+test("In progress: sets Outreach Status and Last Contact; the follow-up date and time ride along only when given", () => {
+  assert.deepEqual(callFields(working(), "2026-10-02", fields), [{ id: F.os, field_value: "In progress" }, { id: F.lc, field_value: "2026-10-02" }]);
+  assert.deepEqual(callFields(working({ followupDate: "2026-10-09", followupTime: "14:00", interest: "Warm" }), "2026-10-02", fields),
+    [{ id: F.os, field_value: "In progress" }, { id: F.lc, field_value: "2026-10-02" }, { id: F.it, field_value: "Warm" }, { id: F.nf, field_value: "2026-10-09" }, { id: F.nt, field_value: "14:00" }]);
+  assert.deepEqual(callFields(working({ followupDate: "2026-10-09" }), "2026-10-02", fields).slice(2), [{ id: F.nf, field_value: "2026-10-09" }, { id: F.nt, field_value: "" }]); // a date with no time is an all-day follow-up
+  assert.match(formatCallNote(working({ followupDate: "2026-10-09", followupTime: "14:00" })), /\nOutcome: In progress\n[\s\S]*Follow-up date: 2026-10-09 around 2:00 pm\n/);
+  assert.doesNotMatch(formatCallNote(working()), /Follow-up date/);
+});
+test("saveCall as In progress: one note, then status + last contact; the lead stays on the call list as a working lead", async () => {
+  queue.push(defs(), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("In progress"));
+  const r = await saveCall(working());
+  assert.equal(r.saved, true); assert.equal(r.warning, undefined);
+  const writes = requests.filter((x) => x.method !== "GET");
+  assert.deepEqual(writes.map((w) => `${w.method} ${w.path}`), [`POST /contacts/${ID}/notes`, `PUT /contacts/${ID}`]); // no tag, nothing else
+  assert.match(String((writes[0].body as { body: string }).body), /\nOutcome: In progress\n/);
+  assert.deepEqual(writes[1].body, { customFields: [{ id: F.os, field_value: "In progress" }, { id: F.lc, field_value: today() }] });
+  assert.equal(requests.filter((x) => x.path.includes("/customFields")).length, 1); // the option is there: no second look at the definitions
+  const after = mapLead(contact({ customFields: [{ id: F.os, value: "In progress" }, { id: F.lc, value: today() }, { id: F.nf, value: "2026-10-09" }] }), fields);
+  assert.equal(after.outreach, "In progress"); assert.equal(contactStage(after), "active"); assert.equal(isOffCallList(after), false);
+  assert.deepEqual(filterRoster([after], { view: "active", owner: "", status: "In progress", source: "", search: "" }).map((l) => l.id), [ID]);
+});
+test("saveCall as In progress with a follow-up writes the date and time the same way a booked followup does", async () => {
+  queue.push(defs(), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("In progress"));
+  assert.equal((await saveCall(working({ followupDate: "2026-10-09", followupTime: "14:00" }))).warning, undefined);
+  const fieldWrite = requests.find((x) => x.method === "PUT")!.body as { customFields: { id: string; field_value: unknown }[] };
+  assert.deepEqual(fieldWrite.customFields, [{ id: F.os, field_value: "In progress" }, { id: F.lc, field_value: today() }, { id: F.nf, field_value: "2026-10-09" }, { id: F.nt, field_value: "14:00" }]);
+});
+test("outcomeOption: ok when GoHighLevel has the option (any capitalisation), missing when its list lacks it, unknown when it sends no list", () => {
+  const withOptions = (options: string[] | undefined) => resolveFromDefs(defsWithOutreach(options).body.customFields);
+  assert.equal(outcomeOption(fields, "In progress"), "ok"); assert.equal(outcomeOption(fields, "Not interested"), "ok"); // "Not interested" is the "Not Interested" option
+  assert.equal(outcomeOption(withOptions(BEFORE_SETUP), "In progress"), "missing"); assert.equal(outcomeOption(withOptions(BEFORE_SETUP), "Booked followup"), "ok");
+  assert.equal(outcomeOption(withOptions([...BEFORE_SETUP, "In Progress"]), "In progress"), "ok");
+  assert.equal(outcomeOption(withOptions(undefined), "In progress"), "unknown"); assert.equal(outcomeOption(withOptions([]), "Booked followup"), "unknown");
+  assert.equal(outcomeOption(withOptions([{ label: "Booked followup" }] as unknown as string[]), "Booked followup"), "unknown"); // a list the desk cannot read never refuses a save
+  assert.throws(() => outcomeOption(resolveFromDefs([]), "In progress"), { status: 503 }); // no Outreach Status field at all: the existing "run the field setup" refusal
+});
+test("until GoHighLevel has the option, an In progress save is refused in plain words before anything is written", async () => {
+  queue.push(defsWithOutreach(BEFORE_SETUP), got(contact()), notes([]), defsWithOutreach(BEFORE_SETUP));
+  await assert.rejects(saveCall(working()), (e: unknown) => {
+    const err = e as { status?: number; message?: string };
+    assert.equal(err.status, 503); // not a 409: the desk must not offer "load the latest record" for this
+    assert.match(err.message || "", /^"In progress" is not an option on the "Outreach Status" field in GoHighLevel yet, so nothing was saved\. An owner needs to add it: run the GoHighLevel field setup/);
+    assert.match(err.message || "", /Until then, choose a different outcome\.$/);
+    return true;
+  });
+  assert.equal(requests.filter((x) => x.method !== "GET").length, 0); // no note, no field write, no tag
+  assert.equal(requests.filter((x) => x.path.includes("/customFields")).length, 2); // it looked once more before refusing
+  // The other outcomes are unaffected on the same field, and the same refusal would catch any option removed in GoHighLevel by mistake.
+  queue.push(got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("Booked followup"));
+  assert.equal((await saveCall(draft({ callId: "7f1c2a4e-3b7d-4c8e-9f01-23456789abcd" }))).warning, undefined);
+  forgetCustomFields();
+  const without = defsWithOutreach(BEFORE_SETUP.filter((o) => o !== "Booked followup"));
+  queue.push(without, got(contact()), notes([]), without);
+  await assert.rejects(saveCall(draft({ callId: "8f1c2a4e-3b7d-4c8e-9f01-23456789abcd" })), { status: 503, message: /^"Booked followup" is not an option on the "Outreach Status" field/ });
+  assert.equal(requests.filter((x) => x.method === "POST" && x.path.endsWith("/notes")).length, 1); // only the one good save wrote a note
+});
+test("an option added a moment ago is found without waiting for the 10-minute definitions cache", async () => {
+  queue.push(defsWithOutreach(BEFORE_SETUP), { status: 200, body: { contacts: [], total: 0 } });
+  await getCallsPage(null); // this instance now holds the old option list
+  queue.push(got(contact()), notes([]), defs(), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("In progress"));
+  const r = await saveCall(working());
+  assert.equal(r.saved, true); assert.equal(r.warning, undefined);
+  assert.deepEqual((requests.find((x) => x.method === "PUT")!.body as { customFields: unknown[] }).customFields[0], { id: F.os, field_value: "In progress" });
+});
+test("an option an owner typed by hand as 'In Progress' is the same option: the save writes GoHighLevel's spelling", async () => {
+  queue.push(defsWithOutreach([...BEFORE_SETUP, "In Progress"]), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("In Progress"));
+  assert.equal((await saveCall(working())).warning, undefined);
+  assert.deepEqual((requests.find((x) => x.method === "PUT")!.body as { customFields: unknown[] }).customFields[0], { id: F.os, field_value: "In Progress" });
+  const held = mapLead(contact({ customFields: [{ id: F.os, value: "In Progress" }, { id: F.lc, value: today() }] }), fields);
+  assert.equal(contactStage(held), "active"); assert.equal(isOffCallList(held), false);
+});
+test("when GoHighLevel sends no option list the save goes ahead, and the read-back says whether the status was kept", async () => {
+  queue.push(defsWithOutreach(undefined), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("In progress"));
+  const kept = await saveCall(working());
+  assert.equal(kept.saved, true); assert.equal(kept.warning, undefined);
+  queue.push(defsWithOutreach(undefined), got(contact()), notes([]), { status: 201, body: { note: { id: "n10" } } }, got(contact()), put(contact()), got(contact({ dateUpdated: v2 })), got(contact({ dateUpdated: v2 }))); // the status did not stick: still Call Booked, on both looks
+  forgetCustomFields();
+  const dropped = await saveCall(working({ callId: "9f1c2a4e-3b7d-4c8e-9f01-23456789abcd" }));
+  assert.equal(dropped.saved, true);
+  assert.equal(dropped.warning, 'Your call note is saved, but GoHighLevel did not keep the status "In progress" (the contact still says "Call Booked"). Check the Outreach Status options in GoHighLevel (Settings, Custom Fields) and set the status on the contact there.');
+});
+test("an option removed in GoHighLevel after this instance cached the list: the save is not reported clean, and the next one is refused", async () => {
+  queue.push(defs(), { status: 200, body: { contacts: [], total: 0 } });
+  await getCallsPage(null); // the cache now says In progress exists
+  // ...and it has since been deleted in GoHighLevel, which keeps the old status when sent a value it has no option for.
+  queue.push(got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), got(contact({ dateUpdated: v2 })), got(contact({ dateUpdated: v2 })));
+  const first = await saveCall(working());
+  assert.equal(first.saved, true); assert.match(first.warning || "", /^Your call note is saved, but GoHighLevel did not keep the status "In progress" \(the contact still says "Call Booked"\)\./);
+  assert.equal(requests.filter((x) => x.path.includes("/customFields")).length, 1); // it trusted the cache once...
+  queue.push(defsWithOutreach(BEFORE_SETUP), got(contact({ dateUpdated: v2 })), notes([]), defsWithOutreach(BEFORE_SETUP));
+  await assert.rejects(saveCall(working({ callId: "af1c2a4e-3b7d-4c8e-9f01-23456789abcd", expectedUpdatedAt: v2 })), { status: 503 }); // ...and not again
+  assert.equal(requests.filter((x) => x.method === "POST" && x.path.endsWith("/notes")).length, 1);
+});
+test("the read-back is not fooled by capitalisation or by a read that trails the write, and a read-back that fails is a warning, not a clean save", async () => {
+  queue.push(defs(), got(contact()), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(contact()), put(contact()), holds("IN PROGRESS"));
+  assert.equal((await saveCall(working())).warning, undefined);
+  queue.push(got(contact()), notes([]), { status: 201, body: { note: { id: "n11" } } }, got(contact()), put(contact()), got(contact({ dateUpdated: v2 })), holds("In progress")); // the first look is early, the second has it
+  assert.equal((await saveCall(working({ callId: "cf1c2a4e-3b7d-4c8e-9f01-23456789abcd" }))).warning, undefined);
+  assert.equal(requests.filter((x) => x.method === "GET" && x.path === `/contacts/${ID}`).length, 7); // 3 for the first save, 4 for the second
+  queue.push(got(contact()), notes([]), { status: 201, body: { note: { id: "n10" } } }, got(contact()), put(contact()), { status: 404, body: { message: "gone" } });
+  const unread = await saveCall(working({ callId: "bf1c2a4e-3b7d-4c8e-9f01-23456789abcd" }));
+  assert.equal(unread.saved, true); assert.match(unread.warning || "", /^Your call note is saved\. GoHighLevel did not confirm all field updates\./);
+});
+test("a stale draft is told to reload first, as before, even when the option or the whole field is missing", async () => {
+  queue.push(defsWithOutreach(BEFORE_SETUP), got(contact({ dateUpdated: v2 })), notes([]));
+  await assert.rejects(saveCall(working()), { status: 409 });
+  forgetCustomFields();
+  queue.push({ status: 200, body: { customFields: DEFS.customFields.filter((d) => d.id !== F.os) } }, got(contact({ dateUpdated: v2 })), notes([]));
+  await assert.rejects(saveCall(working()), { status: 409 });
+  assert.equal(requests.filter((x) => x.method !== "GET").length, 0); assert.equal(requests.filter((x) => x.path.includes("/customFields")).length, 2); // no second look at the definitions for a draft that has to reload anyway
 });

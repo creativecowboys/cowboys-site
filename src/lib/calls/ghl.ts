@@ -1,12 +1,12 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "@/app/leads/types";
 import { CallDeskError, GHL_ID, MONDAY_ID } from "./validation";
-import { isCallOutcome, mondayOutcome } from "./outcomes";
+import { isCallOutcome, outreachStatus, type CallOutcome } from "./outcomes";
 import { prettyTime } from "./followup-time";
 import { noCallTagsOf } from "./roster";
 import { callMarker, handoffMarker, payloadMarker, readableHistory } from "./markers";
-import { addNote, addTags, contactDisplayName, contactUrl, fieldText, getContact, listNotes, searchContacts, updateContact, type GhlContact, type GhlNote, type SearchFilter } from "@/lib/ghl/client";
-import { INTEREST_OPTIONS, leadSourceOptions, requireField, salesFields, type SalesFields } from "@/lib/ghl/fields";
+import { addNote, addTags, contactDisplayName, contactUrl, fieldText, forgetCustomFields, getContact, listNotes, searchContacts, updateContact, type GhlContact, type GhlNote, type SearchFilter } from "@/lib/ghl/client";
+import { INTEREST_OPTIONS, leadSourceOptions, liveOption, missingOptionMessage, requireField, salesFields, type SalesFields } from "@/lib/ghl/fields";
 import { ghlRepIds, ghlRepName, REP_NAMES, type RepName } from "@/lib/ghl/reps";
 
 // The sales desk on GoHighLevel (Oct 1 2026, Dave: "swap the leads coming in to GHL"). A lead is a GHL
@@ -188,11 +188,26 @@ export function formatCallNote(draft: CallDraft): string {
   return `Call note — Creative Cowboys desk\n${rows.filter(([, v]) => v).map(([k, v]) => `${k}: ${esc(v)}`).join("\n")}\n\n${callMarker(draft.callId)} ${payloadMarker(draft)}`;
 }
 
+/**
+ * Can GoHighLevel hold the Outreach Status this outcome sets? A dropdown only keeps a value that is one of its options, so the
+ * desk checks before it writes (Oct 2 2026, when "In progress" was added and the live field did not have the option yet):
+ * "ok" = it is one of the field's options · "missing" = the field lists its options and this is not one of them ·
+ * "unknown" = GoHighLevel sent no option list the desk can read, so it cannot be checked beforehand.
+ * Whatever this says, saveCall reads the status back after writing it: the definitions behind an "ok" can be 10 minutes old.
+ */
+export function outcomeOption(fields: SalesFields, outcome: CallOutcome): "ok" | "missing" | "unknown" {
+  const options = requireField(fields, "outreach").options;
+  if (!options.length) return "unknown";
+  return liveOption(options, outreachStatus(outcome)) ? "ok" : "missing";
+}
+/** The status exactly as GoHighLevel spells the option (an owner may have added "In Progress" by hand); the desk's own wording when the field lists no options. */
+const statusValue = (fields: SalesFields, outcome: CallOutcome): string => liveOption(requireField(fields, "outreach").options, outreachStatus(outcome)) ?? outreachStatus(outcome);
+
 /** Field writes for a saved call. Blank optional values mean leave GHL unchanged, never erase existing information. */
 export function callFields(draft: CallDraft, today: string, fields: SalesFields): { id: string; field_value: unknown }[] {
   if (!isCallOutcome(draft.outcome)) throw new CallDeskError("Choose a valid call outcome.", 400);
   const out: { id: string; field_value: unknown }[] = [
-    { id: requireField(fields, "outreach").id, field_value: mondayOutcome(draft.outcome) },
+    { id: requireField(fields, "outreach").id, field_value: statusValue(fields, draft.outcome) },
     { id: requireField(fields, "lastContact").id, field_value: today },
   ];
   if (draft.interest && (INTEREST_OPTIONS as readonly string[]).includes(draft.interest)) out.push({ id: requireField(fields, "interest").id, field_value: draft.interest });
@@ -204,6 +219,8 @@ export function callFields(draft: CallDraft, today: string, fields: SalesFields)
   return out;
 }
 const sameFields = (before: GhlContact, after: GhlContact, ids: string[]) => ids.every((id) => fieldText(before, id) === fieldText(after, id));
+/** How long saveCall waits before its second look when the status it wrote is not on the contact yet (the tests set 0). */
+export const statusConfirm = { retryMs: 700 };
 
 // A process-local guard reduces double clicks on the same warm instance. It is NOT a distributed lock:
 // GHL has no compare-and-set either; the note marker + version check are what make a retry safe.
@@ -213,7 +230,8 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
   if (savingLeads.has(draft.leadId)) throw new CallDeskError("A call for this lead is already saving. Keep your draft and retry in a moment.", 409);
   savingLeads.add(draft.leadId);
   try {
-    const fields = await salesFields();
+    if (!isCallOutcome(draft.outcome)) throw new CallDeskError("Choose a valid call outcome.", 400);
+    let fields = await salesFields();
     const initial = await getContact(draft.leadId);
     const recordUrl = contactUrl(draft.leadId);
     const prior = (await listNotes(draft.leadId)).find((n) => (n.body || "").includes(callMarker(draft.callId)));
@@ -222,6 +240,11 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
       return { saved: true, updateId: prior.id, recordUrl, warning: "This call note was already saved. Field completion could not be confirmed, so no fields were overwritten. Review the lead in GoHighLevel." };
     }
     if (version(initial) !== draft.expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your draft is safe. Reload the lead and review the changes before saving.", 409);
+    // Everything else that can refuse the call is settled here, BEFORE the note is written, so a refusal never leaves a half-saved
+    // call. The status must be an option the Outreach Status dropdown has in GoHighLevel, or the value would not be kept. The
+    // definitions are cached for 10 minutes and an owner may have added the option since, so a miss looks once more before refusing.
+    if (outcomeOption(fields, draft.outcome) === "missing") fields = await salesFields(true);
+    if (outcomeOption(fields, draft.outcome) === "missing") throw new CallDeskError(missingOptionMessage(requireField(fields, "outreach").name, outreachStatus(draft.outcome)), 503);
     const columns = callFields(draft, todayEastern(), fields); // resolve the fields BEFORE writing the note, so a missing field can't leave a half-saved call
     let updateId: string;
     // Authored as the rep (GHL user id) so the note reads as theirs in GHL, not as the integration's.
@@ -232,6 +255,20 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
       const fresh = await getContact(draft.leadId);
       if (!sameFields(initial, fresh, columns.map((c) => c.id))) return { ...saved, warning: "Your call note is saved. Another change was detected, so the status, follow-up and quote were left unchanged. Review them in GoHighLevel." };
       await updateContact(draft.leadId, { customFields: columns });
+      // Read the status back rather than assume it was kept. The check above can be working from definitions up to 10 minutes old
+      // (an option removed or renamed in GoHighLevel since), or from no option list at all; either way the rep is told, not left guessing.
+      const status = statusValue(fields, draft.outcome);
+      const statusId = requireField(fields, "outreach").id;
+      const kept = (text: string) => text.trim().toLowerCase() === status.trim().toLowerCase();
+      let held = fieldText(await getContact(draft.leadId), statusId);
+      if (!kept(held)) { // a read straight after a write can trail it: look once more before telling the rep it was not kept
+        await new Promise((r) => setTimeout(r, statusConfirm.retryMs));
+        held = fieldText(await getContact(draft.leadId), statusId);
+      }
+      if (!kept(held)) {
+        forgetCustomFields(); // the next save looks at the live options again
+        return { ...saved, warning: `Your call note is saved, but GoHighLevel did not keep the status "${status}"${held ? ` (the contact still says "${held}")` : ""}. Check the Outreach Status options in GoHighLevel (Settings, Custom Fields) and set the status on the contact there.` };
+      }
       return saved;
     } catch {
       return { ...saved, warning: "Your call note is saved. GoHighLevel did not confirm all field updates. Check the status, follow-up date, and quote in GoHighLevel before making further changes." };
