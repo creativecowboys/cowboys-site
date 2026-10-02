@@ -31,8 +31,27 @@ described in `Docs/Leads-Page.md` (Sales), `Docs/Onboarding.md`, `Docs/Clients-T
 - Signed in, `/admin/login` goes to the desk (to `next` when the page was opened with one).
 - `safeNext()` only honours a place on the desk: `/admin…` or the old `/leads…`. Anything else lands on `/admin`.
 - The sign-in itself is unchanged: `/admin/login`, `/api/admin/login`, `/api/admin/verify`, `/api/admin/logout`,
-  `src/lib/team-login.ts`, `src/lib/team-auth.ts`. There is no sign-out button on the desk (the only one was on the
-  old admin screen); `POST /api/admin/logout` still clears the cookie.
+  `src/lib/team-login.ts`, `src/lib/team-auth.ts`. Signing out is on the desk's own bar now (next section).
+
+## Sign out (October 2, 2026)
+The bar that holds the three tabs ends, on the right, with the name of whoever is signed in and a quiet **Sign out**
+(on a phone the pair sits above the tabs). The old admin sidebar had the only sign-out, and it went with that screen.
+- **What it does:** `POST /api/admin/logout` (unchanged: it clears `cc_admin_token`), then a full load of
+  `/admin/login`. A full load on purpose, so nothing the desk had on screen stays in memory. Other desk tabs that are
+  already open keep what they show until their next request, which answers 401.
+- **Who is signed in** has no endpoint of its own. `GET /api/team/calls` (the Sales roster, which the desk asks for on
+  every load whatever tab is open) carries `me: { name, email }`: the same name a note is saved under (`signedInAs` in
+  `src/lib/desk/team.ts`). The bar shows the name; the full address is its tooltip. A session with no address, or an
+  answer from an older build, shows Sign out alone.
+- **Unsaved call notes.** The Sales desk holds the drafts, so the shell asks it first (`DeskLeave` in
+  `src/app/leads/types.ts`). With a draft that is not saved there is one question ("... Sign out anyway?"), and after a
+  yes the browser's own "leave site?" prompt stays quiet. While a save or an assignment is still running, Sign out waits
+  and says so. The drafts are not cleared: they stay in that tab's session storage, as they do when a session expires,
+  and are there again after signing in in the same tab.
+- **If the request fails** the desk says so under the bar for a few seconds and nothing changes.
+- Code: `src/app/leads/shell.tsx` (the bar and `signOut`), `desk.tsx` (`onWho`, `leaveRef`), `onboarding.css`
+  (`.team-bar`, `.team-session`, `.team-signout`, `.team-bar-alert`). `signedInAs` is unit-tested; the flow itself was
+  run in a browser against a local build (sign out; cancel with a draft; a failed request; a save in flight).
 
 ## The old admin screen is gone
 `/admin` used to be a "Clients" list that edited the logins of the old in-site client portal

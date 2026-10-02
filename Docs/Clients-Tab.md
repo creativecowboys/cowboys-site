@@ -7,6 +7,10 @@
 > record, Stripe state in desk-owned fields, notes and comments in every client group — is built behind that switch:
 > see `Docs/Desk-on-GHL.md`.
 
+> **October 2, 2026:** a client in the **Churned** group is off the default view and out of the counts (the group
+> filter still lists them), and a contact that only repeats the business name is no longer printed under it. Both are
+> display rules, on either system: `Docs/Desk-on-GHL.md`, "Names on the lists, and clients that have left".
+
 Built Sep 24 2026 (Claude). Dave: "a third tab that is current clients… keep track of clients that are onboarded, but also
 keep showing if they don't have their GBP linked, or they have stopped paying thru Stripe."
 

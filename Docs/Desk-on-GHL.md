@@ -437,6 +437,39 @@ is edited in GoHighLevel, a contact person from the panel's Contact field.
 After this the Monday Active Clients board holds nothing the desk does not. An owner un-marks a legacy client from its
 panel the day it becomes a normal desk client; nothing is automatic about that, including a later handoff or graduation.
 
+## Names on the lists, and clients that have left (Oct 2 2026)
+Display only. None of this writes to GoHighLevel, and no API answer changed.
+
+**Contact names.** GoHighLevel's contact search returns a name lower-cased ("samuel johnson"); the same contact read by
+its id carries the name as it was typed ("Samuel Johnson"). The lists are built from the search and the panels from the
+read, so a row and its panel disagreed. `src/lib/desk/names.ts` (pure; the Sales, Onboarding and Clients tabs use it):
+- `displayName`: a name with no capital anywhere gets one back per word (also after a hyphen or a full stop; O'Brien;
+  McKay; a trailing "III"; "and" stays small). A name that carries a capital is shown exactly as stored. It is a best
+  guess for a row that has not been opened: opening the record puts the stored spelling on the row, and the helper then
+  leaves it alone. Checked against the 812 names on the production roster on Oct 2 2026.
+- `sameName`: two spellings of one name. Letters and digits only, capitals ignored, "&" read as "and".
+- **A contact that only repeats the business name is not printed.** The row leaves the line out, the panel header leaves
+  the name out, and the Clients panel shows its Contact box empty ("No contact person yet"). This is the 17 legacy
+  clients: the import named each contact after its business. Left empty, the box sends the stored name back unchanged
+  on blur, exactly what it sent before, so nothing is written; a real name typed in saves as it always did (first and
+  last name on the contact).
+- **Business names are never re-cased.** One exception, on the Sales tab: a lead with no business name has the
+  contact's name as its title (the server puts it there, the two are the same text), so that title is shown as a
+  contact's name and is not repeated underneath.
+
+**Churned clients** (`src/lib/desk/clients-view.ts`, pure). Dave: "on the legacy list, we can remove CDM, we can remove
+Georgia Truck Parking." A client moved to the Churned group leaves the Clients tab's default view, the same idea as a
+Not Interested lead leaving the call list:
+- "All groups" lists current clients only. A search there does not surface a churned client; it says how many matches
+  are churned and offers "Show churned".
+- Churned clients are not in "N on the desk", in the legacy count or in the kind filter's counts, and were never in the
+  monthly total. The header adds "· 2 churned" only when there are any.
+- The Churned choice in the group filter (it carries the count) lists them. Changing a client's group in its panel
+  brings it back; nothing was deleted.
+- A churned client still opens by its link: the panel reads the record by id, whatever the list shows.
+- With nobody churned the list, the counts and the header are exactly what they were (tested against the old filter
+  line). The rule is the same on the Monday desk.
+
 ## Environment
 `DESK_BACKEND` (the switch) · `DESK_PAYMENT_ALERTS=off` (no payment task) · `DESK_EXTRA_TEAM="Name:email,…"` (more people in
 the owner lists) · `GHL_REP_IDS="Madison:<GoHighLevel user id>"` (lets that person author notes as themselves; same
@@ -448,13 +481,15 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   LSE overlaps), `team.ts`, `money.ts`, `checklist-text.ts`, `record.ts` (contact ↔ rows, lists, writes), `notes.ts`,
   `onboarding.ts` (list, panel, patches, handoff, retry, graduation), `clients.ts` (list, panel, patches, Stripe),
   `intake.ts`, `winners.ts`, `validation.ts`, `http.ts`, `migrate.ts`, `admin.ts` (setup, diag, self-test),
-  `legacy.ts` (legacy clients: what the marker means on the Clients tab — pure, shared with the browser).
+  `legacy.ts` (legacy clients: what the marker means on the Clients tab — pure, shared with the browser),
+  `clients-view.ts` (what the Clients tab lists and counts: churned clients are off the default view — pure, shared
+  with the browser), `names.ts` (how names are shown on the three tabs — pure, shared with the browser).
 - Routes: each existing handler under `/api/team/onboarding`, `/api/team/clients`, `/api/stripe/webhook`,
   `/api/team/packages` and `/api/onboarding/[token]` gained an early GoHighLevel branch; the Monday code below it is
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
 - UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (112) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (128) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.

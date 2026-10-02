@@ -216,3 +216,13 @@ Every save checks its status against the options the live field has (`outcomeOpt
 refuses a missing one in plain words before anything is written, then reads the status back after the write and warns if
 GoHighLevel did not keep it. On the Monday rollback path In progress is recorded with the board's existing **Contacted**
 label (`mondayOutcome`), so nothing new is written to the frozen board.
+
+## Names on the roster, and Sign out (October 2, 2026)
+The roster is built from GoHighLevel's contact search, which returns names lower-cased. A roster row now shows the
+contact's name with its capitals back (`displayName` in `src/lib/desk/names.ts`), the lead header does the same, and so
+does the first name in the opener. A lead with no business name has the contact's name as its title; it is shown once,
+not again underneath. Business names are shown exactly as stored. Nothing is written: the record keeps the name as
+GoHighLevel holds it. Details: `Docs/Desk-on-GHL.md`, "Names on the lists, and clients that have left".
+
+The roster answer (`GET /api/team/calls`) also carries `me`, who is signed in, for the Sign out control on the desk's
+bar: `Docs/Admin.md`, "Sign out".
