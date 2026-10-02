@@ -4,7 +4,7 @@ import { addNote, addTags, contactDisplayName, createContact, fieldText, getCont
 import { ghlIdFromLink } from "@/lib/ghl/admin";
 import { salesFields, type SalesFields } from "@/lib/ghl/fields";
 import { monday } from "@/lib/onboarding/api";
-import { COL, PIPELINE_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID } from "@/lib/onboarding/config";
+import { COL, PIPELINE_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, isGiveawayWinner } from "@/lib/onboarding/config";
 import { splitNextAction } from "@/lib/onboarding/pipeline";
 import { readIntake, writeIntake } from "@/lib/onboarding/store";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS } from "@/lib/clients/config";
@@ -239,7 +239,12 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
 // ───────────────────────────── the run ─────────────────────────────
 export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number; force?: boolean; onlyIds?: string[]; map?: Record<string, string>; boards?: ("onboarding" | "clients")[]; includeOffDesk?: boolean; createNameOnly?: boolean; origin?: string };
 export type DeskMigrateRow = { board: "onboarding" | "clients"; mondayId: string; name: string; match: MatchKind; ghlId: string; ghlName: string; state: string; fields: string[]; contactFields: string[]; owner: boolean; tags: string[]; updates: number; checklist: number; storage: string[]; warnings: string[]; candidates?: { id: string; name: string }[]; detail?: string; done?: boolean; error?: string };
-export type DeskMigrateReport = { dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; failed: number }; rows: DeskMigrateRow[]; skipped: { template: number; offDesk: { mondayId: string; name: string }[] } };
+export type DeskMigrateReport = {
+  dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; failed: number }; rows: DeskMigrateRow[];
+  skipped: { template: number; offDesk: { mondayId: string; name: string }[] };
+  /** Every row on either board tagged Giveaway Winner, and whether it is on a GoHighLevel contact yet. After the flip the billing guard reads GoHighLevel only — a winner left behind on Monday would no longer be protected. */
+  winners: { board: "onboarding" | "clients"; mondayId: string; name: string; imported: boolean }[];
+};
 
 async function readAllContacts(): Promise<GhlContact[]> {
   const all: GhlContact[] = [];
@@ -272,6 +277,7 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
     dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, ghlContacts: ix.total,
     counts: { imported: 0, mapped: 0, "onboarding-record": 0, "ghl-link": 0, lead: 0, stripe: 0, email: 0, phone: 0, "company-name": 0, create: 0, "create-name-only": 0, unmatched: 0, written: 0, failed: 0 },
     rows: [], skipped: { template: pipeline.length - pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID).length, offDesk: opts.includeOffDesk ? [] : offDesk.filter(keep).map((r) => ({ mondayId: r.id, name: r.name })) },
+    winners: [],
   };
   const linked = new Map<string, string>(); // onboarding item id → contact id, as this run goes
   const pending = new Set<string>(); // onboarding items whose contact this run creates (dry run: would create)
@@ -345,5 +351,10 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
     } catch (e) { out.error = e instanceof Error ? e.message : String(e); report.counts.failed++; }
     report.rows.push(out);
   }
+  const isWinner = (r: MondayRow, colId: string) => isGiveawayWinner(splitPackages(text(r, colId)));
+  report.winners = [
+    ...pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID && isWinner(r, COL.package)).map((r) => ({ board: "onboarding" as const, mondayId: r.id, name: r.name, imported: ix.byMondayOnboarding.has(r.id) })),
+    ...clients.filter((r) => isWinner(r, CCOL.package)).map((r) => ({ board: "clients" as const, mondayId: r.id, name: r.name, imported: ix.byMondayClient.has(r.id) })),
+  ];
   return report;
 }

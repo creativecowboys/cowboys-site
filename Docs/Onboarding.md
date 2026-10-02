@@ -1,5 +1,9 @@
 # Sales → onboarding — creativecowboys.co/leads
 
+> **October 2, 2026:** this page describes the Onboarding tab on **Monday**, which is what production runs while
+> `DESK_BACKEND` is unset. The same tab on GoHighLevel — one contact per business, the checklist on the contact, a notes
+> timeline — is built behind that switch: see `Docs/Desk-on-GHL.md` for the model, the cutover runbook and the rollback.
+
 Built Sep 24 2026 (Claude) from Burt's handoff brief (`Staff/Dave/Burt/Handoffs/2026-09-24-Leads-Onboarding-Claude.md`).
 The call desk (`Docs/Leads-Page.md`) is unchanged; it now sits on a **Sales** tab, and an **Onboarding** tab works the
 Monday **Onboarding Pipeline** board for Madison. One sign-in (`/admin/login`), one page.

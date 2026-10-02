@@ -91,6 +91,7 @@ test("dry run: every row is matched and described, nothing is written anywhere",
   assert.ok(byMonday(r.rows, BOURBON_OB).warnings.some((w) => /GoHighLevel calls this business "Bourbon Leather Co"/.test(w)));
   assert.equal(ghl.writes().length, 0); assert.equal(blobKeys().length, 0);
   assert.equal(mondayQueries.length, 2);
+  assert.deepEqual(r.winners, [], "no giveaway winner on either board in this fixture");
   assert.ok(!JSON.stringify(r).includes("nonfunctional-test"), "no secret in the report");
 });
 
@@ -172,6 +173,11 @@ test("one-record trial, explicit map, batches, off-desk rows, and a client row t
   const first = await migrateDesk({ dryRun: true, offset: 0, limit: 4 });
   assert.equal(first.processed, 4); assert.equal(first.nextOffset, 4);
   assert.equal((await migrateDesk({ dryRun: true, offset: 4, limit: 4 })).nextOffset, null);
+  // A giveaway winner left behind on Monday is called out: after the flip the billing guard only reads GoHighLevel.
+  const base = ghl.monday!;
+  ghl.monday = (q, v) => { const d = base(q, v) as { boards: { items_page: { items: MondayRow[] } }[] }; if ((v.board as string[])[0] !== "18431157561") d.boards[0].items_page.items.push(row("999", "Off-desk Winner Co", group("active"), { [CCOL.package]: "Giveaway Winner, Local Growth", [CCOL.teamDesk]: { text: "", value: { checked: false } } })); return d; };
+  assert.deepEqual((await migrateDesk({ dryRun: true })).winners, [{ board: "clients", mondayId: "999", name: "Off-desk Winner Co", imported: false }]);
+  ghl.monday = base;
   // Off-desk rows only on request; with no email, phone or matching name they are unmatched unless name-only creation is allowed.
   const off = await migrateDesk({ dryRun: true, boards: ["clients"], includeOffDesk: true, onlyIds: [CHAPELHILL_CL] });
   assert.equal(off.rows[0].match, "unmatched"); assert.match(off.rows[0].detail!, /no email or phone/);

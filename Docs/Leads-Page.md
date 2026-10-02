@@ -143,6 +143,9 @@ that writes it back.
   /api/team/ghl/migrate` `{dryRun, offset, limit, force, onlyIds}` (Monday Giveaway Leads → GHL, idempotent on Monday Lead ID).
 - Tests: `npm run test:call-owner` (Monday + GHL backends, switch, client, fields, admin) and `npm run test:onboarding`.
 
+Phase 2 — the Onboarding and Clients tabs on GoHighLevel, behind their own switch `DESK_BACKEND` — is described in
+`Docs/Desk-on-GHL.md` (built October 2, 2026; off until Dave says go).
+
 ### Cutover
 State on Oct 1 2026: the code is on main with `LEADS_BACKEND` unset (Monday). The 10 desk fields were created in GHL by
 `/api/team/ghl/setup` (plus the 2 that already existed). The whole GHL write path — assign, lead source, save call,

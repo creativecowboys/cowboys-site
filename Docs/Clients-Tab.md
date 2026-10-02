@@ -1,5 +1,10 @@
 # Clients tab — creativecowboys.co/leads?tab=clients
 
+> **October 2, 2026:** this page describes the Clients tab on **Monday**, which is what production runs while
+> `DESK_BACKEND` is unset. The same tab on GoHighLevel — the client is the same contact as the lead and the onboarding
+> record, Stripe state in desk-owned fields, notes and comments in every client group — is built behind that switch:
+> see `Docs/Desk-on-GHL.md`.
+
 Built Sep 24 2026 (Claude). Dave: "a third tab that is current clients… keep track of clients that are onboarded, but also
 keep showing if they don't have their GBP linked, or they have stopped paying thru Stripe."
 
