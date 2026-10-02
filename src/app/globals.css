@@ -200,8 +200,10 @@ nextjs-portal {
   display: none !important;
 }
 
-/* ===== Hide GHL Chat Widget Launcher Bubble — fully removed from layout ===== */
-chat-widget,
+/* ===== Hide GHL Chat Widget Launcher Bubble — fully removed from layout =====
+   Exception: #ghl-chat-widget is the A2P SMS opt-in widget (src/components/ChatWidget.tsx),
+   which must be visible on the homepage for the carrier registration. */
+chat-widget:not(#ghl-chat-widget),
 #chat-widget-container,
 .lc-chat-widget-container,
 [id*="lc_chat_widget"],
