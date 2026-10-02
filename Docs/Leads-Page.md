@@ -144,8 +144,20 @@ that writes it back.
 - Tests: `npm run test:call-owner` (Monday + GHL backends, switch, client, fields, admin) and `npm run test:onboarding`.
 
 ### Cutover
-1. `POST /api/team/ghl/setup {dryRun:false}` once (creates the missing fields). 2. `POST /api/team/ghl/backfill {dryRun:false}`
-until `remaining` is 0. 3. `POST /api/team/ghl/migrate {dryRun:true}`, read the rows, then `{dryRun:false}` with `offset`
-until `nextOffset` is null. 4. Preview at `/leads?backend=ghl`. 5. Set `LEADS_BACKEND=ghl` on Vercel (Production) and
-redeploy. Follow-up calendar feeds re-issue events under the GHL ids after the flip. GHL search results lag writes by a few
+State on Oct 1 2026: the code is on main with `LEADS_BACKEND` unset (Monday). The 10 desk fields were created in GHL by
+`/api/team/ghl/setup` (plus the 2 that already existed). The whole GHL write path — assign, lead source, save call,
+idempotent retry, clear owner — was run on production against the test contact `C8FHl1LIfXEMI9isByB2` (never shown on
+the roster). Dry runs: backfill would set Lead Source on 802 contacts (787 The Big Giveaway, 15 Ebook download); the
+import would bring 264 Monday leads over — 254 matched by the board's GHL Contact link, 6 by email, 1 created (Geektopia),
+3 created from their name alone (no email or phone on the board), 0 skipped — with 12 Monday updates copied as notes.
+
+1. Check in GHL that no published workflow messages a contact on a bare "Contact Created" ("Wrangler - New Lead" is the
+   one to open) — website forms start creating GHL contacts at step 5.
+2. `POST /api/team/ghl/backfill {dryRun:false, limit:400}` until `remaining` is 0 (3 calls).
+3. `POST /api/team/ghl/migrate {dryRun:false, offset:0, limit:50}`, repeat with each `nextOffset` until it is null.
+4. Preview at `/leads?backend=ghl`; decide between the full roster (802) and a narrower one (`LEADS_GHL_TAGS`).
+5. Set `LEADS_BACKEND=ghl` on Vercel (Production) and redeploy. Stop adding leads to the Monday board from then on.
+Each of steps 2 and 3 is safe to repeat. Follow-up calendar feeds re-issue events under the GHL ids after the flip (a
+subscribed calendar shows the old Monday-id events until its next refresh). GHL search results lag writes by a few
 seconds, so a roster refresh right after a save can briefly show the old status; the lead detail is always fresh.
+To go back: unset `LEADS_BACKEND` and redeploy — the Monday board is untouched by all of the above.

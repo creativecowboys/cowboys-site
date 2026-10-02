@@ -5,7 +5,7 @@ import type { CallLead } from "@/app/leads/types";
 import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, ghlConfigured, listNotes, listUsers, listWorkflows, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
 import { ensureSalesFields, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
 import { ghlRepIds, MONDAY_IDS, REP_NAMES, type RepName } from "./reps";
-import { LEAD_TAGS, rosterFilters, rosterTags, WON_TAG } from "@/lib/calls/ghl";
+import { LEAD_TAGS, rosterFilters, rosterTags, TEST_CONTACT_ID, WON_TAG } from "@/lib/calls/ghl";
 import { importMarker } from "@/lib/calls/markers";
 
 // One-time / operator tooling behind the owner-only /api/team/ghl/* routes (Oct 1 2026):
@@ -14,7 +14,7 @@ import { importMarker } from "@/lib/calls/markers";
 //   backfill — Lead Source for contacts already in GHL (giveaway-entrant → The Big Giveaway, playbook-lead → Ebook download, website-form → Website form)
 //   migrate  — the Monday Giveaway Leads board → GHL contacts (owner, status, interest, notes, follow-up, quote, audit, call history)
 // Every write path takes dryRun (default true) and a batch limit, and is idempotent so a re-run finishes what a timeout left.
-export const TEST_CONTACT_ID = "C8FHl1LIfXEMI9isByB2"; // the GHL test contact used by the package-builder checks (Sep 30 2026)
+export { TEST_CONTACT_ID } from "@/lib/calls/ghl"; // the GHL test contact used by the package-builder and desk checks
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ───────────────────────────── diag ─────────────────────────────

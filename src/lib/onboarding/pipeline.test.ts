@@ -24,6 +24,17 @@ test("handoff writes the source lead id, handoff id and sales owner, and never i
   assert.deepEqual(cols[COL.phone], { phone: "7705550100", countryShortName: "US" });
 });
 
+test("a lead from GoHighLevel: its contact id goes in Lead ID and in the GHL Contact link; a Monday lead gets no GHL link", () => {
+  const before = process.env.GHL_LOCATION_ID; process.env.GHL_LOCATION_ID = "LOCtest000000000000";
+  try {
+    const cols = handoffColumns({ ...form, leadId: "ocQHyuzHvysMo5N5VsXc" });
+    assert.equal(cols[COL.leadId], "ocQHyuzHvysMo5N5VsXc");
+    assert.deepEqual(cols[COL.ghlContact], { url: "https://app.gohighlevel.com/v2/location/LOCtest000000000000/contacts/detail/ocQHyuzHvysMo5N5VsXc", text: "ocQHyuzHvysMo5N5VsXc" });
+    assert.equal(handoffColumns(form)[COL.ghlContact], undefined);
+    assert.equal(handoffColumns({ ...form, leadId: "", manual: true })[COL.ghlContact], undefined);
+  } finally { if (before === undefined) delete process.env.GHL_LOCATION_ID; else process.env.GHL_LOCATION_ID = before; }
+});
+
 test("next action round-trips its due date", () => {
   assert.deepEqual(splitNextAction(joinNextAction("Call Pat", "2026-10-02")), { action: "Call Pat", due: "2026-10-02" });
   assert.deepEqual(splitNextAction("Plain text"), { action: "Plain text", due: "" });

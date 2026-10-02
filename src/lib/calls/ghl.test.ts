@@ -88,6 +88,10 @@ test("getCallsPage: one request for a small roster, owners and lead-source optio
   assert.deepEqual((requests[1].body as { sort: unknown }).sort, [{ field: "dateAdded", direction: "desc" }]);
   assert.equal((requests[1].body as { pageLimit: number }).pageLimit, 500);
 });
+test("getCallsPage never lists the designated test contact", async () => {
+  queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "C8FHl1LIfXEMI9isByB2", companyName: "Test — Claude" })], total: 2 } });
+  assert.deepEqual((await getCallsPage(null)).leads.map((l) => l.id), [ID]);
+});
 test("getCallsPage: a rejected custom-field clause falls back to tags only", async () => {
   queue.push(defs(), { status: 400, body: { message: "bad filter" } }, { status: 200, body: { contacts: [contact()], total: 1 } });
   const page = await getCallsPage(null);

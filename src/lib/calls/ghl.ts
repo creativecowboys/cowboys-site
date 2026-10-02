@@ -19,6 +19,8 @@ import { ghlRepIds, ghlRepName, REP_NAMES, type RepName } from "@/lib/ghl/reps";
 // a Lead Source set (the backfill/migration). Search results lag writes by a few seconds (GHL docs).
 export const LEAD_TAGS = ["giveaway-entrant", "playbook-lead", "website-form", "sales-lead"] as const;
 export const WON_TAG = "sales-won";
+/** The designated GHL test contact (package-builder and desk checks on production). Never shown on the roster; still reachable by id. */
+export const TEST_CONTACT_ID = "C8FHl1LIfXEMI9isByB2";
 const PAGE = 500; // GHL's max per search page
 const MAX_PAGES = 4; // 2,000 leads per list call is plenty; the cursor continues past that
 
@@ -119,7 +121,7 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
         result = await searchContacts({ filters, page, pageLimit: PAGE, sort: [{ field: "dateAdded", direction: "desc" }] }, { timeoutMs: 25000 });
       } else throw e;
     }
-    leads.push(...result.contacts.map((c) => mapLead(c, fields)));
+    leads.push(...result.contacts.filter((c) => c.id !== TEST_CONTACT_ID).map((c) => mapLead(c, fields)));
     if (result.contacts.length < PAGE) { next = null; break; }
     next = page + 1;
   }
