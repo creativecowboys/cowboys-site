@@ -12,8 +12,9 @@ export type SalesFieldKey = "leadSource" | "outreach" | "interest" | "lastContac
 
 export const LEAD_SOURCE_OPTIONS = ["The Big Giveaway", "Facebook", "Ebook download", "Website form", "Referral", "Other"] as const;
 export const LEAD_SOURCE = { giveaway: "The Big Giveaway", ebook: "Ebook download", website: "Website form", facebook: "Facebook", referral: "Referral", other: "Other" } as const;
-/** Outreach labels, byte-identical to the Monday Giveaway Leads "Outreach Status" labels so the migration maps 1:1. */
-export const OUTREACH_OPTIONS = ["Not Contacted", "Call Booked", "No answer / left voicemail", "Booked followup", "Not Interested", "Bad contact number", "Won"] as const;
+/** Outreach labels, byte-identical to the Monday Giveaway Leads "Outreach Status" column (all 11 labels, read off the board
+ *  Oct 1 2026) so the migration maps 1:1. The desk's call outcomes write four of them; the rest are set by hand in GHL. */
+export const OUTREACH_OPTIONS = ["Not Contacted", "Contacted", "Replied", "Call Booked", "Call Held", "No answer / left voicemail", "Booked followup", "Proposal Sent", "Not Interested", "Bad contact number", "Won"] as const;
 export const INTEREST_OPTIONS = ["Cold", "Warm", "Hot"] as const;
 
 export const SALES_FIELDS: Record<SalesFieldKey, NewFieldDef & { reuse?: boolean }> = {

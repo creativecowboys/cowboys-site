@@ -2,7 +2,7 @@ import { CallDeskError } from "@/lib/calls/validation";
 import { monday } from "@/lib/onboarding/api";
 import { GIVEAWAY_BOARD_ID, mapLead as mapMondayLead } from "@/lib/calls/monday";
 import type { CallLead } from "@/app/leads/types";
-import { addNote, addTags, contactDisplayName, fieldText, getContact, ghlConfigured, listNotes, listUsers, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch, type SearchFilter } from "./client";
+import { addNote, addTags, contactDisplayName, fieldText, getContact, ghlConfigured, listNotes, listUsers, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
 import { ensureSalesFields, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
 import { ghlRepIds, MONDAY_IDS, REP_NAMES, type RepName } from "./reps";
 import { LEAD_TAGS, rosterFilters, WON_TAG } from "@/lib/calls/ghl";
@@ -26,6 +26,7 @@ export async function diagnose(): Promise<Record<string, unknown>> {
   let fields: SalesFields = {};
   await probe("customFieldsRead", async () => { fields = await salesFields(true); const keys = Object.keys(SALES_FIELDS) as SalesFieldKey[]; const have = keys.filter((k) => fields[k]); const missing = keys.filter((k) => !fields[k]).map((k) => SALES_FIELDS[k].name); return `${have.length}/${keys.length} desk fields present${missing.length ? `; missing: ${missing.join(", ")}` : ""}`; });
   out.fields = Object.fromEntries((Object.keys(fields) as SalesFieldKey[]).map((k) => [k, { id: fields[k]!.id, name: fields[k]!.name, dataType: fields[k]!.dataType, options: fields[k]!.options }]));
+  await probe("allContacts", async () => { const r = await searchContacts({ pageLimit: 1 }); return `${r.total} contacts in the location`; });
   await probe("searchTags", async () => { const r = await searchContacts({ filters: rosterFilters(undefined), pageLimit: 1 }); return `${r.total} contacts carry a lead tag`; });
   if (fields.leadSource) await probe("searchLeadSourceExists", async () => { const r = await searchContacts({ filters: [{ field: `customFields.${fields.leadSource!.id}`, operator: "exists" }], pageLimit: 1 }); return `${r.total} contacts have a Lead Source`; });
   await probe("searchRoster", async () => { const r = await searchContacts({ filters: rosterFilters(fields.leadSource?.id), pageLimit: 1 }); return `${r.total} leads would show on the desk`; });
@@ -83,7 +84,7 @@ export async function backfillLeadSource(dryRun: boolean, limit = 150): Promise<
 type MondayColumn = { id: string; text: string | null; value: string | null };
 type MondayUpdate = { id: string; text_body: string | null; created_at: string; creator: { name: string } | null };
 type MondayItem = { id: string; name: string; updated_at: string; board: { id: string }; group: { title: string } | null; column_values: MondayColumn[]; updates?: MondayUpdate[] };
-const MONDAY_COLUMNS = ["contact", "email", "phone", "website", "city", "owner", "outreach", "interest", "notes", "last_contact", "next_followup", "quoted_monthly", "dropdown_mm77a9z5", "audit_score", "audit_report"];
+const MONDAY_COLUMNS = ["contact", "email", "phone", "website", "city", "owner", "outreach", "interest", "notes", "last_contact", "next_followup", "quoted_monthly", "dropdown_mm77a9z5", "audit_score", "audit_report", "ghl_contact"];
 async function readGiveawayBoard(): Promise<MondayItem[]> {
   const items: MondayItem[] = [];
   let cursor: string | null = null;
@@ -99,14 +100,44 @@ async function readGiveawayBoard(): Promise<MondayItem[]> {
   }
   return items;
 }
-export type MigrateRow = { mondayId: string; name: string; match: "imported" | "monday-id" | "email" | "phone" | "create" | "unmatched"; ghlId: string; owner: string; outreach: string; notes: number; detail?: string; done?: boolean; error?: string };
-export type MigrateReport = { dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; counts: Record<MigrateRow["match"], number> & { written: number; failed: number }; rows: MigrateRow[] };
+export type MigrateRow = { mondayId: string; name: string; match: "imported" | "ghl-link" | "email" | "phone" | "create" | "unmatched"; ghlId: string; owner: string; outreach: string; notes: number; detail?: string; done?: boolean; error?: string };
+export type MigrateReport = { dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MigrateRow["match"], number> & { written: number; failed: number }; rows: MigrateRow[] };
 
-const emailFilter = (email: string): SearchFilter[] => [{ field: "email", operator: "eq", value: email.toLowerCase() }];
-const phoneFilter = (phone: string): SearchFilter[] => [{ field: "phone", operator: "eq", value: normalizePhone(phone) }];
-async function findOne(filters: SearchFilter[]): Promise<GhlContact | null> {
-  const r = await searchContacts({ filters, pageLimit: 2 });
-  return r.contacts[0] || null;
+/** Every contact in the location, read once per run (500 a page), indexed for matching — far cheaper than three searches per lead. */
+export type ContactIndex = { byId: Map<string, GhlContact>; byMondayId: Map<string, GhlContact>; byEmail: Map<string, GhlContact>; byPhone: Map<string, GhlContact>; total: number };
+export function indexContacts(contacts: GhlContact[], mondayFieldId: string): ContactIndex {
+  const ix: ContactIndex = { byId: new Map(), byMondayId: new Map(), byEmail: new Map(), byPhone: new Map(), total: contacts.length };
+  for (const c of contacts) { // oldest first, so the earliest contact wins a duplicate email/phone
+    ix.byId.set(c.id, c);
+    const m = fieldText(c, mondayFieldId); if (m && !ix.byMondayId.has(m)) ix.byMondayId.set(m, c);
+    const e = (c.email || "").trim().toLowerCase(); if (e && !ix.byEmail.has(e)) ix.byEmail.set(e, c);
+    const p = c.phone ? normalizePhone(c.phone) : ""; if (p.length >= 11 && !ix.byPhone.has(p)) ix.byPhone.set(p, c);
+  }
+  return ix;
+}
+async function readAllContacts(): Promise<GhlContact[]> {
+  const all: GhlContact[] = [];
+  for (let page = 1; page <= 20; page++) {
+    const r = await searchContacts({ page, pageLimit: 500, sort: [{ field: "dateAdded", direction: "asc" }] }, { timeoutMs: 25000 });
+    all.push(...r.contacts);
+    if (r.contacts.length < 500) break;
+  }
+  return all;
+}
+/** The Monday item's own "GHL Contact" link column, when someone filled it: the contact id is the last path segment (or the bare text). */
+export function ghlIdFromLink(item: { column_values: { id: string; text: string | null; value: string | null }[] }): string {
+  const col = item.column_values.find((c) => c.id === "ghl_contact");
+  let raw = col?.text || "";
+  try { const v = JSON.parse(col?.value || "null") as { url?: string; text?: string } | null; raw = `${v?.url || ""} ${v?.text || ""} ${raw}`; } catch { /* text only */ }
+  return /(?:contacts\/detail\/|^|\s)([A-Za-z0-9]{20})(?=$|[\s/?#])/.exec(raw.trim())?.[1] || "";
+}
+/** Match order: already imported (Monday Lead ID) → the board's GHL Contact link → email → phone → create → unmatched. */
+export function matchLead(item: MondayItem, lead: CallLead, ix: ContactIndex): { match: MigrateRow["match"]; contact: GhlContact | null } {
+  const imported = ix.byMondayId.get(item.id); if (imported) return { match: "imported", contact: imported };
+  const linked = ix.byId.get(ghlIdFromLink(item)); if (linked) return { match: "ghl-link", contact: linked };
+  const email = lead.email.trim().toLowerCase(); const byEmail = email ? ix.byEmail.get(email) : undefined; if (byEmail) return { match: "email", contact: byEmail };
+  const phone = lead.phone ? normalizePhone(lead.phone) : ""; const byPhone = phone.length >= 11 ? ix.byPhone.get(phone) : undefined; if (byPhone) return { match: "phone", contact: byPhone };
+  return { match: email || phone.length >= 11 ? "create" : "unmatched", contact: null };
 }
 
 /** Field + contact writes for one Monday lead. Only fills blank contact fields; desk fields are set from Monday verbatim. */
@@ -148,21 +179,21 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
   const all = (await readGiveawayBoard()).filter((i) => !opts.onlyIds?.length || opts.onlyIds.includes(i.id));
   const offset = Math.max(0, opts.offset || 0); const limit = Math.min(Math.max(opts.limit || 25, 1), 100);
   const slice = all.slice(offset, offset + limit);
-  const report: MigrateReport = { dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, counts: { imported: 0, "monday-id": 0, email: 0, phone: 0, create: 0, unmatched: 0, written: 0, failed: 0 }, rows: [] };
+  const report: MigrateReport = { dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, counts: { imported: 0, "ghl-link": 0, email: 0, phone: 0, create: 0, unmatched: 0, written: 0, failed: 0 }, rows: [], ghlContacts: 0 };
   const mondayLeadId = requireField(fields, "mondayLeadId");
+  const ix = indexContacts(await readAllContacts(), mondayLeadId.id);
+  report.ghlContacts = ix.total;
   for (const item of slice) {
     const lead = mapMondayLead(item);
     const ownerName = REP_NAMES.find((n) => (lead.ownerIds || []).includes(MONDAY_IDS[n])) || "";
     const row: MigrateRow = { mondayId: item.id, name: item.name, match: "unmatched", ghlId: "", owner: ownerName, outreach: lead.group.toLowerCase() === "won" ? "Won" : lead.outreach, notes: (item.updates || []).filter((u) => (u.text_body || "").trim()).length };
     try {
-      let existing = await findOne([{ field: `customFields.${mondayLeadId.id}`, operator: "eq", value: item.id }]);
-      if (existing) { row.match = "imported"; row.ghlId = existing.id; if (!opts.force) { report.counts.imported++; report.rows.push(row); continue; } }
-      if (!existing && lead.email) { existing = await findOne(emailFilter(lead.email)); if (existing) row.match = "email"; }
-      if (!existing && lead.phone && normalizePhone(lead.phone).length >= 11) { existing = await findOne(phoneFilter(lead.phone)); if (existing) row.match = "phone"; }
-      if (existing) row.ghlId = existing.id;
-      else if (lead.email || (lead.phone && normalizePhone(lead.phone).length >= 11)) row.match = "create";
-      else { row.match = "unmatched"; row.detail = "no email or phone on the Monday item — nothing to match or create"; report.counts.unmatched++; report.rows.push(row); continue; }
+      const found = matchLead(item, lead, ix);
+      const existing = found.contact;
+      row.match = found.match; row.ghlId = existing?.id || "";
       report.counts[row.match]++;
+      if (row.match === "unmatched") { row.detail = "no email or phone on the Monday item — nothing to match or create"; report.rows.push(row); continue; }
+      if (row.match === "imported" && !opts.force) { report.rows.push(row); continue; }
       if (opts.dryRun) { report.rows.push(row); continue; }
       const patch = migrationPatch(lead, lead.notes, existing, fields);
       const { tags, ...contactPatch } = patch;
@@ -171,6 +202,9 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
       else {
         const { contact } = await upsertContact({ locationId: process.env.GHL_LOCATION_ID!, ...contactPatch, source: "Big Giveaway (Monday import)", tags: ["monday-import"] });
         contactId = contact.id; row.ghlId = contactId;
+        ix.byId.set(contact.id, contact); ix.byMondayId.set(item.id, contact);
+        if (contactPatch.email) ix.byEmail.set(contactPatch.email, contact);
+        if (contactPatch.phone) ix.byPhone.set(contactPatch.phone, contact);
       }
       if (tags?.length) await addTags(contactId, tags).catch((e) => console.error(`migrate ${item.id}: tag failed: ${e instanceof Error ? e.message : e}`));
       // Call history: every Monday update becomes a GHL note once (marker = the Monday update id).

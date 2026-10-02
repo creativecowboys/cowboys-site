@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { backfillLeadSource, migrationPatch } from "./admin";
+import { backfillLeadSource, ghlIdFromLink, indexContacts, matchLead, migrationPatch } from "./admin";
 import { forgetCustomFields, type GhlContact } from "./client";
 import { resolveFromDefs } from "./fields";
 import { ghlRepIds, MONDAY_IDS } from "./reps";
@@ -34,6 +34,33 @@ test("migrationPatch: desk fields verbatim from Monday, owner mapped to the GHL 
   for (const k of ["firstName", "companyName", "email", "phone", "website", "city"] as const) assert.equal(q[k], undefined);
   const unowned = migrationPatch(lead({ ownerIds: [] }), "", null, fields);
   assert.equal(unowned.assignedTo, undefined);
+});
+
+const mondayItem = (id: string, link: { text?: string; url?: string } | null = null) => ({ id, name: "x", updated_at: "", board: { id: "18430997894" }, group: null, column_values: [{ id: "ghl_contact", text: link?.text || link?.url || null, value: link ? JSON.stringify(link) : null }] });
+test("the Monday GHL Contact link yields a contact id from a URL or bare text, and nothing from junk", () => {
+  assert.equal(ghlIdFromLink(mondayItem("1", { url: "https://app.gohighlevel.com/v2/location/LOC/contacts/detail/ocQHyuzHvysMo5N5VsXc", text: "GHL" })), "ocQHyuzHvysMo5N5VsXc");
+  assert.equal(ghlIdFromLink(mondayItem("1", { text: "ocQHyuzHvysMo5N5VsXc" })), "ocQHyuzHvysMo5N5VsXc");
+  assert.equal(ghlIdFromLink(mondayItem("1", { url: "https://example.com/somewhere", text: "link" })), "");
+  assert.equal(ghlIdFromLink(mondayItem("1", null)), "");
+});
+test("matching: imported → GHL link → email → phone → create → unmatched; the oldest contact wins a duplicate", () => {
+  const contacts: GhlContact[] = [
+    { id: "aaaaaaaaaaaaaaaaaaaa", email: "First@Example.com", phone: "+13865550100" },
+    { id: "bbbbbbbbbbbbbbbbbbbb", email: "first@example.com" }, // duplicate email, added later → loses
+    { id: "cccccccccccccccccccc", phone: "(386) 555-0101" },
+    { id: "dddddddddddddddddddd", customFields: [{ id: F.ml, value: "777" }] },
+    { id: "ocQHyuzHvysMo5N5VsXc" },
+  ];
+  const ix = indexContacts(contacts, F.ml);
+  assert.equal(ix.total, 5);
+  const m = (id: string, over: Partial<CallLead>, link: { text?: string; url?: string } | null = null) => { const r = matchLead(mondayItem(id, link), lead({ email: "", phone: "", ...over }), ix); return [r.match, r.contact?.id || ""]; };
+  assert.deepEqual(m("777", { email: "first@example.com" }), ["imported", "dddddddddddddddddddd"]);
+  assert.deepEqual(m("1", { email: "first@example.com" }, { text: "ocQHyuzHvysMo5N5VsXc" }), ["ghl-link", "ocQHyuzHvysMo5N5VsXc"]);
+  assert.deepEqual(m("2", { email: " FIRST@example.com " }), ["email", "aaaaaaaaaaaaaaaaaaaa"]);
+  assert.deepEqual(m("3", { email: "nobody@example.com", phone: "13865550101" }), ["phone", "cccccccccccccccccccc"]);
+  assert.deepEqual(m("4", { email: "new@example.com" }), ["create", ""]);
+  assert.deepEqual(m("5", { phone: "555" }), ["unmatched", ""]);
+  assert.deepEqual(m("6", { email: "x@y.co" }, { text: "zzzzzzzzzzzzzzzzzzzz" }), ["create", ""]); // a link to a contact that no longer exists is ignored
 });
 
 type Req = { method: string; path: string; body: unknown };
