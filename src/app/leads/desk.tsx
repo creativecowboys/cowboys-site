@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { CallDraft, CallHistory, CallLead, CallsPageData, LeadsBackend, SaveCallResult } from "./types";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import type { CallDraft, CallHistory, CallLead, CallsPageData, DeskLeave, LeadsBackend, SaveCallResult, SignedIn } from "./types";
 import { CALL_OUTCOMES, isCallOutcome, mondayOutcome, outreachStatus, type CallOutcome } from "@/lib/calls/outcomes";
 import { CALL_OWNERS, filterRoster, isOffCallList, mergeRoster, offListReasons, OFF_LIST_LABELS, OFF_LIST_VIEW, type OffListReason } from "@/lib/calls/roster";
 import { HOUR_OPTIONS, prettyTime } from "@/lib/calls/followup-time";
@@ -63,7 +63,7 @@ async function json<T>(response: Response): Promise<T> {
   if (!response.ok) throw Object.assign(new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again; your draft stays in this tab." : "The lead system could not complete that request. Please try again.")), { status: response.status });
   return data;
 }
-export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void; onOpenPackages?: (lead: CallLead | null) => void }) {
+export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, onWho, leaveRef }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void; onOpenPackages?: (lead: CallLead | null) => void; onWho?: (who: SignedIn | null) => void; leaveRef?: RefObject<DeskLeave> }) {
   const storageKey = demo ? "cc-call-desk-demo-v1" : "cc-call-desk-v1";
   const [leads, setLeads] = useState<CallLead[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -178,10 +178,23 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
     setReady(true);
   }, [storageKey]);
   useEffect(() => {
-    const warn = (e: BeforeUnloadEvent) => { if (Object.values(entriesRef.current).some(x => x.dirty) || saveLock.current || assignmentLock.current) { e.preventDefault(); e.returnValue = ""; } };
+    const warn = (e: BeforeUnloadEvent) => {
+      if (leaveRef?.current.leaving) return; // signing out: the shell has already asked about unsaved notes
+      if (Object.values(entriesRef.current).some(x => x.dirty) || saveLock.current || assignmentLock.current) { e.preventDefault(); e.returnValue = ""; }
+    };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, []);
+  }, [leaveRef]);
+  // The shell's Sign out asks this desk whether anything would be lost (the drafts and the locks live here).
+  useEffect(() => {
+    if (!leaveRef) return;
+    const link = leaveRef.current;
+    link.unsaved = () => (saveLock.current || assignmentLock.current ? "saving" : Object.values(entriesRef.current).some(x => x.dirty) ? "notes" : "");
+    return () => { link.unsaved = () => ""; };
+  }, [leaveRef]);
+  // Who is signed in comes back with the roster; the shell shows it. Read through a ref so a new callback never reloads the list.
+  const whoRef = useRef(onWho);
+  useEffect(() => { whoRef.current = onWho; }, [onWho]);
   const loadList = useCallback(async (nextCursor?: string) => {
     if (listLock.current) return;
     listLock.current = true; setListLoading(true); setListError("");
@@ -193,6 +206,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
       setLeads(prev => mergeRoster(prev, data.leads, !!nextCursor));
       setTagsRead(prev => (nextCursor ? prev : true) && data.noCallTagsRead !== false);
       setCursor(data.cursor); setBoard(data.boardName); setSystem(data.system); setCrm(data.systemName); setOwners(data.owners); setLeadSources(data.leadSources);
+      if (!nextCursor) whoRef.current?.(data.me ?? null);
     } catch (e) { setListError(e instanceof Error ? e.message : "Could not load the entrant list."); }
     finally { listLock.current = false; setListLoading(false); }
   }, [demo]);

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { assertForceAllowed, assertMayWriteGhl, assertMondayOpen, backendForRecordId, backendForScope, deskBackend, deskDefault, deskSystemName, isGhlRecordId, validateRecordId, validateScope } from "./switch";
-import { actorFor, deskTeam, isTeamName, memberByGhlUser, nameForMondayId, teamOwners } from "./team";
+import { actorFor, deskTeam, isTeamName, memberByGhlUser, nameForMondayId, signedInAs, teamOwners } from "./team";
 import { ALL_PACKAGE_LABELS, joinPackages, listPrice, monthlyList, splitPackages } from "./money";
 import { itemId, mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, toChecklistItems } from "./checklist-text";
 import { PACKAGES } from "@/lib/onboarding/config";
@@ -72,6 +72,14 @@ test("actor: the signed-in email decides whose name is on a note", () => {
   assert.deepEqual(actorFor("madison@creativecowboys.co"), { name: "Madison", email: "madison@creativecowboys.co", ghlUserId: "" });
   assert.equal(actorFor("howdy@creativecowboys.co").name, "Howdy");
   assert.deepEqual(actorFor(""), { name: "Team", email: "", ghlUserId: "" });
+});
+test("the top bar names who is signed in: the desk name and the address, and nothing a browser has no use for", () => {
+  assert.deepEqual(signedInAs("Dave@CreativeCowboys.co"), { name: "Dave", email: "dave@creativecowboys.co" });
+  assert.deepEqual(signedInAs("madison@creativecowboys.co"), { name: "Madison", email: "madison@creativecowboys.co" });
+  assert.deepEqual(signedInAs("howdy@creativecowboys.co"), { name: "Howdy", email: "howdy@creativecowboys.co" }, "an address outside the roster: the first part of it");
+  assert.deepEqual(Object.keys(signedInAs("josh@creativecowboys.co")!), ["name", "email"], "no GoHighLevel user id leaves the server");
+  // A session with no address (a sign-in from before the email link) names nobody; the bar shows Sign out alone.
+  assert.equal(signedInAs(""), null); assert.equal(signedInAs(null), null); assert.equal(signedInAs(undefined), null); assert.equal(signedInAs("   "), null);
 });
 
 test("list prices match the two Monday formulas label for label", () => {

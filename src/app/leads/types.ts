@@ -17,6 +17,14 @@ export type CallLead = {
   /** @deprecated alias of recordUrl on Monday leads, for desk tabs still running the pre-GHL build across the deploy. Remove after cutover. */
   mondayUrl?: string;
 };
+/** Who the team session belongs to: the desk name ("Dave") and the sign-in address. Shown beside Sign out in the desk's top bar. */
+export type SignedIn = { name: string; email: string };
+/**
+ * How the shell and the Sales desk agree on leaving (signing out). The desk fills in `unsaved`: "saving" while a save or
+ * an assignment is in flight, "notes" while a call draft is not saved, "" when nothing would be lost. The shell sets
+ * `leaving` once the person has said yes to leaving unsaved notes, so the browser's own "leave site?" prompt stays quiet.
+ */
+export type DeskLeave = { unsaved: () => "" | "notes" | "saving"; leaving: boolean };
 export type CallHistory = { id: string; text: string; createdAt: string; author: string; isCallNote?: boolean };
 export type CallDraft = {
   callId: string; leadId: string; expectedUpdatedAt: string;
@@ -34,5 +42,7 @@ export type CallsPageData = {
   leadSources: string[]; // Lead Source options read from GHL ([] on Monday)
   /** GHL only: false when the roster search came back with no contact tags at all, i.e. the desk cannot see `do-not-contact` / `fake-lead` and says so. Absent on Monday. */
   noCallTagsRead?: boolean;
+  /** Who is signed in. Added by the route to every roster answer (not by either lead system); null when the session carries no address. */
+  me?: SignedIn | null;
 };
 export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string; /** @deprecated see CallLead.mondayUrl */ mondayUrl?: string };

@@ -45,6 +45,15 @@ export const memberByGhlUser = (userId: string | null | undefined): TeamMember |
 /** A Monday person id (people column) → the desk name. Used only by the Monday → GoHighLevel import. */
 export const nameForMondayId = (id: string): string => deskTeam().find((m) => m.mondayId && m.mondayId === id)?.name || "";
 
+/**
+ * Who this sign-in is, for the desk's top bar (the name beside "Sign out"). The same name a note is saved under.
+ * Null when the session carries no address: the bar then shows the Sign out control alone.
+ */
+export function signedInAs(email: string | null | undefined): { name: string; email: string } | null {
+  const actor = actorFor(email);
+  return actor.email ? { name: actor.name, email: actor.email } : null;
+}
+
 /** Who is signed in, for note authorship. An address outside the roster still gets a readable name; no session email = "Team". */
 export function actorFor(email: string | null | undefined): Actor {
   const clean = (email || "").trim().toLowerCase();
