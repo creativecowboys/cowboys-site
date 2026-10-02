@@ -170,3 +170,14 @@
 .ob-history small .ob-note-source-onboarding { background: #dbeafb; color: #1c5a94; }
 .ob-history small .ob-note-source-client { background: #dff3e4; color: #1f6b3a; }
 .ob-history small .ob-note-source-billing { background: #f3ecd0; color: #7a5b00; }
+
+/* Legacy clients on the Clients tab (Oct 2 2026): a quiet badge beside the name, a fifth toolbar control once there is one to filter by,
+   and the owner's mark / un-mark control in the panel. The .ob-toolbar-kind rule out-ranks the phone rule above, so it is restated for phones. */
+.ob-legacy{display:inline-block;margin-left:8px;padding:1px 7px;border:1px solid #c9b89e;border-radius:999px;background:#efe6d6;color:#6b5a45;font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;vertical-align:1px;white-space:nowrap}
+.ob-toolbar.ob-toolbar-kind{grid-template-columns:2fr 1fr 1fr 1fr 1fr}
+.ob-kind{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;padding:10px 14px;border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3}
+.ob-kind .ob-hint{margin:0}
+.ob-kind button{flex-shrink:0}
+.ob-kind-link{background:none;border:0;padding:0;color:#a8462b;text-decoration:underline;cursor:pointer;font-size:inherit}
+.ob-kind-link:disabled{color:#9a8f80;cursor:default}
+@media(max-width:900px){.ob-toolbar.ob-toolbar-kind{grid-template-columns:1fr 1fr}.ob-kind{flex-direction:column;align-items:flex-start}}

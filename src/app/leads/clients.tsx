@@ -7,11 +7,15 @@ import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from
 import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
+import { billedOutside, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
 
 // Clients tab, problems first: the Team-desk rows of Josh's Active Clients board on Monday, or the desk's
 // client contacts in GoHighLevel once DESK_BACKEND=ghl (the server says which with every list).
+// On GoHighLevel a client can be a LEGACY client (Oct 2 2026): a long-standing client that was never onboarded through
+// the desk and is billed outside GoHighLevel. It gets a badge, a filter and a count of its own, and the tab stays quiet
+// about what its record does not track (src/lib/desk/legacy.ts). With no legacy client on the list nothing here changes.
 const crmName = (system: DeskSystem) => (system === "ghl" ? "GoHighLevel" : "Monday");
 async function json<T>(response: Response, crm = "Monday"): Promise<T> {
   const data = await response.json().catch(() => ({}));
@@ -35,6 +39,7 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
   const [manager, setManager] = useState("");
   const [group, setGroup] = useState("");
   const [only, setOnly] = useState<"" | "problems" | "payment" | "gbp">("");
+  const [kind, setKind] = useState<ClientKind>(""); // all clients / run on the desk / legacy
   const [spin, setSpin] = useState(false);
   const lock = useRef(false);
   const load = useCallback(async (next?: string) => {
@@ -52,7 +57,10 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
   }, [preview]);
   useEffect(() => { void load(); }, [load]);
   const managers = [...new Map(rows.flatMap((r) => r.accountManagerIds.map((id, i) => [id, r.accountManager.split(", ")[i] || id] as const))).entries()];
+  const counts = kindCounts(rows);
+  const shownKind = effectiveKind(kind, rows); // the kind filter only exists while there is a legacy client to tell apart
   const filtered = rows.filter((r) =>
+    isKind(r, shownKind) &&
     (!manager || (manager === "unassigned" ? r.accountManagerIds.length === 0 : r.accountManagerIds.includes(manager))) &&
     (!group || r.group === group) &&
     (only !== "problems" || r.flags.length > 0) && (only !== "payment" || r.flags.includes("payment")) && (only !== "gbp" || r.flags.includes("gbp") || r.flags.includes("gbp-recheck")) &&
@@ -62,9 +70,10 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
   const update = useCallback((row: ClientRow) => setRows((prev) => prev.some((r) => r.id === row.id) ? prev.map((r) => r.id === row.id ? row : r) : [row, ...prev]), []);
   const mrr = rows.filter((r) => r.group !== "churned" && r.group !== "paused").reduce((sum, r) => sum + (Number(r.mrr) || 0), 0);
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {rows.length} on the desk{money ? ` · $${mrr.toLocaleString()}/mo list` : ""} · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label={`Refresh from ${crm}`}><RefreshIcon /></button></header>
-    <div className="ob-toolbar">
+    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {deskCountLabel(rows)}{money ? ` · $${mrr.toLocaleString()}/mo list` : ""} · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label={`Refresh from ${crm}`}><RefreshIcon /></button></header>
+    <div className={`ob-toolbar ${counts.legacy ? "ob-toolbar-kind" : ""}`}>
       <input placeholder="Search client, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
+      {counts.legacy > 0 && <select value={shownKind} onChange={(e) => setKind(e.target.value as ClientKind)} aria-label="Show desk or legacy clients"><option value="">All clients ({counts.total})</option><option value="desk">Desk clients ({counts.desk})</option><option value="legacy">Legacy clients ({counts.legacy})</option></select>}
       <select value={manager} onChange={(e) => setManager(e.target.value)} aria-label="Filter by account manager"><option value="">All managers</option>{managers.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
       <select value={group} onChange={(e) => setGroup(e.target.value)} aria-label="Filter by group"><option value="">All groups</option>{CLIENT_GROUPS.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}</select>
       <select value={only} onChange={(e) => setOnly(e.target.value as typeof only)} aria-label="Show only"><option value="">Everything</option><option value="problems">Anything flagged</option><option value="payment">Payment issues</option><option value="gbp">GBP not verified / recheck</option></select>
@@ -74,14 +83,18 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
     <div className="ob-table" role="table" aria-label="Clients">
       <div className="ob-row ob-row-head" role="row"><span>Client</span><span>Package</span><span>Manager</span><span>Payment</span><span>GBP</span><span>Flags</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.flags.includes("payment") ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
-        <span><b>{r.name}</b><small>{r.contact || "no contact"}{r.clientSince && ` · since ${r.clientSince}`}</small></span>
-        <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : money ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
+        <span><b>{r.name}</b>{isLegacyRow(r) && <i className="ob-legacy">Legacy</i>}<small>{r.contact || "no contact"}{r.clientSince && ` · since ${r.clientSince}`}</small></span>
+        <span>{r.packages || "—"}<small>{isGiveawayWinner(r.packages) ? "Giveaway winner · no charge" : money && !(isLegacyRow(r) && !Number(r.mrr)) ? `${fmtMoney(r.mrr)}/mo` : ""}</small></span>
         <span>{r.accountManager || <em>Unassigned</em>}<small>{groupLabel(r.group)} · {r.health || "—"}</small></span>
-        <span><i className={`ob-stage ${r.flags.includes("payment") ? "ob-stage-hold" : r.payStatus === "Paid / Current" ? "ob-stage-launched" : ""}`}>{r.payStatus || "—"}</i><small>{r.payMethod || ""}{r.nextBill && ` · next ${r.nextBill}`}</small></span>
-        <span>{r.gbpLive?.ok
+        <span>{billedOutside(r) && !r.flags.includes("payment")
+          ? <><i className="ob-stage">{r.payMethod || "Outside the desk"}</i><small>billed outside the desk{r.nextBill && ` · next ${r.nextBill}`}</small></>
+          : <><i className={`ob-stage ${r.flags.includes("payment") ? "ob-stage-hold" : r.payStatus === "Paid / Current" ? "ob-stage-launched" : ""}`}>{r.payStatus || "—"}</i><small>{r.payMethod || ""}{r.nextBill && ` · next ${r.nextBill}`}</small></>}</span>
+        <span>{!gbpTracked(r)
+          ? <><em>Not tracked</em><small>legacy client</small></>
+          : r.gbpLive?.ok
           ? <><i className={`ob-stage ${r.gbpLive.verified ? "ob-stage-launched" : "ob-stage-hold"}`}>{r.gbpLive.verified ? "Verified (live)" : "Not verified (live)"}</i><small>{r.gbpLive.reviewCount ? `${r.gbpLive.rating.toFixed(1)} ★ · ${r.gbpLive.reviewCount} reviews` : "no reviews"}{r.gbpLive.unanswered ? ` · ${r.gbpLive.unanswered} unanswered` : ""}</small></>
           : <><i className={`ob-stage ${r.gbpAccess === "Verified" ? "ob-stage-launched" : r.gbpAccess === "No GBP Exists" ? "" : "ob-stage-hold"}`}>{r.gbpAccess || "Not Requested"}</i><small>{r.gbpLive ? "Search Atlas read failed" : r.gbpChecked ? `checked ${r.gbpChecked}` : "not linked to Search Atlas"}</small></>}</span>
-        <span>{r.flags.length ? r.flags.map((f) => <small key={f} className={f === "payment" ? "ob-overdue" : ""}>{FLAG[f]}</small>) : <b className="ob-ok">All good</b>}</span>
+        <span>{r.flags.length ? r.flags.map((f) => <small key={f} className={f === "payment" ? "ob-overdue" : ""}>{FLAG[f]}</small>) : isLegacyRow(r) ? <small>No flags</small> : <b className="ob-ok">All good</b>}</span>
       </button>)}
       {loading && <p role="status" className="call-roster-message">Loading from {crm}…</p>}
       {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients on the desk yet. Graduate one from the Onboarding tab."}</p>}
@@ -151,24 +164,28 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
   };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
   const { row, stripe, stripeConnected, owners, history, canSeeMoney, files, fileScope } = detail;
+  const legacy = isLegacyRow(row);
+  const outsideStripe = legacy && !stripeFollowed(row); // a legacy client billed outside GoHighLevel: the Stripe prompts do not apply
+  const isOwner = canSeeMoney; // the server says yes for owners only; marking a legacy client is theirs (and is checked again on the server)
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[row.contact, row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {row.flags.length > 0 && <div className="call-alert" role="status"><strong>Needs a look:</strong> {row.flags.map((f) => FLAG[f]).join(" · ")}</div>}
 
-    <section className="ob-section"><h3>Billing {stripeConnected ? <small>Stripe connected</small> : <small>Stripe not connected — add the restricted key in Vercel</small>}</h3>
+    <section className="ob-section"><h3>Billing {outsideStripe ? <small>Billed outside the desk{row.payMethod && ` · ${row.payMethod}`}</small> : stripeConnected ? <small>Stripe connected</small> : <small>Stripe not connected — add the restricted key in Vercel</small>}</h3>
       <div className="ob-grid">
-        <div><span>Status</span><b>{row.payStatus || "—"}</b><small>{row.payMethod}</small></div>
-        <div><span>Package</span><b>{row.packages || "—"}</b>{isGiveawayWinner(row.packages) ? <small>Giveaway winner — no charge. Do not invoice.</small> : canSeeMoney && <small>{fmtMoney(row.mrr)}/mo list</small>}</div>
+        <div><span>Status</span>{billedOutside(row) && !row.flags.includes("payment") ? <><b>Billed outside the desk</b><small>{row.payMethod || "no method on file"}</small></> : <><b>{row.payStatus || "—"}</b><small>{row.payMethod}</small></>}</div>
+        <div><span>Package</span><b>{row.packages || "—"}</b>{isGiveawayWinner(row.packages) ? <small>Giveaway winner — no charge. Do not invoice.</small> : canSeeMoney && !(legacy && !Number(row.mrr)) && <small>{fmtMoney(row.mrr)}/mo list</small>}</div>
         <div><span>Last payment</span><b>{row.lastPayment || "—"}</b></div>
         <div><span>Next bill</span><b>{row.nextBill || "—"}</b><small>{row.billingDay && `day ${row.billingDay}`}</small></div>
         {stripe && <><div><span>Stripe subscription</span><b>{stripe.subscription ? `${stripe.subscription.status}${canSeeMoney ? ` · $${stripe.subscription.amount}/${stripe.subscription.interval}` : ""}` : "none"}</b><small>{stripe.subscription?.currentPeriodEnd && `renews ${stripe.subscription.currentPeriodEnd}`}{stripe.subscription?.cancelAt && ` · cancels ${stripe.subscription.cancelAt}`}</small></div><div><span>Latest invoice</span><b>{stripe.latestInvoice ? `${stripe.latestInvoice.status}${canSeeMoney ? ` · $${stripe.latestInvoice.amountDue}` : ""}` : "none"}</b><small>{stripe.latestInvoice?.paidAt && `paid ${stripe.latestInvoice.paidAt}`}{stripe.latestInvoice?.hostedUrl && <> · <a href={stripe.latestInvoice.hostedUrl} target="_blank" rel="noreferrer">open</a></>}</small></div></>}
       </div>
       <div className="ob-buttons">
-        <button className="call-primary" disabled={!!busy || !stripeConnected} onClick={sync}>{busy === "sync" ? "Syncing…" : "Sync from Stripe"}</button>
+        {!outsideStripe && <button className="call-primary" disabled={!!busy || !stripeConnected} onClick={sync}>{busy === "sync" ? "Syncing…" : "Sync from Stripe"}</button>}
         {row.stripeCustomer && <a className="call-secondary" href={`https://dashboard.stripe.com/customers/${row.stripeCustomer}`} target="_blank" rel="noreferrer">Open in Stripe ↗</a>}
       </div>
       {synced && <p className="ob-ok">Synced. {synced.length ? `Changed: ${synced.join(", ")}.` : "Nothing changed."}</p>}
+      {outsideStripe && <p className="call-muted ob-hint">A legacy client billed outside GoHighLevel, so the desk does not look for it in Stripe. To follow it there, set the payment method to Stripe via GHL or paste its Stripe customer id.</p>}
       <div className="ob-controls">
         <label>Stripe customer id<input value={customerId} placeholder="cus_…" disabled={!!busy} onChange={(e) => setCustomerId(e.target.value.trim())} onBlur={() => customerId !== row.stripeCustomer && patch({ action: "stripeCustomer", customerId }, "stripe")} /></label>
         <label>Payment status (manual)<select value={row.payStatus || "No Billing Set Up"} disabled={!!busy} onChange={(e) => patch({ action: "payStatus", value: e.target.value }, "pay")}>{PAY_STATUS.map((s) => <option key={s}>{s}</option>)}</select></label>
@@ -186,7 +203,7 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
         <label>GBP / Maps URL<input value={gbpUrl} disabled={!!busy} onChange={(e) => setGbpUrl(e.target.value)} onBlur={() => gbpUrl !== row.gbpUrl && patch({ action: "gbp", value: row.gbpAccess || "Not Requested", gbpUrl }, "gbp")} placeholder="https://maps.google.com/…" /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "gbpChecked" }, "gbpchk")}>I just confirmed we still have access</button>{row.gbpUrl && <a className="call-secondary" href={row.gbpUrl} target="_blank" rel="noreferrer">Open listing ↗</a>}</div>
-      <p className="call-muted ob-hint">Last confirmed: {row.gbpChecked || "never"}. {row.gbpLive?.ok ? "A live Search Atlas read counts as a check, so the 90-day recheck does not apply while the listing is linked." : "The tab asks for a recheck every 90 days. Only a staff check (or a live Search Atlas read) counts."}</p>
+      <p className="call-muted ob-hint">Last confirmed: {row.gbpChecked || "never"}. {row.gbpLive?.ok ? "A live Search Atlas read counts as a check, so the 90-day recheck does not apply while the listing is linked." : legacy ? "For a legacy client the tab only asks about GBP once it is tracked here: link the Search Atlas listing, set access to Requested or Lost / recheck, or confirm a check." : "The tab asks for a recheck every 90 days. Only a staff check (or a live Search Atlas read) counts."}</p>
     </section>
 
     <section className="ob-section"><h3>Account</h3>
@@ -200,7 +217,14 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
         <label>Website<input value={contact.website} disabled={!!busy} onChange={(e) => setContact({ ...contact, website: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "reportSent" }, "report")}>Report sent today</button>{row.website && <a className="call-secondary" href={row.website} target="_blank" rel="noreferrer">Site ↗</a>}{row.ghlContact && system !== "ghl" && <a className="call-secondary" href={row.ghlContact} target="_blank" rel="noreferrer">GHL ↗</a>}{row.driveFolder && <a className="call-secondary" href={row.driveFolder} target="_blank" rel="noreferrer">Files ↗</a>}</div>
-      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}${preview ? `&desk=${preview}` : ""}`}>open</a>.</>}</p>
+      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{legacy && !row.lastReport && " (Not flagged for a legacy client until a report is logged here.)"}{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}${preview ? `&desk=${preview}` : ""}`}>open</a>.</>}</p>
+      {/* Legacy marker (GoHighLevel desk). A legacy client says so, and an owner can make it a desk client; on a desk client the only
+          addition is one quiet line for owners — the way to mark a long-standing client legacy. Checked again on the server. */}
+      {system === "ghl" && legacy && <div className="ob-kind">
+        <p className="call-muted ob-hint">Legacy client: a long-standing client that was not onboarded through the desk and is billed outside GoHighLevel. The tab only flags what this record tracks.{!isOwner && " An owner can change this."}</p>
+        {isOwner && <button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "legacy", value: false }, "legacy")}>{busy === "legacy" ? "Saving…" : "Make this a desk client"}</button>}
+      </div>}
+      {system === "ghl" && !legacy && isOwner && <p className="call-muted ob-hint">A long-standing client that is billed outside GoHighLevel? <button type="button" className="ob-kind-link" disabled={!!busy} onClick={() => patch({ action: "legacy", value: true }, "legacy")}>{busy === "legacy" ? "Saving…" : "Mark as legacy client"}</button></p>}
       {row.notes && <p className="call-preserve ob-notes">{row.notes}</p>}
     </section>
 

@@ -4,8 +4,14 @@ Dave, October 1, 2026: "We need to cut the link to Monday and use just go high l
 onboarding tab and active clients. But we need the ability to add notes and comments in the active state."
 
 Phase 1 moved the **Sales** tab to GoHighLevel (`LEADS_BACKEND`, see `Docs/Leads-Page.md`). This is Phase 2: the
-**Onboarding** and **Clients** tabs. It is built and on main, and it is **off**: with `DESK_BACKEND` unset every route
-takes the same Monday code path as before. Nothing has been created in GoHighLevel and nothing has been imported.
+**Onboarding** and **Clients** tabs.
+
+> **Status — live since October 2, 2026.** The cutover below was run that day and `DESK_BACKEND=ghl` is set on Vercel
+> Production: both tabs run on GoHighLevel. The runbook is kept as the record of how it was done (and of how to go back).
+> Added the same day, after the cutover: **legacy clients** — see the section of that name near the end.
+
+As first shipped it was built and on main but **off**: with `DESK_BACKEND` unset every route takes the same Monday code
+path as before, nothing is created in GoHighLevel and nothing is imported.
 
 ## The switch
 - `DESK_BACKEND=ghl` (Vercel, Production) puts both tabs on GoHighLevel. Anything else, or unset, is Monday.
@@ -45,7 +51,8 @@ can be had in GoHighLevel with a Smart List grouped on `Desk Onboarding Stage`; 
 later if Dave and Josh want it, once someone has read those triggers.
 
 ## What the desk writes in GoHighLevel — and what it never does
-**Custom fields (43, all new, all named "Desk …"; resolved by name at runtime, no field id in code):**
+**Custom fields (44, all new, all named "Desk …"; resolved by name at runtime, no field id in code — the 43 the cutover
+created, plus `Desk Legacy Client`, added after it and the one field the desk can run without):**
 Desk Packages (multi-select, the package labels byte-for-byte), Desk Custom Monthly, Desk Notes, Desk GBP Access,
 Desk GBP Last Checked, Desk GBP URL, Desk Search Atlas Listing, Desk Drive Folder, Desk Last Touch ·
 Desk Onboarding Stage, Desk Onboarding Health, Desk Onboarding Owner, Desk Build Owner, Desk Sales Owner,
@@ -53,7 +60,8 @@ Desk Business Type, Desk Signed, Desk Target Launch, Desk Profile Complete, Desk
 Desk Next Action, Desk Next Action Due, Desk Setup Amount, Desk Agreement, Desk Onboarding Payment, Desk Intake,
 Desk Handoff ID, Desk Checklist, Desk Link, Desk Monday Onboarding ID · Desk Client Status, Desk Client Health,
 Desk Account Manager, Desk Pay Status, Desk Pay Method, Desk Billing Day, Desk Next Bill, Desk Last Payment,
-Desk Client Since, Desk Term Ends, Desk Last Report Sent, Desk Stripe Customer ID, Desk Monday Client ID.
+Desk Client Since, Desk Term Ends, Desk Last Report Sent, Desk Stripe Customer ID, Desk Monday Client ID,
+Desk Legacy Client.
 
 **Tags added:** `desk-onboarding`, `desk-client`, and `monday-import` (the desk's own Phase-1 tag, on contacts the import
 creates). A handoff from a lead also does what the Sales tab already did: Outreach Status → Won, Last Contact, tag `sales-won`.
@@ -270,6 +278,105 @@ tab: one detail request, not a stream of them.
 is exactly where it was at step 6; work done on the GoHighLevel desk after the flip stays in GoHighLevel. Intake links
 issued on the GoHighLevel desk keep working either way.
 
+## Legacy clients (added Oct 2 2026, after the cutover)
+Dave: "our old clients.. we can call them legacy clients. We can bring them into the active clients tab on the leads page."
+(The desk moved from `/leads` to `/admin` the same day; `/leads` forwards there. The API routes did not move.)
+
+A **legacy client** is a long-standing client that was never onboarded through the desk and is billed outside
+GoHighLevel (QuickBooks). On Oct 2 2026 that is the 17 Active Clients rows that never had "Team desk" ticked.
+
+- **The marker** is one desk-owned contact field, `Desk Legacy Client` (single select, Yes / No). Yes is legacy; No or
+  blank is a normal desk client. Resolved by name like every desk field, created by the same setup call, and covered by
+  the same write guard. It is the one **optional** desk field (`OPTIONAL_DESK_FIELDS` in `src/lib/desk/fields.ts`): on a
+  location where it does not exist yet every desk route works as before and nobody is legacy; only marking a client asks
+  for it, by name.
+- **Who sets it.** The import, for an Active Clients row without "Team desk" — and only where the field is blank. An
+  owner (dave@ / josh@), from the client's panel: *Make this a desk client* on a legacy client, *Mark as legacy client*
+  (one quiet line under Account) on a desk client. The panel always writes an explicit Yes or No, so a later re-import
+  (even with `force`) never puts back a marker an owner took off. Nobody else can change it (403, checked on the server).
+- **The Clients tab.** A `Legacy` badge beside the name, a kind filter (All clients / Desk clients / Legacy clients)
+  that appears once there is a legacy client, and the header count: "18 on the desk · 17 legacy". With no legacy client
+  on the list the tab is exactly what it was. Desk clients are not changed by any of this.
+- **Money** is the same for everyone: a legacy client's packages and Custom $/mo count in the owners' monthly total, and
+  amounts stay owners-only.
+- **Quiet flags** (`flagsFor`, `src/lib/clients/board.ts`). A legacy client is only flagged for what its record tracks;
+  a blank is "not tracked here", not a problem. Every rule for a desk client is unchanged.
+
+  | Flag | Desk client | Legacy client |
+  |---|---|---|
+  | Payment issue | group Payment issue, or status Overdue / Card Failed | the same — someone set that on purpose |
+  | GBP not verified | anything but Verified / No GBP Exists (a blank counts) | only when it is tracked: a linked Search Atlas listing that reads unverified, or access set to Requested or Lost / recheck. Blank or Not Requested is quiet |
+  | GBP recheck due | Verified and never checked, or checked over 90 days ago | only when a check was stamped and is over 90 days old |
+  | No report 35+ days | never sent, or over 35 days ago | only when a report was logged here and is over 35 days old |
+  | Term ends soon | within 30 days | the same |
+  | No Stripe link | Stripe method and no customer id | the same — so never while the method is QuickBooks invoice |
+
+  The list also words the two blanks plainly for a legacy client: GBP "Not tracked", and — while nobody has set a payment
+  status — how it is billed ("QuickBooks invoice · billed outside the desk") instead of the board's default "No Billing
+  Set Up". The stored values are not changed.
+- **Stripe leaves it alone** unless Stripe is part of its record (a stored customer id, or a Stripe payment method): the
+  nightly reconcile skips it and a Stripe event is never matched to it by email. Otherwise a QuickBooks-billed client
+  whose email is also a Stripe customer would be flipped to "Stripe via GHL". The panel hides "Sync from Stripe" for
+  such a client; setting the method to Stripe via GHL, or pasting a customer id, brings all of it back.
+- **A payment status someone sets by hand** still does what it does for any client: Overdue / Card Failed moves it to
+  Payment issue and leaves the one task for the account manager. The **import never creates a task**.
+- **Not changed:** the Sales roster (a legacy client's contact has no lead tag and no Lead Source), the giveaway-winner
+  billing guard (a legacy client is a winner only if its packages say so, like anyone), onboarding, graduation.
+
+### Bringing the old Active Clients rows over
+None of the 17 rows has an email, a phone or a contact person on the board, and no contact in GoHighLevel carries any of
+the business names (checked Oct 2 2026 with the dry run below against all 1,216 contacts: no exact name, and no
+look-alike either). So each gets a **new contact made from the business name**: company name
+= the business name, website where the board has one, nobody as the contact person, source "Team desk (Monday import)",
+tags `desk-client` + `monday-import`, and the desk fields the row carries (status, health, payment status and method,
+account manager, packages, notes, the Monday row id) plus `Desk Legacy Client` = Yes. A row's Monday updates, if it has
+any, are copied as notes like every other import. No onboarding stage, no checklist, no Lead Source, no task.
+
+A contact with no email and no phone is the one kind GoHighLevel will create twice, and its search — how a re-run
+finds "already imported" — runs a few seconds behind writes. So the import keeps **its own record** of every contact it
+creates from a name alone (private storage, `onboarding/import/client-<monday row id>.json`) and reads that contact by
+id, fresh, before it would create one: running a row again straight away finds the contact instead of making a second.
+Two rows with one business name are refused as one business (in the dry run too), and each row that creates a contact
+lists the contacts already in GoHighLevel that **look like** it (`similar`: the same name apart from Inc / LLC / The,
+one whole business name inside the other, the row's website or email domain, an email or website that spells the
+business name, or a business name that starts with the same uncommon word) — a hint to pin the row with `map` instead of
+creating a duplicate; it never changes a match. Another church is not a look-alike for a church, nor a person called
+Chris for a Christian academy: only the part of a name that is the business's own counts.
+
+Every call is made from an owner's signed-in Chrome on the desk (see the cutover runbook above for how to post and read
+a report). They are all dry runs unless the body says `dryRun: false`. State on Oct 2 2026: step 1 is done (the field
+exists, id `nMtC0XKwmnr9dUbs9E0s`, and the self-test passes 44 of 44 on the test contact); step 2 was run and answered
+exactly as written; nothing has been imported.
+
+1. **The field, once (done Oct 2 2026).** `POST /api/team/ghl/setup {"scope":"desk"}` → `missing` is exactly
+   `Desk Legacy Client`, `present` 43. Then `{"scope":"desk","dryRun":false}` → `created` is that one field, `failed`
+   empty. Now the dry call answers `missing: []`, `present` 44, and `GET /api/team/ghl/diag` → `desk.fields.deskPresent`
+   44, `desk.legacyClients` 0.
+2. **Dry run.** `POST /api/team/ghl/desk-migrate {"boards":["clients"],"includeOffDesk":true,"createNameOnly":true}`
+   → `total` 19; `counts`: `imported` 2 (Squirrel Made Products and Choice Pressure Washing, "already imported —
+   skipped"), `create-name-only` 17, `unmatched` 0, `failed` 0. Every one of the 17: `legacy: true`, `detail` "creates a
+   new contact from the business name alone…", `contact` = `companyName` (+ `website` on four of them), `values` = the
+   eight desk fields it writes (nine for Defoor Plumbing and Sconyers Concrete Inc, which carry `Desk Packages`
+   Local Growth), `tags` `desk-client` + `monday-import`, `similar` empty, no `warnings`, `winners` empty. No row may
+   say `BLOCKED` (that means step 1 was skipped). **A non-empty `similar` is the thing to stop on:** look at those
+   contacts in GoHighLevel, and if one is the same business add `"map":{"<monday row id>":"<contact id>"}` so the row
+   uses it.
+3. **One row as a trial.** The same body plus `"dryRun":false,"onlyIds":["13125631516"]` (Whiten Pools, Inc.) →
+   `written` 1, the row `done`, `detail` "wrote 8 fields, 0 of 0 updates copied as notes", `storage` "import record:
+   this row created contact …". Then look: the Clients tab (`/admin?tab=clients`) reads "2 on the desk · 1 legacy"
+   (GoHighLevel's search can take ~20 seconds to list a new contact; `/admin?tab=clients&client=<contact id>` opens
+   its panel at once), the row has the Legacy badge and no flags, its panel opens; the contact in
+   GoHighLevel has the company name, the two tags and no owner; the Sales tab does not list it; the published workflows'
+   "Total enrolled" counts have not moved. Running the same trial call again must answer `imported`, not create.
+   If GoHighLevel refuses a contact that has a company name and nobody's name, the row says so and nothing is created:
+   run it again with `"businessAsContactName":true` (the business name also goes in the contact's own name).
+4. **The rest.** The same body with `"dryRun":false` (no `onlyIds`) → `written` 16, `imported` 3, `failed` 0.
+5. **Dry run again a minute later** → all 19 `imported`, "already imported — skipped". The tab: "18 on the desk · 17
+   legacy". If a row failed with "GoHighLevel did not answer", wait a minute and do this dry run before anything else.
+
+After this the Monday Active Clients board holds nothing the desk does not. An owner un-marks a legacy client from its
+panel the day it becomes a normal desk client; nothing is automatic about that, including a later handoff or graduation.
+
 ## Environment
 `DESK_BACKEND` (the switch) · `DESK_PAYMENT_ALERTS=off` (no payment task) · `DESK_EXTRA_TEAM="Name:email,…"` (more people in
 the owner lists) · `GHL_REP_IDS="Madison:<GoHighLevel user id>"` (lets that person author notes as themselves; same
@@ -280,13 +387,14 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
 - `src/lib/desk/` — `switch.ts` (the switch, id and scope shapes), `fields.ts` (field catalog, resolver, write guard,
   LSE overlaps), `team.ts`, `money.ts`, `checklist-text.ts`, `record.ts` (contact ↔ rows, lists, writes), `notes.ts`,
   `onboarding.ts` (list, panel, patches, handoff, retry, graduation), `clients.ts` (list, panel, patches, Stripe),
-  `intake.ts`, `winners.ts`, `validation.ts`, `http.ts`, `migrate.ts`, `admin.ts` (setup, diag, self-test).
+  `intake.ts`, `winners.ts`, `validation.ts`, `http.ts`, `migrate.ts`, `admin.ts` (setup, diag, self-test),
+  `legacy.ts` (legacy clients: what the marker means on the Clients tab — pure, shared with the browser).
 - Routes: each existing handler under `/api/team/onboarding`, `/api/team/clients`, `/api/stripe/webhook`,
   `/api/team/packages` and `/api/onboarding/[token]` gained an early GoHighLevel branch; the Monday code below it is
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
 - UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (77) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (98) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.
