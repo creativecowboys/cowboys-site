@@ -180,4 +180,6 @@
 .ob-kind button{flex-shrink:0}
 .ob-kind-link{background:none;border:0;padding:0;color:#a8462b;text-decoration:underline;cursor:pointer;font-size:inherit}
 .ob-kind-link:disabled{color:#9a8f80;cursor:default}
+/* Clients tab: a search on the default view found clients that have churned (they are not listed there). */
+.ob-churned-hint{font-size:11px;line-height:1.6;color:#71665a;margin:0 0 10px}
 @media(max-width:900px){.ob-toolbar.ob-toolbar-kind{grid-template-columns:1fr 1fr}.ob-kind{flex-direction:column;align-items:flex-start}}

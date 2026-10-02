@@ -7,7 +7,8 @@ import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from
 import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
-import { billedOutside, clientOrder, deskCountLabel, effectiveKind, gbpTracked, isKind, isLegacyRow, kindCounts, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
+import { billedOutside, gbpTracked, isLegacyRow, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
+import { appliedKind, CHURNED, churnedMatches, clientCountLabel, clientCounts, filterClients, monthlyTotal } from "@/lib/desk/clients-view";
 import { deskHref } from "@/lib/desk-path";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
@@ -19,6 +20,8 @@ import { contactLine, personShown, sameName } from "@/lib/desk/names";
 // On GoHighLevel a client can be a LEGACY client (Oct 2 2026): a long-standing client that was never onboarded through
 // the desk and is billed outside GoHighLevel. It gets a badge, a filter and a count of its own, and the tab stays quiet
 // about what its record does not track (src/lib/desk/legacy.ts). With no legacy client on the list nothing here changes.
+// A client that has left (the Churned group) is off the default view and out of the counts; the group filter lists them
+// (src/lib/desk/clients-view.ts). With nobody churned nothing here changes either.
 const crmName = (system: DeskSystem) => (system === "ghl" ? "GoHighLevel" : "Monday");
 async function json<T>(response: Response, crm = "Monday"): Promise<T> {
   const data = await response.json().catch(() => ({}));
@@ -60,29 +63,27 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
   }, [preview]);
   useEffect(() => { void load(); }, [load]);
   const managers = [...new Map(rows.flatMap((r) => r.accountManagerIds.map((id, i) => [id, r.accountManager.split(", ")[i] || id] as const))).entries()];
-  const counts = kindCounts(rows);
-  const shownKind = effectiveKind(kind, rows); // the kind filter only exists while there is a legacy client to tell apart
-  const filtered = rows.filter((r) =>
-    isKind(r, shownKind) &&
-    (!manager || (manager === "unassigned" ? r.accountManagerIds.length === 0 : r.accountManagerIds.includes(manager))) &&
-    (!group || r.group === group) &&
-    (only !== "problems" || r.flags.length > 0) && (only !== "payment" || r.flags.includes("payment")) && (only !== "gbp" || r.flags.includes("gbp") || r.flags.includes("gbp-recheck")) &&
-    `${r.name} ${r.contact} ${r.email} ${r.packages}`.toLowerCase().includes(search.toLowerCase()),
-  ).sort(clientOrder); // problems first, as before; then desk clients ahead of legacy ones, by name
+  const filters = { kind, manager, group, only, search };
+  const counts = clientCounts(rows); // current clients (desk / legacy), with the churned ones counted apart
+  const shownKind = appliedKind(kind, rows); // the kind filter only exists while there is a legacy client to tell apart
+  // Problems first, as before; then desk clients ahead of legacy ones, by name. No group chosen = every current client, never a churned one.
+  const filtered = filterClients(rows, filters);
+  const hiddenChurned = churnedMatches(rows, filters); // a search on the default view only says that churned matches exist
   // A client opened by id that the list does not have yet (just graduated — GoHighLevel's search runs a few seconds behind) joins the list.
   const update = useCallback((row: ClientRow) => setRows((prev) => prev.some((r) => r.id === row.id) ? prev.map((r) => r.id === row.id ? row : r) : [row, ...prev]), []);
-  const mrr = rows.filter((r) => r.group !== "churned" && r.group !== "paused").reduce((sum, r) => sum + (Number(r.mrr) || 0), 0);
+  const mrr = monthlyTotal(rows);
   return <main className="ob-desk">
-    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {deskCountLabel(rows)}{money ? ` · $${mrr.toLocaleString()}/mo list` : ""} · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label={`Refresh from ${crm}`}><RefreshIcon /></button></header>
+    <header className="ob-head"><div><span className="call-eyebrow">CLIENTS</span><h1>Who&rsquo;s paying, who&rsquo;s linked, who needs a look.</h1><p className="call-muted">{board} · {clientCountLabel(rows)}{money ? ` · $${mrr.toLocaleString()}/mo list` : ""} · Stripe {stripeOn ? "connected" : "not connected yet"}</p></div><button className={`call-icon-button ${spin || loading ? "is-spinning" : ""}`} onClick={() => { setSpin(true); window.setTimeout(() => setSpin(false), 900); void load(); }} disabled={loading} aria-label={`Refresh from ${crm}`}><RefreshIcon /></button></header>
     <div className={`ob-toolbar ${counts.legacy ? "ob-toolbar-kind" : ""}`}>
       <input placeholder="Search client, contact, package…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search clients" />
       {counts.legacy > 0 && <select value={shownKind} onChange={(e) => setKind(e.target.value as ClientKind)} aria-label="Show desk or legacy clients"><option value="">All clients ({counts.total})</option><option value="desk">Desk clients ({counts.desk})</option><option value="legacy">Legacy clients ({counts.legacy})</option></select>}
       <select value={manager} onChange={(e) => setManager(e.target.value)} aria-label="Filter by account manager"><option value="">All managers</option>{managers.map(([id, name]) => <option key={id} value={id}>{name}</option>)}<option value="unassigned">Unassigned</option></select>
-      <select value={group} onChange={(e) => setGroup(e.target.value)} aria-label="Filter by group"><option value="">All groups</option>{CLIENT_GROUPS.map((g) => <option key={g.id} value={g.id}>{g.label}</option>)}</select>
+      <select value={group} onChange={(e) => setGroup(e.target.value)} aria-label="Filter by group"><option value="">All groups</option>{CLIENT_GROUPS.map((g) => <option key={g.id} value={g.id}>{g.label}{g.id === CHURNED && counts.churned > 0 ? ` (${counts.churned})` : ""}</option>)}</select>
       <select value={only} onChange={(e) => setOnly(e.target.value as typeof only)} aria-label="Show only"><option value="">Everything</option><option value="problems">Anything flagged</option><option value="payment">Payment issues</option><option value="gbp">GBP not verified / recheck</option></select>
     </div>
     {error && <div className="call-alert" role="alert">{error}<button onClick={() => load()}>Try again</button></div>}
-    <div className="ob-count">{filtered.length} shown · {rows.length} loaded{cursor ? " · more available" : ""}</div>
+    <div className="ob-count">{filtered.length} shown · {rows.length} loaded{!group && counts.churned > 0 ? ` · ${counts.churned} churned` : ""}{cursor ? " · more available" : ""}</div>
+    {hiddenChurned > 0 && <p className="ob-churned-hint">{hiddenChurned} {filtered.length ? "more " : ""}{hiddenChurned === 1 ? "match is a churned client" : "matches are churned clients"}. <button type="button" className="ob-kind-link" onClick={() => setGroup(CHURNED)}>Show churned</button></p>}
     <div className="ob-table" role="table" aria-label="Clients">
       <div className="ob-row ob-row-head" role="row"><span>Client</span><span>Package</span><span>Manager</span><span>Payment</span><span>GBP</span><span>Flags</span></div>
       {filtered.map((r) => <button key={r.id} type="button" role="row" className={`ob-row ${clientId === r.id ? "is-active" : ""} ${r.flags.includes("payment") ? "is-overdue" : ""}`} onClick={() => onOpenClient(r.id)}>
@@ -100,7 +101,7 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
         <span>{r.flags.length ? r.flags.map((f) => <small key={f} className={f === "payment" ? "ob-overdue" : ""}>{FLAG[f]}</small>) : isLegacyRow(r) ? <small>No flags</small> : <b className="ob-ok">All good</b>}</span>
       </button>)}
       {loading && <p role="status" className="call-roster-message">Loading from {crm}…</p>}
-      {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients on the desk yet. Graduate one from the Onboarding tab."}</p>}
+      {!loading && !filtered.length && <p className="call-roster-message">{!rows.length ? "No clients on the desk yet. Graduate one from the Onboarding tab." : !counts.total && !group ? "No current clients. Choose Churned in the group filter to see the ones that have left." : "No clients match these filters."}</p>}
     </div>
     {cursor && <button className="call-secondary call-load-more" disabled={loading} onClick={() => load(cursor)}>Load more</button>}
     {clientId && <ClientPanel key={clientId} id={clientId} listSystem={system} preview={preview} onClose={() => onOpenClient("")} onRow={update} />}
