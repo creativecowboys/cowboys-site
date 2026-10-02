@@ -1,10 +1,10 @@
 import { isoDate, LEAD_TAGS, TEST_CONTACT_ID, WON_TAG } from "@/lib/calls/ghl";
-import { addTags, getContact, ghl, GhlError, ghlConfigured, ghlLocationId, listCustomFields, listNotes, removeTags, searchContacts, updateContact, type GhlContact } from "@/lib/ghl/client";
+import { addTags, contactDisplayName, getContact, ghl, GhlError, ghlConfigured, ghlLocationId, listCustomFields, listNotes, removeTags, searchContacts, updateContact, type GhlContact } from "@/lib/ghl/client";
 import { SALES_FIELDS } from "@/lib/ghl/fields";
 import { todayEastern } from "@/lib/onboarding/api";
 import { mergeTemplates, parseChecklist, serializeChecklist } from "./checklist-text";
 import { DESK_FIELDS, DESK_FIELD_KEYS, DESK_TAG_LIST, DESK_TAGS, deskFields, deskList, deskNumber, deskText, deskWrites, ensureDeskFields, isDeskFieldName, LSE_OVERLAPS, resolveDeskFields, toFieldValue, type DeskFieldKey, type DeskFields, type DeskSetupReport, type DeskValue } from "./fields";
-import { addDeskNote } from "./notes";
+import { addDeskNote, noteMarker } from "./notes";
 import { listRecords } from "./record";
 import { deskDefault } from "./switch";
 import { deskTeam, type Actor } from "./team";
@@ -80,7 +80,14 @@ export async function deskDiagnose(): Promise<Record<string, unknown>> {
 
 // ───────────────────────────── self-test (test contact only) ─────────────────────────────
 type Check = { field: string; dataType: string; wrote: unknown; readBack: string; ok: boolean; cleared: boolean; error?: string };
-export type SelfTestReport = { dryRun: boolean; contact: string; plan?: { field: string; dataType: string; sample: unknown }[]; checks?: Check[]; passed?: number; failed?: string[]; clearFailed?: string[]; tag?: string; search?: string; note?: string; restored?: string; error?: string };
+export type SelfTestReport = {
+  dryRun: boolean; contact: string; plan?: { field: string; dataType: string; sample: unknown }[]; checks?: Check[]; passed?: number; failed?: string[]; clearFailed?: string[];
+  tag?: string; search?: string; note?: string; restored?: string; error?: string;
+  /** Does the contact's dateUpdated (the desk's version token) move on a field write and on a tag add? */
+  version?: string;
+  /** Which of the fields the lists read does a SEARCH result carry (the lists are built from search results; panels read the contact itself). */
+  searchCarries?: string;
+};
 
 // Large-text samples are deliberately life-size: the checklist field holds a whole checklist (the biggest one the desk
 // can build is ~45 rows) and a notes field can take 6,000 characters. A length limit would show here, not on a client.
@@ -135,7 +142,7 @@ async function writeEach(f: DeskFields, keys: DeskFieldKey[], values: Partial<Re
  */
 export async function deskSelfTest(dryRun: boolean, actor: Actor): Promise<SelfTestReport> {
   const f = await deskFields(true);
-  const keys = DESK_FIELD_KEYS.filter((k) => f[k]);
+  const keys = DESK_FIELD_KEYS.filter((k) => f[k] && isDeskFieldName(f[k]!.name)); // the same name guard every desk write goes through
   const samples = Object.fromEntries(keys.map((k) => [k, sampleFor(k, f)])) as Record<DeskFieldKey, DeskValue>;
   const report: SelfTestReport = { dryRun, contact: TEST_CONTACT_ID };
   if (dryRun) return { ...report, plan: keys.map((k) => ({ field: f[k]!.name, dataType: f[k]!.dataType, sample: samples[k] })), note: `${DESK_FIELD_KEYS.length - keys.length} desk fields are missing in GoHighLevel and are not in this plan.` };
@@ -144,6 +151,8 @@ export async function deskSelfTest(dryRun: boolean, actor: Actor): Promise<SelfT
   try {
     const refused = await writeEach(f, keys, samples);
     const written = await getContact(TEST_CONTACT_ID);
+    const moved = (a: GhlContact, b: GhlContact) => (a.dateUpdated && b.dateUpdated && a.dateUpdated !== b.dateUpdated ? "moved" : "DID NOT MOVE");
+    report.version = `dateUpdated ${moved(before, written)} on the field write`;
     const checks: Check[] = keys.map((k) => { const readBack = readFor(written, f, k); return { field: f[k]!.name, dataType: f[k]!.dataType, wrote: samples[k], readBack, ok: !refused.has(k) && readBack === expectFor(samples[k]), cleared: false, ...(refused.has(k) ? { error: `write refused: ${refused.get(k)}` } : {}) }; });
     // The checklist field has to survive a real edit cycle (parse → serialize), not just a round trip of text.
     if (f.checklist && serializeChecklist(parseChecklist(deskText(written, f, "checklist"))) !== BIG_CHECKLIST) checks.find((c) => c.field === f.checklist!.name)!.ok = false;
@@ -159,17 +168,31 @@ export async function deskSelfTest(dryRun: boolean, actor: Actor): Promise<SelfT
     report.checks = checks; report.passed = checks.filter((c) => c.ok).length; report.failed = checks.filter((c) => !c.ok).map((c) => c.field); report.clearFailed = checks.filter((c) => !c.cleared).map((c) => c.field);
     // Tag add / remove with a desk tag, and whether the search filter the lists rely on is accepted.
     const hadTag = (before.tags || []).includes(DESK_TAGS.onboarding);
+    const untagged = await getContact(TEST_CONTACT_ID);
     await addTags(TEST_CONTACT_ID, [DESK_TAGS.onboarding]);
-    const tagged = ((await getContact(TEST_CONTACT_ID)).tags || []).includes(DESK_TAGS.onboarding);
+    const withTag = await getContact(TEST_CONTACT_ID);
+    const tagged = (withTag.tags || []).includes(DESK_TAGS.onboarding);
+    if (!hadTag) report.version += `; ${moved(untagged, withTag)} on the tag add`;
     if (!hadTag) await removeTags(TEST_CONTACT_ID, [DESK_TAGS.onboarding]);
     report.tag = `${DESK_TAGS.onboarding}: add ${tagged ? "ok" : "FAILED"}${hadTag ? " (was already there, left in place)" : `, removed again: ${((await getContact(TEST_CONTACT_ID)).tags || []).includes(DESK_TAGS.onboarding) ? "FAILED" : "ok"}`}`;
     try { const r = await searchContacts({ filters: [{ group: "OR", filters: [{ field: "tags", operator: "eq", value: DESK_TAGS.onboarding }, { field: `customFields.${f.obStage?.id}`, operator: "exists" }] }], pageLimit: 1 }); report.search = `tag-or-stage filter accepted (${r.total} match right now; the index lags writes by a few seconds)`; }
     catch (e) { report.search = `tag-or-stage filter REJECTED: ${plain(e)} — the lists fall back to the tag alone`; }
-    // One labelled note per day, authored as whoever ran this (idempotent), so the notes path is proven too.
+    // The lists are built from search results: say which of the fields they read a search result actually carries.
+    try {
+      const probe = before.email || before.phone || contactDisplayName(before) || before.companyName || "";
+      const hit = probe ? (await searchContacts({ query: probe.slice(0, 75), pageLimit: 20 })).contacts.find((c) => c.id === TEST_CONTACT_ID) : undefined;
+      report.searchCarries = hit
+        ? (["firstName", "lastName", "contactName", "companyName", "email", "phone", "website", "city", "state", "tags", "customFields", "assignedTo", "dateUpdated"] as const).map((k) => `${k} ${k in hit ? "yes" : "NO"}`).join(", ")
+        : "the test contact was not in the search results for its own email, phone or name — check by hand";
+    } catch (e) { report.searchCarries = `search failed: ${plain(e)}`; }
+    // One labelled note per day, authored as whoever ran this (idempotent), so the notes path is proven too — and a LONG one
+    // (the longest note the desk accepts), because the marker that makes a retry safe sits at the end of the note.
     const noteId = `selftest-${todayEastern()}`;
-    const saved = await addDeskNote(TEST_CONTACT_ID, { text: `Desk self-test (${todayEastern()}): field round trip on the test contact. Safe to ignore.`, noteId, source: "system", actor });
+    const filler = Array.from({ length: 70 }, (_, n) => `self-test line ${String(n + 1).padStart(2, "0")} — the quick brown fox jumps over the lazy dog, twice over.`).join("\n");
+    const saved = await addDeskNote(TEST_CONTACT_ID, { text: `Desk self-test (${todayEastern()}): field round trip on the test contact. Safe to ignore.\n${filler}`, noteId, source: "system", actor });
     const note = (await listNotes(TEST_CONTACT_ID)).find((n) => n.id === saved.id);
-    report.note = `${saved.existed ? "already there today" : "added"}; authored as ${note?.userId ? (note.userId === actor.ghlUserId ? actor.name : "another user") : "the integration (no GoHighLevel user for this sign-in)"}`;
+    const whole = (note?.body || "").includes(noteMarker(noteId));
+    report.note = `${saved.existed ? "already there today" : "added"}; authored as ${note?.userId ? (note.userId === actor.ghlUserId ? actor.name : "another user") : "the integration (no GoHighLevel user for this sign-in)"}; ${(note?.body || "").length} characters ${whole ? "kept whole" : "— CUT SHORT: the end of the note (and its marker) did not survive"}`;
   } catch (e) { report.error = plain(e); }
   finally {
     // Put back exactly what was there; a field that was empty is cleared in the shape its type wants ("" or []).

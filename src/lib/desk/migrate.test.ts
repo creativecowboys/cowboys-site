@@ -8,6 +8,7 @@ import { clientDetailGhl, listClientsGhl } from "./clients";
 import { parseChecklist } from "./checklist-text";
 import { resolveToken } from "@/lib/onboarding/intake";
 import { resolveFromDefs } from "@/lib/ghl/fields";
+import { forgetCustomFields } from "@/lib/ghl/client";
 import { COL, STAGES } from "@/lib/onboarding/config";
 import { CCOL, CLIENT_GROUPS } from "@/lib/clients/config";
 import type { IntakeRecord } from "@/lib/onboarding/types";
@@ -117,7 +118,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(ghl.value(choiceId, "Desk Notes"), "Veteran-owned. Reese Pownall + father Vance.\n\nOnboarded Sept 2026 on Local Growth First Year at $297.");
   assert.equal(ghl.value(choiceId, "Desk GBP Access"), "Requested", "the client row's Not Requested never steps the onboarding record's state back");
   assert.deepEqual(parseChecklist(String(ghl.value(choiceId, "Desk Checklist"))).map((i) => [i.name, i.status, i.phase, i.owner]), [["Welcome email + onboarding link delivered (LSE-01)", "Done", "Onboard", ""], ["Citations submitted via Search Atlas Citation Builder", "Working on it", "Build", "Dave"], ["DNS cutover / go-live (CNAME only, never apex or MX)", "", "Launch", ""]]);
-  assert.equal(ghl.notesFor(choiceId).length, 1); assert.equal(ghl.notesFor(choiceId)[0].body, "From the old board (Josh Pack, 2026-09-20):\nReese sent the old WP login.\n\n[CC-MONDAY-UPDATE:901] [CC-SRC:onboarding]");
+  assert.equal(ghl.notesFor(choiceId).length, 1); assert.equal(ghl.notesFor(choiceId)[0].body, "From the old board (Josh Pack, 2026-09-20): [CC-MONDAY-UPDATE:901] [CC-SRC:onboarding]\nReese sent the old WP login.");
   // Storage: nothing moved; the intake record learned its contact, and the link the client already has still opens it.
   assert.deepEqual(blobKeys(), keysBefore);
   assert.equal(blobJson<IntakeRecord>(`onboarding/intake/${CHOICE_OB}.json`)!.contactId, choiceId);
@@ -129,7 +130,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(bourbon.companyName, "Bourbon Leather Co"); assert.equal(bourbon.assignedTo, reps.Dave); assert.equal(ghl.value(bourbon.id, "LSE Health"), "green");
   assert.equal(ghl.value(bourbon.id, "Desk Onboarding Owner"), "Madison"); assert.equal(ghl.value(bourbon.id, "Desk Sales Owner"), "Dave"); assert.equal(ghl.value(bourbon.id, "Desk Next Action"), "Madison: send the intake link and request assets"); assert.equal(ghl.value(bourbon.id, "Desk Next Action Due"), "2026-09-29");
   assert.equal(ghl.value(bourbon.id, "Desk Handoff ID"), HANDOFF); assert.equal(ghl.value(bourbon.id, "Desk Target Launch"), "2026-09-30");
-  assert.match(ghl.notesFor(bourbon.id)[0].body, new RegExp(`\\[CC-MONDAY-UPDATE:902\\] \\[CC-HANDOFF-SUMMARY:${HANDOFF}\\] \\[CC-SRC:onboarding\\]$`), "the copied handoff summary is recognised, so a retry never posts a second one");
+  assert.ok(ghl.notesFor(bourbon.id)[0].body.startsWith(`From the old board (Dave Collum, 2026-09-28): [CC-MONDAY-UPDATE:902] [CC-HANDOFF-SUMMARY:${HANDOFF}] [CC-SRC:onboarding]\n`), "the copied handoff summary is recognised, so a retry never posts a second one — and the markers ride on the first line");
   // Arctic: matched by email (case-insensitive); blank company filled; owner Keaton; the label the desk does not know is left out.
   const arctic = ghl.get("ArcticLawContact0001");
   assert.equal(arctic.companyName, "Arctic Law"); assert.equal(ghl.value(arctic.id, "Desk Onboarding Owner"), "Keaton"); assert.equal(ghl.value(arctic.id, "Desk Setup Amount"), 436); assert.equal(ghl.value(arctic.id, "Desk GBP Access"), "Verified"); assert.equal(ghl.value(arctic.id, "Desk Business Type"), undefined);
@@ -140,7 +141,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(ghl.get(lady).email, "erin@ladybug.example"); assert.equal(ghl.get(lady).assignedTo, reps.Dave, "an existing owner is never replaced by the board's sales owner");
   assert.equal(ghl.value(lady, "Desk Link"), `https://www.creativecowboys.co/leads?tab=onboarding&client=${lady}`);
   // Squirrel Made: a client with no onboarding record.
-  assert.equal(ghl.value("SquirrelMadeJeremy01", "Desk Client Status"), "Active"); assert.deepEqual(ghl.get("SquirrelMadeJeremy01").tags, ["desk-client"]); assert.equal(ghl.notesFor("SquirrelMadeJeremy01")[0].body.endsWith("[CC-MONDAY-UPDATE:903] [CC-SRC:client]"), true);
+  assert.equal(ghl.value("SquirrelMadeJeremy01", "Desk Client Status"), "Active"); assert.deepEqual(ghl.get("SquirrelMadeJeremy01").tags, ["desk-client"]); assert.equal(ghl.notesFor("SquirrelMadeJeremy01")[0].body.startsWith("From the old board (Josh Pack, 2026-09-24): [CC-MONDAY-UPDATE:903] [CC-SRC:client]\n"), true);
   assert.equal(ghl.get("SomeoneElse000000001").customFields!.length, 0, "a contact that is not on either board is not touched");
   // The desk now reads it all back.
   const ob = (await listOnboardingGhl()).rows;
@@ -148,7 +149,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(ob.find((x) => x.name === "Ladybug Hot Sauces")!.monthly, "1747");
   assert.deepEqual((await listClientsGhl()).rows.map((x) => x.name), ["Squirrel Made Products"], "Choice is still onboarding, so it stays on the Onboarding tab only");
   assert.equal((await onboardingDetailGhl(CHOICE_OB)).row.id, choiceId); assert.equal((await clientDetailGhl(SQUIRREL_CL, true)).fileScope, `c${SQUIRREL_CL}`);
-  assert.deepEqual((await onboardingDetailGhl(choiceId)).history.map((h) => [h.source, h.author]), [["Imported", "Josh Pack"]]);
+  assert.deepEqual((await onboardingDetailGhl(choiceId)).history.map((h) => [h.source, h.author, h.text]), [["Imported", "Josh Pack", "From the old board (Josh Pack, 2026-09-20):\nReese sent the old WP login."]]);
   // Idempotent.
   const writes = ghl.writes().length;
   const again = await migrateDesk({ pauseMs: 0, dryRun: false });
@@ -177,7 +178,7 @@ test("one-record trial, explicit map, batches, off-desk rows, and a client row t
   // A giveaway winner left behind on Monday is called out: after the flip the billing guard only reads GoHighLevel.
   const base = ghl.monday!;
   ghl.monday = (q, v) => { const d = base(q, v) as { boards: { items_page: { items: MondayRow[] } }[] }; if ((v.board as string[])[0] !== "18431157561") d.boards[0].items_page.items.push(row("999", "Off-desk Winner Co", group("active"), { [CCOL.package]: "Giveaway Winner, Local Growth", [CCOL.teamDesk]: { text: "", value: { checked: false } } })); return d; };
-  assert.deepEqual((await migrateDesk({ dryRun: true })).winners, [{ board: "clients", mondayId: "999", name: "Off-desk Winner Co", imported: false }]);
+  assert.deepEqual((await migrateDesk({ dryRun: true })).winners, [{ board: "clients", mondayId: "999", name: "Off-desk Winner Co", imported: false, protected: false }]);
   ghl.monday = base;
   // Off-desk rows only on request; with no email, phone or matching name they are unmatched unless name-only creation is allowed.
   const off = await migrateDesk({ dryRun: true, boards: ["clients"], includeOffDesk: true, onlyIds: [CHAPELHILL_CL] });
@@ -216,6 +217,143 @@ test("a graduated client whose onboarding item is gone, pinned by hand, still fi
   assert.equal(detail.fileScope, GONE); assert.deepEqual(detail.files.map((x) => x.name), ["logo.png"]);
   assert.deepEqual((await listOnboardingGhl()).rows, [], "carrying the id does not make the client an onboarding record");
   assert.deepEqual((await listClientsGhl()).rows.map((x) => x.name), ["Squirrel Made Products"]);
+});
+
+// A world of its own: just these rows on the two boards.
+const boards = (p: MondayRow[], c: MondayRow[] = []) => { ghl.monday = (_q, v) => ({ boards: [{ items_page: { cursor: null, items: (v.board as string[])[0] === "18431157561" ? p : c } }] }); };
+const onDesk = { text: "v", value: { checked: "true" } };
+
+test("an onboarding row and a client row that reach the same contact by email (no link between them): the second adds to the first", async () => {
+  ghl.addContact({ id: "AcmeRoofingContact01", firstName: "Al", companyName: "Acme Roofing", email: "al@acme.example" });
+  boards(
+    [row("111", "Acme Roofing", stage("building"), { [COL.email]: "al@acme.example", [COL.package]: "Giveaway Winner, Local Growth", [COL.gbpAccess]: "Verified", [COL.notes]: "onboarding notes" })],
+    [row("211", "Acme Roofing", group("active"), { [CCOL.email]: "AL@acme.example", [CCOL.package]: "Local Growth", [CCOL.gbpAccess]: "Not Requested", [CCOL.notes]: "client notes", [CCOL.teamDesk]: onDesk })],
+  );
+  const r = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(r.rows.map((x) => [x.board, x.match, x.ghlId, !!x.done]), [["onboarding", "email", "AcmeRoofingContact01", true], ["clients", "email", "AcmeRoofingContact01", true]]);
+  const id = "AcmeRoofingContact01";
+  assert.deepEqual(ghl.value(id, "Desk Packages"), ["Giveaway Winner", "Local Growth"], "the client row sees what the onboarding row just wrote, and keeps the winner label");
+  assert.equal(ghl.value(id, "Desk GBP Access"), "Verified"); assert.equal(ghl.value(id, "Desk Notes"), "onboarding notes\n\nclient notes");
+  assert.equal(ghl.value(id, "Desk Monday Onboarding ID"), "111"); assert.equal(ghl.value(id, "Desk Monday Client ID"), "211");
+  assert.deepEqual(r.winners, [{ board: "onboarding", mondayId: "111", name: "Acme Roofing", imported: true, protected: true }]);
+});
+
+test("a business new to GoHighLevel with a row on each board: one contact is created and both rows land on it", async () => {
+  boards(
+    [row("121", "New Both Co", stage("launched"), { [COL.email]: "both@new.example", [COL.package]: "Local Growth" })],
+    [row("221", "New Both Co", group("active"), { [CCOL.email]: "both@new.example", [CCOL.package]: "Local Growth", [CCOL.payStatus]: "Paid / Current", [CCOL.teamDesk]: onDesk })],
+  );
+  const dry = await migrateDesk({ dryRun: true });
+  assert.deepEqual(dry.rows.map((x) => [x.board, x.match, x.ghlName]), [["onboarding", "create", ""], ["clients", "email", "(the contact row 121 creates in this run)"]]);
+  assert.equal(ghl.writes().length, 0);
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(run.rows.map((x) => [x.match, !!x.done]), [["create", true], ["email", true]]); assert.equal(run.rows[0].ghlId, run.rows[1].ghlId); assert.equal(ghl.contacts.size, 6);
+  const id = run.rows[0].ghlId;
+  assert.deepEqual([...ghl.get(id).tags!].sort(), ["desk-client", "desk-onboarding", "monday-import"]); assert.equal(ghl.value(id, "Desk Pay Status"), "Paid / Current"); assert.equal(ghl.value(id, "Desk Onboarding Stage"), "Launched");
+  assert.deepEqual((await listClientsGhl()).rows.map((x) => x.name), ["New Both Co"], "launched, so it shows on the Clients tab");
+});
+
+test("two rows of one board never land on one contact: the second is refused, in the dry run too", async () => {
+  // One person, two businesses, one email — and GoHighLevel has no contact for either yet.
+  boards([
+    row("311", "Brand One Plumbing", stage("new"), { [COL.email]: "owner@brands.example", [COL.package]: "Local Growth" }),
+    row("312", "Brand Two HVAC", stage("collecting"), { [COL.email]: "Owner@brands.example", [COL.package]: "Max Growth" }),
+  ]);
+  const dry = await migrateDesk({ dryRun: true });
+  assert.deepEqual(dry.rows.map((x) => x.match), ["create", "unmatched"]);
+  assert.match(dry.rows[1].detail!, /row 311 creates a contact with the same email or phone, and one contact cannot be two onboarding records/);
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(run.rows.map((x) => [x.name, x.match, !!x.done]), [["Brand One Plumbing", "create", true], ["Brand Two HVAC", "unmatched", false]]);
+  assert.match(run.rows[1].detail!, /already carries onboarding record item 311 from the old board/); assert.equal(run.rows[1].candidates!.length, 1);
+  const id = run.rows[0].ghlId;
+  assert.equal(ghl.contacts.size, 6); assert.equal(ghl.value(id, "Desk Monday Onboarding ID"), "311"); assert.deepEqual(ghl.value(id, "Desk Packages"), ["Local Growth"]); assert.equal(ghl.value(id, "Desk Onboarding Stage"), "New handoff");
+  // Running it again changes nothing: the first stays imported, the second stays refused until it has a contact of its own.
+  const again = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(again.rows.map((x) => x.match), ["imported", "unmatched"]); assert.equal(ghl.value(id, "Desk Monday Onboarding ID"), "311");
+  const own = ghl.addContact({ id: "BrandTwoOwnContact01", companyName: "Brand Two HVAC" });
+  const pinned = await migrateDesk({ pauseMs: 0, dryRun: false, onlyIds: ["312"], map: { "312": own.id } });
+  assert.equal(pinned.counts.written, 1); assert.equal(ghl.value(own.id, "Desk Monday Onboarding ID"), "312"); assert.equal(ghl.get(own.id).email, undefined, "the shared email stays on the first contact");
+  // And two rows that match one EXISTING contact: refused before anything is written, dry run included.
+  boards([row("411", "Twin A", stage("new"), { [COL.email]: "pat@unrelated.example" }), row("412", "Twin B", stage("new"), { [COL.email]: "pat@unrelated.example" })]);
+  assert.deepEqual((await migrateDesk({ dryRun: true })).rows.map((x) => x.match), ["email", "unmatched"]);
+});
+
+test("a giveaway winner is never brought over without the label: the row is blocked, and the winners list says who is protected", async () => {
+  boards([row("511", "Winner Co", stage("new"), { [COL.email]: "win@winner.example", [COL.package]: "Giveaway Winner, Local Growth" })]);
+  const def = ghl.defs.find((d) => d.name === "Desk Packages")!;
+  const full = def.picklistOptions;
+  def.picklistOptions = (full || []).filter((o) => o !== "Giveaway Winner"); forgetCustomFields();
+  const dry = await migrateDesk({ dryRun: true });
+  assert.match(dry.rows[0].detail!, /^BLOCKED — a real run will refuse this row: "Giveaway Winner" is not an option on Desk Packages in GoHighLevel/);
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.equal(run.counts.failed, 1); assert.equal(run.counts.written, 0); assert.match(run.rows[0].error!, /^not imported: "Giveaway Winner" is not an option/);
+  assert.equal(ghl.contacts.size, 5, "no contact was created"); assert.equal(ghl.writes().length, 0);
+  assert.deepEqual(run.winners, [{ board: "onboarding", mondayId: "511", name: "Winner Co", imported: false, protected: false }]);
+  // With the option back, it goes over and is protected.
+  def.picklistOptions = full; forgetCustomFields();
+  const ok = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(ok.winners, [{ board: "onboarding", mondayId: "511", name: "Winner Co", imported: true, protected: true }]);
+  // A winner whose contact lost the label in GoHighLevel since is called out: imported, not protected.
+  ghl.get(ok.rows[0].ghlId).customFields!.find((x) => x.id === ghl.fieldId("Desk Packages"))!.value = ["Local Growth"];
+  assert.deepEqual((await migrateDesk({ dryRun: true })).winners, [{ board: "onboarding", mondayId: "511", name: "Winner Co", imported: true, protected: false }]);
+});
+
+test("a run that stopped after the fields were written is finished by the next one, not skipped as imported", async () => {
+  boards([row("611", "Half Done Co", stage("new"), { [COL.email]: "half@done.example" }, { updates: [upd("801", "first update"), upd("802", "second update")] })]);
+  blobSeed("onboarding/intake/611.json", { version: 1, itemId: "611", leadId: "", business: "Half Done Co", tokenHash: null, tokenIssuedAt: null, tokenExpiresAt: null, revokedAt: null, form: { business: "Half Done Co" }, lastSavedAt: null, submittedAt: null, reviewedAt: null, files: [], createdAt: "", updatedAt: "" });
+  ghl.failures.push({ match: /^POST \/contacts\/[^/]+\/tags$/, status: 500 });
+  const first = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.equal(first.counts.failed, 1); assert.match(first.rows[0].error!, /GoHighLevel error 500 on POST/);
+  const id = [...ghl.contacts.values()].find((c) => c.companyName === "Half Done Co")!.id;
+  assert.equal(ghl.value(id, "Desk Monday Onboarding ID"), "611"); assert.deepEqual(ghl.get(id).tags, []); assert.equal(ghl.notesFor(id).length, 0);
+  const dry = await migrateDesk({ dryRun: true });
+  assert.equal(dry.rows[0].match, "imported"); assert.match(dry.rows[0].detail!, /^already imported, but an earlier run did not finish: tag desk-onboarding, 2 updates to copy as notes, storage link intake\/611 — the next real run completes it$/);
+  const second = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.equal(second.counts.finished, 1); assert.equal(second.counts.written, 0); assert.equal(second.counts.failed, 0);
+  assert.match(second.rows[0].detail!, /^already imported — finished what an earlier run left: tag desk-onboarding, 2 updates copied as notes, storage link intake\/611$/);
+  assert.deepEqual(ghl.get(id).tags, ["desk-onboarding"]); assert.equal(ghl.notesFor(id).length, 2); assert.equal(blobJson<IntakeRecord>("onboarding/intake/611.json")!.contactId, id);
+  const writes = ghl.writes().length;
+  const third = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.equal(third.rows[0].detail, "already imported — skipped (force re-writes it)"); assert.equal(ghl.writes().length, writes);
+});
+
+test("a contact GoHighLevel's search has not caught up with is matched, not overwritten: nothing it holds is replaced", async () => {
+  boards([row("711", "Board Name LLC", stage("new"), { [COL.email]: "fresh@lead.example", [COL.contact]: "Board Person", [COL.salesOwner]: person("Josh Pack", 39848217), [COL.package]: "Local Growth" })]);
+  ghl.settle(); ghl.lag = true; // the search index is a few seconds behind…
+  ghl.addContact({ id: "FreshLeadContact0001", firstName: "Fresh", lastName: "Lead", companyName: "Fresh Lead LLC", email: "fresh@lead.example", tags: ["website-form"], assignedTo: reps.Dave }); // …and this contact arrived in those seconds
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.equal(run.counts.written, 1); assert.equal(run.rows[0].ghlId, "FreshLeadContact0001"); assert.equal(ghl.contacts.size, 6, "no second contact");
+  const c = ghl.get("FreshLeadContact0001");
+  assert.equal(c.firstName, "Fresh"); assert.equal(c.companyName, "Fresh Lead LLC"); assert.equal(c.assignedTo, reps.Dave, "its owner is not replaced by the board's sales owner");
+  assert.deepEqual(c.tags, ["website-form", "desk-onboarding"], "it was not created by the import, so it is not tagged monday-import");
+  assert.ok(run.rows[0].warnings.some((w) => /GoHighLevel already had a contact with this email or phone \(FreshLeadContact0001\)/.test(w)));
+  assert.equal(ghl.value("FreshLeadContact0001", "Desk Onboarding Stage"), "New handoff"); assert.equal(ghl.value("FreshLeadContact0001", "Desk Link"), undefined);
+});
+
+test("search results that come without the name pair never make the import overwrite a name: every matched contact is read fresh", async () => {
+  ghl.searchOmitsNames = true;
+  const dry = await migrateDesk({ dryRun: true, onlyIds: [BOURBON_OB] });
+  assert.deepEqual(dry.rows[0].contactFields.sort(), ["city", "state", "website"], "the lead already has a name, an email and a phone");
+  await migrateDesk({ pauseMs: 0, dryRun: false, onlyIds: [BOURBON_OB] });
+  const c = ghl.get("LeadBourbon0000000A1");
+  assert.equal(c.firstName, "Freddy"); assert.equal(c.lastName, "Sumbay"); assert.equal(c.companyName, "Bourbon Leather Co");
+});
+
+test("the import proves what GoHighLevel kept: a dropped package fails the row, and files left under another key are called out", async () => {
+  ghl.drop.set("Desk Packages", ["Social Ads $1,200"]);
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false, onlyIds: [LADYBUG_OB] });
+  assert.equal(run.counts.failed, 1); assert.match(run.rows[0].error!, /GoHighLevel did not keep "Social Ads \$1,200" in Desk Packages on LadybugGhlContact001/);
+  ghl.drop.clear();
+  // An unlinked client row whose files sit under its own key, for a business whose contact keeps its files under the onboarding key.
+  ghl.addContact({ id: "AcmeRoofingContact01", firstName: "Al", companyName: "Acme Roofing", email: "al@acme.example" });
+  boards(
+    [row("111", "Acme Roofing", stage("building"), { [COL.email]: "al@acme.example", [COL.package]: "Local Growth" })],
+    [row("211", "Acme Roofing", group("active"), { [CCOL.email]: "al@acme.example", [CCOL.package]: "Local Growth", [CCOL.teamDesk]: onDesk })],
+  );
+  blobSeed("onboarding/intake/c211.json", { version: 1, itemId: "c211", leadId: "", business: "Acme Roofing", tokenHash: null, tokenIssuedAt: null, tokenExpiresAt: null, revokedAt: null, form: { business: "Acme Roofing" }, lastSavedAt: null, submittedAt: null, reviewedAt: null, files: [{ key: "onboarding/files/c211/Brand/logo.png", name: "logo.png", size: 10, type: "image/png", category: "Brand", uploadedAt: "2026-09-25T10:00:00.000Z" }], createdAt: "", updatedAt: "" });
+  const both = await migrateDesk({ pauseMs: 0, dryRun: false });
+  assert.deepEqual(both.rows.map((x) => !!x.done), [true, true]);
+  assert.ok(both.rows[1].warnings.some((w) => /1 file added on the Clients tab is stored under c211, but this contact's files live under 111 — it will not show on the desk after the switch unless moved/.test(w)));
 });
 
 test("matching order and its tie-breaks", () => {
@@ -277,7 +415,10 @@ test("setup, diag and the self-test: what the desk writes is spelled out, and th
   assert.equal(plan.plan!.length, 43); assert.equal(ghl.writes().length, 0);
   const run = await deskSelfTest(false, DAVE);
   assert.equal(run.error, undefined); assert.equal(run.passed, 43); assert.deepEqual(run.failed, []); assert.deepEqual(run.clearFailed, []);
-  assert.match(run.tag!, /desk-onboarding: add ok, removed again: ok/); assert.match(run.search!, /accepted/); assert.match(run.note!, /^added; authored as Dave/); assert.equal(run.restored, "original values written back");
+  assert.match(run.tag!, /desk-onboarding: add ok, removed again: ok/); assert.match(run.search!, /accepted/); assert.equal(run.restored, "original values written back");
+  assert.match(run.note!, /^added; authored as Dave; \d{4} characters kept whole$/, "a note as long as the desk accepts keeps its marker");
+  assert.equal(run.version, "dateUpdated moved on the field write; moved on the tag add");
+  assert.match(run.searchCarries!, /^firstName NO, lastName NO, contactName yes, companyName yes, .*tags yes, customFields yes, assignedTo yes, dateUpdated yes$/);
   assert.equal(ghl.value(TEST, "Desk Notes"), "was here before"); assert.equal(ghl.value(TEST, "Desk Onboarding Stage"), ""); assert.deepEqual(ghl.value(TEST, "Desk Packages"), []); assert.deepEqual(ghl.get(TEST).tags, ["sales-lead"]); assert.equal(ghl.value(TEST, "Lead Source"), "Other");
   assert.ok(ghl.writes().every((w) => w.path.startsWith(`/contacts/${TEST}`)), "no other contact was written");
   assert.match((await deskSelfTest(false, DAVE)).note!, /^already there today/);

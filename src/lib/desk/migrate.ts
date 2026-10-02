@@ -1,10 +1,10 @@
 import { CallDeskError, MONDAY_ID } from "@/lib/calls/validation";
 import { importMarker } from "@/lib/calls/markers";
-import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, ghlLocationId, listNotes, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "@/lib/ghl/client";
+import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, GhlError, ghlLocationId, listNotes, normalizePhone, searchContacts, splitName, updateContact, type GhlContact, type GhlContactPatch } from "@/lib/ghl/client";
 import { ghlIdFromLink } from "@/lib/ghl/admin";
 import { salesFields, type SalesFields } from "@/lib/ghl/fields";
 import { monday } from "@/lib/onboarding/api";
-import { COL, PIPELINE_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, isGiveawayWinner } from "@/lib/onboarding/config";
+import { COL, GIVEAWAY_WINNER, PIPELINE_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, isGiveawayWinner } from "@/lib/onboarding/config";
 import { splitNextAction } from "@/lib/onboarding/pipeline";
 import { readIntake, writeIntake } from "@/lib/onboarding/store";
 import { CCOL, CLIENTS_BOARD_ID, CLIENT_GROUPS } from "@/lib/clients/config";
@@ -137,7 +137,9 @@ export function matchRow(input: MatchInput, ix: DeskIndex, opts: MatchOptions = 
 }
 
 // ───────────────────────────── planning the writes ─────────────────────────────
-export type Plan = { values: DeskValues; native: Omit<GhlContactPatch, "customFields" | "tags">; tags: string[]; salesLeadId: string; warnings: string[] };
+export type Plan = { values: DeskValues; native: Omit<GhlContactPatch, "customFields" | "tags">; tags: string[]; salesLeadId: string; warnings: string[];
+  /** Reasons this row must NOT be written as planned (a real run refuses it; a dry run shows them). */
+  blockers: string[] };
 const option = (f: DeskFields, key: DeskFieldKey, value: string, warnings: string[], what: string): string => {
   if (!value) return "";
   const live = f[key]?.options || []; const options = live.length ? live : DESK_FIELDS[key].options || [];
@@ -146,10 +148,14 @@ const option = (f: DeskFields, key: DeskFieldKey, value: string, warnings: strin
   return "";
 };
 const put = (values: DeskValues, key: DeskFieldKey, value: string | number | string[] | null | undefined) => { if (value !== undefined && value !== null && value !== "" && !(Array.isArray(value) && !value.length)) values[key] = value; };
-function packagesOf(row: MondayRow, colId: string, f: DeskFields, warnings: string[]): string[] {
+function packagesOf(row: MondayRow, colId: string, f: DeskFields, warnings: string[], blockers: string[]): string[] {
   const live = f.packages?.options || []; const options = live.length ? live : DESK_FIELDS.packages.options || [];
   const all = splitPackages(text(row, colId));
-  for (const p of all.filter((x) => !options.includes(x))) warnings.push(`package "${p}" is not an option on Desk Packages — skipped`);
+  for (const p of all.filter((x) => !options.includes(x))) {
+    // A winner must never arrive without the label: on GoHighLevel that label is the only thing that stops the package builder billing them.
+    if (p === GIVEAWAY_WINNER) blockers.push(`"${GIVEAWAY_WINNER}" is not an option on Desk Packages in GoHighLevel — add it there (Settings → Custom Fields) before importing this row`);
+    else warnings.push(`package "${p}" is not an option on Desk Packages — skipped`);
+  }
   return all.filter((p) => options.includes(p));
 }
 /** The contact's own fields: fill what is blank, never overwrite what GoHighLevel has. */
@@ -167,7 +173,7 @@ function nativeFor(row: MondayRow, existing: GhlContact | null, contact: string,
 }
 
 export function planOnboarding(row: MondayRow, existing: GhlContact | null, f: DeskFields, deskLink = ""): Plan {
-  const warnings: string[] = [];
+  const warnings: string[] = []; const blockers: string[] = [];
   const values: DeskValues = { mondayOnboardingId: row.id };
   const stage = STAGES.find((s) => s.group === row.group?.id);
   if (stage) values.obStage = stage.label; else warnings.push(`group "${row.group?.title || "?"}" is not a desk stage — imported with no stage (shows as Unknown)`);
@@ -183,7 +189,7 @@ export function planOnboarding(row: MondayRow, existing: GhlContact | null, f: D
   put(values, "dnsPath", option(f, "dnsPath", text(row, COL.dnsPath).split(",")[0].trim(), warnings, "DNS path"));
   const next = splitNextAction(text(row, COL.nextAction));
   put(values, "nextAction", next.action.slice(0, 500)); put(values, "nextDue", next.due);
-  put(values, "packages", packagesOf(row, COL.package, f, warnings));
+  put(values, "packages", packagesOf(row, COL.package, f, warnings, blockers));
   const custom = Number(text(row, COL.customMonthly)); if (text(row, COL.customMonthly) && Number.isFinite(custom)) values.customMonthly = custom;
   const setup = Number(text(row, COL.setup)); if (text(row, COL.setup) && Number.isFinite(setup)) values.setup = setup;
   put(values, "agreement", option(f, "agreement", text(row, COL.agreement), warnings, "agreement"));
@@ -203,11 +209,11 @@ export function planOnboarding(row: MondayRow, existing: GhlContact | null, f: D
   const owner = memberByName(salesOwner);
   if (!existing?.assignedTo && owner?.ghlUserId) native.assignedTo = owner.ghlUserId;
   const leadId = text(row, COL.leadId);
-  return { values, native, tags: [DESK_TAGS.onboarding], salesLeadId: MONDAY_ID.test(leadId) ? leadId : "", warnings };
+  return { values, native, tags: [DESK_TAGS.onboarding], salesLeadId: MONDAY_ID.test(leadId) ? leadId : "", warnings, blockers };
 }
 
 export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskFields): Plan {
-  const warnings: string[] = [];
+  const warnings: string[] = []; const blockers: string[] = [];
   const values: DeskValues = { mondayClientId: row.id };
   const group = CLIENT_GROUPS.find((g) => g.group === row.group?.id);
   if (group) values.clientStatus = group.label; else warnings.push(`group "${row.group?.title || "?"}" is not a desk group — imported with no status (shows as Unknown)`);
@@ -222,7 +228,7 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
   const custom = Number(text(row, CCOL.customMonthly)); if (text(row, CCOL.customMonthly) && Number.isFinite(custom)) values.customMonthly = custom;
   // One contact carries both records. Where the onboarding record already set a shared field, the client row only adds to it.
   const had = (key: DeskFieldKey) => (existing ? deskText(existing, f, key) : "");
-  const packages = packagesOf(row, CCOL.package, f, warnings);
+  const packages = packagesOf(row, CCOL.package, f, warnings, blockers);
   const already = existing ? deskList(existing, f, "packages") : [];
   if (already.length && packages.length && [...packages].sort().join("|") !== [...already].sort().join("|")) warnings.push(`packages differ: the contact has ${already.join(", ")}; the Active Clients row has ${packages.join(", ")} — both are kept`);
   put(values, "packages", [...new Set([...already, ...packages])]);
@@ -239,7 +245,7 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
   const onboardingItem = text(row, CCOL.onboardingItem);
   if (MONDAY_ID.test(onboardingItem) && !had("mondayOnboardingId")) values.mondayOnboardingId = onboardingItem;
   const native = nativeFor(row, existing, text(row, CCOL.contact), text(row, CCOL.email), text(row, CCOL.phone), link(row, CCOL.website), "", warnings);
-  return { values, native, tags: [DESK_TAGS.client], salesLeadId: "", warnings };
+  return { values, native, tags: [DESK_TAGS.client], salesLeadId: "", warnings, blockers };
 }
 
 // ───────────────────────────── the run ─────────────────────────────
@@ -248,10 +254,11 @@ export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number;
   pauseMs?: number };
 export type DeskMigrateRow = { board: "onboarding" | "clients"; mondayId: string; name: string; match: MatchKind; ghlId: string; ghlName: string; state: string; fields: string[]; contactFields: string[]; owner: boolean; tags: string[]; updates: number; checklist: number; storage: string[]; warnings: string[]; candidates?: { id: string; name: string }[]; detail?: string; done?: boolean; error?: string };
 export type DeskMigrateReport = {
-  dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; failed: number }; rows: DeskMigrateRow[];
+  dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; finished: number; failed: number }; rows: DeskMigrateRow[];
   skipped: { template: number; offDesk: { mondayId: string; name: string }[] };
-  /** Every row on either board tagged Giveaway Winner, and whether it is on a GoHighLevel contact yet. After the flip the billing guard reads GoHighLevel only — a winner left behind on Monday would no longer be protected. */
-  winners: { board: "onboarding" | "clients"; mondayId: string; name: string; imported: boolean }[];
+  /** Every row on either board tagged Giveaway Winner: `imported` = it is on a GoHighLevel contact; `protected` = that contact's Desk Packages carries
+   *  Giveaway Winner. After the flip the billing guard reads GoHighLevel only, so every winner must be `protected` before then. */
+  winners: { board: "onboarding" | "clients"; mondayId: string; name: string; imported: boolean; protected: boolean }[];
 };
 
 async function readAllContacts(): Promise<GhlContact[]> {
@@ -283,13 +290,73 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
   const ix = indexForDesk(await readAllContacts(), f, sales);
   const report: DeskMigrateReport = {
     dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, ghlContacts: ix.total,
-    counts: { imported: 0, mapped: 0, "onboarding-record": 0, "ghl-link": 0, lead: 0, stripe: 0, email: 0, phone: 0, "company-name": 0, create: 0, "create-name-only": 0, unmatched: 0, written: 0, failed: 0 },
+    counts: { imported: 0, mapped: 0, "onboarding-record": 0, "ghl-link": 0, lead: 0, stripe: 0, email: 0, phone: 0, "company-name": 0, create: 0, "create-name-only": 0, unmatched: 0, written: 0, finished: 0, failed: 0 },
     rows: [], skipped: { template: pipeline.length - pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID).length, offDesk: opts.includeOffDesk ? [] : offDesk.filter(keep).map((r) => ({ mondayId: r.id, name: r.name })) },
     winners: [],
   };
   const gap = opts.pauseMs ?? 120;
   const linked = new Map<string, string>(); // onboarding item id → contact id, as this run goes
   const pending = new Set<string>(); // onboarding items whose contact this run creates (dry run: would create)
+  // One contact cannot be two onboarding records (or two clients): the second row would overwrite the first. `claimed` catches two
+  // rows of one board landing on the same contact inside a run; `creating` does the same for two rows that would each create a
+  // contact with the same email or phone (a dry run creates nothing, so the first row's contact is not there to find).
+  const claimed = { onboarding: new Map<string, string>(), client: new Map<string, string>() };
+  const creating = new Map<string, { row: string; kind: "onboarding" | "client" }>();
+  const what = (kind: "onboarding" | "client") => (kind === "onboarding" ? "onboarding record" : "client");
+  const conflictOn = (kind: "onboarding" | "client", row: MondayRow, c: GhlContact): string => {
+    const holds = deskText(c, f, kind === "onboarding" ? "mondayOnboardingId" : "mondayClientId").trim();
+    const inRun = claimed[kind].get(c.id) || "";
+    // A client row may carry its (gone) onboarding item's id for its files; that is not a second onboarding record unless the contact is one.
+    const other = holds && holds !== row.id && (kind === "client" || !!deskText(c, f, "obStage") || (c.tags || []).includes(DESK_TAGS.onboarding)) ? holds : inRun && inRun !== row.id ? inRun : "";
+    return other ? `contact ${c.id} (${(c.companyName || contactDisplayName(c) || "no name").trim()}) already carries ${what(kind)} item ${other} from the old board, and one contact cannot be two ${what(kind)}s. Two businesses that share an email or phone need a contact each: make one in GoHighLevel for this business and pass map: { "${row.id}": "<contact id>" }. The same business listed twice on the board: import only one of the rows.` : "";
+  };
+  const planFor = (kind: "onboarding" | "client", row: MondayRow, c: GhlContact | null): Plan => {
+    const plan = kind === "onboarding" ? planOnboarding(row, c, f, c && opts.origin ? `${opts.origin}/leads?tab=onboarding&client=${c.id}` : "") : planClient(row, c, f);
+    // GoHighLevel refuses an email or phone another contact already holds, and that refusal would fail the whole write:
+    // leave this contact's blank as it is and say so (the dry run shows it too).
+    if (c) {
+      const emailOwner = plan.native.email ? ix.byEmail.get(plan.native.email) : undefined;
+      if (emailOwner && emailOwner.id !== c.id) { plan.warnings.push(`the board's email is already on another contact (${emailOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.email; }
+      const phoneOwner = plan.native.phone ? ix.byPhone.get(plan.native.phone) : undefined;
+      if (phoneOwner && phoneOwner.id !== c.id) { plan.warnings.push(`the board's phone is already on another contact (${phoneOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.phone; }
+    }
+    if ((row.updates || []).length >= UPDATES_PER_ITEM) plan.warnings.push(`this item has ${UPDATES_PER_ITEM} or more updates — only the newest ${UPDATES_PER_ITEM} are copied as notes`);
+    return plan;
+  };
+  /**
+   * Everything after the field write: the desk tag(s), one note per Monday update (the marker is the update id, so never twice),
+   * and the storage link. Run for every written row — and for a row that is already imported, so a run that stopped after the
+   * fields were written is finished by the next one instead of being skipped as "imported". `apply: false` only reports.
+   */
+  const finish = async (kind: "onboarding" | "client", row: MondayRow, c: GhlContact, tags: string[], out: DeskMigrateRow, apply: boolean): Promise<{ did: string[]; left: string[]; copied: number }> => {
+    const did: string[] = []; const left: string[] = [];
+    const missingTags = tags.filter((t) => !(c.tags || []).includes(t));
+    if (missingTags.length) { if (apply) { await addTags(c.id, tags); did.push(`tag ${missingTags.join(", ")}`); } else left.push(`tag ${missingTags.join(", ")}`); }
+    const have = await listNotes(c.id);
+    let copied = 0; let waiting = 0;
+    for (const u of [...(row.updates || [])].reverse()) {
+      const body = (u.text_body || "").trim();
+      if (!body || have.some((n) => (n.body || "").includes(importMarker(u.id)))) continue;
+      if (!apply) { waiting++; continue; }
+      const handoff = /\[CC-HANDOFF:([^\]]+)\]/.exec(body)?.[1];
+      // The markers ride on the first line: if GoHighLevel ever cuts a long note short, "already copied" still holds.
+      await addNote(c.id, `From the old board (${u.creator?.name || "Team"}, ${u.created_at.slice(0, 10)}): ${importMarker(u.id)}${handoff ? ` ${summaryMarker(handoff)}` : ""} [CC-SRC:${kind === "onboarding" ? "onboarding" : "client"}]\n${body}`);
+      copied++; await pause(gap);
+    }
+    if (copied) did.push(`${copied} update${copied === 1 ? "" : "s"} copied as notes`);
+    if (waiting) left.push(`${waiting} update${waiting === 1 ? "" : "s"} to copy as notes`);
+    // Storage: the client's intake / file record stays under its Monday-era key and learns which contact it belongs to.
+    const onboardingScope = kind === "client" ? text(row, CCOL.onboardingItem) : "";
+    for (const scope of kind === "onboarding" ? [row.id] : [`c${row.id}`, ...(MONDAY_ID.test(onboardingScope) ? [onboardingScope] : [])]) {
+      const intake = await readIntake(scope).catch(() => null);
+      if (intake && intake.contactId !== c.id) {
+        if (apply) { await writeIntake({ ...intake, contactId: c.id }); out.storage.push(`intake/${scope}: contactId set`); did.push(`storage link intake/${scope}`); }
+        else left.push(`storage link intake/${scope}`);
+      } else if (intake) out.storage.push(`intake/${scope}: already linked`);
+    }
+    return { did, left, copied };
+  };
+
   for (const { kind, row } of slice) {
     const board = kind === "onboarding" ? "onboarding" as const : "clients" as const;
     const out: DeskMigrateRow = { board, mondayId: row.id, name: row.name, match: "unmatched", ghlId: "", ghlName: "", state: row.group?.title || "", fields: [], contactFields: [], owner: false, tags: [], updates: (row.updates || []).filter((u) => (u.text_body || "").trim()).length, checklist: (row.subitems || []).length, storage: [], warnings: [] };
@@ -299,90 +366,116 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       if (stripeCustomer && stripeConnected()) stripeEmail = (await snapshot(stripeCustomer).catch(() => null))?.email?.toLowerCase() || "";
       const email = text(row, kind === "onboarding" ? COL.email : CCOL.email); const phone = text(row, kind === "onboarding" ? COL.phone : CCOL.phone);
       const found = matchRow({ row, kind, email, phone, leadId: kind === "onboarding" ? text(row, COL.leadId) : "", onboardingItem: kind === "client" ? text(row, CCOL.onboardingItem) : "", stripeCustomer, stripeEmail }, ix, { map: opts.map, createNameOnly: opts.createNameOnly, linked, pending });
-      out.match = found.match; out.candidates = found.candidates; out.detail = found.detail; report.counts[found.match]++;
-      let contact = found.contact;
-      out.ghlId = contact?.id || ""; out.ghlName = contact ? (contact.companyName || contactDisplayName(contact) || "").trim() : "";
-      if (contact && kind === "onboarding") linked.set(row.id, contact.id);
-      if (!contact && kind === "onboarding" && (found.match === "create" || found.match === "create-name-only")) pending.add(row.id);
-      if (found.match === "unmatched") { report.rows.push(out); continue; }
-      if (found.match === "onboarding-record" && !contact) { // a dry run (nothing is created yet), or a real run in which the onboarding row failed
+      let match = found.match; let detail = found.detail; let candidates = found.candidates;
+      // Plan from a FRESH read by id, never from the search copy: search results lag writes (an earlier row in this run may
+      // have just written this contact) and can come without the name pair — and "fill only what is blank" must see the truth.
+      let contact = found.contact ? await getContact(found.contact.id) : null;
+      let joins = ""; // dry run only: the row of the OTHER board whose new contact this row would land on
+      if (contact) {
+        const conflict = conflictOn(kind, row, contact);
+        if (conflict) { candidates = [{ id: contact.id, name: (contact.companyName || contactDisplayName(contact) || contact.id).trim() }]; match = "unmatched"; detail = conflict; contact = null; }
+      } else if (match === "create" || match === "create-name-only") {
+        const keys = [email.trim() ? `e:${email.trim().toLowerCase()}` : "", phone && normalizePhone(phone).length >= 11 ? `p:${normalizePhone(phone)}` : ""].filter(Boolean);
+        const twin = keys.map((k) => creating.get(k)).find(Boolean);
+        if (twin && twin.kind === kind) { match = "unmatched"; detail = `row ${twin.row} creates a contact with the same email or phone, and one contact cannot be two ${what(kind)}s. Two businesses that share an email or phone need a contact each: make one in GoHighLevel for this business and pass map: { "${row.id}": "<contact id>" }.`; }
+        else if (twin) { match = keys[0].startsWith("e:") && creating.get(keys[0]) ? "email" : "phone"; joins = twin.row; }
+        else for (const k of keys) creating.set(k, { row: row.id, kind });
+      }
+      out.match = match; out.candidates = candidates; out.detail = detail; report.counts[match]++;
+      out.ghlId = contact?.id || ""; out.ghlName = contact ? (contact.companyName || contactDisplayName(contact) || "").trim() : joins ? `(the contact row ${joins} creates in this run)` : "";
+      if (contact) { claimed[kind].set(contact.id, row.id); if (kind === "onboarding") linked.set(row.id, contact.id); }
+      if (!contact && kind === "onboarding" && (match === "create" || match === "create-name-only")) pending.add(row.id);
+      if (match === "unmatched") { report.rows.push(out); continue; }
+      if (match === "onboarding-record" && !contact) { // a dry run (nothing is created yet), or a real run in which the onboarding row failed
         out.ghlName = "(the contact its onboarding record creates)";
         if (!opts.dryRun) out.detail = "skipped: its onboarding record was not written in this run — fix that row and run this again";
         report.rows.push(out); continue;
       }
-      const plan = kind === "onboarding" ? planOnboarding(row, contact, f, contact && opts.origin ? `${opts.origin}/leads?tab=onboarding&client=${contact.id}` : "") : planClient(row, contact, f);
-      // GoHighLevel refuses an email or phone another contact already holds, and that refusal would fail the whole write:
-      // leave this contact's blank as it is and say so (the dry run shows it too).
-      if (contact) {
-        const emailOwner = plan.native.email ? ix.byEmail.get(plan.native.email) : undefined;
-        if (emailOwner && emailOwner.id !== contact.id) { plan.warnings.push(`the board's email is already on another contact (${emailOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.email; }
-        const phoneOwner = plan.native.phone ? ix.byPhone.get(plan.native.phone) : undefined;
-        if (phoneOwner && phoneOwner.id !== contact.id) { plan.warnings.push(`the board's phone is already on another contact (${phoneOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.phone; }
+      let plan = planFor(kind, row, contact);
+      if (kind === "client") {
+        // The Monday desk kept an unlinked client's files under "c" + its row id. If this contact's files live under another key
+        // (its onboarding record's), those would no longer show: say so now rather than after the switch.
+        const scope = (contact ? deskText(contact, f, "mondayOnboardingId").trim() : "") || (typeof plan.values.mondayOnboardingId === "string" ? plan.values.mondayOnboardingId : "") || `c${row.id}`;
+        const own = scope === `c${row.id}` ? null : await readIntake(`c${row.id}`).catch(() => null);
+        if (own?.files.length) plan.warnings.push(`${own.files.length} file${own.files.length === 1 ? "" : "s"} added on the Clients tab ${own.files.length === 1 ? "is" : "are"} stored under c${row.id}, but this contact's files live under ${scope} — ${own.files.length === 1 ? "it" : "they"} will not show on the desk after the switch unless moved`);
       }
-      if ((row.updates || []).length >= UPDATES_PER_ITEM) plan.warnings.push(`this item has ${UPDATES_PER_ITEM} or more updates — only the newest ${UPDATES_PER_ITEM} are copied as notes`);
-      out.fields = fieldNames(f, plan.values); out.contactFields = Object.keys(plan.native).filter((k) => k !== "assignedTo"); out.owner = "assignedTo" in plan.native; out.tags = plan.tags; out.warnings = plan.warnings;
-      if (found.match === "imported" && !opts.force) { out.detail = "already imported — skipped (force re-writes it)"; report.rows.push(out); continue; }
+      const describe = () => { out.fields = fieldNames(f, plan.values); out.contactFields = Object.keys(plan.native).filter((k) => k !== "assignedTo"); out.owner = "assignedTo" in plan.native; out.tags = plan.tags; out.warnings = plan.warnings; };
+      describe();
+      if (plan.blockers.length) {
+        if (!opts.dryRun) throw new Error(`not imported: ${plan.blockers.join("; ")}`);
+        out.detail = `BLOCKED — a real run will refuse this row: ${plan.blockers.join("; ")}`; report.rows.push(out); continue;
+      }
+      if (match === "imported" && !opts.force) {
+        // Imported means FINISHED: fields, tags, notes and the storage link. A run that stopped part-way is completed here.
+        const rest = await finish(kind, row, contact!, plan.tags, out, !opts.dryRun);
+        if (rest.did.length) { out.detail = `already imported — finished what an earlier run left: ${rest.did.join(", ")}`; out.done = true; report.counts.finished++; }
+        else if (rest.left.length) out.detail = `already imported, but an earlier run did not finish: ${rest.left.join(", ")} — the next real run completes it`;
+        else out.detail = "already imported — skipped (force re-writes it)";
+        report.rows.push(out); continue;
+      }
       if (opts.dryRun) { report.rows.push(out); continue; }
 
-      const customFields = deskWrites(f, plan.values);
       // The lead this onboarding record was handed off from: keep its Monday lead id on the contact so the stored handoff is found.
-      if (plan.salesLeadId && sales.mondayLeadId && !(contact && fieldText(contact, sales.mondayLeadId.id))) customFields.push({ id: sales.mondayLeadId.id, field_value: plan.salesLeadId });
-      if (contact) await updateContact(contact.id, { ...plan.native, customFields });
-      else {
-        const payload = { locationId: ghlLocationId(), ...plan.native, customFields, source: "Team desk (Monday import)" };
-        contact = found.match === "create-name-only" ? await createContact(payload) : (await upsertContact(payload)).contact;
-        out.ghlId = contact.id; out.ghlName = row.name; out.tags = [...plan.tags, DESK_TAGS.imported];
-        ix.byId.set(contact.id, contact);
-        if (plan.native.email) ix.byEmail.set(plan.native.email, contact);
-        if (plan.native.phone) ix.byPhone.set(plan.native.phone, contact);
-        if (kind === "onboarding") linked.set(row.id, contact.id);
+      const fieldsFor = (c: GhlContact | null) => [...deskWrites(f, plan.values), ...(plan.salesLeadId && sales.mondayLeadId && !(c && fieldText(c, sales.mondayLeadId.id)) ? [{ id: sales.mondayLeadId.id, field_value: plan.salesLeadId as unknown }] : [])];
+      let customFields = fieldsFor(contact);
+      let created = false;
+      if (!contact) {
+        // A plain create, never an upsert: if GoHighLevel already has this email or phone (its search had not caught up with a
+        // brand-new contact) it refuses and names the contact, and that contact is then treated as what it is — an existing one.
+        try { contact = await createContact({ locationId: ghlLocationId(), ...plan.native, customFields, source: "Team desk (Monday import)" }); created = true; }
+        catch (e) {
+          const dup = e instanceof GhlError ? /"contactId"\s*:\s*"([A-Za-z0-9]+)"/.exec(e.body)?.[1] : undefined;
+          if (!dup) throw e;
+          contact = await getContact(dup);
+          const conflict = conflictOn(kind, row, contact);
+          if (conflict) throw new Error(conflict);
+          plan = planFor(kind, row, contact); describe();
+          if (plan.blockers.length) throw new Error(`not imported: ${plan.blockers.join("; ")}`);
+          customFields = fieldsFor(contact);
+          out.warnings.push(`GoHighLevel already had a contact with this email or phone (${contact.id}) that its search did not show yet — matched to it instead of creating one; only its blank details were filled`);
+        }
+      }
+      if (created) {
+        out.tags = [...plan.tags, DESK_TAGS.imported];
         // The staff link back to the desk needs the new contact's id, so it is written once the contact exists.
         if (kind === "onboarding" && opts.origin) {
           const link = deskWrites(f, { deskLink: `${opts.origin}/leads?tab=onboarding&client=${contact.id}` });
           await updateContact(contact.id, { customFields: link });
           customFields.push(...link);
         }
-      }
+      } else await updateContact(contact.id, { ...plan.native, customFields });
       const contactId = contact.id;
-      // The checklist is one large-text field: prove GoHighLevel kept every row before calling this record imported.
-      if (typeof plan.values.checklist === "string") {
-        const kept = parseChecklist(deskText(await getContact(contactId), f, "checklist")).length;
-        if (kept !== out.checklist) throw new Error(`GoHighLevel kept ${kept} of ${out.checklist} checklist rows — the Desk Checklist field is too small for this record. The other fields were written; fix the field and re-run this row with force.`);
+      out.ghlId = contactId; if (!out.ghlName || created) out.ghlName = created ? row.name : (contact.companyName || contactDisplayName(contact) || "").trim();
+      // Read the contact back and prove the two things that must never be lost quietly before calling this record imported:
+      // the checklist (one large-text field — every row, whole) and the packages (a dropped Giveaway Winner label would let a winner be billed).
+      const merged = await getContact(contactId);
+      if (typeof plan.values.checklist === "string" && serializeChecklist(parseChecklist(deskText(merged, f, "checklist"))) !== plan.values.checklist) {
+        throw new Error(`GoHighLevel kept ${parseChecklist(deskText(merged, f, "checklist")).length} of ${out.checklist} checklist rows whole — the Desk Checklist field is too small for this record. The other fields were written; fix the field and re-run this row with force.`);
       }
-      // A later row for the same business (its Active Clients row) must see what this row just wrote.
-      const merged: GhlContact = { ...contact, ...plan.native, customFields: [...(contact.customFields || []).filter((x) => !customFields.some((w) => w.id === x.id)), ...customFields.map((w) => ({ id: w.id, value: w.field_value }))] };
+      const lost = (Array.isArray(plan.values.packages) ? plan.values.packages : []).filter((p) => !deskList(merged, f, "packages").includes(p));
+      if (lost.length) throw new Error(`GoHighLevel did not keep ${lost.map((p) => `"${p}"`).join(", ")} in Desk Packages on ${contactId}. The other fields were written; fix the Desk Packages field (or set the packages on the contact by hand) and re-run this row with force.`);
+      // A later row for the same business (its Active Clients row) is matched against what GoHighLevel holds now.
       ix.byId.set(contactId, merged);
       (kind === "onboarding" ? ix.byMondayOnboarding : ix.byMondayClient).set(row.id, merged);
-      if (plan.native.email && !ix.byEmail.has(plan.native.email)) ix.byEmail.set(plan.native.email, merged);
-      if (plan.native.phone && !ix.byPhone.has(plan.native.phone)) ix.byPhone.set(plan.native.phone, merged);
-      await addTags(contactId, out.tags);
-      // Monday updates → notes, once each (the marker is the Monday update id).
-      const have = await listNotes(contactId);
-      let copied = 0;
-      for (const u of [...(row.updates || [])].reverse()) {
-        const body = (u.text_body || "").trim();
-        if (!body || have.some((n) => (n.body || "").includes(importMarker(u.id)))) continue;
-        const handoff = /\[CC-HANDOFF:([^\]]+)\]/.exec(body)?.[1];
-        await addNote(contactId, `From the old board (${u.creator?.name || "Team"}, ${u.created_at.slice(0, 10)}):\n${body}\n\n${importMarker(u.id)}${handoff ? ` ${summaryMarker(handoff)}` : ""} [CC-SRC:${kind === "onboarding" ? "onboarding" : "client"}]`);
-        copied++; await pause(gap);
-      }
-      // Storage: the client's intake / file record stays under its Monday-era key and learns which contact it belongs to.
-      const onboardingScope = kind === "client" ? text(row, CCOL.onboardingItem) : "";
-      for (const scope of kind === "onboarding" ? [row.id] : [`c${row.id}`, ...(MONDAY_ID.test(onboardingScope) ? [onboardingScope] : [])]) {
-        const intake = await readIntake(scope).catch(() => null);
-        if (intake && intake.contactId !== contactId) { await writeIntake({ ...intake, contactId }); out.storage.push(`intake/${scope}: contactId set`); }
-        else if (intake) out.storage.push(`intake/${scope}: already linked`);
-      }
-      out.detail = `wrote ${customFields.length} fields, ${copied} of ${out.updates} updates copied as notes`; out.done = true;
+      if (merged.email && !ix.byEmail.has(merged.email.toLowerCase())) ix.byEmail.set(merged.email.toLowerCase(), merged);
+      if (merged.phone && !ix.byPhone.has(normalizePhone(merged.phone))) ix.byPhone.set(normalizePhone(merged.phone), merged);
+      claimed[kind].set(contactId, row.id);
+      if (kind === "onboarding") linked.set(row.id, contactId);
+      const rest = await finish(kind, row, merged, out.tags, out, true);
+      out.detail = `wrote ${customFields.length} fields, ${rest.copied} of ${out.updates} updates copied as notes`; out.done = true;
       report.counts.written++;
       await pause(gap);
-    } catch (e) { out.error = (e instanceof Error ? e.message : String(e)).replace(/[=?&]/g, " ").slice(0, 400); report.counts.failed++; } // no query-string shapes: the browser tool that reads this report redacts them
+    } catch (e) { out.error = (e instanceof Error ? e.message : String(e)).replace(/[=?&]/g, " ").slice(0, 600); report.counts.failed++; } // no query-string shapes: the browser tool that reads this report redacts them
     report.rows.push(out);
   }
+  const winnerRow = (r: MondayRow, boardName: "onboarding" | "clients", index: Map<string, GhlContact>) => {
+    const hit = index.get(r.id); const c = hit ? ix.byId.get(hit.id) || hit : undefined;
+    return { board: boardName, mondayId: r.id, name: r.name, imported: !!c, protected: !!c && isGiveawayWinner(deskList(c, f, "packages")) };
+  };
   const isWinner = (r: MondayRow, colId: string) => isGiveawayWinner(splitPackages(text(r, colId)));
   report.winners = [
-    ...pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID && isWinner(r, COL.package)).map((r) => ({ board: "onboarding" as const, mondayId: r.id, name: r.name, imported: ix.byMondayOnboarding.has(r.id) })),
-    ...clients.filter((r) => isWinner(r, CCOL.package)).map((r) => ({ board: "clients" as const, mondayId: r.id, name: r.name, imported: ix.byMondayClient.has(r.id) })),
+    ...pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID && isWinner(r, COL.package)).map((r) => winnerRow(r, "onboarding", ix.byMondayOnboarding)),
+    ...clients.filter((r) => isWinner(r, CCOL.package)).map((r) => winnerRow(r, "clients", ix.byMondayClient)),
   ];
   return report;
 }
