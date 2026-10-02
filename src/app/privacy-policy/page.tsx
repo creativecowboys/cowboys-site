@@ -401,7 +401,7 @@ export default function PrivacyPolicyPage() {
                         }}
                     >
                         <p style={{ fontSize: "15px", fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
-                            Creative Cowboys Media, LLC
+                            Creative Cowboys Media, LLC, doing business as Creative Cowboys
                         </p>
                         <p style={{ ...bodyStyle, margin: "0 0 4px" }}>222 W Montgomery St, Villa Rica, GA 30180</p>
                         <p style={{ ...bodyStyle, margin: "0 0 4px" }}>

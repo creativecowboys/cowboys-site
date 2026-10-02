@@ -184,7 +184,7 @@ export default function SmsTermsPage() {
 
                     <p style={{ ...bodyStyle, marginBottom: "48px" }}>
                         <strong style={{ color: "rgba(255,255,255,0.40)", fontWeight: 500 }}>
-                            Creative Cowboys Media, LLC
+                            Creative Cowboys Media, LLC, doing business as Creative Cowboys
                         </strong>
                     </p>
 
