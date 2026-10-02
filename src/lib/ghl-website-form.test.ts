@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { pushWebsiteFormToGHL, websiteFormNote, websiteFormPayload } from "./ghl-website-form";
+import { pushWebsiteFormToGHL, websiteFormNote, websiteFormPayload, websiteFormsToGhl } from "./ghl-website-form";
 import { forgetCustomFields } from "./ghl/client";
 import { resetIntakeLookup } from "./ghl/fields";
 
@@ -11,6 +11,7 @@ const originalFetch = global.fetch;
 beforeEach(() => {
   requests = []; queue = []; forgetCustomFields(); resetIntakeLookup();
   process.env.GHL_API_TOKEN = "nonfunctional-test-token"; process.env.GHL_LOCATION_ID = "LOCtest000000000000";
+  process.env.WEBSITE_FORMS_TO_GHL = "on"; delete process.env.LEADS_BACKEND;
   global.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     requests.push({ method: init?.method || "GET", path: String(url).replace("https://services.leadconnectorhq.com", ""), body: init?.body ? JSON.parse(String(init.body)) : undefined });
     const next = queue.shift();
@@ -20,6 +21,15 @@ beforeEach(() => {
 });
 afterEach(() => { global.fetch = originalFetch; });
 
+test("website forms stay out of GHL until the desk is on GHL, with an explicit override either way", async () => {
+  assert.equal(websiteFormsToGhl({}), false); assert.equal(websiteFormsToGhl({ LEADS_BACKEND: "monday" }), false);
+  assert.equal(websiteFormsToGhl({ LEADS_BACKEND: "ghl" }), true);
+  assert.equal(websiteFormsToGhl({ LEADS_BACKEND: "ghl", WEBSITE_FORMS_TO_GHL: "off" }), false);
+  assert.equal(websiteFormsToGhl({ WEBSITE_FORMS_TO_GHL: "ON" }), true);
+  delete process.env.WEBSITE_FORMS_TO_GHL; // default: off while LEADS_BACKEND is unset
+  assert.equal(await pushWebsiteFormToGHL({ name: "A B", email: "a@b.co", message: "hi" }), "");
+  assert.equal(requests.length, 0); // not one request to GHL
+});
 test("website form payload: split name, E.164 phone, form name as GHL source, website-form tag, Lead Source = Website form", () => {
   const p = websiteFormPayload({ name: "Jane Q Public", email: "Jane@Example.com", phone: "(770) 555-0199", company: "Public Plumbing", source: "Homepage Popup", service: "Local SEO", message: "Need more calls" }, "LOC", "fLS");
   assert.deepEqual(p, { locationId: "LOC", firstName: "Jane", lastName: "Q Public", email: "jane@example.com", phone: "+17705550199", companyName: "Public Plumbing", source: "Website form: Homepage Popup", tags: ["website-form"], customFields: [{ id: "fLS", field_value: "Website form" }] });

@@ -126,8 +126,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Mirror the lead into GoHighLevel (tag website-form, Lead Source "Website form") so it shows on the
-    // sales desk. Runs AFTER the response is sent (Next `after`, kept alive by the platform), so the
-    // visitor's submit is exactly as fast as before and a GHL problem can never fail or slow it.
+    // sales desk — only once the desk is on GHL (LEADS_BACKEND=ghl, or WEBSITE_FORMS_TO_GHL=on); until
+    // then this is a no-op and the form behaves exactly as it always has. Runs AFTER the response is sent
+    // (Next `after`, kept alive by the platform), so a GHL problem can never fail or slow the visitor's submit.
     const lead = {
       name: String(name), email: String(email), phone: typeof phone === "string" ? phone : undefined,
       company: typeof (company || business) === "string" ? String(company || business) : undefined,

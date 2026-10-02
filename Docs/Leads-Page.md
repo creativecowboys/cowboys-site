@@ -125,8 +125,12 @@ A GHL dropdown custom field, options seeded as `The Big Giveaway`, `Facebook`, `
 `Other`. **The desk reads the option list from GHL every time** — add "Big Giveaway 2" in GHL → Settings → Custom Fields →
 Lead Source and it appears on the desk with no deploy. Set automatically at intake: `/api/giveaway` → The Big Giveaway,
 `/api/playbook` → Ebook download, `/api/contact` (contact page, proposal popup, industry offer forms) → Website form (new:
-those forms now also upsert the contact into GHL with tag `website-form` and a note carrying the message; the Resend email
-is unchanged). On the desk: tag on every roster row, "Lead source" filter, and a select on the lead that writes it back.
+those forms also upsert the contact into GHL with tag `website-form` and a note carrying the message; the Resend email
+is unchanged). **The website-form push is off until `LEADS_BACKEND=ghl`** (override: `WEBSITE_FORMS_TO_GHL=on|off`) —
+a new GHL contact can enroll in whatever published workflow fires on contact creation, and GHL's API does not expose
+triggers, so before the flip a person checks that nothing unintended would message a website inquirer ("Wrangler - New
+Lead" is the workflow to look at). On the desk: tag on every roster row, "Lead source" filter, and a select on the lead
+that writes it back.
 
 ### Code
 - `src/lib/ghl/client.ts` — the ONE GHL client (timeout, 429 backoff, typed `GhlError`); `src/lib/packages/ghl.ts` re-exports it.
