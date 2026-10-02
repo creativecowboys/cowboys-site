@@ -113,6 +113,7 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
   const start = unwrapCursor(cursor);
   const leads: CallLead[] = [];
   let next: number | null = null;
+  let seen = 0, tagged = 0;
   let filters = rosterFilters(fields.leadSource?.id);
   for (let page = start; page < start + MAX_PAGES; page++) {
     let result: { contacts: GhlContact[]; total: number };
@@ -125,11 +126,14 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
         result = await searchContacts({ filters, page, pageLimit: PAGE, sort: [{ field: "dateAdded", direction: "desc" }] }, { timeoutMs: 25000 });
       } else throw e;
     }
+    seen += result.contacts.length; tagged += result.contacts.filter((c) => Array.isArray(c.tags) && c.tags.length > 0).length;
     leads.push(...result.contacts.filter((c) => c.id !== TEST_CONTACT_ID).map((c) => mapLead(c, fields)));
     if (result.contacts.length < PAGE) { next = null; break; }
     next = page + 1;
   }
-  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields) };
+  // Leads are found by tag, so a roster that comes back with no tags at all means GHL left them out of the search results. The desk
+  // then says it cannot see do-not-contact / fake-lead, rather than quietly listing someone who should not be called.
+  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields), noCallTagsRead: seen === 0 || tagged > 0 };
 }
 
 function mapHistory(notes: GhlNote[]): CallHistory[] {

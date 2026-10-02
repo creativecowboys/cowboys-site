@@ -183,6 +183,9 @@ email campaigns and news letters. But I don't want them in the sales list to cal
   or change Outreach Status on the contact in GHL. A `do-not-contact` / `fake-lead` tag is removed in GHL, never from the
   desk; a lead with a tag stays off the list until the tag is gone, whatever its status.
 - **Calendar feeds** skip off-list leads (`buildFeed`), whatever their status.
+- **Safety net**: the tag rule needs GHL to return each contact's tags with the roster search. The roster response carries
+  `noCallTagsRead`; if a roster ever comes back with no tags at all the desk shows a warning instead of quietly listing
+  a do-not-contact lead.
 - **Unchanged**: Won and Bad contact number. Both still show under All leads (sorted last) and under Closed / bad number;
   the calendar feeds still skip Bad contact number and still keep Won. The roster API still returns every lead (with
   `noCallTags` on each) and the split happens in the browser, so the Not Interested rule applies on the Monday backend too.

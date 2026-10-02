@@ -84,7 +84,7 @@ test("LEADS_GHL_TAGS narrows the roster to exactly those tags (no Lead Source cl
 test("getCallsPage: one request for a small roster, owners and lead-source options come back with it", async () => {
   queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "second00000000000000", companyName: "Second" })], total: 2 } });
   const page = await getCallsPage(null);
-  assert.equal(page.system, "ghl"); assert.equal(page.leads.length, 2); assert.equal(page.cursor, null);
+  assert.equal(page.system, "ghl"); assert.equal(page.leads.length, 2); assert.equal(page.cursor, null); assert.equal(page.noCallTagsRead, true);
   assert.deepEqual(page.owners.map((o) => o.name), ["Dave", "Josh", "Keaton"]); assert.deepEqual(page.leadSources, DEFS.customFields[0].picklistOptions);
   assert.deepEqual((requests[1].body as { sort: unknown }).sort, [{ field: "dateAdded", direction: "desc" }]);
   assert.equal((requests[1].body as { pageLimit: number }).pageLimit, 500);
@@ -112,6 +112,15 @@ test("off the call list: the roster search is unchanged and read-only, off-list 
   assert.deepEqual(ids("all"), [ID, "concept0000000000000"].sort());
   assert.deepEqual(ids(OFF_LIST_VIEW), ["dnc00000000000000000", "fake0000000000000000", "notint00000000000000"]);
   assert.deepEqual(Object.fromEntries(page.leads.map((l) => [l.name, offListReasons(l)])), { "Juniper & Co.": [], "Said No Co": ["not-interested"], "Do Not Contact Co": ["do-not-contact"], "Fake Co": ["not-interested", "fake-lead"], "Concept Co": [] });
+});
+test("getCallsPage says so when the search hands the roster back with no tags at all", async () => {
+  queue.push(defs(), { status: 200, body: { contacts: [contact({ tags: undefined }), contact({ id: "second00000000000000", tags: [] })], total: 2 } });
+  const blind = await getCallsPage(null);
+  assert.equal(blind.leads.length, 2); assert.equal(blind.noCallTagsRead, false);
+  queue.push({ status: 200, body: { contacts: [contact({ tags: undefined }), contact({ id: "second00000000000000", tags: ["sales-lead"] })], total: 2 } });
+  assert.equal((await getCallsPage(null)).noCallTagsRead, true); // one tagged contact is proof the tags are coming through
+  queue.push({ status: 200, body: { contacts: [], total: 0 } });
+  assert.equal((await getCallsPage(null)).noCallTagsRead, true); // an empty roster is not a warning
 });
 test("getCallsPage: a rejected custom-field clause falls back to tags only", async () => {
   queue.push(defs(), { status: 400, body: { message: "bad filter" } }, { status: 200, body: { contacts: [contact()], total: 1 } });

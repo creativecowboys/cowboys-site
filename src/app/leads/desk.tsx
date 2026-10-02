@@ -71,6 +71,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
   const [crm, setCrm] = useState("Monday"); // "Monday" | "GoHighLevel" — named in copy so a rep knows where a save went
   const [owners, setOwners] = useState<{ id: string; name: RepName }[]>(CALL_OWNERS.map((o) => ({ id: o.id, name: o.name })));
   const [leadSources, setLeadSources] = useState<string[]>([]);
+  const [tagsRead, setTagsRead] = useState(true); // false = GHL sent the roster without contact tags, so do-not-contact / fake-lead cannot be seen
   const [source, setSource] = useState("");
   const [sourceSaving, setSourceSaving] = useState(false);
   const ownerNameFor = (id: string): AssignName => owners.find((o) => o.id === id)?.name || "";
@@ -189,6 +190,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
       const q = new URLSearchParams(); if (nextCursor) q.set("cursor", nextCursor); if (preview === "ghl" || preview === "monday") q.set("backend", preview);
       const data: CallsPageData = demo ? demoPage : await json(await fetch(`/api/team/calls${q.toString() ? `?${q}` : ""}`, { cache: "no-store" }));
       setLeads(prev => mergeRoster(prev, data.leads, !!nextCursor));
+      setTagsRead(prev => (nextCursor ? prev : true) && data.noCallTagsRead !== false);
       setCursor(data.cursor); setBoard(data.boardName); setSystem(data.system); setCrm(data.systemName); setOwners(data.owners); setLeadSources(data.leadSources);
     } catch (e) { setListError(e instanceof Error ? e.message : "Could not load the entrant list."); }
     finally { listLock.current = false; setListLoading(false); }
@@ -280,7 +282,8 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages }
       <label className="call-queue-filter">Show leads<select aria-label="Filter by contact stage" value={queue} onChange={e => { setQueue(e.target.value); setStatus(""); }}><option value="all">All leads</option><option value="new">Not contacted yet</option><option value="active">Contacted / working on</option><option value="closed">Closed / bad number</option><option value={OFF_LIST_VIEW}>Not interested / do not call</option></select></label>
       <p className="call-order-hint">{offView ? `These leads are off the call list. ${system === "ghl" ? "They stay in GoHighLevel for email campaigns and newsletters" : "They stay on the Monday board"}. To put one back, save a call with a different outcome${system === "ghl" ? " or change its Outreach Status in GoHighLevel. A do-not-contact or fake-lead tag is removed in GoHighLevel, not here." : "."}` : "Not contacted first, then oldest contact. Choose an owner to see their leads."}</p>
       <div className="call-list-count">{filtered.length} shown · {leads.length} loaded{!offView && offCount > 0 ? ` · ${offCount} off the call list` : ""}{cursor ? " · more available" : ""}</div>
-      {hiddenMatches > 0 && <p className="call-off-hint">{hiddenMatches} more {hiddenMatches === 1 ? "match is" : "matches are"} off the call list. <button type="button" onClick={() => { setQueue(OFF_LIST_VIEW); setStatus(""); }}>Show not interested / do not call</button></p>}
+      {!tagsRead && <div className="call-alert" role="alert">GoHighLevel sent this list without contact tags, so a lead tagged do-not-contact or fake-lead may still be showing. Check the lead in GoHighLevel before you call.</div>}
+      {hiddenMatches > 0 && <p className="call-off-hint">{hiddenMatches} {filtered.length ? "more " : ""}{hiddenMatches === 1 ? "match is" : "matches are"} off the call list. <button type="button" onClick={() => { setQueue(OFF_LIST_VIEW); setStatus(""); }}>Show not interested / do not call</button></p>}
       {listError && <div className="call-alert" role="alert">{listError}<button onClick={() => loadList(cursor || undefined)}>Try again</button></div>}
       <div className="call-person-list">{filtered.map(lead => <button key={lead.id} onClick={() => choose(lead.id)} disabled={saving || assigning} className={`call-person ${selected === lead.id ? "is-active" : ""}`} aria-pressed={selected === lead.id}><span className="call-person-top"><span>{lead.name}</span><span aria-hidden="true">↗</span></span><span className="call-person-contact">{lead.contact || "Contact not supplied"}{lead.city && ` · ${lead.city}`}</span><span className="call-person-bottom"><span className="call-status">{lead.outreach || "No status"}</span><span>{entries[lead.id]?.dirty ? "Draft saved here" : lead.owner || "Unassigned"}</span></span><OffBadges lead={lead} />{lead.leadSource && <span className="call-person-source">{lead.leadSource}</span>}</button>)}</div>
       {listLoading && <p role="status" className="call-roster-message">Loading entrants…</p>}

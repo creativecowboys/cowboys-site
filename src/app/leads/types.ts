@@ -32,5 +32,7 @@ export type CallsPageData = {
   system: LeadsBackend; systemName: string; // "Monday" | "GoHighLevel" — for UI copy
   owners: { id: string; name: RepName }[]; // the three reps with their ids in this backend
   leadSources: string[]; // Lead Source options read from GHL ([] on Monday)
+  /** GHL only: false when the roster search came back with no contact tags at all, i.e. the desk cannot see `do-not-contact` / `fake-lead` and says so. Absent on Monday. */
+  noCallTagsRead?: boolean;
 };
 export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string; /** @deprecated see CallLead.mondayUrl */ mondayUrl?: string };
