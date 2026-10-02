@@ -1,4 +1,8 @@
-# Giveaway call desk — creativecowboys.co/leads
+# Giveaway call desk — creativecowboys.co/admin (Sales tab)
+
+> **October 2, 2026:** the desk is served at `/admin`. `/leads` and anything under it forwards there with its query
+> string, so every older link still works. Where this page says `/leads` in a dated section, read `/admin`. The move,
+> the forward and the sign-in rules are in `Docs/Admin.md`.
 
 Dave requested `creativecowboys.co/leads` on September 21, 2026 and, later that day, chose it as the ONE call desk (the
 `/team/calls` build in local-seo-engine PR #1 is not being used; its Monday backend was ported here instead).
@@ -13,12 +17,13 @@ Owner people column).
 `/admin/login` asks for a work email. Any **@creativecowboys.co** address (plus any outside address listed in
 `TEAM_LOGIN_EMAILS`) gets a one-time link from howdy@ via Resend (`src/lib/team-login.ts`, tokens hashed in private Blob,
 15-minute expiry, single use, 1 link per minute per address). The link hits `/api/admin/verify`, which sets the same
-`cc_admin_token` cookie as before (issuer `cc-admin`, now 30 days, `sub` = the email). `src/middleware.ts` still sends
-unauthenticated visitors from `/leads` to `/admin/login?next=/leads`; the APIs still check the cookie via
-`src/lib/team-auth.ts`. ADMIN_USERNAME / ADMIN_PASSWORD are no longer used. The rep name on a call note is still self-selected.
+`cc_admin_token` cookie as before (issuer `cc-admin`, now 30 days, `sub` = the email). `src/middleware.ts` sends
+unauthenticated visitors from `/admin` to `/admin/login?next=<where they were going>` (path and query, since Oct 2
+2026); the APIs still check the cookie via `src/lib/team-auth.ts`. ADMIN_USERNAME / ADMIN_PASSWORD are no longer used. The rep name on a call note is still self-selected.
 
 ## Code
-- `src/app/leads/` — page + desk UI (desk.tsx now calls the real API; `demo` prop kept for local review).
+- `src/app/leads/` — desk UI (desk.tsx now calls the real API; `demo` prop kept for local review). The page that
+  mounts it is `src/app/admin/page.tsx` since Oct 2 2026.
 - `src/app/api/team/calls/route.ts` — GET list (paginated, signed cursor).
 - `src/app/api/team/calls/[id]/route.ts` — GET lead + history, POST save call, **PATCH assign** `{ owner: "Josh", expectedUpdatedAt: "..." }`.
 - `src/lib/calls/monday.ts` — Monday client (API 2026-07), board-locked, append-only notes, retry/conflict guards,
@@ -36,7 +41,7 @@ unauthenticated visitors from `/leads` to `/admin/login?next=/leads`; the APIs s
   import from the Sheet.
 - Monday has no atomic compare-and-set; two people saving the same lead at the same instant can race. The desk detects
   stale records and reused call ids and refuses rather than double-writes.
-- `/leads` is noindex and not in navigation or the sitemap.
+- `/admin` is noindex (meta and `X-Robots-Tag`) and not in navigation or the sitemap.
 
 ## Founder Playbook call guidance (September 22, 2026)
 Dave requested incorporating the reference Josh shared into this guide and Burt’s business advice.
@@ -95,7 +100,8 @@ Dave: "we should add a loose time to the client. So while we personally are look
 - **Wrap-up step** has "Around what time?" next to the follow-up date: half-hours 8:00am–5:30pm Eastern, or "No set time (all-day)". The banner reads "Follow-up booked for Monday, September 28 around 9:00am". The time is written into the board's **Next Follow-up** date column (Monday stores date-column times in UTC; `src/lib/calls/followup-time.ts` converts both ways, DST-aware). The lead detail shows `date · time`.
 - **Feeds**: `GET /api/team/followups/<dave|josh|keaton>.ics?key=…` — private iCalendar, no cookie (calendar apps can't sign in). The key is an HMAC of the rep slug under `NEXTAUTH_SECRET`, so nothing is stored and rotating that secret rotates every feed. Timed follow-ups are a 30-minute block with a 15-minute alarm; date-only ones are all-day with an 8:30am alarm. Leads marked Not Interested / Bad contact number are skipped, and so is anything else off the call list (see "Off the call list" below); Won leads stay on the calendar (Dave, Sep 28 2026). Event UID = `followup-<leadId>@creativecowboys.co`, so a changed date moves the event instead of duplicating it. Monday errors return 503 + Retry-After so the calendar app keeps the subscription.
 - **Where to get the link**: the roster's "📅 My follow-up calendar" button calls `GET /api/team/followups` (cookie) and shows the signed-in rep's link with Copy and an Apple Calendar `webcal:` link; Dave and Josh see all three. Google Calendar: Other calendars → + → From URL. Google refreshes subscribed feeds every few hours (not adjustable); Apple/iPhone can refresh hourly. Reps whose email is not one of the three (Madison) get "No calendar for this sign-in."
-- **Deep link**: events link to `/leads?lead=<id>`; the desk selects that lead after the first load.
+- **Deep link**: events link to `/admin?lead=<id>` (events issued before Oct 2 2026 say `/leads?lead=<id>`, which
+  forwards); the desk selects that lead after the first load.
 - Code: `src/lib/calls/followups.ts` (REPS, feed key, ICS builder), `src/lib/calls/followup-time.ts` (client-safe: HOUR_OPTIONS, prettyTime, ET↔UTC — keep `node:crypto` out of anything the desk imports or the webpack client build fails), routes under `src/app/api/team/followups/`. Tests in `followups.test.ts` (`npm run test:call-owner`).
 
 ## Leads on GoHighLevel — the `LEADS_BACKEND` switch (October 1, 2026)
@@ -158,7 +164,7 @@ import would bring 264 Monday leads over — 254 matched by the board's GHL Cont
    one to open) — website forms start creating GHL contacts at step 5.
 2. `POST /api/team/ghl/backfill {dryRun:false, limit:400}` until `remaining` is 0 (3 calls).
 3. `POST /api/team/ghl/migrate {dryRun:false, offset:0, limit:50}`, repeat with each `nextOffset` until it is null.
-4. Preview at `/leads?backend=ghl`; decide between the full roster (802) and a narrower one (`LEADS_GHL_TAGS`).
+4. Preview at `/admin?backend=ghl`; decide between the full roster (802) and a narrower one (`LEADS_GHL_TAGS`).
 5. Set `LEADS_BACKEND=ghl` on Vercel (Production) and redeploy. Stop adding leads to the Monday board from then on.
 Each of steps 2 and 3 is safe to repeat. Follow-up calendar feeds re-issue events under the GHL ids after the flip (a
 subscribed calendar shows the old Monday-id events until its next refresh). GHL search results lag writes by a few

@@ -1,4 +1,6 @@
-# Sales → onboarding — creativecowboys.co/leads
+# Sales → onboarding — creativecowboys.co/admin?tab=onboarding
+
+> **October 2, 2026:** the desk is served at `/admin`; `/leads` forwards there with its query string (`Docs/Admin.md`).
 
 > **October 2, 2026:** this page describes the Onboarding tab on **Monday**, which is what production runs while
 > `DESK_BACKEND` is unset. The same tab on GoHighLevel — one contact per business, the checklist on the contact, a notes

@@ -1,4 +1,6 @@
-# Clients tab — creativecowboys.co/leads?tab=clients
+# Clients tab — creativecowboys.co/admin?tab=clients
+
+> **October 2, 2026:** the desk is served at `/admin`; `/leads` forwards there with its query string (`Docs/Admin.md`).
 
 > **October 2, 2026:** this page describes the Clients tab on **Monday**, which is what production runs while
 > `DESK_BACKEND` is unset. The same tab on GoHighLevel — the client is the same contact as the lead and the onboarding
