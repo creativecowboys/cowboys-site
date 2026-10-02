@@ -606,14 +606,16 @@ test("legacy clients: contacts that look like the business are listed before one
   ghl.addContact({ id: "OtherChurch000000001", firstName: "Isabella", companyName: "First Assembly Church" });
   ghl.addContact({ id: "OtherAgency000000001", firstName: "Jami", companyName: "Hometown Insurance" });
   ghl.addContact({ id: "PersonChris000000001", firstName: "chris" });
-  boards([], [...legacyBoard(), legacyRow("905", "Innovative Construction Group"), legacyRow("906", "McKinley Roofing and Restoration"), legacyRow("907", "Georgia Truck Parking"), legacyRow("908", "Commercial Insurance Agency"), legacyRow("909", "Dunwoody Christian Academy")]);
+  ghl.addContact({ id: "GroveElsewhere000001", firstName: "Mary", companyName: "Magnolia Grove Creations, LLC" });
+  boards([], [...legacyBoard(), legacyRow("905", "Innovative Construction Group"), legacyRow("906", "McKinley Roofing and Restoration"), legacyRow("907", "Georgia Truck Parking"), legacyRow("908", "Commercial Insurance Agency"), legacyRow("909", "Dunwoody Christian Academy"), legacyRow("910", "The Grove at DeFoor Farm")]);
   const r = await migrateDesk({ dryRun: true, ...LEGACY_RUN });
   const similar = (id: string) => byMonday(r.rows, id).similar!.map((x) => [x.id, x.why]);
   assert.deepEqual(similar(SCONYERS), [["SconyersNoInc0000001", "the same name apart from Inc, LLC, The and the like"]]);
   assert.deepEqual(similar(WHITEN), [["WhitenPerson00000001", "the same website or email domain (whiten-pools.com)"]]);
   assert.deepEqual(similar(CHAPEL), [["ChapelSite0000000001", "the same website or email domain (chapelhill.cc)"]]);
   assert.deepEqual(similar("905"), [["GmailLocal0000000001", "its email or website spells this business name"]]);
-  assert.deepEqual(similar("906"), [["McKinleyOther0000001", 'its business name also starts from the uncommon word "mckinley"']], "another roofer is not a look-alike: only the business's own first word counts");
+  assert.deepEqual(similar("906"), [["McKinleyOther0000001", 'its business name starts with the same uncommon word, "mckinley"']], "another roofer is not a look-alike: only the business's own first word counts");
+  assert.deepEqual(similar("910"), [], "a word in the middle of another name is not enough: Magnolia Grove Creations is not The Grove at DeFoor Farm");
   assert.deepEqual(similar("907"), []);
   assert.deepEqual(similar("908"), [], "another insurance business is not a look-alike");
   assert.deepEqual(similar("909"), [], "a person called chris is not a look-alike for a Christian academy");
