@@ -3,6 +3,7 @@ import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } 
 import { CallDeskError, GHL_ID, MONDAY_ID } from "./validation";
 import { isCallOutcome, mondayOutcome } from "./outcomes";
 import { prettyTime } from "./followup-time";
+import { noCallTagsOf } from "./roster";
 import { callMarker, handoffMarker, payloadMarker, readableHistory } from "./markers";
 import { addNote, addTags, contactDisplayName, contactUrl, fieldText, getContact, listNotes, searchContacts, updateContact, type GhlContact, type GhlNote, type SearchFilter } from "@/lib/ghl/client";
 import { INTEREST_OPTIONS, leadSourceOptions, requireField, salesFields, type SalesFields } from "@/lib/ghl/fields";
@@ -17,6 +18,9 @@ import { ghlRepIds, ghlRepName, REP_NAMES, type RepName } from "@/lib/ghl/reps";
 // Which contacts are "leads": anything tagged with one of LEAD_TAGS (the three intake routes tag their
 // contacts; `sales-lead` is for a rep to push any contact onto the desk by hand in GHL) OR anything with
 // a Lead Source set (the backfill/migration). Search results lag writes by a few seconds (GHL docs).
+// Leads that are OFF the call list (Outreach Status "Not Interested", or a `do-not-contact` / `fake-lead` tag — the rule
+// lives in ./roster.ts) still come back from here: the desk hides them from its normal views and lists them under
+// "Not interested / do not call", and the calendar feeds skip them. Nothing about the contact is changed in GHL.
 export const LEAD_TAGS = ["giveaway-entrant", "playbook-lead", "website-form", "sales-lead"] as const;
 export const WON_TAG = "sales-won";
 /** The designated GHL test contact (package-builder and desk checks on production). Never shown on the roster; still reachable by id. */
@@ -75,7 +79,7 @@ export function mapLead(c: GhlContact, fields: SalesFields): CallLead {
     outreach, interest: f("interest"), notes: f("salesNotes"), lastContact: isoDate(f("lastContact")),
     nextFollowup: isoDate(f("nextFollowup")), nextFollowupTime: /^\d{2}:\d{2}$/.test(f("nextFollowupTime")) ? f("nextFollowupTime") : "",
     quotedMonthly: quoted, interestedIn: f("interestedIn"), auditScore: f("auditScore"), auditReport: f("auditReport"),
-    group: outreach === "Won" ? "Won" : leadSource || "Leads", leadSource,
+    group: outreach === "Won" ? "Won" : leadSource || "Leads", leadSource, noCallTags: noCallTagsOf(c.tags),
     updatedAt: c.dateUpdated || c.dateAdded || "", recordUrl: contactUrl(c.id),
   };
 }
@@ -109,6 +113,7 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
   const start = unwrapCursor(cursor);
   const leads: CallLead[] = [];
   let next: number | null = null;
+  let seen = 0, tagged = 0;
   let filters = rosterFilters(fields.leadSource?.id);
   for (let page = start; page < start + MAX_PAGES; page++) {
     let result: { contacts: GhlContact[]; total: number };
@@ -121,11 +126,14 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
         result = await searchContacts({ filters, page, pageLimit: PAGE, sort: [{ field: "dateAdded", direction: "desc" }] }, { timeoutMs: 25000 });
       } else throw e;
     }
+    seen += result.contacts.length; tagged += result.contacts.filter((c) => Array.isArray(c.tags) && c.tags.length > 0).length;
     leads.push(...result.contacts.filter((c) => c.id !== TEST_CONTACT_ID).map((c) => mapLead(c, fields)));
     if (result.contacts.length < PAGE) { next = null; break; }
     next = page + 1;
   }
-  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields) };
+  // Leads are found by tag, so a roster that comes back with no tags at all means GHL left them out of the search results. The desk
+  // then says it cannot see do-not-contact / fake-lead, rather than quietly listing someone who should not be called.
+  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields), noCallTagsRead: seen === 0 || tagged > 0 };
 }
 
 function mapHistory(notes: GhlNote[]): CallHistory[] {

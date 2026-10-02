@@ -46,3 +46,14 @@
 @media(max-width:1150px){.call-context-source{grid-template-columns:1fr 1fr}}
 .call-context .call-assign{margin-left:0;max-width:100%;font-size:11px}
 .call-context em{display:block;font-size:10px;color:#766955;margin-top:4px}
+
+/* Off the call list (Dave, Oct 1 2026): Not Interested, or a do-not-contact / fake-lead tag in GoHighLevel. Reason badges on the
+   roster row and the lead header, a note on the opened lead, and the "more matches off the list" line under the count. */
+.call-off-badges{display:inline-flex;flex-wrap:wrap;gap:5px;margin:9px 6px 0 0;vertical-align:top}
+.call-off-badge{padding:2px 7px;border-radius:999px;background:#5a2415;color:#fff3ea;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.call-offlist{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:18px 0 0;padding:13px 16px;border:1px solid #c9a08f;border-left:4px solid #5a2415;background:#f7e9e1;border-radius:4px;font-size:12px;line-height:1.7;color:#4a2a1d}
+.call-offlist strong{font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.call-offlist .call-off-badges{margin:0}
+.call-offlist p{flex-basis:100%;margin:2px 0 0}
+.call-off-hint{font-size:11px;line-height:1.6;color:#71665a;margin:0 0 11px}
+.call-off-hint button{background:none;border:0;padding:0;color:#a8462b;text-decoration:underline;font-size:inherit}

@@ -11,6 +11,8 @@ export type CallLead = {
   notes: string; lastContact: string; nextFollowup: string; nextFollowupTime: string; quotedMonthly: string;
   interestedIn: string; auditScore: string; auditReport: string; group: string;
   leadSource: string; // GHL "Lead Source" dropdown ("" on the Monday backend)
+  /** GHL tags that take a lead off the call list (`do-not-contact`, `fake-lead` — see src/lib/calls/roster.ts). Computed server-side; absent on Monday leads. */
+  noCallTags?: string[];
   updatedAt: string; recordUrl: string; // link to the record in whichever system holds it
   /** @deprecated alias of recordUrl on Monday leads, for desk tabs still running the pre-GHL build across the deploy. Remove after cutover. */
   mondayUrl?: string;
@@ -30,5 +32,7 @@ export type CallsPageData = {
   system: LeadsBackend; systemName: string; // "Monday" | "GoHighLevel" — for UI copy
   owners: { id: string; name: RepName }[]; // the three reps with their ids in this backend
   leadSources: string[]; // Lead Source options read from GHL ([] on Monday)
+  /** GHL only: false when the roster search came back with no contact tags at all, i.e. the desk cannot see `do-not-contact` / `fake-lead` and says so. Absent on Monday. */
+  noCallTagsRead?: boolean;
 };
 export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string; /** @deprecated see CallLead.mondayUrl */ mondayUrl?: string };

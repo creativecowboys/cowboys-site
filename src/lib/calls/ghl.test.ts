@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, isoDate, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
 import { validateAssign, validateLeadId } from "./validation";
+import { filterRoster, OFF_LIST_VIEW, offListReasons } from "./roster";
 import { forgetCustomFields } from "@/lib/ghl/client";
 import { resolveFromDefs } from "@/lib/ghl/fields";
 import { ghlRepIds } from "@/lib/ghl/reps";
@@ -83,7 +84,7 @@ test("LEADS_GHL_TAGS narrows the roster to exactly those tags (no Lead Source cl
 test("getCallsPage: one request for a small roster, owners and lead-source options come back with it", async () => {
   queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "second00000000000000", companyName: "Second" })], total: 2 } });
   const page = await getCallsPage(null);
-  assert.equal(page.system, "ghl"); assert.equal(page.leads.length, 2); assert.equal(page.cursor, null);
+  assert.equal(page.system, "ghl"); assert.equal(page.leads.length, 2); assert.equal(page.cursor, null); assert.equal(page.noCallTagsRead, true);
   assert.deepEqual(page.owners.map((o) => o.name), ["Dave", "Josh", "Keaton"]); assert.deepEqual(page.leadSources, DEFS.customFields[0].picklistOptions);
   assert.deepEqual((requests[1].body as { sort: unknown }).sort, [{ field: "dateAdded", direction: "desc" }]);
   assert.equal((requests[1].body as { pageLimit: number }).pageLimit, 500);
@@ -91,6 +92,35 @@ test("getCallsPage: one request for a small roster, owners and lead-source optio
 test("getCallsPage never lists the designated test contact", async () => {
   queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "C8FHl1LIfXEMI9isByB2", companyName: "Test — Claude" })], total: 2 } });
   assert.deepEqual((await getCallsPage(null)).leads.map((l) => l.id), [ID]);
+});
+test("mapLead carries the contact's no-call tags (and only those) for the desk", () => {
+  assert.deepEqual(mapLead(contact(), fields).noCallTags, []);
+  assert.deepEqual(mapLead(contact({ tags: ["giveaway-entrant", "do-not-contact", "concept-not-interested", "Fake-Lead"] }), fields).noCallTags, ["do-not-contact", "fake-lead"]);
+  assert.deepEqual(mapLead(contact({ tags: undefined }), fields).noCallTags, []);
+});
+test("off the call list: the roster search is unchanged and read-only, off-list leads still come back, and the desk's views split them", async () => {
+  const notInterested = contact({ id: "notint00000000000000", companyName: "Said No Co", customFields: [{ id: F.os, value: "Not Interested" }] });
+  const doNotContact = contact({ id: "dnc00000000000000000", companyName: "Do Not Contact Co", tags: ["giveaway-entrant", "do-not-contact"] });
+  const fake = contact({ id: "fake0000000000000000", companyName: "Fake Co", tags: ["sales-lead", "fake-lead"], customFields: [{ id: F.os, value: "Not Interested" }] });
+  const concept = contact({ id: "concept0000000000000", companyName: "Concept Co", tags: ["giveaway-entrant", "concept-not-interested", "spoke-to-ai"] });
+  queue.push(defs(), { status: 200, body: { contacts: [contact(), notInterested, doNotContact, fake, concept], total: 5 } });
+  const page = await getCallsPage(null);
+  assert.equal(page.leads.length, 5);
+  assert.deepEqual((requests[1].body as { filters: unknown }).filters, rosterFilters(F.ls)); // nothing about status or these tags is sent to GHL
+  assert.deepEqual(requests.map((r) => `${r.method} ${r.path.split("?")[0]}`), ["GET /locations/LOCtest000000000000/customFields", "POST /contacts/search"]); // a search, no write
+  const ids = (v: string) => filterRoster(page.leads, { view: v, owner: "", status: "", source: "", search: "" }).map((l) => l.id).sort();
+  assert.deepEqual(ids("all"), [ID, "concept0000000000000"].sort());
+  assert.deepEqual(ids(OFF_LIST_VIEW), ["dnc00000000000000000", "fake0000000000000000", "notint00000000000000"]);
+  assert.deepEqual(Object.fromEntries(page.leads.map((l) => [l.name, offListReasons(l)])), { "Juniper & Co.": [], "Said No Co": ["not-interested"], "Do Not Contact Co": ["do-not-contact"], "Fake Co": ["not-interested", "fake-lead"], "Concept Co": [] });
+});
+test("getCallsPage says so when the search hands the roster back with no tags at all", async () => {
+  queue.push(defs(), { status: 200, body: { contacts: [contact({ tags: undefined }), contact({ id: "second00000000000000", tags: [] })], total: 2 } });
+  const blind = await getCallsPage(null);
+  assert.equal(blind.leads.length, 2); assert.equal(blind.noCallTagsRead, false);
+  queue.push({ status: 200, body: { contacts: [contact({ tags: undefined }), contact({ id: "second00000000000000", tags: ["sales-lead"] })], total: 2 } });
+  assert.equal((await getCallsPage(null)).noCallTagsRead, true); // one tagged contact is proof the tags are coming through
+  queue.push({ status: 200, body: { contacts: [], total: 0 } });
+  assert.equal((await getCallsPage(null)).noCallTagsRead, true); // an empty roster is not a warning
 });
 test("getCallsPage: a rejected custom-field clause falls back to tags only", async () => {
   queue.push(defs(), { status: 400, body: { message: "bad filter" } }, { status: 200, body: { contacts: [contact()], total: 1 } });
@@ -166,6 +196,15 @@ test("saveCall: note first, then the fields, with the version checked before any
   const writes = requests.filter((x) => x.method !== "GET");
   assert.equal(writes[0].path, `/contacts/${ID}/notes`); assert.ok(String((writes[0].body as { body: string }).body).includes("[CC-CALL:6f1c2a4e"));
   assert.equal(writes[1].method, "PUT"); assert.deepEqual((writes[1].body as { customFields: unknown[] }).customFields, callFields(draft(), new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date()), fields));
+});
+test("saveCall as Not interested writes one note and the status + last-contact fields — no tag, no DND, nothing removed", async () => {
+  const tagged = contact({ tags: ["giveaway-entrant", "newsletter"] });
+  queue.push(defs(), got(tagged), notes([]), { status: 201, body: { note: { id: "n9" } } }, got(tagged), put(tagged));
+  const r = await saveCall(draft({ outcome: "Not interested", interest: "", followupDate: "", followupTime: "", quotedMonthly: "" }));
+  assert.equal(r.saved, true); assert.equal(r.warning, undefined);
+  const writes = requests.filter((x) => x.method !== "GET");
+  assert.deepEqual(writes.map((w) => `${w.method} ${w.path}`), [`POST /contacts/${ID}/notes`, `PUT /contacts/${ID}`]);
+  assert.deepEqual(writes[1].body, { customFields: [{ id: F.os, field_value: "Not Interested" }, { id: F.lc, field_value: new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date()) }] });
 });
 test("saveCall: a stale version is refused before the note is written", async () => {
   queue.push(defs(), got(contact({ dateUpdated: v2 })), notes([]));

@@ -43,3 +43,19 @@ test("the feed emits timed and all-day events and skips closed or undated leads"
   assert.match(ics, /leads\?lead=1/);
   assert.ok(ics.split("\r\n").every((l) => l.length <= 75), "lines are folded");
 });
+
+test("the feed skips a lead that is off the call list, whatever its status; other tags change nothing", () => {
+  const base = { contact: "Pat", phone: "770-555-0100", email: "pat@example.com", city: "Villa Rica", notes: "", updatedAt: "" };
+  const ics = buildFeed(REPS[0], [
+    { id: "1", name: "Still Calling Co", outreach: "Booked followup", nextFollowup: "2026-10-05", ...base },
+    { id: "2", name: "Tagged Do Not Contact", outreach: "Booked followup", nextFollowup: "2026-10-05", noCallTags: ["do-not-contact"], ...base },
+    { id: "3", name: "Tagged Fake", outreach: "", nextFollowup: "2026-10-06", nextFollowupTime: "10:00", noCallTags: ["fake-lead"], ...base },
+    { id: "4", name: "Said No", outreach: "Not Interested", nextFollowup: "2026-10-06", ...base },
+    { id: "5", name: "Won Yet Tagged", outreach: "Won", nextFollowup: "2026-10-07", noCallTags: ["do-not-contact"], ...base },
+    { id: "6", name: "Won Client", outreach: "Won", nextFollowup: "2026-10-07", ...base },
+    { id: "7", name: "Untagged Reply", outreach: "Replied", nextFollowup: "2026-10-08", noCallTags: [], ...base },
+    { id: "8", name: "Wrong Number", outreach: "Bad contact number", nextFollowup: "2026-10-08", ...base },
+  ], "https://www.creativecowboys.co", new Date("2026-10-01T12:00:00Z"));
+  const summaries = ics.replace(/\r\n /g, "").split("\r\n").filter((l) => l.startsWith("SUMMARY:")).map((l) => l.slice("SUMMARY:Follow-up: ".length));
+  assert.deepEqual(summaries, ["Still Calling Co", "Won Client", "Untagged Reply"]);
+});
