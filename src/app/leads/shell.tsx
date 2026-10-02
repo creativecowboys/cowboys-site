@@ -13,15 +13,15 @@ import "./onboarding.css";
 
 // Three tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
 // so switching tabs only hides it; nothing is unmounted while a save is running.
-// `?backend=ghl|monday` previews the other system (the Sales roster and the Onboarding / Clients desk) and is
-// kept while moving between tabs and clients.
+// `?desk=ghl|monday` previews the Onboarding / Clients desk on the other system and is kept while moving between
+// tabs and clients. (`?backend=` is the Sales roster's own preview from Phase 1; the Sales tab reads it itself.)
 export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSystem }) {
   const params = useSearchParams();
   const router = useRouter();
   const tab = params.get("tab") === "onboarding" ? "onboarding" : params.get("tab") === "clients" ? "clients" : "sales";
   const client = params.get("client") || "";
-  const backend = params.get("backend");
-  const preview = backend === "ghl" || backend === "monday" ? backend : "";
+  const desk = params.get("desk");
+  const preview = desk === "ghl" || desk === "monday" ? desk : "";
   // Which system the Onboarding / Clients desk is on: what the last list response said, else the preview, else the build-time default.
   const [reported, setReported] = useState<DeskSystem | "">("");
   const deskSystem: DeskSystem = reported || preview || deskDefault;
@@ -31,7 +31,7 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
     const q = new URLSearchParams();
     if (next !== "sales") q.set("tab", next);
     if (clientId) q.set("client", clientId);
-    if (preview) q.set("backend", preview);
+    if (preview) q.set("desk", preview);
     router.replace(`/leads${q.toString() ? `?${q}` : ""}`);
   }, [router, preview]);
   return <div className="team-shell">

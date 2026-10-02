@@ -40,8 +40,8 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
     if (lock.current) return;
     lock.current = true; setLoading(true); setError("");
     try {
-      // `?backend=ghl|monday` on the page URL previews the other system's desk without flipping DESK_BACKEND.
-      const q = new URLSearchParams(); if (next) q.set("cursor", next); if (preview) q.set("backend", preview);
+      // `?desk=ghl|monday` on the page URL previews the other system's desk without flipping DESK_BACKEND.
+      const q = new URLSearchParams(); if (next) q.set("cursor", next); if (preview) q.set("desk", preview);
       const data: OnboardingListData = await json(await fetch(`/api/team/onboarding${q.toString() ? `?${q}` : ""}`, { cache: "no-store" }), crm);
       setRows((prev) => next ? [...new Map([...prev, ...data.rows].map((r) => [r.id, r])).values()] : data.rows);
       setCursor(data.cursor); setBoard(data.boardName); onSystem?.(data.system === "ghl" ? "ghl" : "monday");

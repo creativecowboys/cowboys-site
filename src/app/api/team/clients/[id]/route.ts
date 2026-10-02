@@ -10,7 +10,7 @@ import { onboardingOwners } from "@/lib/onboarding/config";
 import { readIntake } from "@/lib/onboarding/store";
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 import { clientDetailGhl, patchClientGhl } from "@/lib/desk/clients";
-import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
+import { assertMayWriteGhl, backendForRecordId, mayWriteGhl, validateRecordId } from "@/lib/desk/switch";
 import { actorFor } from "@/lib/desk/team";
 import { validateDeskClientPatch } from "@/lib/desk/validation";
 
@@ -26,7 +26,8 @@ export async function GET(_req: Request, context: Context) {
     const canSeeMoney = isOwnerEmail(session.email);
     const rawId = (await context.params).id;
     // A GoHighLevel contact id always goes to GoHighLevel; a Monday item id follows DESK_BACKEND (see src/lib/desk/switch.ts).
-    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await clientDetailGhl(validateRecordId(rawId), canSeeMoney), { headers: teamHeaders });
+    // Before the flip a non-owner may look at the GoHighLevel preview but not change it — and opening a record must not change it either.
+    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await clientDetailGhl(validateRecordId(rawId), canSeeMoney, { mayWrite: mayWriteGhl(isOwnerEmail(session.email)) }), { headers: teamHeaders });
     const id = validateClientId(rawId);
     const { row: stored, history } = await getClient(id);
     // Live Stripe read when we know the customer; a Stripe hiccup never hides the Monday record.

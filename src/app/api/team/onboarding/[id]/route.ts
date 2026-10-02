@@ -10,7 +10,7 @@ import type { OnboardingDetail } from "@/lib/onboarding/types";
 import { validateItemId, validatePatch } from "@/lib/onboarding/validation";
 import { failure, unauthorized } from "@/lib/onboarding/http";
 import { onboardingDetailGhl, patchOnboardingGhl } from "@/lib/desk/onboarding";
-import { assertMayWriteGhl, backendForRecordId, validateRecordId } from "@/lib/desk/switch";
+import { assertMayWriteGhl, backendForRecordId, mayWriteGhl, validateRecordId } from "@/lib/desk/switch";
 import { actorFor } from "@/lib/desk/team";
 import { validateDeskPatch } from "@/lib/desk/validation";
 
@@ -27,7 +27,8 @@ export async function GET(_req: Request, context: Context) {
     if (!(await isTeam())) return unauthorized();
     const rawId = (await context.params).id;
     // A GoHighLevel contact id always goes to GoHighLevel; a Monday item id follows DESK_BACKEND (see src/lib/desk/switch.ts).
-    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await onboardingDetailGhl(validateRecordId(rawId)), { headers });
+    // Before the flip a non-owner may look at the GoHighLevel preview but not change it — and opening a record must not change it either.
+    if (backendForRecordId(rawId) === "ghl") return NextResponse.json(await onboardingDetailGhl(validateRecordId(rawId), { mayWrite: mayWriteGhl(isOwnerEmail((await teamSession())?.email)) }), { headers });
     const id = validateItemId(rawId);
     const { row: stored, history } = await getOnboarding(id);
     const key = stored.leadId || (stored.handoffId ? `manual-${stored.handoffId}` : "");

@@ -17,11 +17,13 @@ test("DESK_BACKEND defaults to monday; only the exact value 'ghl' flips it", () 
   assert.equal(deskDefault("ghl"), "ghl");
   assert.equal(deskSystemName("ghl"), "GoHighLevel"); assert.equal(deskSystemName("monday"), "Monday");
 });
-test("?backend= on a team request previews the other system without touching the env", () => {
+test("?desk= on a team request previews the other system without touching the env; the Sales tab's ?backend= is not ours", () => {
   const url = (q: string) => new Request(`https://www.creativecowboys.co/api/team/onboarding${q}`);
-  assert.equal(deskBackend(url("?backend=ghl"), undefined), "ghl");
-  assert.equal(deskBackend(url("?backend=monday"), "ghl"), "monday");
-  assert.equal(deskBackend(url("?backend=other"), undefined), "monday");
+  assert.equal(deskBackend(url("?desk=ghl"), undefined), "ghl");
+  assert.equal(deskBackend(url("?desk=monday"), "ghl"), "monday");
+  assert.equal(deskBackend(url("?desk=other"), undefined), "monday");
+  // /leads?backend=ghl is the Sales-roster preview from Phase 1: it must not move the Onboarding or Clients tab.
+  assert.equal(deskBackend(url("?backend=ghl"), undefined), "monday"); assert.equal(deskBackend(url("?backend=monday"), "ghl"), "ghl");
   assert.equal(deskBackend(url(""), "ghl"), "ghl");
   assert.equal(deskBackend(null, undefined), "monday");
 });
@@ -108,6 +110,11 @@ test("checklist text: round-trips, reads hand edits, and is plain enough to read
   assert.deepEqual(parseChecklist(serializeChecklist(items)), items);
   assert.equal(serializeChecklist([{ name: "Pipes | and\nnewlines", status: "Done", phase: "Build", owner: "", due: "" }]), "[x] Pipes / and newlines | Build");
   assert.deepEqual(parseChecklist(""), []); assert.deepEqual(parseChecklist(null), []);
+  // What is written is exactly what is read back — the save check compares the two, so the awkward names must survive the trip.
+  const awkward = [{ name: "due 2026-10-05", status: "Done", phase: "", owner: "", due: "" }, { name: "[x] already boxed", status: "", phase: "", owner: "", due: "" }, { name: "@Dave follow up", status: "Stuck", phase: "Launch", owner: "A | B", due: "2026-10-05" }, { name: "   ", status: "Done", phase: "", owner: "", due: "" }, { name: "Status nobody knows", status: "Weird", phase: "Other", owner: "", due: "10/05/2026" }];
+  const once = serializeChecklist(awkward);
+  assert.equal(once.split("\n").length, 4, "a row with no name is not written");
+  assert.equal(serializeChecklist(parseChecklist(once)), once); assert.equal(serializeChecklist(parseChecklist(once.replace(/\n/g, "\r\n"))), once);
 });
 test("checklist ids are stable per name, distinct for twins, and 'required' follows the packages", () => {
   const stored = parseChecklist("[ ] Logo files received (vector preferred) | Onboard\n[ ] Kickoff call offered | Onboard\n[ ] Kickoff call offered | Onboard");

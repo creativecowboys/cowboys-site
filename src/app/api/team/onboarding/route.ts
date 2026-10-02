@@ -19,7 +19,7 @@ const headers = { "Cache-Control": "private, no-store" };
 export async function GET(req: Request) {
   try {
     if (!(await isTeam())) return unauthorized();
-    // DESK_BACKEND decides the system; `?backend=ghl` lets the team preview the GoHighLevel desk before the flip.
+    // DESK_BACKEND decides the system; `?desk=ghl` lets the team preview the GoHighLevel desk before the flip.
     if (deskBackend(req) === "ghl") return NextResponse.json(await listOnboardingGhl(), { headers });
     return NextResponse.json(await listOnboarding(new URL(req.url).searchParams.get("cursor")), { headers });
   } catch (error) { return failure(error); }
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       const started = await startOnboardingGhl(form, { origin: new URL(req.url).origin, actor: actorFor(session?.email) });
       return NextResponse.json(started, { status: started.pending.length ? 202 : 201, headers });
     }
-    assertMondayOpen(); // a no-op until DESK_BACKEND=ghl; after that `?backend=monday` cannot create a record on the old boards
+    assertMondayOpen(); // a no-op until DESK_BACKEND=ghl; after that `?desk=monday` cannot create a record on the old boards
     const result = await startOnboarding(form);
     return NextResponse.json(result, { status: result.pending.length ? 202 : 201, headers });
   } catch (error) { return failure(error); }

@@ -41,8 +41,8 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
     if (lock.current) return;
     lock.current = true; setLoading(true); setError("");
     try {
-      // `?backend=ghl|monday` on the page URL previews the other system's desk without flipping DESK_BACKEND.
-      const q = new URLSearchParams(); if (next) q.set("cursor", next); if (preview) q.set("backend", preview);
+      // `?desk=ghl|monday` on the page URL previews the other system's desk without flipping DESK_BACKEND.
+      const q = new URLSearchParams(); if (next) q.set("cursor", next); if (preview) q.set("desk", preview);
       const data: ClientsListData = await json(await fetch(`/api/team/clients${q.toString() ? `?${q}` : ""}`, { cache: "no-store" }), crm);
       setRows((prev) => next ? [...new Map([...prev, ...data.rows].map((r) => [r.id, r])).values()] : data.rows);
       setCursor(data.cursor); setBoard(data.boardName); setStripeOn(data.stripeConnected); setMoney(data.canSeeMoney); onSystem?.(data.system === "ghl" ? "ghl" : "monday");
@@ -87,11 +87,11 @@ export default function Clients({ clientId, onOpenClient, system = "monday", pre
       {!loading && !filtered.length && <p className="call-roster-message">{rows.length ? "No clients match these filters." : "No clients on the desk yet. Graduate one from the Onboarding tab."}</p>}
     </div>
     {cursor && <button className="call-secondary call-load-more" disabled={loading} onClick={() => load(cursor)}>Load more</button>}
-    {clientId && <ClientPanel key={clientId} id={clientId} listSystem={system} onClose={() => onOpenClient("")} onRow={update} />}
+    {clientId && <ClientPanel key={clientId} id={clientId} listSystem={system} preview={preview} onClose={() => onOpenClient("")} onRow={update} />}
   </main>;
 }
 
-function ClientPanel({ id, listSystem, onClose, onRow }: { id: string; listSystem: DeskSystem; onClose: () => void; onRow: (row: ClientRow) => void }) {
+function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; listSystem: DeskSystem; preview: string; onClose: () => void; onRow: (row: ClientRow) => void }) {
   const [detail, setDetail] = useState<ClientDetail | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
@@ -200,7 +200,7 @@ function ClientPanel({ id, listSystem, onClose, onRow }: { id: string; listSyste
         <label>Website<input value={contact.website} disabled={!!busy} onChange={(e) => setContact({ ...contact, website: e.target.value })} onBlur={() => patch({ action: "contact", ...contact }, "contact")} /></label>
       </div>
       <div className="ob-buttons"><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "reportSent" }, "report")}>Report sent today</button>{row.website && <a className="call-secondary" href={row.website} target="_blank" rel="noreferrer">Site ↗</a>}{row.ghlContact && system !== "ghl" && <a className="call-secondary" href={row.ghlContact} target="_blank" rel="noreferrer">GHL ↗</a>}{row.driveFolder && <a className="call-secondary" href={row.driveFolder} target="_blank" rel="noreferrer">Files ↗</a>}</div>
-      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}`}>open</a>.</>}</p>
+      <p className="call-muted ob-hint">Last report: {row.lastReport || "never"}.{row.onboardingItem && <> Onboarding record: <a href={`/leads?tab=onboarding&client=${row.onboardingItem}${preview ? `&desk=${preview}` : ""}`}>open</a>.</>}</p>
       {row.notes && <p className="call-preserve ob-notes">{row.notes}</p>}
     </section>
 

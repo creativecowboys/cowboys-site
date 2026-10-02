@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const session = await teamSession();
     if (!session) return unauthorized();
     const canSeeMoney = isOwnerEmail(session.email);
-    // DESK_BACKEND decides the system; `?backend=ghl` previews the GoHighLevel desk before the flip. Money is stripped the same way on both.
+    // DESK_BACKEND decides the system; `?desk=ghl` previews the GoHighLevel desk before the flip. Money is stripped the same way on both.
     const data = deskBackend(req) === "ghl" ? await listClientsGhl() : await listClients(new URL(req.url).searchParams.get("cursor"));
     return NextResponse.json({ ...data, rows: canSeeMoney ? data.rows : data.rows.map(withoutMoney), canSeeMoney }, { headers: teamHeaders });
   } catch (error) { return failure(error); }

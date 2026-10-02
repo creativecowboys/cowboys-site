@@ -70,7 +70,7 @@ export default function Handoff({ lead, onClose, onDone, system = "monday", prev
     setBusy(true); setError("");
     try {
       // The version was captured when the panel opened; the server refuses if the lead changed since.
-      const res = await fetch(`/api/team/onboarding${preview ? `?backend=${preview}` : ""}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: lead ? (form.expectedUpdatedAt || lead.updatedAt) : "" }) });
+      const res = await fetch(`/api/team/onboarding${preview ? `?desk=${preview}` : ""}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, expectedUpdatedAt: lead ? (form.expectedUpdatedAt || lead.updatedAt) : "" }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || (res.status === 401 ? "Your team session expired. Sign in again; this handoff draft stays in this tab." : "The handoff could not be saved. Your draft is still here."));
       setResult(data as StartResult);

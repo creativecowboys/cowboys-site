@@ -10,8 +10,10 @@ import { CallDeskError, GHL_ID, MONDAY_ID } from "@/lib/calls/validation";
 // need cross-system code that nobody intends to run. LEADS_BACKEND (the Sales tab) stays its own switch.
 //
 // Rules:
-//   - List routes follow the switch, or `?backend=ghl|monday` on a team request so an owner can preview
-//     /leads?tab=onboarding&backend=ghl before the flip.
+//   - List routes follow the switch, or `?desk=ghl|monday` on a team request so an owner can preview
+//     /leads?tab=onboarding&desk=ghl before the flip. The parameter is NOT `backend`: that one already means
+//     "preview the Sales roster" (Phase 1), and someone on /leads?backend=ghl must still get the Monday boards
+//     on the other two tabs until this switch is flipped.
 //   - Record routes follow the id's SHAPE first: a GoHighLevel contact id (letters + digits) always goes
 //     to GoHighLevel. An all-digit id is a Monday item id; it goes to Monday while the switch says Monday,
 //     and once the switch says ghl it is looked up among the imported records (never sent to Monday).
@@ -19,7 +21,7 @@ export type DeskBackend = "monday" | "ghl";
 
 export const deskDefault = (env = process.env.DESK_BACKEND): DeskBackend => (env === "ghl" ? "ghl" : "monday");
 export function deskBackend(req?: Request | null, env = process.env.DESK_BACKEND): DeskBackend {
-  const q = req ? new URL(req.url).searchParams.get("backend") : null;
+  const q = req ? new URL(req.url).searchParams.get("desk") : null;
   return q === "ghl" || q === "monday" ? q : deskDefault(env);
 }
 export const deskSystemName = (b: DeskBackend) => (b === "ghl" ? "GoHighLevel" : "Monday");
@@ -48,18 +50,19 @@ export function validateScope(scope: string): string {
 export const backendForScope = (scope: string, env = process.env.DESK_BACKEND): DeskBackend => (isGhlRecordId(scope) ? "ghl" : deskDefault(env));
 
 /**
- * Once the switch says ghl the link to Monday is cut: `?backend=monday` still LISTS the old boards (a look back), but
+ * Once the switch says ghl the link to Monday is cut: `?desk=monday` still LISTS the old boards (a look back), but
  * nothing new is created there. Every other Monday write is already unreachable after the flip — a Monday item id on a
  * record route is resolved to the imported contact, never sent to Monday.
  */
 export function assertMondayOpen(env = process.env.DESK_BACKEND): void {
-  if (deskDefault(env) === "ghl") throw new CallDeskError("The desk is on GoHighLevel now, so nothing new is created on the Monday boards. Take “backend=monday” off the address and try again.", 409);
+  if (deskDefault(env) === "ghl") throw new CallDeskError("The desk is on GoHighLevel now, so nothing new is created on the Monday boards. Take “desk=monday” off the address and try again.", 409);
 }
 
 /**
  * While the switch still says Monday, GoHighLevel desk records are a preview: anyone on the team may look,
  * only an owner may change them (the import canary and the pre-flip checks). After the flip everyone works there.
  */
+export const mayWriteGhl = (isOwner: boolean, env = process.env.DESK_BACKEND): boolean => deskDefault(env) === "ghl" || isOwner;
 export function assertMayWriteGhl(isOwner: boolean, env = process.env.DESK_BACKEND): void {
   if (deskDefault(env) !== "ghl" && !isOwner) throw new CallDeskError("The GoHighLevel desk is still a preview. Only an owner can change records there until the desk is switched over.", 403);
 }
