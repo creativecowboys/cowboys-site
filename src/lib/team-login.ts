@@ -2,10 +2,11 @@ import { createHash, randomBytes } from "node:crypto";
 import { del, get, put } from "@vercel/blob";
 import { SignJWT } from "jose";
 import { Resend } from "resend";
+import { safeNext } from "./desk-path";
 
 // Email-only team sign-in (Dave, Sep 24 2026: "change the whole login process to be an email only login").
 // A team member types their address; if it is on the allowlist they get a one-time link that signs them
-// in for 30 days. Same cookie (`cc_admin_token`, issuer cc-admin) as before, so /leads, /admin and the
+// in for 30 days. Same cookie (`cc_admin_token`, issuer cc-admin) as before, so the desk (/admin) and the
 // team APIs need no changes. Tokens are hashed at rest, single-use, and expire after 15 minutes.
 export const SESSION_DAYS = 30;
 const LINK_MINUTES = 15;
@@ -35,11 +36,8 @@ async function readJson<T>(pathname: string): Promise<T | null> {
   } catch { return null; }
 }
 
-/** Only ever paths under /leads or /admin come back; anything else lands on /admin. */
-export function safeNext(value: string | null | undefined): string {
-  if (!value || value.length > 200 || !value.startsWith("/") || value.startsWith("//")) return "/admin";
-  return value === "/leads" || value.startsWith("/leads?") || value.startsWith("/leads/") || value === "/admin" || value.startsWith("/admin/") ? value : "/admin";
-}
+// Where a link may land after sign-in: only a place on the desk (see ./desk-path). Re-exported for the sign-in route.
+export { safeNext };
 
 /** Issue a link for a team address. Non-team addresses return quietly (the caller says the same thing either way). */
 export async function issueMagicLink(email: string, origin: string, next: string): Promise<"sent" | "not-team" | "throttled" | "unconfigured"> {

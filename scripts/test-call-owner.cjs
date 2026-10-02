@@ -14,6 +14,7 @@ const sources = {
   'monday': '../src/lib/calls/monday.ts', 'ghl': '../src/lib/calls/ghl.ts', 'switch': '../src/lib/calls/switch.ts',
   'ghl-client': '../src/lib/ghl/client.ts', 'ghl-fields': '../src/lib/ghl/fields.ts', 'ghl-reps': '../src/lib/ghl/reps.ts', 'ghl-links': '../src/lib/ghl/links.ts',
   'ghl-website-form': '../src/lib/ghl-website-form.ts', 'ghl-admin': '../src/lib/ghl/admin.ts', 'onboarding-api': '../src/lib/onboarding/api.ts',
+  'desk-path': '../src/lib/desk-path.ts', 'desk-path.test': '../src/lib/desk-path.test.ts',
   'roster.test': '../src/lib/calls/roster.test.ts', 'owner.test': '../src/lib/calls/owner.test.ts', 'followups.test': '../src/lib/calls/followups.test.ts',
   'ghl.test': '../src/lib/calls/ghl.test.ts', 'switch.test': '../src/lib/calls/switch.test.ts',
   'ghl-client.test': '../src/lib/ghl/client.test.ts', 'ghl-fields.test': '../src/lib/ghl/fields.test.ts', 'ghl-admin.test': '../src/lib/ghl/admin.test.ts', 'ghl-website-form.test': '../src/lib/ghl-website-form.test.ts',
@@ -24,6 +25,7 @@ const rewrites = [
   [/from "@\/lib\/ghl\/reps"/g, 'from "./ghl-reps"'], [/from "@\/lib\/ghl\/links"/g, 'from "./ghl-links"'],
   [/from "@\/lib\/ghl-website-form"/g, 'from "./ghl-website-form"'], [/from "@\/lib\/onboarding\/api"/g, 'from "./onboarding-api"'],
   [/from "@\/lib\/calls\/monday"/g, 'from "./monday"'], [/from "@\/lib\/calls\/ghl"/g, 'from "./ghl"'], [/from "\.\/admin"/g, 'from "./ghl-admin"'],
+  [/from "@\/lib\/desk-path"/g, 'from "./desk-path"'],
   [/from "\.\/links"/g, 'from "./ghl-links"'], [/from "\.\/client"/g, 'from "./ghl-client"'], [/from "\.\/fields"/g, 'from "./ghl-fields"'], [/from "\.\/reps"/g, 'from "./ghl-reps"'],
   [/from "\.\/ghl\/client"/g, 'from "./ghl-client"'], [/from "\.\/ghl\/fields"/g, 'from "./ghl-fields"'], [/from "\.\/ghl-website-form"/g, 'from "./ghl-website-form"'],
 ];
@@ -37,7 +39,7 @@ try {
     const result = ts.transpileModule(input, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } });
     fs.writeFileSync(path.join(output, `${name}.js`), result.outputText);
   }
-  const tests = ['owner.test', 'roster.test', 'followups.test', 'ghl.test', 'switch.test', 'ghl-client.test', 'ghl-fields.test', 'ghl-admin.test', 'ghl-website-form.test'].filter((t) => present.has(t)).map((t) => path.join(output, `${t}.js`));
+  const tests = ['owner.test', 'roster.test', 'followups.test', 'ghl.test', 'switch.test', 'ghl-client.test', 'ghl-fields.test', 'ghl-admin.test', 'ghl-website-form.test', 'desk-path.test'].filter((t) => present.has(t)).map((t) => path.join(output, `${t}.js`));
   process.exitCode = spawnSync(process.execPath, ['--test', ...tests], { stdio: 'inherit' }).status ?? 1;
 } finally {
   fs.rmSync(output, { recursive: true, force: true });
