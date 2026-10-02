@@ -20,6 +20,8 @@ export const maxDuration = 300;
  * `createNameOnly` allows a new contact for a row with no email and no phone (the business name becomes the contact's
  * company name; `businessAsContactName` also puts it in the contact's own name, for the one case where GoHighLevel will
  * not take a contact with nobody's name). Every row of the report says exactly what it writes (`values`, `contact`, `tags`).
+ * A real run is asked for with `apply: true` (`dryRun: false` means the same): a build from before the Oct 2 2026 safeguards does not
+ * know that word and can only answer with a dry run. The report's `build` is the commit that answered.
  * Once DESK_BACKEND=ghl, `force` is refused unless `overwriteLiveDesk: true` comes with it: it re-writes each contact's desk
  * fields from what the old boards say, over whatever the team has done on the GoHighLevel desk since.
  */

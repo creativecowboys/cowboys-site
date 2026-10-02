@@ -77,7 +77,7 @@ const byMonday = <T extends { mondayId: string }>(rows: T[], id: string): T => r
 
 test("dry run: every row is matched and described, nothing is written anywhere", async () => {
   const r = await migrateDesk({ dryRun: true });
-  assert.equal(r.dryRun, true); assert.equal(r.total, 6); assert.equal(r.processed, 6); assert.equal(r.nextOffset, null); assert.equal(r.ghlContacts, 5);
+  assert.equal(r.dryRun, true); assert.equal(r.total, 6); assert.equal(r.processed, 6); assert.equal(r.nextOffset, null); assert.equal(r.ghlContacts, 5); assert.equal(r.build, "unknown", "no commit on a test machine; on Vercel it is the commit that answered");
   assert.deepEqual(r.rows.map((x) => [x.board, x.name, x.match, x.ghlId]), [
     ["onboarding", "Choice Pressure Washing", "create", ""],
     ["onboarding", "Bourbon Leather Company", "lead", "LeadBourbon0000000A1"],
@@ -931,6 +931,10 @@ test("the request is checked strictly: a filter that is malformed is refused, ne
   refused({ boards: ["client"] }, /boards must be a list/); refused({ boards: [] }, /boards/); refused({ boards: "clients" }, /boards/);
   refused({ dryRun: "false" }, /dryRun must be true or false/); refused({ createNameOnly: "yes" }, /createNameOnly must be true or false/); refused({ limit: "17" }, /limit must be a whole number/); refused({ offset: -1 }, /offset/);
   refused(null, /JSON object/); refused([], /JSON object/); refused("x", /JSON object/);
+  // A real run is asked for with apply: true — a word an older build of the site does not know, so it can only answer with a dry run.
+  assert.equal(parseMigrateBody({ apply: true }).dryRun, false); assert.equal(parseMigrateBody({ dryRun: false }).dryRun, false, "the cutover runbook's way still works");
+  assert.equal(parseMigrateBody({ apply: false }).dryRun, true); assert.equal(parseMigrateBody({ dryRun: true }).dryRun, true); assert.equal(parseMigrateBody({ apply: true, dryRun: false }).dryRun, false);
+  refused({ apply: true, dryRun: true }, /apply and dryRun say opposite things/); refused({ apply: false, dryRun: false }, /apply and dryRun say opposite things/); refused({ apply: "true" }, /apply must be true or false/);
 });
 
 test("a board row that came back without its Team desk column, or with a phone that is not a number, is never guessed at", async () => {

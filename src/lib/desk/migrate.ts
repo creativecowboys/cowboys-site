@@ -410,8 +410,13 @@ export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number;
  * The request body of the import, checked strictly. A filter that is malformed must never quietly become "no filter": `onlyIds` given as
  * anything but a list of item ids, a `map` entry that is not an id → an id, a mistyped key — each is refused (400) instead of running the
  * whole board. With createNameOnly, "the whole board" means a new contact for every unmatched row.
+ *
+ * A REAL run is asked for with `apply: true`. (`dryRun: false` still means the same, for the cutover runbook.) The reason for the second
+ * word: a build of the site from before these safeguards does not know `apply`, so it answers such a request with a dry run. On Oct 2 2026
+ * a deployment made by hand from a stale checkout took production over for a few minutes — with `dryRun: false` that build would have
+ * created contacts with no legacy marker, no records and no lock. Every report also carries `build`, the commit that answered.
  */
-const BODY_KEYS = ["dryRun", "offset", "limit", "force", "overwriteLiveDesk", "onlyIds", "map", "boards", "includeOffDesk", "createNameOnly", "businessAsContactName"];
+const BODY_KEYS = ["dryRun", "apply", "offset", "limit", "force", "overwriteLiveDesk", "onlyIds", "map", "boards", "includeOffDesk", "createNameOnly", "businessAsContactName"];
 export function parseMigrateBody(input: unknown): Omit<MigrateOptions, "origin" | "pauseMs"> & { overwriteLiveDesk: boolean } {
   const bad = (m: string) => new CallDeskError(m, 400);
   if (input === null || typeof input !== "object" || Array.isArray(input)) throw bad("Send the import a JSON object (an empty one is a dry run of everything).");
@@ -421,6 +426,8 @@ export function parseMigrateBody(input: unknown): Omit<MigrateOptions, "origin" 
   const flag = (k: string): boolean => { if (body[k] !== undefined && typeof body[k] !== "boolean") throw bad(`${k} must be true or false. Nothing was run.`); return body[k] === true; };
   const count = (k: string, fallback: number): number => { const v = body[k]; if (v === undefined) return fallback; if (typeof v !== "number" || !Number.isInteger(v) || v < 0) throw bad(`${k} must be a whole number. Nothing was run.`); return v; };
   if (body.dryRun !== undefined && typeof body.dryRun !== "boolean") throw bad("dryRun must be true or false. Nothing was run.");
+  const apply = flag("apply");
+  if (body.apply !== undefined && body.dryRun !== undefined && body.dryRun === apply) throw bad("apply and dryRun say opposite things. Nothing was run — send apply: true for a real run, or neither for a dry run.");
   let onlyIds: string[] | undefined;
   if (body.onlyIds !== undefined) {
     const list = Array.isArray(body.onlyIds) ? body.onlyIds.map((v) => (typeof v === "number" && Number.isSafeInteger(v) ? String(v) : v)) : null;
@@ -443,7 +450,7 @@ export function parseMigrateBody(input: unknown): Omit<MigrateOptions, "origin" 
     boards = [...new Set(body.boards as ("onboarding" | "clients")[])];
   }
   return {
-    dryRun: body.dryRun !== false, offset: count("offset", 0), limit: count("limit", 25), force: flag("force"), overwriteLiveDesk: flag("overwriteLiveDesk"), onlyIds, map, boards,
+    dryRun: !(apply || body.dryRun === false), offset: count("offset", 0), limit: count("limit", 25), force: flag("force"), overwriteLiveDesk: flag("overwriteLiveDesk"), onlyIds, map, boards,
     includeOffDesk: flag("includeOffDesk"), createNameOnly: flag("createNameOnly"), businessAsContactName: flag("businessAsContactName"),
   };
 }
@@ -456,6 +463,8 @@ export type DeskMigrateRow = { board: "onboarding" | "clients"; mondayId: string
   /** Only on a row that creates a contact: contacts already in GoHighLevel that look like this business (first five). A hint — check them, and pin the row with `map` if one is the same business. */
   similar?: Lookalike[] };
 export type DeskMigrateReport = {
+  /** The commit of the build that answered (Vercel's own variable; "unknown" where it is not set) — so a report can be told from one a stale deployment wrote. */
+  build: string;
   dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; finished: number; failed: number }; rows: DeskMigrateRow[];
   skipped: { template: number; offDesk: { mondayId: string; name: string }[] };
   /** Every row on either board tagged Giveaway Winner: `imported` = it is on a GoHighLevel contact; `protected` = that contact's Desk Packages carries
@@ -502,6 +511,7 @@ async function runMigration(opts: MigrateOptions): Promise<DeskMigrateReport> {
   const slice = all.slice(offset, offset + limit);
   const ix = indexForDesk(await readAllContacts(), f, sales);
   const report: DeskMigrateReport = {
+    build: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7) || "unknown",
     dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, ghlContacts: ix.total,
     counts: { imported: 0, mapped: 0, "onboarding-record": 0, "ghl-link": 0, lead: 0, stripe: 0, email: 0, phone: 0, "company-name": 0, create: 0, "create-name-only": 0, unmatched: 0, written: 0, finished: 0, failed: 0 },
     rows: [], skipped: { template: pipeline.length - pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID).length, offDesk: opts.includeOffDesk ? [] : offDesk.filter(keep).map((r) => ({ mondayId: r.id, name: r.name })) },

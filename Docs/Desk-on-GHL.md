@@ -377,7 +377,17 @@ package the board has and the contact lacks is said in a warning and never writt
 history); for a Giveaway Winner label that warning starts "NOT PROTECTED".
 
 Every call is made from an owner's signed-in Chrome on the desk (see the cutover runbook above for how to post and read
-a report). They are all dry runs unless the body says `dryRun: false`. State on Oct 2 2026: step 1 is done (the field
+a report). They are all dry runs unless the body says **`apply: true`**.
+
+> **Why `apply: true` and not `dryRun: false`.** Production is whatever was deployed last, and on Oct 2 2026 a deployment
+> made by hand from a checkout fifteen commits behind main took production over for a few minutes — the desk was back at
+> `/leads` and none of this code was there. That older import would have taken `dryRun: false` and created seventeen
+> contacts with no legacy marker, no records and no lock. It does not know the word `apply`, so it can only answer such
+> a request with a dry run. Before a real call, and in its answer, check two things in the report: **`build`** is the
+> commit on main you expect (the older code has no `build` at all), and the answer to a real call says `dryRun: false`.
+> (`dryRun: false` still works on the current code, for the cutover runbook above; do not use it here.)
+
+State on Oct 2 2026: step 1 is done (the field
 exists, id `nMtC0XKwmnr9dUbs9E0s`, and the self-test passes 44 of 44 on the test contact); step 2 was run and answered
 exactly as written; nothing has been imported.
 
@@ -386,7 +396,7 @@ exactly as written; nothing has been imported.
    empty. Now the dry call answers `missing: []`, `present` 44, and `GET /api/team/ghl/diag` → `desk.fields.deskPresent`
    44, `desk.legacyClients` 0.
 2. **Dry run.** `POST /api/team/ghl/desk-migrate {"boards":["clients"],"includeOffDesk":true,"createNameOnly":true}`
-   → `total` 19; `counts`: `imported` 2 (Squirrel Made Products and Choice Pressure Washing, "already imported —
+   → `build` the commit on main, `dryRun: true`, `total` 19; `counts`: `imported` 2 (Squirrel Made Products and Choice Pressure Washing, "already imported —
    skipped"), `create-name-only` 17, `unmatched` 0, `failed` 0. Every one of the 17: `legacy: true`, `detail` "creates a
    new contact from the business name alone…", `contact` = `companyName` (+ `website` on four of them), `values` = the
    eight desk fields it writes (nine for Defoor Plumbing and Sconyers Concrete Inc, which carry `Desk Packages`
@@ -394,7 +404,8 @@ exactly as written; nothing has been imported.
    say `BLOCKED` (step 1 skipped, or the import's records unreadable). **A non-empty `similar` is the thing to stop on:** look at those
    contacts in GoHighLevel, and if one is the same business add `"map":{"<monday row id>":"<contact id>"}` so the row
    uses it.
-3. **One row as a trial.** The same body plus `"dryRun":false,"onlyIds":["13125631516"]` (Whiten Pools, Inc.) →
+3. **One row as a trial.** The same body plus `"apply":true,"onlyIds":["13125631516"]` (Whiten Pools, Inc.) →
+   `dryRun: false`,
    `written` 1, the row `done`, `detail` "wrote 8 fields, 0 of 0 updates copied as notes", `storage` "import record:
    this row created contact …". Then look: the Clients tab (`/admin?tab=clients`) reads "2 on the desk · 1 legacy"
    (GoHighLevel's search can take ~20 seconds to list a new contact; `/admin?tab=clients&client=<contact id>` opens
@@ -406,7 +417,8 @@ exactly as written; nothing has been imported.
    option is the answer if the trial contact turns out hard to tell apart in GoHighLevel's own lists, where a contact
    with no name shows blank: decide on the trial contact before running the rest (its own name can be set from the
    panel's Contact field).
-4. **The rest.** The same body with `"dryRun":false` (no `onlyIds`) → `written` 16, `imported` 3, `failed` 0.
+4. **The rest.** The same body with `"apply":true` (no `onlyIds`) → `dryRun: false`, `written` 16, `imported` 3,
+   `failed` 0.
 5. **Dry run again a minute later** → all 19 `imported`, "already imported — skipped". The tab: "18 on the desk · 17
    legacy". **Whenever a real run reports a failed row, the next call is a dry run, not a retry:** it says whether the
    row is `imported` (the contact exists — a real run then finishes it), held (`BLOCKED … an earlier run started creating
