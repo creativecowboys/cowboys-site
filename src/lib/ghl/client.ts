@@ -120,6 +120,12 @@ export async function upsertContact(payload: GhlUpsertPayload, opts?: GhlOptions
   if (!r.contact?.id) throw new CallDeskError("GoHighLevel did not confirm the contact upsert.", 502);
   return { contact: r.contact, isNew: !!r.new };
 }
+/** Plain create (POST /contacts/) — for a contact with no email or phone, which upsert cannot dedupe. The caller owns idempotency. */
+export async function createContact(payload: GhlUpsertPayload): Promise<GhlContact> {
+  const r = await ghl<{ contact?: GhlContact }>("POST", "/contacts/", payload);
+  if (!r.contact?.id) throw new CallDeskError("GoHighLevel did not confirm the new contact.", 502);
+  return r.contact;
+}
 export const addTags = (id: string, tags: string[]) => ghl<{ tags?: string[] }>("POST", `/contacts/${encodeURIComponent(id)}/tags`, { tags });
 export const removeTags = (id: string, tags: string[]) => ghl<{ tags?: string[] }>("DELETE", `/contacts/${encodeURIComponent(id)}/tags`, { tags });
 

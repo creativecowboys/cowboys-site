@@ -2,7 +2,7 @@ import { CallDeskError } from "@/lib/calls/validation";
 import { monday } from "@/lib/onboarding/api";
 import { GIVEAWAY_BOARD_ID, mapLead as mapMondayLead } from "@/lib/calls/monday";
 import type { CallLead } from "@/app/leads/types";
-import { addNote, addTags, contactDisplayName, fieldText, getContact, ghlConfigured, listNotes, listUsers, listWorkflows, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
+import { addNote, addTags, contactDisplayName, createContact, fieldText, getContact, ghlConfigured, listNotes, listUsers, listWorkflows, normalizePhone, searchContacts, splitName, updateContact, upsertContact, type GhlContact, type GhlContactPatch } from "./client";
 import { ensureSalesFields, LEAD_SOURCE, OUTREACH_OPTIONS, INTEREST_OPTIONS, requireField, SALES_FIELDS, salesFields, type SalesFieldKey, type SalesFields } from "./fields";
 import { ghlRepIds, MONDAY_IDS, REP_NAMES, type RepName } from "./reps";
 import { LEAD_TAGS, rosterFilters, rosterTags, WON_TAG } from "@/lib/calls/ghl";
@@ -102,7 +102,7 @@ async function readGiveawayBoard(): Promise<MondayItem[]> {
   }
   return items;
 }
-export type MigrateRow = { mondayId: string; name: string; match: "imported" | "ghl-link" | "email" | "phone" | "create" | "unmatched"; ghlId: string; owner: string; outreach: string; notes: number; detail?: string; done?: boolean; error?: string };
+export type MigrateRow = { mondayId: string; name: string; match: "imported" | "ghl-link" | "email" | "phone" | "create" | "create-name-only" | "unmatched"; ghlId: string; owner: string; outreach: string; notes: number; detail?: string; done?: boolean; error?: string };
 export type MigrateReport = { dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MigrateRow["match"], number> & { written: number; failed: number }; rows: MigrateRow[] };
 
 /** Every contact in the location, read once per run (500 a page), indexed for matching — far cheaper than three searches per lead. */
@@ -133,13 +133,15 @@ export function ghlIdFromLink(item: { column_values: { id: string; text: string 
   try { const v = JSON.parse(col?.value || "null") as { url?: string; text?: string } | null; raw = `${v?.url || ""} ${v?.text || ""} ${raw}`; } catch { /* text only */ }
   return /(?:contacts\/detail\/|^|\s)([A-Za-z0-9]{20})(?=$|[\s/?#])/.exec(raw.trim())?.[1] || "";
 }
-/** Match order: already imported (Monday Lead ID) → the board's GHL Contact link → email → phone → create → unmatched. */
+/** Match order: already imported (Monday Lead ID) → the board's GHL Contact link → email → phone → create. A row with no email
+ *  or phone is created from its name alone (it is still a lead someone is working); only a row with no name at all is unmatched. */
 export function matchLead(item: MondayItem, lead: CallLead, ix: ContactIndex): { match: MigrateRow["match"]; contact: GhlContact | null } {
   const imported = ix.byMondayId.get(item.id); if (imported) return { match: "imported", contact: imported };
   const linked = ix.byId.get(ghlIdFromLink(item)); if (linked) return { match: "ghl-link", contact: linked };
   const email = lead.email.trim().toLowerCase(); const byEmail = email ? ix.byEmail.get(email) : undefined; if (byEmail) return { match: "email", contact: byEmail };
   const phone = lead.phone ? normalizePhone(lead.phone) : ""; const byPhone = phone.length >= 11 ? ix.byPhone.get(phone) : undefined; if (byPhone) return { match: "phone", contact: byPhone };
-  return { match: email || phone.length >= 11 ? "create" : "unmatched", contact: null };
+  if (email || phone.length >= 11) return { match: "create", contact: null };
+  return { match: (item.name || lead.contact).trim() ? "create-name-only" : "unmatched", contact: null };
 }
 
 /** Field + contact writes for one Monday lead. Only fills blank contact fields; desk fields are set from Monday verbatim. */
@@ -182,7 +184,7 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
   const all = (await readGiveawayBoard()).filter((i) => !opts.onlyIds?.length || opts.onlyIds.includes(i.id));
   const offset = Math.max(0, opts.offset || 0); const limit = Math.min(Math.max(opts.limit || 25, 1), 100);
   const slice = all.slice(offset, offset + limit);
-  const report: MigrateReport = { dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, counts: { imported: 0, "ghl-link": 0, email: 0, phone: 0, create: 0, unmatched: 0, written: 0, failed: 0 }, rows: [], ghlContacts: 0 };
+  const report: MigrateReport = { dryRun: opts.dryRun, total: all.length, offset, processed: slice.length, nextOffset: offset + limit < all.length ? offset + limit : null, counts: { imported: 0, "ghl-link": 0, email: 0, phone: 0, create: 0, "create-name-only": 0, unmatched: 0, written: 0, failed: 0 }, rows: [], ghlContacts: 0 };
   const mondayLeadId = requireField(fields, "mondayLeadId");
   const ix = indexContacts(await readAllContacts(), mondayLeadId.id);
   report.ghlContacts = ix.total;
@@ -195,7 +197,8 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
       const existing = found.contact;
       row.match = found.match; row.ghlId = existing?.id || "";
       report.counts[row.match]++;
-      if (row.match === "unmatched") { row.detail = "no email or phone on the Monday item — nothing to match or create"; report.rows.push(row); continue; }
+      if (row.match === "unmatched") { row.detail = "no name, email or phone on the Monday item — nothing to match or create"; report.rows.push(row); continue; }
+      if (row.match === "create-name-only") row.detail = "no email or phone on the Monday item — will be created in GHL from its name";
       if (row.match === "imported" && !opts.force) { report.rows.push(row); continue; }
       if (opts.dryRun) { report.rows.push(row); continue; }
       const patch = migrationPatch(lead, lead.notes, existing, fields);
@@ -203,7 +206,9 @@ export async function migrateFromMonday(opts: { dryRun: boolean; offset?: number
       let contactId = existing?.id || "";
       if (existing) await updateContact(existing.id, contactPatch);
       else {
-        const { contact } = await upsertContact({ locationId: process.env.GHL_LOCATION_ID!, ...contactPatch, source: "Big Giveaway (Monday import)", tags: ["monday-import", ...(tags || [])] });
+        const payload = { locationId: process.env.GHL_LOCATION_ID!, ...contactPatch, source: "Big Giveaway (Monday import)", tags: ["monday-import", ...(tags || [])] };
+        // Upsert dedupes on email/phone; with neither there is nothing to dedupe on, so it is a plain create (guarded by the Monday Lead ID index).
+        const contact = row.match === "create-name-only" ? await createContact(payload) : (await upsertContact(payload)).contact;
         contactId = contact.id; row.ghlId = contactId;
         ix.byId.set(contact.id, contact); ix.byMondayId.set(item.id, contact);
         if (contactPatch.email) ix.byEmail.set(contactPatch.email, contact);

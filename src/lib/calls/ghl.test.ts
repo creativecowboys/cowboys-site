@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
-import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
+import { assignOwner, callFields, formatCallNote, getCallLead, getCallsPage, isoDate, LEAD_TAGS, mapLead, markSourceLead, readLeadVersion, rosterFilters, rosterTags, saveCall, setLeadSource, unwrapCursor, WON_TAG } from "./ghl";
 import { validateAssign, validateLeadId } from "./validation";
 import { forgetCustomFields } from "@/lib/ghl/client";
 import { resolveFromDefs } from "@/lib/ghl/fields";
@@ -60,6 +60,15 @@ test("mapLead: business name, person, owner by GHL user id, custom fields, group
   const stranger = mapLead(contact({ assignedTo: "someoneElse00000000", customFields: [{ id: F.os, value: "Won" }] }), fields);
   assert.equal(stranger.ownerName, ""); assert.equal(stranger.owner, "Assigned in GHL"); assert.equal(stranger.group, "Won");
   assert.equal(mapLead(contact({ companyName: "", customFields: [], tags: [WON_TAG] }), fields).outreach, "Won");
+});
+test("date fields read as YYYY-MM-DD whether GHL returns an ISO string, an ISO timestamp or an epoch", () => {
+  assert.equal(isoDate("2026-10-07"), "2026-10-07"); assert.equal(isoDate("2026-10-07T00:00:00.000Z"), "2026-10-07");
+  assert.equal(isoDate(String(Date.UTC(2026, 9, 7))), "2026-10-07"); // midnight UTC, ms
+  assert.equal(isoDate(String(Date.UTC(2026, 9, 7) / 1000)), "2026-10-07"); // seconds
+  assert.equal(isoDate(String(Date.UTC(2026, 9, 7, 4, 0, 0))), "2026-10-07"); // midnight Eastern (EDT) stored as a moment
+  assert.equal(isoDate(String(Date.UTC(2026, 9, 8, 2, 30, 0))), "2026-10-07"); // 10:30pm Eastern on the 7th
+  assert.equal(isoDate(""), ""); assert.equal(isoDate("soon"), "");
+  assert.equal(mapLead(contact({ customFields: [{ id: F.lc, value: Date.UTC(2026, 8, 28) }, { id: F.nf, value: "2026-10-03T00:00:00.000Z" }] }), fields).lastContact, "2026-09-28");
 });
 test("roster filters: an OR of the lead tags plus 'has a Lead Source'", () => {
   assert.deepEqual(rosterFilters("fLeadSource"), [{ group: "OR", filters: [...LEAD_TAGS.map((t) => ({ field: "tags", operator: "eq", value: t })), { field: "customFields.fLeadSource", operator: "exists" }] }]);

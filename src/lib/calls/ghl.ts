@@ -42,7 +42,22 @@ export function rosterFilters(leadSourceFieldId?: string, env = process.env.LEAD
   return [{ group: "OR", filters: any }];
 }
 
-const isoDate = (v: string) => (/^\d{4}-\d{2}-\d{2}/.exec(v)?.[0] || "");
+/**
+ * A GHL DATE custom field as YYYY-MM-DD. GHL has returned these both as an ISO string and as an epoch
+ * (ms or s) depending on how the value was written, so accept either: an epoch that is exactly midnight
+ * UTC is a date-only value (read it in UTC); anything else is a moment, read in Eastern.
+ */
+export function isoDate(v: string): string {
+  const iso = /^\d{4}-\d{2}-\d{2}/.exec(v)?.[0];
+  if (iso) return iso;
+  let ms = NaN;
+  if (/^\d{9,14}$/.test(v)) ms = v.length <= 10 ? Number(v) * 1000 : Number(v);
+  else if (v) ms = Date.parse(v);
+  if (!Number.isFinite(ms)) return "";
+  const d = new Date(ms);
+  if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0) return d.toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+}
 export function mapLead(c: GhlContact, fields: SalesFields): CallLead {
   const f = (key: keyof SalesFields) => fieldText(c, fields[key]?.id);
   const person = contactDisplayName(c);

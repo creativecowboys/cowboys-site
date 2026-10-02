@@ -59,7 +59,8 @@ test("matching: imported → GHL link → email → phone → create → unmatch
   assert.deepEqual(m("2", { email: " FIRST@example.com " }), ["email", "aaaaaaaaaaaaaaaaaaaa"]);
   assert.deepEqual(m("3", { email: "nobody@example.com", phone: "13865550101" }), ["phone", "cccccccccccccccccccc"]);
   assert.deepEqual(m("4", { email: "new@example.com" }), ["create", ""]);
-  assert.deepEqual(m("5", { phone: "555" }), ["unmatched", ""]);
+  assert.deepEqual(m("5", { phone: "555" }), ["create-name-only", ""]); // no usable email/phone, but it has a name → created from the name
+  assert.deepEqual(matchLead({ ...mondayItem("9"), name: "" }, lead({ email: "", phone: "", contact: "" }), ix).match, "unmatched");
   assert.deepEqual(m("6", { email: "x@y.co" }, { text: "zzzzzzzzzzzzzzzzzzzz" }), ["create", ""]); // a link to a contact that no longer exists is ignored
 });
 
