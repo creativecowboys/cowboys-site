@@ -82,7 +82,7 @@ export function mapLead(item: Item): CallLead {
     interest: cols.interest || "", notes: cols.notes || "", lastContact: cols.last_contact || "", nextFollowup, nextFollowupTime,
     quotedMonthly: cols.quoted_monthly || "", interestedIn: cols.dropdown_mm77a9z5 || "", auditScore: cols.audit_score || "",
     auditReport: link("audit_report"), group: item.group?.title || "", leadSource: "", updatedAt: item.updated_at,
-    recordUrl: mondayLeadUrl(item.id),
+    recordUrl: mondayLeadUrl(item.id), mondayUrl: mondayLeadUrl(item.id),
   };
 }
 export const mondayLeadUrl = (id: string) => `https://creativecowboys.monday.com/boards/${GIVEAWAY_BOARD_ID}/pulses/${id}`;
@@ -203,7 +203,7 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
     const recordUrl = mapLead(initial).recordUrl;
     if (prior) {
       if (!(prior.text_body || "").includes(payloadMarker(draft))) throw new CallDeskError("A different version of this call note is already in Monday. Your edited draft has not been saved. Review the existing note before starting a new call record.", 409);
-      return { saved: true, updateId: prior.id, recordUrl, warning: "This call note was already saved. Board-field completion could not be confirmed, so no fields were overwritten. Review the lead in Monday." };
+      return { saved: true, updateId: prior.id, recordUrl, mondayUrl: recordUrl, warning: "This call note was already saved. Board-field completion could not be confirmed, so no fields were overwritten. Review the lead in Monday." };
     }
     const baseline = await readItem(draft.leadId);
     if (baseline.updated_at !== draft.expectedUpdatedAt) throw new CallDeskError("Someone changed this lead since you opened it. Your draft is safe. Reload the lead and review the changes before saving.", 409);
@@ -215,7 +215,7 @@ export async function saveCall(draft: CallDraft): Promise<SaveCallResult> {
     } catch {
       throw new CallDeskError("Monday did not confirm the call note. It may already be saved. Keep this draft and retry with the same call reference; do not start a new call.", 502);
     }
-    const saved = { saved: true as const, updateId, recordUrl };
+    const saved = { saved: true as const, updateId, recordUrl, mondayUrl: recordUrl };
     try {
       const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
       const columns = callColumns(draft, today);

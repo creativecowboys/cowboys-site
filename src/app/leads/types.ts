@@ -12,6 +12,8 @@ export type CallLead = {
   interestedIn: string; auditScore: string; auditReport: string; group: string;
   leadSource: string; // GHL "Lead Source" dropdown ("" on the Monday backend)
   updatedAt: string; recordUrl: string; // link to the record in whichever system holds it
+  /** @deprecated alias of recordUrl on Monday leads, for desk tabs still running the pre-GHL build across the deploy. Remove after cutover. */
+  mondayUrl?: string;
 };
 export type CallHistory = { id: string; text: string; createdAt: string; author: string; isCallNote?: boolean };
 export type CallDraft = {
@@ -29,4 +31,4 @@ export type CallsPageData = {
   owners: { id: string; name: RepName }[]; // the three reps with their ids in this backend
   leadSources: string[]; // Lead Source options read from GHL ([] on Monday)
 };
-export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string };
+export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string; /** @deprecated see CallLead.mondayUrl */ mondayUrl?: string };
