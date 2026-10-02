@@ -44,13 +44,14 @@ type Sub = { id: string; name: string; column_values: Column[] };
 export type MondayRow = { id: string; name: string; group: { id: string; title: string } | null; column_values: Column[]; subitems?: Sub[] | null; updates?: Update[] };
 
 const PIPELINE_COLUMNS = [...new Set([...Object.values(COL), "build_week"])];
+const UPDATES_PER_ITEM = 50; // the newest 50 updates of an item are copied as notes; the report warns when an item has that many
 const CLIENT_COLUMNS = Object.values(CCOL);
 async function readBoard(boardId: string, columns: string[], withSubitems: boolean): Promise<MondayRow[]> {
   const rows: MondayRow[] = [];
   let cursor: string | null = null;
   for (let page = 0; page < 10; page++) {
     const data: { boards: { items_page: { cursor: string | null; items: MondayRow[] } }[] } = await monday(
-      `query DeskMigrate($board: [ID!]!, $cursor: String) { boards(ids: $board) { items_page(limit: 100, cursor: $cursor) { cursor items { id name group { id title } column_values(ids: ${JSON.stringify(columns)}) { id text value } ${withSubitems ? `subitems { id name column_values(ids: ${JSON.stringify(Object.values(SUBITEM_COL))}) { id text value } }` : ""} updates(limit: 50) { id text_body created_at creator { name } } } } } }`,
+      `query DeskMigrate($board: [ID!]!, $cursor: String) { boards(ids: $board) { items_page(limit: 100, cursor: $cursor) { cursor items { id name group { id title } column_values(ids: ${JSON.stringify(columns)}) { id text value } ${withSubitems ? `subitems { id name column_values(ids: ${JSON.stringify(Object.values(SUBITEM_COL))}) { id text value } }` : ""} updates(limit: ${UPDATES_PER_ITEM}) { id text_body created_at creator { name } } } } } }`,
       { board: [boardId], cursor }, 25000,
     );
     const pg = data.boards?.[0]?.items_page;
@@ -237,7 +238,9 @@ export function planClient(row: MondayRow, existing: GhlContact | null, f: DeskF
 }
 
 // ───────────────────────────── the run ─────────────────────────────
-export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number; force?: boolean; onlyIds?: string[]; map?: Record<string, string>; boards?: ("onboarding" | "clients")[]; includeOffDesk?: boolean; createNameOnly?: boolean; origin?: string };
+export type MigrateOptions = { dryRun: boolean; offset?: number; limit?: number; force?: boolean; onlyIds?: string[]; map?: Record<string, string>; boards?: ("onboarding" | "clients")[]; includeOffDesk?: boolean; createNameOnly?: boolean; origin?: string;
+  /** Pause between writes, in ms (default 120 — well inside GoHighLevel's rate limit). Tests pass 0; the route never sets it. */
+  pauseMs?: number };
 export type DeskMigrateRow = { board: "onboarding" | "clients"; mondayId: string; name: string; match: MatchKind; ghlId: string; ghlName: string; state: string; fields: string[]; contactFields: string[]; owner: boolean; tags: string[]; updates: number; checklist: number; storage: string[]; warnings: string[]; candidates?: { id: string; name: string }[]; detail?: string; done?: boolean; error?: string };
 export type DeskMigrateReport = {
   dryRun: boolean; total: number; offset: number; processed: number; nextOffset: number | null; ghlContacts: number; counts: Record<MatchKind, number> & { written: number; failed: number }; rows: DeskMigrateRow[];
@@ -279,6 +282,7 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
     rows: [], skipped: { template: pipeline.length - pipeline.filter((r) => r.group?.id !== TEMPLATE_GROUP_ID).length, offDesk: opts.includeOffDesk ? [] : offDesk.filter(keep).map((r) => ({ mondayId: r.id, name: r.name })) },
     winners: [],
   };
+  const gap = opts.pauseMs ?? 120;
   const linked = new Map<string, string>(); // onboarding item id → contact id, as this run goes
   const pending = new Set<string>(); // onboarding items whose contact this run creates (dry run: would create)
   for (const { kind, row } of slice) {
@@ -302,6 +306,15 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         report.rows.push(out); continue;
       }
       const plan = kind === "onboarding" ? planOnboarding(row, contact, f, contact && opts.origin ? `${opts.origin}/leads?tab=onboarding&client=${contact.id}` : "") : planClient(row, contact, f);
+      // GoHighLevel refuses an email or phone another contact already holds, and that refusal would fail the whole write:
+      // leave this contact's blank as it is and say so (the dry run shows it too).
+      if (contact) {
+        const emailOwner = plan.native.email ? ix.byEmail.get(plan.native.email) : undefined;
+        if (emailOwner && emailOwner.id !== contact.id) { plan.warnings.push(`the board's email is already on another contact (${emailOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.email; }
+        const phoneOwner = plan.native.phone ? ix.byPhone.get(plan.native.phone) : undefined;
+        if (phoneOwner && phoneOwner.id !== contact.id) { plan.warnings.push(`the board's phone is already on another contact (${phoneOwner.id}) — not added to this one; if that is the same business, merge the two in GoHighLevel`); delete plan.native.phone; }
+      }
+      if ((row.updates || []).length >= UPDATES_PER_ITEM) plan.warnings.push(`this item has ${UPDATES_PER_ITEM} or more updates — only the newest ${UPDATES_PER_ITEM} are copied as notes`);
       out.fields = fieldNames(f, plan.values); out.contactFields = Object.keys(plan.native).filter((k) => k !== "assignedTo"); out.owner = "assignedTo" in plan.native; out.tags = plan.tags; out.warnings = plan.warnings;
       if (found.match === "imported" && !opts.force) { out.detail = "already imported — skipped (force re-writes it)"; report.rows.push(out); continue; }
       if (opts.dryRun) { report.rows.push(out); continue; }
@@ -318,6 +331,12 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         if (plan.native.email) ix.byEmail.set(plan.native.email, contact);
         if (plan.native.phone) ix.byPhone.set(plan.native.phone, contact);
         if (kind === "onboarding") linked.set(row.id, contact.id);
+        // The staff link back to the desk needs the new contact's id, so it is written once the contact exists.
+        if (kind === "onboarding" && opts.origin) {
+          const link = deskWrites(f, { deskLink: `${opts.origin}/leads?tab=onboarding&client=${contact.id}` });
+          await updateContact(contact.id, { customFields: link });
+          customFields.push(...link);
+        }
       }
       const contactId = contact.id;
       // The checklist is one large-text field: prove GoHighLevel kept every row before calling this record imported.
@@ -329,6 +348,8 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       const merged: GhlContact = { ...contact, ...plan.native, customFields: [...(contact.customFields || []).filter((x) => !customFields.some((w) => w.id === x.id)), ...customFields.map((w) => ({ id: w.id, value: w.field_value }))] };
       ix.byId.set(contactId, merged);
       (kind === "onboarding" ? ix.byMondayOnboarding : ix.byMondayClient).set(row.id, merged);
+      if (plan.native.email && !ix.byEmail.has(plan.native.email)) ix.byEmail.set(plan.native.email, merged);
+      if (plan.native.phone && !ix.byPhone.has(plan.native.phone)) ix.byPhone.set(plan.native.phone, merged);
       await addTags(contactId, out.tags);
       // Monday updates → notes, once each (the marker is the Monday update id).
       const have = await listNotes(contactId);
@@ -338,7 +359,7 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
         if (!body || have.some((n) => (n.body || "").includes(importMarker(u.id)))) continue;
         const handoff = /\[CC-HANDOFF:([^\]]+)\]/.exec(body)?.[1];
         await addNote(contactId, `From the old board (${u.creator?.name || "Team"}, ${u.created_at.slice(0, 10)}):\n${body}\n\n${importMarker(u.id)}${handoff ? ` ${summaryMarker(handoff)}` : ""} [CC-SRC:${kind === "onboarding" ? "onboarding" : "client"}]`);
-        copied++; await pause(120);
+        copied++; await pause(gap);
       }
       // Storage: the client's intake / file record stays under its Monday-era key and learns which contact it belongs to.
       const scope = kind === "onboarding" ? row.id : `c${row.id}`;
@@ -347,8 +368,8 @@ export async function migrateDesk(opts: MigrateOptions): Promise<DeskMigrateRepo
       else if (intake) out.storage.push(`intake/${scope}: already linked`);
       out.detail = `wrote ${customFields.length} fields, ${copied} of ${out.updates} updates copied as notes`; out.done = true;
       report.counts.written++;
-      await pause(150);
-    } catch (e) { out.error = e instanceof Error ? e.message : String(e); report.counts.failed++; }
+      await pause(gap);
+    } catch (e) { out.error = (e instanceof Error ? e.message : String(e)).replace(/[=?&]/g, " ").slice(0, 400); report.counts.failed++; } // no query-string shapes: the browser tool that reads this report redacts them
     report.rows.push(out);
   }
   const isWinner = (r: MondayRow, colId: string) => isGiveawayWinner(splitPackages(text(r, colId)));

@@ -99,8 +99,16 @@ export async function onboardingDetailGhl(rawId: string): Promise<OnboardingDeta
     liveGbp(stored, f), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
     searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
   ]);
+  // The client's Submit is saved in storage first and the status on the contact second. If that second write was missed
+  // (a GoHighLevel hiccup at that moment, or a submit that landed on the old board between the import and the switch),
+  // storage is the truth: show it and put it on the contact.
+  let row = live.row;
+  if (intake?.submittedAt && ["", "Not sent", "Link issued"].includes(row.intake)) {
+    try { await writeRecord(contact.id, f, { intake: "Client submitted" }); row = mapOnboarding(await readContact(contact.id), f); }
+    catch (e) { console.error(`desk intake: could not mark ${contact.id} Client submitted: ${e instanceof Error ? e.message : e}`); row = { ...row, intake: "Client submitted" }; }
+  }
   return {
-    row: live.row, history: toTimeline(notes), record,
+    row, history: toTimeline(notes), record,
     intake: intake ? { ...stripToken(intake), linkActive: linkActive(intake) } : null,
     owners: teamOwners(), gbp: live.card, gbpLocations, searchAtlasConnected: searchAtlasConnected(),
     fileScope: scope, nextDue: nextDueOf(contact, f), system: "ghl",

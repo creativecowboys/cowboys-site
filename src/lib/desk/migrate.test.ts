@@ -101,7 +101,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   blobSeed(`onboarding/intake/${CHOICE_OB}.json`, { version: 1, itemId: CHOICE_OB, leadId: "", business: "Choice Pressure Washing", tokenHash: hash, tokenIssuedAt: "2026-10-01T18:00:00.000Z", tokenExpiresAt: "2099-01-01T00:00:00.000Z", revokedAt: null, form: { business: "Choice Pressure Washing" }, lastSavedAt: null, submittedAt: null, reviewedAt: null, files: [], createdAt: "", updatedAt: "" });
   blobSeed(`onboarding/tokens/${hash}.json`, { itemId: CHOICE_OB });
   const keysBefore = blobKeys();
-  const r = await migrateDesk({ dryRun: false, origin: "https://www.creativecowboys.co" });
+  const r = await migrateDesk({ pauseMs: 0, dryRun: false, origin: "https://www.creativecowboys.co" });
   assert.equal(r.counts.written, 6); assert.equal(r.counts.failed, 0); assert.ok(r.rows.every((x) => x.done && !x.error));
   assert.equal(ghl.contacts.size, 6, "exactly one contact was created (Choice); nobody else was duplicated");
   // Choice: created from its onboarding row, then its Active Clients row joined the SAME contact.
@@ -123,6 +123,7 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.equal(blobJson<IntakeRecord>(`onboarding/intake/${CHOICE_OB}.json`)!.contactId, choiceId);
   assert.equal((await resolveToken(token)).itemId, CHOICE_OB);
   assert.deepEqual(byMonday(r.rows, CHOICE_OB).storage, [`intake/${CHOICE_OB}: contactId set`]);
+  assert.equal(ghl.value(choiceId, "Desk Link"), `https://www.creativecowboys.co/leads?tab=onboarding&client=${choiceId}`, "a contact the import creates gets its desk link once it has an id");
   // Bourbon: matched to the lead Phase 1 imported; nothing GoHighLevel already had was overwritten; Madison mapped by Monday id.
   const bourbon = ghl.get("LeadBourbon0000000A1");
   assert.equal(bourbon.companyName, "Bourbon Leather Co"); assert.equal(bourbon.assignedTo, reps.Dave); assert.equal(ghl.value(bourbon.id, "LSE Health"), "green");
@@ -150,19 +151,19 @@ test("the real run: one contact per business, fields, owners, checklist, notes, 
   assert.deepEqual((await onboardingDetailGhl(choiceId)).history.map((h) => [h.source, h.author]), [["Imported", "Josh Pack"]]);
   // Idempotent.
   const writes = ghl.writes().length;
-  const again = await migrateDesk({ dryRun: false });
+  const again = await migrateDesk({ pauseMs: 0, dryRun: false });
   assert.deepEqual(again.rows.map((x) => x.match), Array(6).fill("imported")); assert.equal(again.counts.written, 0); assert.equal(ghl.writes().length, writes, "a second run writes nothing");
   // force re-writes the fields but never copies a note twice and never replaces a checklist that is already on the contact.
   ghl.get(choiceId).customFields!.find((x) => x.id === ghl.fieldId("Desk Checklist"))!.value = "[x] Edited on the desk since";
-  const forced = await migrateDesk({ dryRun: false, force: true, onlyIds: [CHOICE_OB] });
+  const forced = await migrateDesk({ pauseMs: 0, dryRun: false, force: true, onlyIds: [CHOICE_OB] });
   assert.equal(forced.total, 1); assert.equal(forced.counts.written, 1); assert.equal(ghl.notesFor(choiceId).length, 1); assert.equal(ghl.value(choiceId, "Desk Checklist"), "[x] Edited on the desk since");
 });
 
 test("one-record trial, explicit map, batches, off-desk rows, and a client row that must wait for its onboarding record", async () => {
-  const trial = await migrateDesk({ dryRun: false, onlyIds: [BOURBON_OB] });
+  const trial = await migrateDesk({ pauseMs: 0, dryRun: false, onlyIds: [BOURBON_OB] });
   assert.equal(trial.total, 1); assert.equal(trial.counts.written, 1); assert.equal(ghl.value("LeadBourbon0000000A1", "Desk Onboarding Stage"), "New handoff"); assert.equal(ghl.contacts.size, 5);
   // The client board alone: Choice's row has an onboarding record that is not imported yet → it waits instead of getting a second contact.
-  const clientsOnly = await migrateDesk({ dryRun: false, boards: ["clients"] });
+  const clientsOnly = await migrateDesk({ pauseMs: 0, dryRun: false, boards: ["clients"] });
   assert.deepEqual(clientsOnly.rows.map((x) => [x.name, x.match, !!x.done]), [["Squirrel Made Products", "company-name", true], ["Choice Pressure Washing", "unmatched", false]]);
   assert.match(byMonday(clientsOnly.rows, CHOICE_CL).detail!, /its onboarding record \(Monday item 13052279909\) is not imported yet/); assert.equal(ghl.contacts.size, 5);
   // map pins a row to a contact; a bad map is refused, not guessed around.
@@ -182,6 +183,23 @@ test("one-record trial, explicit map, batches, off-desk rows, and a client row t
   const off = await migrateDesk({ dryRun: true, boards: ["clients"], includeOffDesk: true, onlyIds: [CHAPELHILL_CL] });
   assert.equal(off.rows[0].match, "unmatched"); assert.match(off.rows[0].detail!, /no email or phone/);
   assert.equal((await migrateDesk({ dryRun: true, boards: ["clients"], includeOffDesk: true, onlyIds: [CHAPELHILL_CL], createNameOnly: true })).rows[0].match, "create-name-only");
+});
+
+test("an email or phone another contact already holds is left off (GoHighLevel would refuse the whole write), and the report says so", async () => {
+  // The board links this row to a contact with no email or phone; the row's email is Pat's and its phone is Kaden's.
+  ghl.addContact({ id: "NoEmailContact000001", firstName: "Sam", companyName: "Linked Elsewhere Co" });
+  const base = ghl.monday!;
+  ghl.monday = (q, v) => { const d = base(q, v) as { boards: { items_page: { items: MondayRow[] } }[] }; if ((v.board as string[])[0] === "18431157561") d.boards[0].items_page.items.push(row("555", "Linked Elsewhere Co", stage("new"), { [COL.email]: "Pat@Unrelated.example", [COL.phone]: "(812) 555-0186", [COL.ghlContact]: url("https://app.gohighlevel.com/v2/location/LOC/contacts/detail/NoEmailContact000001", "GHL") }, { updates: Array.from({ length: 50 }, (_, i) => upd(`7${String(i).padStart(3, "0")}`, `update ${i + 1}`)) })); return d; };
+  const dry = await migrateDesk({ dryRun: true, onlyIds: ["555"] });
+  assert.deepEqual([dry.rows[0].match, dry.rows[0].ghlId], ["ghl-link", "NoEmailContact000001"]);
+  assert.ok(!dry.rows[0].contactFields.includes("email") && !dry.rows[0].contactFields.includes("phone"));
+  assert.ok(dry.rows[0].warnings.some((w) => /email is already on another contact \(SomeoneElse000000001\)/.test(w)) && dry.rows[0].warnings.some((w) => /phone is already on another contact \(ArcticLawContact0001\)/.test(w)));
+  assert.ok(dry.rows[0].warnings.some((w) => /only the newest 50 are copied/.test(w)), "an item with a full page of updates says the older ones are not copied");
+  const run = await migrateDesk({ pauseMs: 0, dryRun: false, onlyIds: ["555"] });
+  assert.equal(run.counts.written, 1); assert.equal(run.rows[0].error, undefined);
+  assert.equal(ghl.get("NoEmailContact000001").email, undefined); assert.equal(ghl.get("NoEmailContact000001").phone, undefined);
+  assert.equal(ghl.value("NoEmailContact000001", "Desk Onboarding Stage"), "New handoff"); assert.equal(ghl.notesFor("NoEmailContact000001").length, 50);
+  assert.equal(ghl.get("SomeoneElse000000001").customFields!.length, 0);
 });
 
 test("matching order and its tie-breaks", () => {
@@ -248,4 +266,22 @@ test("setup, diag and the self-test: what the desk writes is spelled out, and th
   assert.ok(ghl.writes().every((w) => w.path.startsWith(`/contacts/${TEST}`)), "no other contact was written");
   assert.match((await deskSelfTest(false, DAVE)).note!, /^already there today/);
   assert.equal(ghl.notesFor(TEST).length, 1);
+  // Nothing in these reports looks like a query string: the browser tool that reads them on production redacts anything that does.
+  assert.ok(!/[=?&]/.test(JSON.stringify([diag.writes, run])), "no =, ? or & in the write list or the self-test report");
+  // The awkward labels are the ones tested: an em dash and a dollar sign, a comma inside a label, parentheses, a slash.
+  assert.deepEqual(plan.plan!.find((x) => x.field === "Desk Packages")!.sample, ["Local Growth — First Year $297", "Social Ads $1,200", "CRM (incl. AI Chat)"]);
+  assert.equal(plan.plan!.find((x) => x.field === "Desk Pay Status")!.sample, "Paid / Current");
+});
+
+test("self-test: a field GoHighLevel refuses is named, the others are still proven, and the contact is put back", async () => {
+  const TEST = "C8FHl1LIfXEMI9isByB2";
+  ghl.addContact({ id: TEST, companyName: "Test — Claude", fields: { "Desk Notes": "was here before" } });
+  ghl.refuse.add("Desk Billing Day");
+  const run = await deskSelfTest(false, DAVE);
+  assert.equal(run.error, undefined); assert.equal(run.passed, 42); assert.deepEqual(run.failed, ["Desk Billing Day"]); assert.deepEqual(run.clearFailed, ["Desk Billing Day"]);
+  assert.match(run.checks!.find((c) => c.field === "Desk Billing Day")!.error!, /^write refused: GoHighLevel error 422 .*Desk Billing Day.*; clear refused: /);
+  assert.match(run.restored!, /^original values written back except Desk Billing Day — clear those on the test contact by hand$/);
+  assert.equal(ghl.value(TEST, "Desk Notes"), "was here before"); assert.equal(ghl.value(TEST, "Desk Billing Day"), undefined); assert.deepEqual(ghl.value(TEST, "Desk Packages"), []);
+  assert.ok(ghl.writes().every((w) => w.path.startsWith(`/contacts/${TEST}`)), "no other contact was written");
+  assert.ok(!/[=?&]/.test(JSON.stringify(run)));
 });

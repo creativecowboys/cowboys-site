@@ -132,6 +132,14 @@ test("Stripe sync writes payment state to desk fields: finds the customer by ema
   stripeUp({ ...activeSub, status: "canceled" }, paidInvoice);
   assert.equal((await syncClientFromStripeGhl(CLIENT)).row.group, "churned");
 });
+test("a burst of Stripe events for one failed payment leaves one task, not one per event", async () => {
+  addClient({ "Desk Pay Status": "Paid / Current", "Desk Stripe Customer ID": "cus_123" });
+  stripeUp({ ...activeSub, status: "past_due" }, { ...paidInvoice, id: "in_2", status: "open", attempted: true, status_transitions: { paid_at: null } });
+  // invoice.payment_failed, customer.subscription.updated and invoice.updated arrive together; each sync reads the contact before any has written.
+  const all = await Promise.all([syncClientFromStripeGhl(CLIENT), syncClientFromStripeGhl(CLIENT), syncClientFromStripeGhl(CLIENT)]);
+  assert.ok(all.every((r) => r.row.payStatus === "Card Failed" && r.row.group === "issue"));
+  assert.equal(ghl.tasks.length, 1);
+});
 test("Stripe sync says what is missing instead of guessing", async () => {
   process.env.STRIPE_SECRET_KEY = "nonfunctional-test-stripe-key";
   ghl.addContact({ id: "NoEmailClient0000001", companyName: "No Email Co", tags: ["desk-client"], fields: { "Desk Client Status": "Active" } });

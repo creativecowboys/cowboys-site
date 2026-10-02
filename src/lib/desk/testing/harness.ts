@@ -7,6 +7,7 @@ import { SALES_FIELDS } from "@/lib/ghl/fields";
 import { WON_TAG } from "@/lib/calls/ghl";
 import type { GhlContact } from "@/lib/ghl/client";
 import type { HandoffForm } from "@/lib/onboarding/types";
+import { forgetPaymentAlerts } from "../clients";
 import { DESK_TAG_LIST, isDeskFieldName } from "../fields";
 import type { Actor } from "../team";
 import { blobReset } from "./blob-stub";
@@ -26,7 +27,7 @@ export function setUp(): FakeGhl {
   saved = Object.fromEntries(KEEP.map((k) => [k, process.env[k]]));
   for (const k of KEEP) delete process.env[k];
   process.env.BLOB_READ_WRITE_TOKEN = "nonfunctional-test-blob-token";
-  blobReset();
+  blobReset(); forgetPaymentAlerts();
   return new FakeGhl().install().addLseFields().addAllFields();
 }
 export function tearDown(ghl: FakeGhl): void {

@@ -1,5 +1,5 @@
 import { isoDate, LEAD_TAGS, TEST_CONTACT_ID, WON_TAG } from "@/lib/calls/ghl";
-import { addTags, getContact, ghl, ghlConfigured, ghlLocationId, listCustomFields, listNotes, removeTags, searchContacts, updateContact, type GhlContact } from "@/lib/ghl/client";
+import { addTags, getContact, ghl, GhlError, ghlConfigured, ghlLocationId, listCustomFields, listNotes, removeTags, searchContacts, updateContact, type GhlContact } from "@/lib/ghl/client";
 import { SALES_FIELDS } from "@/lib/ghl/fields";
 import { todayEastern } from "@/lib/onboarding/api";
 import { mergeTemplates, parseChecklist, serializeChecklist } from "./checklist-text";
@@ -30,11 +30,11 @@ const isLseName = (name: string, key?: string) => /^lse\b/i.test(name.trim()) ||
 /** What the desk writes — the list to check against the published automations before the cutover. */
 export const deskWriteList = () => ({
   customFields: DESK_FIELD_KEYS.map((k) => DESK_FIELDS[k].name),
-  salesFieldsTouched: ["Outreach Status = Won and Last Contact (handoff from a lead, as the Sales tab already does)", "Monday Lead ID (import only, where blank)"],
+  salesFieldsTouched: ["Outreach Status set to Won, and Last Contact (handoff from a lead, as the Sales tab already does)", "Monday Lead ID (import only, where blank)"],
   tagsAdded: [...DESK_TAG_LIST, `${WON_TAG} (handoff from a lead, as the Sales tab already does)`],
   contactFields: ["firstName / lastName / companyName / email / phone / website / city — only where blank at handoff and import; edited on purpose from the Clients panel's contact fields", "assignedTo — only when the contact has no owner"],
   notes: "contact notes (handoff summary, desk notes, imported Monday updates)",
-  tasks: "one contact task when a payment turns Card Failed or Overdue (DESK_PAYMENT_ALERTS=off disables)",
+  tasks: "one contact task when a payment turns Card Failed or Overdue (setting DESK_PAYMENT_ALERTS to off disables it)",
   never: ["any field named LSE …", "any lse: tag", "opportunities or pipelines", "workflows", "conversations, emails or texts"],
 });
 
@@ -79,7 +79,7 @@ export async function deskDiagnose(): Promise<Record<string, unknown>> {
 }
 
 // ───────────────────────────── self-test (test contact only) ─────────────────────────────
-type Check = { field: string; dataType: string; wrote: unknown; readBack: string; ok: boolean; cleared: boolean };
+type Check = { field: string; dataType: string; wrote: unknown; readBack: string; ok: boolean; cleared: boolean; error?: string };
 export type SelfTestReport = { dryRun: boolean; contact: string; plan?: { field: string; dataType: string; sample: unknown }[]; checks?: Check[]; passed?: number; failed?: string[]; clearFailed?: string[]; tag?: string; search?: string; note?: string; restored?: string; error?: string };
 
 // Large-text samples are deliberately life-size: the checklist field holds a whole checklist (the biggest one the desk
@@ -90,8 +90,13 @@ function sampleFor(key: DeskFieldKey, f: DeskFields): DeskValue {
   const field = f[key]!;
   const options = field.options.length ? field.options : DESK_FIELDS[key].options || [];
   switch (field.dataType) {
-    case "SINGLE_OPTIONS": case "RADIO": return options[0] || "";
-    case "MULTIPLE_OPTIONS": case "CHECKBOX": return options.slice(0, 2);
+    // The awkward option on purpose (a slash, parentheses, an em dash, a dollar sign): if one of those does not survive, it shows here.
+    case "SINGLE_OPTIONS": case "RADIO": return options.find((o) => /[^A-Za-z0-9 ]/.test(o)) || options[0] || "";
+    case "MULTIPLE_OPTIONS": case "CHECKBOX": {
+      // Package labels carry an em dash and a dollar sign, a comma INSIDE a label, and parentheses — the three that could break a multi-select.
+      const awkward = ["Local Growth — First Year $297", "Social Ads $1,200", "CRM (incl. AI Chat)"].filter((o) => options.includes(o));
+      return awkward.length ? awkward : options.slice(0, 2);
+    }
     case "DATE": return "2026-10-01";
     case "NUMERICAL": return 15;
     case "MONETORY": return 297.5;
@@ -101,12 +106,28 @@ function sampleFor(key: DeskFieldKey, f: DeskFields): DeskValue {
 }
 function readFor(c: GhlContact, f: DeskFields, key: DeskFieldKey): string {
   const type = f[key]!.dataType;
-  if (type === "MULTIPLE_OPTIONS" || type === "CHECKBOX") return deskList(c, f, key).join(" | ");
+  if (type === "MULTIPLE_OPTIONS" || type === "CHECKBOX") return [...deskList(c, f, key)].sort().join(" | "); // GoHighLevel may hand a multi-select back in its own order
   if (type === "NUMERICAL" || type === "MONETORY") return deskNumber(c, f, key);
   if (type === "DATE") return isoDate(deskText(c, f, key));
-  return deskText(c, f, key);
+  return deskText(c, f, key).replace(/\r\n/g, "\n").trim();
 }
-const expectFor = (value: DeskValue): string => (Array.isArray(value) ? value.join(" | ") : value === null ? "" : String(value));
+const expectFor = (value: DeskValue): string => (Array.isArray(value) ? [...value].sort().join(" | ") : value === null ? "" : String(value));
+/** Error text for a report: no "=", "?" or "&" (the browser tool that reads these reports redacts anything shaped like a query string). */
+const plain = (e: unknown): string => (e instanceof Error ? e.message : String(e)).replace(/[=?&]/g, " ").slice(0, 300);
+/**
+ * One PUT for all the fields; if GoHighLevel refuses the batch, one PUT per field, so the report names the field it
+ * refused instead of failing the whole run on the first bad shape. Returns the refused fields and why.
+ */
+async function writeEach(f: DeskFields, keys: DeskFieldKey[], values: Partial<Record<DeskFieldKey, DeskValue>>): Promise<Map<DeskFieldKey, string>> {
+  const refused = new Map<DeskFieldKey, string>();
+  try { await updateContact(TEST_CONTACT_ID, { customFields: deskWrites(f, values) }); return refused; }
+  catch (e) { if (!(e instanceof GhlError) || e.scopeProblem || e.ghlStatus === 429 || e.ghlStatus >= 500) throw e; }
+  for (const k of keys) {
+    try { await updateContact(TEST_CONTACT_ID, { customFields: deskWrites(f, { [k]: values[k] }) }); }
+    catch (e) { refused.set(k, plain(e)); }
+  }
+  return refused;
+}
 
 /**
  * Round-trips every desk field on the designated test contact (never a client): write a sample, read it back,
@@ -121,16 +142,20 @@ export async function deskSelfTest(dryRun: boolean, actor: Actor): Promise<SelfT
   const before = await getContact(TEST_CONTACT_ID);
   const original = Object.fromEntries(keys.map((k) => [k, (before.customFields || []).find((x) => x.id === f[k]!.id)?.value ?? ""])) as Record<DeskFieldKey, unknown>;
   try {
-    await updateContact(TEST_CONTACT_ID, { customFields: deskWrites(f, samples) });
+    const refused = await writeEach(f, keys, samples);
     const written = await getContact(TEST_CONTACT_ID);
-    const checks: Check[] = keys.map((k) => { const readBack = readFor(written, f, k); return { field: f[k]!.name, dataType: f[k]!.dataType, wrote: samples[k], readBack, ok: readBack === expectFor(samples[k]), cleared: false }; });
+    const checks: Check[] = keys.map((k) => { const readBack = readFor(written, f, k); return { field: f[k]!.name, dataType: f[k]!.dataType, wrote: samples[k], readBack, ok: !refused.has(k) && readBack === expectFor(samples[k]), cleared: false, ...(refused.has(k) ? { error: `write refused: ${refused.get(k)}` } : {}) }; });
     // The checklist field has to survive a real edit cycle (parse → serialize), not just a round trip of text.
     if (f.checklist && serializeChecklist(parseChecklist(deskText(written, f, "checklist"))) !== BIG_CHECKLIST) checks.find((c) => c.field === f.checklist!.name)!.ok = false;
     // Long values are reported by length, not echoed back in full.
     for (const c of checks) if (typeof c.wrote === "string" && c.wrote.length > 200) { c.wrote = `${c.wrote.length} characters`; c.readBack = `${c.readBack.length} characters`; }
-    await updateContact(TEST_CONTACT_ID, { customFields: deskWrites(f, Object.fromEntries(keys.map((k) => [k, ""])) as Record<DeskFieldKey, DeskValue>) });
+    const unclearable = await writeEach(f, keys, Object.fromEntries(keys.map((k) => [k, ""])) as Record<DeskFieldKey, DeskValue>);
     const cleared = await getContact(TEST_CONTACT_ID);
-    for (const c of checks) { const key = keys.find((k) => f[k]!.name === c.field)!; c.cleared = readFor(cleared, f, key) === ""; }
+    for (const c of checks) {
+      const key = keys.find((k) => f[k]!.name === c.field)!;
+      c.cleared = !unclearable.has(key) && readFor(cleared, f, key) === "";
+      if (unclearable.has(key)) c.error = `${c.error ? `${c.error}; ` : ""}clear refused: ${unclearable.get(key)}`;
+    }
     report.checks = checks; report.passed = checks.filter((c) => c.ok).length; report.failed = checks.filter((c) => !c.ok).map((c) => c.field); report.clearFailed = checks.filter((c) => !c.cleared).map((c) => c.field);
     // Tag add / remove with a desk tag, and whether the search filter the lists rely on is accepted.
     const hadTag = (before.tags || []).includes(DESK_TAGS.onboarding);
@@ -139,17 +164,26 @@ export async function deskSelfTest(dryRun: boolean, actor: Actor): Promise<SelfT
     if (!hadTag) await removeTags(TEST_CONTACT_ID, [DESK_TAGS.onboarding]);
     report.tag = `${DESK_TAGS.onboarding}: add ${tagged ? "ok" : "FAILED"}${hadTag ? " (was already there, left in place)" : `, removed again: ${((await getContact(TEST_CONTACT_ID)).tags || []).includes(DESK_TAGS.onboarding) ? "FAILED" : "ok"}`}`;
     try { const r = await searchContacts({ filters: [{ group: "OR", filters: [{ field: "tags", operator: "eq", value: DESK_TAGS.onboarding }, { field: `customFields.${f.obStage?.id}`, operator: "exists" }] }], pageLimit: 1 }); report.search = `tag-or-stage filter accepted (${r.total} match right now; the index lags writes by a few seconds)`; }
-    catch (e) { report.search = `tag-or-stage filter REJECTED: ${e instanceof Error ? e.message : e} — the lists fall back to the tag alone`; }
+    catch (e) { report.search = `tag-or-stage filter REJECTED: ${plain(e)} — the lists fall back to the tag alone`; }
     // One labelled note per day, authored as whoever ran this (idempotent), so the notes path is proven too.
     const noteId = `selftest-${todayEastern()}`;
     const saved = await addDeskNote(TEST_CONTACT_ID, { text: `Desk self-test (${todayEastern()}): field round trip on the test contact. Safe to ignore.`, noteId, source: "system", actor });
     const note = (await listNotes(TEST_CONTACT_ID)).find((n) => n.id === saved.id);
     report.note = `${saved.existed ? "already there today" : "added"}; authored as ${note?.userId ? (note.userId === actor.ghlUserId ? actor.name : "another user") : "the integration (no GoHighLevel user for this sign-in)"}`;
-  } catch (e) { report.error = e instanceof Error ? e.message : String(e); }
+  } catch (e) { report.error = plain(e); }
   finally {
     // Put back exactly what was there; a field that was empty is cleared in the shape its type wants ("" or []).
-    try { await updateContact(TEST_CONTACT_ID, { customFields: keys.map((k) => ({ id: f[k]!.id, field_value: original[k] === "" || original[k] === null ? toFieldValue(f[k]!, "") : original[k] })) }); report.restored = "original values written back"; }
-    catch (e) { report.restored = `RESTORE FAILED: ${e instanceof Error ? e.message : e} — clear the Desk … fields on the test contact by hand`; }
+    const restore = keys.map((k) => ({ name: f[k]!.name, write: { id: f[k]!.id, field_value: original[k] === "" || original[k] === null ? toFieldValue(f[k]!, "") : original[k] } }));
+    try {
+      try { await updateContact(TEST_CONTACT_ID, { customFields: restore.map((r) => r.write) }); report.restored = "original values written back"; }
+      catch (e) {
+        if (!(e instanceof GhlError) || e.scopeProblem || e.ghlStatus === 429 || e.ghlStatus >= 500) throw e;
+        // The batch was refused (one field's shape): put the rest back one at a time and name what is left.
+        const left: string[] = [];
+        for (const r of restore) { try { await updateContact(TEST_CONTACT_ID, { customFields: [r.write] }); } catch { left.push(r.name); } }
+        report.restored = left.length ? `original values written back except ${left.join(", ")} — clear those on the test contact by hand` : "original values written back (one field at a time)";
+      }
+    } catch (e) { report.restored = `RESTORE FAILED: ${plain(e)} — clear the Desk … fields on the test contact by hand`; }
   }
   return report;
 }

@@ -34,6 +34,8 @@ export class FakeGhl {
   lag = false;
   /** Field NAME → max characters GoHighLevel "keeps" — to prove the desk notices a field that is too small instead of losing rows quietly. */
   truncate = new Map<string, number>();
+  /** Field NAMES GoHighLevel "refuses": any PUT that carries one is a 422 and changes nothing — a value shape the real API does not take. */
+  refuse = new Set<string>();
   /** One-shot failures: the first request whose "METHOD path" matches gets this status. */
   failures: { match: RegExp; status: number; body?: unknown }[] = [];
   private snapshot: GhlContact[] = [];
@@ -142,6 +144,13 @@ export class FakeGhl {
     c.dateUpdated = this.tick();
   }
 
+  /** The real location refuses a second contact with the same email or phone, on create and on update, and names the one it clashes with. */
+  private duplicate(body: Record<string, unknown> | undefined, selfId?: string): Response | null {
+    const email = typeof body?.email === "string" ? body.email.toLowerCase() : ""; const phone = typeof body?.phone === "string" ? body.phone : "";
+    const hit = [...this.contacts.values()].find((c) => c.id !== selfId && ((!!email && (c.email || "").toLowerCase() === email) || (!!phone && c.phone === phone)));
+    return hit ? json(400, { statusCode: 400, message: "This location does not allow duplicated contacts.", meta: { contactId: hit.id, matchingField: email && (hit.email || "").toLowerCase() === email ? "email" : "phone" } }) : null;
+  }
+
   private matches(c: GhlContact, f: Filter): boolean {
     if (f.group) return f.group === "OR" ? (f.filters || []).some((x) => this.matches(c, x)) : (f.filters || []).every((x) => this.matches(c, x));
     const field = f.field || "";
@@ -183,6 +192,7 @@ export class FakeGhl {
       const email = String(body.email || "").toLowerCase(); const phone = String(body.phone || "");
       const existing = path === "/contacts/upsert" ? [...this.contacts.values()].find((c) => (email && (c.email || "").toLowerCase() === email) || (phone && c.phone === phone)) : undefined;
       if (existing) { this.applyPatch(existing, body); return json(200, { new: false, contact: structuredClone(existing) }); }
+      if (path === "/contacts/") { const dup = this.duplicate(body); if (dup) return dup; }
       const c = this.addContact({ id: this.newId("n") });
       this.applyPatch(c, body);
       return json(201, { new: true, contact: structuredClone(c) });
@@ -193,6 +203,9 @@ export class FakeGhl {
       if (method === "GET") return json(200, { contact: structuredClone(c) });
       if (method === "PUT") {
         if (body && "locationId" in body) return json(422, { message: "property locationId should not exist" });
+        const dup = this.duplicate(body, c.id); if (dup) return dup;
+        const bad = ((body?.customFields as { id: string }[] | undefined) || []).map((x) => this.defs.find((d) => d.id === x.id)?.name || "").find((name) => this.refuse.has(name));
+        if (bad) return json(422, { message: `Invalid value for custom field ${bad}` });
         this.applyPatch(c, body || {});
         return json(200, { succeded: true, contact: structuredClone(c) });
       }

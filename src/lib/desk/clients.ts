@@ -75,8 +75,16 @@ export async function clientDetailGhl(rawId: string, canSeeMoney: boolean): Prom
  * this path, so the same heads-up becomes a GoHighLevel task on the contact for the account manager (Josh when
  * the manager has no GoHighLevel user). Internal only — nothing goes to the client. DESK_PAYMENT_ALERTS=off disables it.
  */
+// One failure reaches the site as a burst of Stripe events in the same second, each running its own sync before the first
+// has written — without this, each of them would leave a task. Per warm instance, which is where a burst lands.
+const alerted = new Map<string, number>();
+const ALERT_QUIET_MS = 120_000;
+export const forgetPaymentAlerts = () => alerted.clear();
 async function paymentAlert(contact: GhlContact, f: DeskFields, before: string, after: string): Promise<void> {
   if (before === after || !["Card Failed", "Overdue"].includes(after) || (process.env.DESK_PAYMENT_ALERTS || "").toLowerCase() === "off") return;
+  const key = `${contact.id}:${after}`;
+  if (Date.now() - (alerted.get(key) ?? -Infinity) < ALERT_QUIET_MS) return;
+  alerted.set(key, Date.now());
   const name = businessName(contact);
   const title = after === "Card Failed" ? `Payment failed for ${name} — card declined. Reach out before the service lapses.` : `${name} is overdue on payment. Chase it before the service lapses.`;
   const assignee = memberByName(mapClient(contact, f).accountManager)?.ghlUserId || ghlRepIds().Josh;

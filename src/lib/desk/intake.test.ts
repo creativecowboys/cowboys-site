@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { afterEach, beforeEach, test } from "node:test";
 import { contactIdForScope, ensureIntakeGhl, issueIntakeLinkGhl, scopeForRecord, submitIntakeGhl } from "./intake";
-import { startOnboardingGhl } from "./onboarding";
+import { onboardingDetailGhl, startOnboardingGhl } from "./onboarding";
 import { resolveDeskFields } from "./fields";
 import { clientView, indexFile, removeFile, resolveToken, revokeIntakeLink, saveIntakeForm } from "@/lib/onboarding/intake";
 import { validateHandoff, validateIntakeForm } from "@/lib/onboarding/validation";
@@ -72,6 +72,27 @@ test("a link a client was sent BEFORE the switch keeps working: nothing in stora
   ghl.get(id).customFields!.find((f) => f.id === ghl.fieldId("Desk Intake"))!.value = "Link issued";
   await submitIntakeGhl(bare);
   assert.equal(ghl.value(id, "Desk Intake"), "Client submitted");
+});
+
+test("storage is the truth for a submitted intake: a status write that was missed is repaired the next time the panel opens", async () => {
+  addLead(ghl);
+  await startOnboardingGhl(validateHandoff(handoffForm(ghl)), { origin: ORIGIN, actor: DAVE });
+  const link = await issueIntakeLinkGhl(LEAD, ORIGIN);
+  // GoHighLevel fails at the moment the client presses Submit: the client still gets a clean save, the status is not written.
+  ghl.failures.push({ match: new RegExp(`^PUT /contacts/${LEAD}$`), status: 500 });
+  const submitted = await submitIntakeGhl(await resolveToken(tokenOf(link.url)));
+  assert.ok(submitted.submittedAt); assert.equal(ghl.value(LEAD, "Desk Intake"), "Link issued");
+  const detail = await onboardingDetailGhl(LEAD);
+  assert.equal(detail.row.intake, "Client submitted"); assert.equal(ghl.value(LEAD, "Desk Intake"), "Client submitted");
+  assert.equal(detail.row.updatedAt, ghl.get(LEAD).dateUpdated, "the row carries the version after the repair, so the next change is not refused as stale");
+  // And when the repair itself cannot be written, the panel still shows what storage says.
+  ghl.get(LEAD).customFields!.find((x) => x.id === ghl.fieldId("Desk Intake"))!.value = "Link issued";
+  ghl.failures.push({ match: new RegExp(`^PUT /contacts/${LEAD}$`), status: 500 });
+  assert.equal((await onboardingDetailGhl(LEAD)).row.intake, "Client submitted");
+  // A status staff set after the submit ("Reviewed") is never stepped back.
+  ghl.get(LEAD).customFields!.find((x) => x.id === ghl.fieldId("Desk Intake"))!.value = "Reviewed";
+  const writes = ghl.writes().length;
+  assert.equal((await onboardingDetailGhl(LEAD)).row.intake, "Reviewed"); assert.equal(ghl.writes().length, writes);
 });
 
 test("file stores: a client that never had an onboarding record, an unknown scope, and scope → contact", async () => {

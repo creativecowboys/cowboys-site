@@ -104,7 +104,9 @@ be checked against the live account before the cutover.
   and the files stay in the private Blob store under the same keys; a client imported from Monday keeps its Monday-era key
   (the pipeline item id, or `c` + the client item id) and the import stamps that record with its contact id. So a link a
   client was sent before the switch opens the same record and files. A record born on GoHighLevel is keyed by the contact
-  id. Only the status the desk shows ("Link issued", "Client submitted") moves to `Desk Intake`.
+  id. Only the status the desk shows ("Link issued", "Client submitted") moves to `Desk Intake`. Storage is the truth for
+  a submit: if the status write was missed (GoHighLevel down at that moment, or a submit that landed on the old board
+  between the import and the flip), opening the panel shows "Client submitted" and puts it on the contact.
 - **Graduation.** Same contact: stage → Launched, tag `desk-client`, and whatever client fields are still blank get their
   starting values (Active, Too New, No Billing Set Up, Stripe via GHL unless a giveaway winner, Client Since, account
   manager). A client that was already on the Clients tab keeps every value it has. Safe to press twice.
@@ -138,8 +140,10 @@ a dropped connection finds the note instead of posting it twice) and needs no re
 - `POST /api/team/ghl/setup` `{ "scope": "desk" }` → the missing "Desk …" fields and whether a desk tag name is already
   taken; `{ "scope": "desk", "dryRun": false }` creates the fields. Never edits an existing field.
 - `POST /api/team/ghl/desk-selftest` `{ "dryRun": false }` → on the designated test contact only: writes a sample to every
-  desk field (a life-size checklist and notes block included), reads it back, clears it, restores what was there,
-  round-trips a desk tag, checks the list filter, leaves one labelled note per day.
+  desk field (a life-size checklist and notes block, and the awkward labels on purpose — an em dash and a dollar sign, a
+  comma inside a package label, parentheses, a slash), reads it back, clears it, restores what was there, round-trips a
+  desk tag, checks the list filter, leaves one labelled note per day. If GoHighLevel refuses the batch it writes one
+  field at a time, so the report names the field it refused (`checks[].error`) instead of failing on the first one.
 - `POST /api/team/ghl/desk-migrate` → the two Monday boards to GoHighLevel. Body: `dryRun` (default true), `onlyIds`
   (Monday item ids, for a one-row trial), `offset` / `limit`, `force` (re-write a row already imported), `map`
   (`{ "<monday item id>": "<contact id>" }` to pin a row), `boards` (`["onboarding"]` / `["clients"]`), `includeOffDesk`
@@ -150,7 +154,13 @@ a dropped connection finds the note instead of posting it twice) and needs no re
   onboarding record is still to be imported. The report lists every row with its match, the fields and contact details it
   writes, warnings, and what it did in storage; it contains no secrets. It also lists every row on either board tagged
   Giveaway Winner with `imported: true|false` — after the flip the billing guard reads GoHighLevel only, so a winner left
-  behind on Monday would no longer be protected. `winners` must show no `imported: false` before the flip.
+  behind on Monday would no longer be protected. `winners` must show no `imported: false` before the flip (a winner on an
+  Active Clients row without "Team desk" is brought over with `{"onlyIds":["<id>"],"includeOffDesk":true}`).
+  An email or phone on the board that another contact already holds is left off the matched contact, with a warning
+  (GoHighLevel refuses duplicates, and that refusal would fail the row). Monday hands over the newest 50 updates of an
+  item; the report warns when an item has that many.
+- These reports contain no `=`, `?` or `&` in their own text (the browser tool Claude reads them with redacts anything
+  shaped like a query string). Error text passed through from GoHighLevel has those characters replaced with spaces.
 
 ## Cutover runbook
 State on Oct 2 2026: code on main, `DESK_BACKEND` unset, no desk field exists in GoHighLevel, nothing imported.
@@ -166,6 +176,10 @@ Sauces) and 2 Team-desk client rows (Squirrel Made Products, Choice Pressure Was
 3. `POST /api/team/ghl/desk-selftest {"dryRun":false}` → `passed: 43`, `failed: []`, `clearFailed: []`, tag ok, filter
    accepted, restored. Compare the enrollment counts again: writing desk fields, a desk tag and a note on the test contact
    must have enrolled nothing. **Stop here if any field fails** — that is a value-shape problem to fix before a client is touched.
+   The one known way out without a code change: if `Desk Packages` is the field that fails (a comma inside a label is the
+   likely reason), delete that one field in GoHighLevel and add it again by hand as a single-line **Text** field with the
+   same name. The desk shapes every value by the field's live type, so a text `Desk Packages` holds the labels joined
+   with commas and is read back label for label. Run the self-test again.
 4. `POST /api/team/ghl/desk-migrate {}` (dry) → six rows. Read every match and warning. A row reported `unmatched` needs
    `map` (Squirrel Made Products has no email or phone on the board: it matches only if exactly one contact carries that
    business name).
@@ -201,7 +215,7 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
 - UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (52) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (55) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.
