@@ -41,9 +41,16 @@ described in `Docs/Leads-Page.md` (Sales), `Docs/Onboarding.md`, `Docs/Clients-T
 `src/components/dashboard/`). `/admin/clients` and anything under it now forwards to `/admin`. The sign-in page no
 longer shows that screen's sidebar next to the card.
 
-The client portal itself (`/clients/login`, `/clients/<slug>/seo` and `/ads`, `src/lib/clients.ts`, `src/lib/auth.ts`,
-`/api/auth/*`, `/api/brightlocal/*`) was not changed by this move. With the admin screen gone its logins can only be
-edited in `src/data/clients.json` (the password is a bcrypt hash).
+The old client portal was retired later the same day (Dave, October 2: "delete the old one"). Gone: the pages
+(`/clients/login`, `/clients/<slug>`, `/seo`, `/ads`), its logins (`src/data/clients.json`, `src/lib/clients.ts`),
+its sign-in (`src/lib/auth.ts`, `/api/auth/*`, the `next-auth` and `bcryptjs` packages), its report routes
+(`/api/brightlocal/*` and `/api/brightlocal-lrt/*` — the second answered without a sign-in), `src/lib/brightlocal.ts`,
+`src/components/dashboard/*`, and two captures of a client's rank tracker that sat in `public/`. `/clients` and
+anything under it now forwards to the home page (`next.config.ts`, 307). `jose` is a direct dependency now — the
+team cookie is signed and verified with it and it used to arrive only through `next-auth`. `NEXTAUTH_SECRET` is still
+the team cookie's signing key; do not remove it. `BRIGHTLOCAL_API_KEY` is no longer read by anything. The three
+logins were two demos and one real but unused client login; the files are in git history before this commit.
+Do not confuse `src/lib/clients.ts` (the portal, gone) with the directory `src/lib/clients/` (the desk, live).
 
 ## Kept out of search engines
 The page carries `robots: noindex, nofollow` (as `/leads` did), every `/admin` response carries the same in an

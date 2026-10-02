@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { jwtVerify } from "jose";
 import { DESK_PATH, deskGate } from "@/lib/desk-path";
 
@@ -66,27 +65,7 @@ export async function middleware(request: NextRequest) {
         return res;
     }
 
-    // ── Client portal routes ───────────────────────────────────────────────────
-    if (pathname.startsWith("/clients")) {
-        const isLoginPage = pathname === "/clients/login";
-
-        const token = await getToken({
-            req: request,
-            secret: process.env.NEXTAUTH_SECRET,
-        });
-
-        if (!token && !isLoginPage) {
-            const loginUrl = new URL("/clients/login", request.url);
-            loginUrl.searchParams.set("callbackUrl", pathname);
-            return NextResponse.redirect(loginUrl);
-        }
-
-        if (token && isLoginPage) {
-            // @ts-ignore
-            const slug = token.slug as string;
-            return NextResponse.redirect(new URL(`/clients/${slug}`, request.url));
-        }
-    }
+    // The old client portal (/clients) was retired Oct 2 2026; next.config.ts sends its old addresses home.
 
     return NextResponse.next();
 }

@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
       // The campaign page shipped briefly at its old path; keep that alive so
       // anything already linking or crawling it doesn't hit a 404.
       { source: '/christmas-in-september', destination: '/thebiggiveaway', statusCode: 301 },
+      // The old in-site client portal was retired Oct 2 2026. A bookmarked portal link goes home instead of a 404.
+      // 307 on purpose (not cached), same as the /leads → /admin forward.
+      { source: '/clients', destination: '/', permanent: false },
+      { source: '/clients/:path*', destination: '/', permanent: false },
       { source: '/home-new', destination: '/', permanent: true },
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
