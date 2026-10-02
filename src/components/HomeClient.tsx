@@ -1308,6 +1308,7 @@ export default function HomeClient() {
               <a href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</a>
               <a href="/brand-strategy" className="hover:text-[#B5330E] transition-colors">Brand Strategy</a>
               <a href="/privacy-policy" className="hover:text-[#B5330E] transition-colors mt-2">Privacy Policy</a>
+              <a href="/sms-terms" className="hover:text-[#B5330E] transition-colors">SMS Terms</a>
             </div>
           </div>
 
@@ -1319,6 +1320,7 @@ export default function HomeClient() {
         isOpen={isProposalModalOpen} 
         onClose={() => setIsProposalModalOpen(false)} 
         source={modalSource} 
+        hidePhone
       />
     </div>
   );
