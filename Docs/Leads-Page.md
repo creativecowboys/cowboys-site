@@ -257,3 +257,27 @@ a short business type and whether they have a site for an entrant ("Trades · no
   roster, the lead and the lead an assignment returns all carry `told`) and words the block and the chip (`toldView`,
   `toldChip`); it is pure, so the desk imports it. Tests: `src/lib/calls/told.test.ts` (each source, empty answers, tag
   and source-line fallbacks, tier wording, ordering, the chip, and that the roster and lead requests are unchanged).
+
+## The people list scrolls on its own (October 2, 2026)
+Dave: "I want to be able to scroll down through that list, but I want the content on the page to stay where it is. So I
+need the sidebar to be scrollable."
+
+- **Two-column widths (761px and up).** The roster on the left is pinned: it stays in the window while the page scrolls,
+  and it is exactly as tall as the window below whatever part of the header is still on screen (the whole window once the
+  header has scrolled away). Its heading, search and filters stay put at the top; only the list of people scrolls, with
+  its own scrollbar, and reaching either end of the list never moves the page. The open lead on the right scrolls with
+  the page as before.
+- **The opened lead stays in sight in the list.** After a filter change the list shows that lead's card if the new list
+  has it, otherwise it starts from the top. While a search is typed, results start from the top (a search is looking for
+  someone else); clearing it brings the opened lead back into sight. A calendar link (`/admin?lead=<id>`) scrolls the
+  list to that lead's card. Only the list moves, never the page, and a card picked by clicking stays where it is. This
+  also applies to the phone's list box.
+- **Room for the list.** In the pinned roster the Lead source and Show leads captions sit beside their selects, "My
+  follow-up calendar" opens its box above the button (over the list), and the "01 — People first" note that closed the
+  roster is gone. On a short window at the top of the page the list starts small under the header; scroll the page
+  anywhere outside the list and the roster pins to the top at full height.
+- **Phones (760px and under)** are unchanged: the roster sits above the lead and the list scrolls in its 270px box.
+- **Code.** The "Pinned roster" block at the end of `src/app/leads/calls.css`. `desk.tsx` measures how much of the
+  header is on screen and hands it to the CSS as `--call-roster-gap` on `.call-layout` (kept current on scroll and
+  resize; without the script the roster is simply a full window tall), and holds the rules for keeping the opened lead
+  in sight. The Onboarding and Clients tabs share nothing with it.
