@@ -1,5 +1,6 @@
 import type { FileCategory, PackageLabel, StageId } from "./config";
 import type { GbpCard, GbpLocationSummary } from "@/lib/gbp/types";
+import type { DeskTasks } from "@/lib/desk/task-text";
 
 export type HandoffForm = {
   handoffId: string; // uuid v4, minted by the desk when the panel opens; idempotency key
@@ -78,5 +79,6 @@ export type OnboardingDetail = {
   fileScope?: string; // storage key for this client's files when it differs from the record id (records imported to GoHighLevel keep their Monday-era key)
   nextDue?: string; // the next action's due date, so the editor can show it (GoHighLevel desk)
   system?: "monday" | "ghl";
+  tasks?: DeskTasks; // the client's running task list: GoHighLevel tasks on the contact (GoHighLevel desk only)
 };
 export type StartResult = { itemId: string; itemUrl: string; pending: StepName[]; adopted: boolean; system?: "monday" | "ghl" };

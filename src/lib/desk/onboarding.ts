@@ -15,6 +15,7 @@ import type { GbpCard } from "@/lib/gbp/types";
 import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, type StoredItem } from "./checklist-text";
 import { assertOption, DESK_TAGS, deskList, deskText, type DeskFields } from "./fields";
 import { addDeskNote, toTimeline } from "./notes";
+import { tasksFor } from "./tasks";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, hasTag, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageIdForLabel, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
 import { isGhlRecordId } from "./switch";
 import { isTeamName, memberByName, teamOwners, type Actor } from "./team";
@@ -100,10 +101,11 @@ export async function onboardingDetailGhl(rawId: string, opts: { mayWrite?: bool
   const contact = await onboardingContact(rawId, f);
   const scope = fileScopeFor(contact, f);
   const stored = mapOnboarding(contact, f);
-  const [notes, record, intake, live, gbpLocations] = await Promise.all([
+  const [notes, record, intake, live, gbpLocations, tasks] = await Promise.all([
     listNotes(contact.id), findHandoffRecord(contact, f).catch(() => null), readIntake(scope).catch(() => null),
     liveGbp(stored, f, { mayWrite }), // Search Atlas read + auto-promotion to Verified; never throws for a Search Atlas failure
     searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
+    tasksFor(contact.id), // the running task list (GoHighLevel tasks on the contact); never throws
   ]);
   // The client's Submit is saved in storage first and the status on the contact second. If that second write was missed
   // (a GoHighLevel hiccup at that moment, or a submit that landed on the old board between the import and the switch),
@@ -120,7 +122,7 @@ export async function onboardingDetailGhl(rawId: string, opts: { mayWrite?: bool
     row, history: toTimeline(notes), record,
     intake: intake ? { ...stripToken(intake), linkActive: linkActive(intake) } : null,
     owners: teamOwners(), gbp: live.card, gbpLocations, searchAtlasConnected: searchAtlasConnected(),
-    fileScope: scope, nextDue: nextDueOf(contact, f), system: "ghl",
+    fileScope: scope, nextDue: nextDueOf(contact, f), system: "ghl", tasks,
   };
 }
 

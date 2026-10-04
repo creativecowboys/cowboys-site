@@ -34,7 +34,7 @@ export const deskWriteList = () => ({
   tagsAdded: [...DESK_TAG_LIST, `${WON_TAG} (handoff from a lead, as the Sales tab already does)`],
   contactFields: ["firstName / lastName / companyName / email / phone / website / city — only where blank at handoff and import; edited on purpose from the Clients panel's contact fields", "assignedTo — only when the contact has no owner"],
   notes: "contact notes (handoff summary, desk notes, imported Monday updates)",
-  tasks: "one contact task when a payment turns Card Failed or Overdue (setting DESK_PAYMENT_ALERTS to off disables it)",
+  tasks: "one contact task when a payment turns Card Failed or Overdue (setting DESK_PAYMENT_ALERTS to off disables it); the tasks the team adds on a client's Tasks list (title, due date or the Dec 31 2099 stand-in, an assignee only when someone picks one), ticked off and reopened from the desk, never deleted",
   never: ["any field named LSE …", "any lse: tag", "opportunities or pipelines", "workflows", "conversations, emails or texts"],
 });
 

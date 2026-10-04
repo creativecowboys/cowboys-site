@@ -40,6 +40,10 @@ export class FakeGhl {
   searchOmitsNames = false;
   /** Field NAMES GoHighLevel "refuses": any PUT that carries one is a 422 and changes nothing — a value shape the real API does not take. */
   refuse = new Set<string>();
+  /** Tasks: GoHighLevel's spec makes dueDate required on create, so the fake refuses a task without one (set false to accept it). */
+  taskNeedsDueDate = true;
+  /** When true, a task write also moves the contact's dateUpdated (unknown on the real API; the self-test measures it). */
+  tasksBumpContact = false;
   /** One-shot failures: the first request whose "METHOD path" matches gets this status. */
   failures: { match: RegExp; status: number; body?: unknown }[] = [];
   private snapshot: GhlContact[] = [];
@@ -239,12 +243,30 @@ export class FakeGhl {
       c.dateUpdated = this.tick();
       return json(201, { tags: c.tags });
     }
-    if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "GET") return json(200, { tasks: this.tasks.filter((t) => t.contactId === m![1]) });
+    if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "GET") {
+      if (!this.contacts.has(m[1])) return json(400, { message: "Contact with id not found" });
+      return json(200, { tasks: this.tasks.filter((t) => t.contactId === m![1]).map((t) => structuredClone(t)) });
+    }
     if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "POST") {
       if (!this.contacts.has(m[1])) return json(400, { message: "Contact with id not found" });
+      if (this.taskNeedsDueDate && !body?.dueDate) return json(422, { statusCode: 422, message: ["dueDate must be a valid ISO 8601 date string"], error: "Unprocessable Entity" });
+      if (body?.completed === undefined || !body?.title) return json(422, { statusCode: 422, message: ["title should not be empty", "completed must be a boolean value"] });
       const task: FakeTask = { id: this.newId("task"), title: String(body?.title || ""), body: body?.body ? String(body.body) : undefined, dueDate: String(body?.dueDate || ""), completed: !!body?.completed, assignedTo: body?.assignedTo ? String(body.assignedTo) : undefined, contactId: m[1] };
       this.tasks.push(task);
-      return json(201, { task });
+      if (this.tasksBumpContact) this.get(m[1]).dateUpdated = this.tick();
+      return json(201, { task: structuredClone(task) });
+    }
+    if ((m = /^\/contacts\/([^/]+)\/tasks\/([^/]+)(\/completed)?$/.exec(path))) {
+      const task = this.tasks.find((t) => t.id === m![2] && t.contactId === m![1]);
+      if (!task) return json(400, { message: "Task not found" });
+      if (method === "GET" && !m[3]) return json(200, { task: structuredClone(task) });
+      if (method === "PUT" && m[3]) {
+        if (typeof body?.completed !== "boolean") return json(422, { message: ["completed must be a boolean value"] });
+        task.completed = body.completed;
+        if (this.tasksBumpContact) this.get(m[1]).dateUpdated = this.tick();
+        return json(200, { task: structuredClone(task) });
+      }
+      if (method === "DELETE" && !m[3]) { this.tasks = this.tasks.filter((t) => t !== task); return json(200, { succeded: true }); }
     }
     throw new Error(`fake GHL: no route for ${method} ${path}`);
   }

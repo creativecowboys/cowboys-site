@@ -5,6 +5,7 @@ import type { ClientPatch } from "@/lib/clients/board";
 import { CHECK_STATUS } from "@/lib/onboarding/config";
 import { isNoteId } from "./notes";
 import { isTeamName } from "./team";
+import { isDueDay, isTaskRequestId, type TaskSource } from "./task-text";
 
 // Request validation for the GoHighLevel desk. Every action the Monday desk accepts is accepted here with
 // the same body; the three whose ids mean something different on GoHighLevel are checked here, and the
@@ -81,4 +82,35 @@ export function validateDeskClientPatch(input: unknown): DeskClientPatch {
     return { action, value: raw.value, expectedUpdatedAt: versionOf(raw, true) };
   }
   return validateClientPatch(input) as DeskClientPatch;
+}
+
+// Tasks (Oct 4 2026): the client's running task list, on /api/team/tasks/<contact id>. A task is added (title, an optional
+// due day, an optional assignee) or ticked off / opened again. Nothing else about a task is changed from the desk.
+const TASK_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{5,79}$/; // a GoHighLevel task id; the route also checks it is on that contact
+function onlyKeys(raw: Record<string, unknown>, keys: string[]): void {
+  if (Object.keys(raw).some((k) => !keys.includes(k))) throw bad("Unexpected task field.");
+}
+export type TaskAddBody = { title: string; due: string; assignee: string; requestId: string; source: TaskSource };
+export function validateTaskAdd(input: unknown): TaskAddBody {
+  const raw = object(input);
+  onlyKeys(raw, ["title", "due", "assignee", "requestId", "source"]);
+  const title = str(raw, "title", 400).replace(/\s+/g, " ").trim();
+  if (!title) throw bad("Write the task first.");
+  if (title.length > 200) throw bad("Keep a task under 200 characters. Put the detail in a note.");
+  const due = str(raw, "due", 10);
+  if (due && !isDueDay(due)) throw bad("Choose a real due date, or leave it empty.");
+  const assignee = str(raw, "assignee", 40);
+  if (assignee && !isTeamName(assignee)) throw bad("Give the task to someone on the team, or leave it unassigned.");
+  if (!isTaskRequestId(raw.requestId)) throw bad("Invalid task reference. Reload and try again.");
+  const source = str(raw, "source", 20);
+  if (source !== "onboarding" && source !== "client") throw bad("Invalid task source.");
+  return { title, due, assignee, requestId: raw.requestId, source };
+}
+export function validateTaskDone(input: unknown): { taskId: string; completed: boolean } {
+  const raw = object(input);
+  onlyKeys(raw, ["taskId", "completed"]);
+  const taskId = str(raw, "taskId", 80);
+  if (!TASK_ID.test(taskId)) throw bad("Invalid task.");
+  if (typeof raw.completed !== "boolean") throw bad("Say whether the task is done.");
+  return { taskId, completed: raw.completed };
 }

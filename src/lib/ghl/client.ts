@@ -161,6 +161,27 @@ export function addTask(contactId: string, title: string, body: string, dueInDay
   const dueDate = new Date(Date.now() + dueInDays * 86400000).toISOString();
   return ghl("POST", `/contacts/${encodeURIComponent(contactId)}/tasks`, { title, body, dueDate, completed: false, ...(assignedTo ? { assignedTo } : {}) });
 }
+// Contact tasks (contacts.readonly / contacts.write — the site's token has both). The published spec: POST needs title,
+// dueDate and completed; PUT …/completed takes { completed }; every answer is { task } or { tasks }. The client's running
+// task list on the desk (src/lib/desk/tasks.ts) is built on these.
+export type GhlTask = { id: string; title?: string; body?: string; assignedTo?: string | null; dueDate?: string | null; completed?: boolean; contactId?: string; [key: string]: unknown };
+export async function listTasks(contactId: string, opts?: GhlOptions): Promise<GhlTask[]> {
+  const r = await ghl<{ tasks?: GhlTask[] }>("GET", `/contacts/${encodeURIComponent(contactId)}/tasks`, undefined, opts);
+  return (r.tasks ?? []).filter((t) => t && typeof t.id === "string" && t.id && t.deleted !== true); // a soft-deleted task, should GoHighLevel ever list one, is not a task
+}
+export type NewGhlTask = { title: string; body?: string; dueDate: string; completed: boolean; assignedTo?: string };
+export async function createTask(contactId: string, task: NewGhlTask): Promise<GhlTask> {
+  const r = await ghl<{ task?: GhlTask }>("POST", `/contacts/${encodeURIComponent(contactId)}/tasks`, task);
+  if (!r.task?.id) throw new CallDeskError("GoHighLevel did not confirm the task. It may already be saved — reload before retrying.", 502);
+  return r.task;
+}
+/** Tick a task off, or open it again. Returns the task GoHighLevel sends back (null when it sends none). */
+export async function setTaskCompleted(contactId: string, taskId: string, completed: boolean): Promise<GhlTask | null> {
+  const r = await ghl<{ task?: GhlTask }>("PUT", `/contacts/${encodeURIComponent(contactId)}/tasks/${encodeURIComponent(taskId)}/completed`, { completed });
+  return r.task?.id ? r.task : null;
+}
+/** Only the desk's task self-test calls this, and only on tasks it created moments earlier on the test contact. The desk itself never deletes a task. */
+export const deleteTask = (contactId: string, taskId: string) => ghl<{ succeded?: boolean; succeeded?: boolean }>("DELETE", `/contacts/${encodeURIComponent(contactId)}/tasks/${encodeURIComponent(taskId)}`);
 
 // ───────────────────────────── custom fields ─────────────────────────────
 export type GhlFieldDef = { id: string; name: string; fieldKey?: string; dataType: string; picklistOptions?: string[]; model?: string; position?: number; placeholder?: string };

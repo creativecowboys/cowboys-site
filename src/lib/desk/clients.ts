@@ -12,6 +12,7 @@ import type { GbpCard } from "@/lib/gbp/types";
 import { assertOption, type DeskFields } from "./fields";
 import { stripeFollowed } from "./legacy";
 import { addDeskNote, toTimeline } from "./notes";
+import { tasksFor } from "./tasks";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, isClientRecord, listRecords, mapClient, readContact, resolveRecordId, stillOnboarding, version, writeRecord, type DeskValues } from "./record";
 import { memberByName, teamOwners, type Actor } from "./team";
 import type { DeskClientPatch } from "./validation";
@@ -61,17 +62,18 @@ export async function clientDetailGhl(rawId: string, canSeeMoney: boolean, opts:
   const stored = mapClient(contact, f);
   const fileScope = fileScopeFor(contact, f);
   // Live Stripe read when we know the customer; a Stripe hiccup never hides the record.
-  const [notes, stripe, live, gbpLocations, intake] = await Promise.all([
+  const [notes, stripe, live, gbpLocations, intake, tasks] = await Promise.all([
     listNotes(contact.id),
     stripeConnected() && stored.stripeCustomer ? snapshot(stored.stripeCustomer).catch(() => null) : Promise.resolve(null),
     liveGbp(stored, f, { mayWrite: opts.mayWrite }),
     searchAtlasConnected() ? listLocations().catch(() => []) : Promise.resolve([]),
     readIntake(fileScope).catch(() => null),
+    tasksFor(contact.id), // the running task list (GoHighLevel tasks on the contact); never throws
   ]);
   const files = intake?.files.map((x) => ({ key: x.key, name: x.name, size: x.size, category: x.category, uploadedAt: x.uploadedAt })) || [];
   // Owners-only money covers the timeline too: the package builder's notes list plan line items and totals.
   const history = toTimeline(notes).filter((n) => canSeeMoney || n.source !== "Billing");
-  return { fileScope, files, row: canSeeMoney ? live.row : withoutMoney(live.row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: teamOwners(), canSeeMoney, gbpLocations, searchAtlasConnected: searchAtlasConnected(), system: "ghl" };
+  return { fileScope, files, row: canSeeMoney ? live.row : withoutMoney(live.row), history, stripe: canSeeMoney ? stripe : stripeWithoutMoney(stripe), stripeConnected: stripeConnected(), owners: teamOwners(), canSeeMoney, gbpLocations, searchAtlasConnected: searchAtlasConnected(), system: "ghl", tasks };
 }
 
 /**
