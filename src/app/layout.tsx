@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Space_Grotesk, Manrope, Anton, Inter, Lobster } from "next/font/google";
 import "./globals.css";
-import TopBar from "@/components/TopBar";
 import ScrollToTop from "@/components/ScrollToTop";
 import MetaPixel from "@/components/MetaPixel";
 import ChatWidget from "@/components/ChatWidget";
@@ -196,7 +195,6 @@ export default function RootLayout({
         <MetaPixel />
         <ChatWidget />
         <ScrollToTop />
-        <TopBar />
         {children}
       </body>
     </html>

@@ -28,7 +28,7 @@ const NEXT = [
 
 export default function LocalMaxWelcomePage() {
     return (
-        <div className="font-inter bg-[#F2EBDA] text-[#0a0a0a] min-h-screen md:pt-[36px]">
+        <div className="font-inter bg-[#F2EBDA] text-[#0a0a0a] min-h-screen">
             <header className="w-full bg-[#0a0a0a] border-b-4 border-[#0a0a0a] py-4 px-6 md:px-12">
                 <div className="max-w-6xl mx-auto flex justify-between items-center gap-4">
                     <Link href="/" className="inline-block select-none" prefetch={false}>

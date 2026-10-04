@@ -41,7 +41,7 @@ export default function ContactPage() {
     return (
         <>
             <div
-                className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}
+                className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative overflow-hidden flex flex-col pt-0`}
             >
                 <style
                     dangerouslySetInnerHTML={{

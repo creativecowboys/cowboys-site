@@ -389,7 +389,7 @@ export default function HomeClient() {
   }, [activeTestimonial, isHovered]);
 
   return (
-    <div className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}>
+    <div className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative overflow-hidden flex flex-col pt-0`}>
       
       {/* Scope specific styles */}
       <style dangerouslySetInnerHTML={{ __html: `

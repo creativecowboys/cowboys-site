@@ -222,7 +222,7 @@ export default function Home2Page() {
             }
             @media (min-width: 768px) {
               .sticky-header {
-                top: 36px !important;
+                top: 0 !important;
               }
             }
             

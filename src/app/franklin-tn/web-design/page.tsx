@@ -463,7 +463,7 @@ export default function WebDesignFranklinPage() {
   }, [activeTestimonial, isHovered]);
 
   return (
-    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} ${lobster.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col md:pt-[36px] pt-0`}>
+    <div className={`${anton.variable} ${robotoCondensed.variable} ${syne.variable} ${playfairDisplay.variable} ${alfaSlabOne.variable} ${lobster.variable} bg-h3-cream text-h3-black font-h3-secondary selection:bg-h3-red selection:text-h3-cream min-h-screen relative overflow-hidden flex flex-col pt-0`}>
       
       {/* Scope specific styles */}
       <style dangerouslySetInnerHTML={{ __html: `

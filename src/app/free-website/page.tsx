@@ -107,7 +107,7 @@ const MARQUEE = [
 export default function FreeWebsiteOfferPage() {
     return (
         <div
-            className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative flex flex-col md:pt-[36px] pb-[76px] md:pb-0`}
+            className={`${anton.variable} bg-[#F2EBDA] text-[#0a0a0a] font-inter selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative flex flex-col pb-[76px] md:pb-0`}
         >
             <style
                 dangerouslySetInnerHTML={{

@@ -67,7 +67,7 @@ export default function LocalMaxOfferPage() {
     const videoAvailable = fs.existsSync(path.join(process.cwd(), "public", VIDEO.mp4));
 
     return (
-        <div className="font-inter bg-[#F2EBDA] text-[#0a0a0a] selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative md:pt-[36px] pb-[72px] md:pb-0">
+        <div className="font-inter bg-[#F2EBDA] text-[#0a0a0a] selection:bg-[#B5330E] selection:text-[#F2EBDA] min-h-screen relative pb-[72px] md:pb-0">
             <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
             {/* Header — logo and phone only. Dead end by design. */}
