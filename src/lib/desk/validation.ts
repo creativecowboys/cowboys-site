@@ -94,7 +94,7 @@ export type TaskAddBody = { title: string; due: string; assignee: string; reques
 export function validateTaskAdd(input: unknown): TaskAddBody {
   const raw = object(input);
   onlyKeys(raw, ["title", "due", "assignee", "requestId", "source"]);
-  const title = str(raw, "title", 400).replace(/\s+/g, " ").trim();
+  const title = str(raw, "title", 400).replace(/[\u200B-\u200D\u2060\uFEFF]/g, "").replace(/\s+/g, " ").trim();
   if (!title) throw bad("Write the task first.");
   if (title.length > 200) throw bad("Keep a task under 200 characters. Put the detail in a note.");
   const due = str(raw, "due", 10);

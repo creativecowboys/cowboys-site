@@ -193,7 +193,11 @@ the flags) have a **Tasks** section, laid out like Notes.
   or a tag can start from it.
 - **Version.** If a task write moves the contact's `dateUpdated`, the route answers with the version right before and
   right after the change, and the panel takes the new one only if its copy was current before, so the next change in
-  the panel is not refused as "someone changed this client" (a change made by someone else still is).
+  the panel is not refused as "someone changed this client". The "after" version is only ever new when nothing the desk
+  shows or writes on the contact changed in between, so a change someone else saved during the task write is still
+  caught by the panel's next save. The panel sends one task request at a time (each answer replaces the whole list).
+- **Known limit:** the same add sent at the same moment to two server instances (a double click that lands on two warm
+  functions) could make two copies; on one instance, and on any retry after a dropped answer, it makes one.
 - **Routes:** `GET /api/team/tasks/<contact id>` (the list and who can be assigned), `POST` (add), `PATCH`
   (`{ taskId, completed }`). Team sign-in; changes follow the desk's write rule (everyone, now the desk is on
   GoHighLevel). A task can only be changed through the contact it is on. Any contact on the location can carry tasks
@@ -218,7 +222,9 @@ the flags) have a **Tasks** section, laid out like Notes.
   sends one raw task with no due date (to record what GoHighLevel does with it: `noDueDate`), adds a desk task with no due
   date and one due in a week (both unassigned), sends the second again (must not add another), reads both back, ticks one
   off and opens it again, reports the field names GoHighLevel returns on a task (`taskFields`) and whether the contact's
-  version moved (`version`), then removes every task the run created and only those (`cleanup`).
+  version moved (`version`), then removes every task the run created and only those (`cleanup`; a task that was on the
+  test contact before the run is never removed, whatever an answer says). Unknown body keys are refused, so a typo never
+  runs the field self-test for real.
 - `POST /api/team/ghl/desk-migrate` → the two Monday boards to GoHighLevel. Body: `dryRun` (default true), `onlyIds`
   (Monday item ids, for a one-row trial), `offset` / `limit`, `force` (re-write a row already imported), `map`
   (`{ "<monday item id>": "<contact id>" }` to pin a row), `boards` (`["onboarding"]` / `["clients"]`), `includeOffDesk`

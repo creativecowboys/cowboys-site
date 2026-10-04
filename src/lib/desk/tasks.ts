@@ -1,9 +1,9 @@
 import { CallDeskError } from "@/lib/calls/validation";
 import { TEST_CONTACT_ID } from "@/lib/calls/ghl";
-import { createTask, deleteTask, getContact, ghl, GhlError, listTasks, setTaskCompleted, type GhlTask } from "@/lib/ghl/client";
+import { createTask, deleteTask, getContact, ghl, GhlError, listTasks, setTaskCompleted, type GhlContact, type GhlTask } from "@/lib/ghl/client";
 import { readContact, version } from "./record";
 import { deskTeam, memberByGhlUser, memberByName, type Actor } from "./team";
-import { dueFromIso, dueIsoFor, easternDay, formatTaskBody, isDeskTaskBody, isTaskRequestId, plusDays, taskAddedBy, taskMarker, taskNote, type DeskTask, type DeskTasks, type TaskSource } from "./task-text";
+import { dueFromIso, dueIsoFor, easternDay, formatTaskBody, isDeskTaskBody, isDueDay, isTaskRequestId, plusDays, taskAddedBy, taskMarker, taskNote, type DeskTask, type DeskTasks, type TaskSource } from "./task-text";
 
 // The client's running task list (Oct 4 2026) on the Onboarding and Clients panels. A task is a native GoHighLevel
 // contact task — the desk keeps no copy of its own — so it shows in GoHighLevel too, and anything typed there shows
@@ -43,9 +43,12 @@ const overlay = (base: GhlTask, answer: GhlTask | null): GhlTask => ({ ...base, 
 export async function listDeskTasks(contactId: string): Promise<DeskTasks> {
   return board(await listTasks(contactId));
 }
-/** For a panel's first load: never throws, so a GoHighLevel hiccup on the task list never hides the client. */
+/**
+ * For a panel's first load: never throws, and never waits long, so a GoHighLevel hiccup on the task list never hides the
+ * client (the panel's own request has 60 seconds; the default read policy alone could spend that on a hanging endpoint).
+ */
 export async function tasksFor(contactId: string): Promise<DeskTasks> {
-  try { return await listDeskTasks(contactId); }
+  try { return board(await listTasks(contactId, { timeoutMs: 8000, retries: 1 })); }
   catch (e) {
     console.error(`desk tasks: could not read the tasks of ${contactId}: ${e instanceof Error ? e.message : e}`);
     return { items: [], assignees: taskAssignees(), error: "Could not read this client's tasks from GoHighLevel." };
@@ -56,14 +59,29 @@ export async function tasksFor(contactId: string): Promise<DeskTasks> {
  * What a change answers with: the whole list as it now stands, the task it touched, and the contact's version right
  * before and right after the change. If the panel's copy of the record was current before (its version equals `before`),
  * it may take `after` as its version — so a task that moves the contact's version never turns the panel's next change
- * into a "someone changed this client" refusal, while a change someone ELSE made still does.
+ * into a "someone changed this client" refusal, while a change someone ELSE made still does. `after` is only ever a
+ * NEW version when nothing the desk shows or writes on the contact changed in between (deskView): if someone else saved
+ * the record during the task write, `after` equals `before` and the panel's next change is refused as stale, as it should be.
  */
 export type TaskWrite = { tasks: DeskTasks; task: DeskTask | null; existed?: boolean; before: string; after: string };
 export type TaskAdd = { title: string; due: string; assignee: string; requestId: string; source: TaskSource };
 
+/** The parts of a contact the panels show and write: what the panel's version check protects. */
+function deskView(c: GhlContact): string {
+  const fields = (c.customFields || []).map((f) => [f.id, f.value !== undefined ? f.value : f.field_value ?? null] as const).sort((a, b) => a[0].localeCompare(b[0]));
+  return JSON.stringify([fields, [...(c.tags || [])].sort(), c.firstName, c.lastName, c.companyName, c.email, c.phone, c.website, c.city, c.state, c.assignedTo].map((v) => v ?? ""));
+}
+/** The version a panel may move to after a task write (see TaskWrite). */
+async function versionAfter(contactId: string, before: GhlContact): Promise<string> {
+  const after = await getContact(contactId).catch(() => null);
+  return after && deskView(after) === deskView(before) ? version(after) : version(before);
+}
+
 const adding = new Set<string>(); // a double click on the same warm instance; the marker is what makes a retry safe
 export async function addDeskTask(contactId: string, input: TaskAdd, actor: Actor): Promise<TaskWrite> {
   if (!isTaskRequestId(input.requestId)) throw new CallDeskError("Invalid task reference. Reload and try again.", 400);
+  if (!input.title.trim() || input.title.length > 200) throw new CallDeskError("Write the task first (under 200 characters).", 400);
+  if (input.due && !isDueDay(input.due)) throw new CallDeskError("Choose a real due date, or leave it empty.", 400);
   const assignedTo = input.assignee ? memberByName(input.assignee)?.ghlUserId || "" : "";
   if (input.assignee && !assignedTo) throw new CallDeskError(`${input.assignee} has no GoHighLevel user, so the task cannot be put on them there. Leave it unassigned, or pick someone else.`, 400);
   const key = `${contactId}:${input.requestId}`;
@@ -79,8 +97,7 @@ export async function addDeskTask(contactId: string, input: TaskAdd, actor: Acto
       task = overlay({ id: "", ...sent }, await createTask(contactId, sent)); // what GoHighLevel answers wins; what was sent fills any gap
     }
     const items = prior ? existing : [...existing, task!];
-    const after = await getContact(contactId).catch(() => null);
-    return { tasks: board(items), task: task ? toDeskTask(task) : null, existed: !!prior, before: version(before), after: after ? version(after) : "" };
+    return { tasks: board(items), task: task ? toDeskTask(task) : null, existed: !!prior, before: version(before), after: await versionAfter(contactId, before) };
   } finally { adding.delete(key); }
 }
 
@@ -96,8 +113,7 @@ export async function setDeskTaskDone(contactId: string, taskId: string, complet
     task = { ...overlay(current, back), completed: typeof back?.completed === "boolean" ? back.completed : completed };
     if (task.completed !== completed) throw new CallDeskError("GoHighLevel did not keep that change. Reload and try again.", 502);
   }
-  const after = await getContact(contactId).catch(() => null);
-  return { tasks: board(existing.map((t) => (t.id === taskId ? task : t))), task: toDeskTask(task), before: version(before), after: after ? version(after) : "" };
+  return { tasks: board(existing.map((t) => (t.id === taskId ? task : t))), task: toDeskTask(task), before: version(before), after: await versionAfter(contactId, before) };
 }
 
 // ───────────────────────────── self-test (test contact only, owner-only route) ─────────────────────────────
@@ -134,23 +150,28 @@ export async function deskTaskSelfTest(dryRun: boolean, actor: Actor): Promise<T
   const check = (name: string, ok: boolean, detail = "") => { steps.push(`${ok ? "ok" : "FAILED"}: ${name}${detail ? ` (${detail.replace(/[=?&]/g, " ")})` : ""}`); if (!ok) failed.push(name); };
   const stamp = `${easternDay()}-${Date.now().toString(36)}`;
   let startCount = -1;
+  const startIds = new Set<string>(); // never removed, whatever an answer says
+  const keep = (id: string | undefined, existed = false) => { if (id && !existed && !startIds.has(id) && !made.includes(id)) made.push(id); };
   try {
     const before = await getContact(TEST_CONTACT_ID);
-    startCount = (await listTasks(TEST_CONTACT_ID)).length;
+    const start = await listTasks(TEST_CONTACT_ID);
+    startCount = start.length;
+    for (const t of start) startIds.add(t.id);
     try {
       const r = await ghl<{ task?: GhlTask }>("POST", `/contacts/${TEST_CONTACT_ID}/tasks`, { title: "Back Office task self-test: no due date probe. Safe to ignore.", body: "Added and removed again by the Back Office task self-test.", completed: false }, { retries: 0 });
-      if (r.task?.id) made.push(r.task.id);
+      keep(r.task?.id);
       report.noDueDate = r.task?.id ? `ACCEPTED with no due date. GoHighLevel kept dueDate as ${r.task.dueDate === undefined ? "(not in its answer)" : JSON.stringify(r.task.dueDate)}` : "answered without a task";
     } catch (e) { report.noDueDate = `refused, as its spec says: ${plain(e)}`; }
     const due = plusDays(easternDay(), 7);
     const a = await addDeskTask(TEST_CONTACT_ID, { title: "Back Office task self-test A, no due date. Safe to ignore.", due: "", assignee: "", requestId: `selftest-a-${stamp}`, source: "client" }, actor);
-    if (a.task && !a.existed) made.push(a.task.id);
+    keep(a.task?.id, a.existed);
     check("add a task with no due date", !!a.task && !a.existed && a.task.due === "" && a.task.fromDesk && a.task.addedBy === actor.name && !a.task.completed && !a.task.assignee, a.task ? `shown as ${a.task.due || "no due date"}, added by ${a.task.addedBy || "nobody"}` : "no task came back");
     const bInput = { title: "Back Office task self-test B, due in a week. Safe to ignore.", due, assignee: "", requestId: `selftest-b-${stamp}`, source: "onboarding" as const };
     const b = await addDeskTask(TEST_CONTACT_ID, bInput, actor);
-    if (b.task && !b.existed) made.push(b.task.id);
+    keep(b.task?.id, b.existed);
     check("add a task due in a week", !!b.task && b.task.due === due, b.task ? `shown as due ${b.task.due || "never"}` : "no task came back");
     const again = await addDeskTask(TEST_CONTACT_ID, bInput, actor);
+    keep(again.task?.id, again.existed); // if the retry did add a second task, it is removed with the rest
     check("the same task sent twice is added once", again.existed === true && again.tasks.items.filter((t) => t.id === b.task?.id).length === 1);
     const read = await listTasks(TEST_CONTACT_ID);
     const ra = read.find((t) => t.id === a.task?.id); const rb = read.find((t) => t.id === b.task?.id);
@@ -168,9 +189,9 @@ export async function deskTaskSelfTest(dryRun: boolean, actor: Actor): Promise<T
     report.version = `the contact's dateUpdated ${before.dateUpdated && after.dateUpdated && before.dateUpdated !== after.dateUpdated ? "MOVED" : "did not move"} across the task writes`;
   } catch (e) { report.error = plain(e); }
   finally {
-    // Remove exactly the tasks this run created, on the test contact, and nothing else.
+    // Remove exactly the tasks this run created, on the test contact, and nothing else (never one that was there before the run).
     const left: string[] = [];
-    for (const id of made) { try { await deleteTask(TEST_CONTACT_ID, id); } catch { left.push(id); } }
+    for (const id of made) { if (startIds.has(id)) continue; try { await deleteTask(TEST_CONTACT_ID, id); } catch { left.push(id); } }
     let now = "";
     try { const n = (await listTasks(TEST_CONTACT_ID)).length; now = startCount >= 0 ? `; the test contact has ${n} tasks, ${n === startCount ? "as before the run" : `it had ${startCount} before the run`}` : ""; } catch { /* the line above is a courtesy */ }
     report.cleanup = `removed ${made.length - left.length} of ${made.length} self-test tasks${left.length ? `, still on the test contact: ${left.join(", ")}` : ""}${now}`;

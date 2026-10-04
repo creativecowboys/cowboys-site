@@ -114,6 +114,8 @@ test("refusals happen before anything is written", async () => {
   addLead(ghl);
   await assert.rejects(add({ assignee: "Madison" }), { status: 400, message: /Madison has no GoHighLevel user/ });
   await assert.rejects(add({ requestId: "../../etc" }), { status: 400 });
+  await assert.rejects(add({ due: "2099-06-01" }), { status: 400 }, "the library refuses a 2099 date too, not only the route's validator");
+  await assert.rejects(add({ title: "   " }), { status: 400 });
   await assert.rejects(add({}, DAVE, "NoSuchContact0000001"), { status: 404 });
   assert.equal(taskWrites().length, 0);
   // GoHighLevel refusing the task itself surfaces as an error, not a silent success.
@@ -155,6 +157,30 @@ test("the version a panel may take: before and after the task write, so its next
   assert.equal(d.before, r.after); assert.equal(d.after, String(ghl.get(LEAD).dateUpdated));
 });
 
+test("someone else's change during a task write is never folded into the version the panel takes", async () => {
+  addLead(ghl);
+  ghl.tasksBumpContact = true;
+  const fake = ghl as unknown as { handle: (url: string, init?: RequestInit) => Promise<Response> };
+  const real = fake.handle.bind(ghl);
+  // While the task is being added, someone saves the record (a desk field changes and the version moves).
+  fake.handle = async (url, init) => {
+    const r = await real(url, init);
+    if ((init?.method || "GET") === "POST" && /\/tasks$/.test(url)) {
+      ghl.get(LEAD).customFields!.push({ id: ghl.fieldId("Desk Onboarding Health"), value: "Blocked" });
+      ghl.get(LEAD).dateUpdated = ghl.tick();
+    }
+    return r;
+  };
+  try {
+    const r = await add();
+    assert.equal(r.after, r.before, "the panel keeps its old version, so its next change is refused as stale");
+    assert.notEqual(String(ghl.get(LEAD).dateUpdated), r.before);
+  } finally { fake.handle = real; }
+  // Without anyone else, the version the task write moved to is the one the panel may take.
+  const again = await add({ requestId: "c0ffee00-1111-4222-8333-444455556666", title: "Second" });
+  assert.notEqual(again.after, again.before); assert.equal(again.after, String(ghl.get(LEAD).dateUpdated));
+});
+
 test("reading: tasks from GoHighLevel itself and the desk's own alerts show too, with who they are on", async () => {
   addLead(ghl);
   ghl.tasks.push(
@@ -169,11 +195,12 @@ test("reading: tasks from GoHighLevel itself and the desk's own alerts show too,
   assert.deepEqual(toDeskTask({ id: "x", title: "t", completed: "true" as unknown as boolean }).completed, false, "only a real true is done");
 });
 
-test("a panel's first load never fails because of the task list", async () => {
+test("a panel's first load never fails because of the task list, and never waits long for it", async () => {
   addLead(ghl);
-  ghl.failures.push(...[0, 1, 2].map(() => ({ match: /^GET \/contacts\/[^/]+\/tasks$/, status: 500 })));
+  ghl.failures.push(...[0, 1].map(() => ({ match: /^GET \/contacts\/[^/]+\/tasks$/, status: 500 })));
   const t = await tasksFor(LEAD);
   assert.deepEqual(t.items, []); assert.match(t.error!, /Could not read this client's tasks/); assert.deepEqual(t.assignees, ["Dave", "Josh", "Keaton"]);
+  assert.equal(ghl.requests.filter((r) => /\/tasks$/.test(r.path)).length, 2, "one retry, not the default two: a hanging endpoint must not use up the panel's time");
   await assert.rejects(listDeskTasks("NoSuchContact0000001"), (e: Error & { status?: number }) => e.status === 502 || e.status === 404);
 });
 
@@ -184,7 +211,7 @@ test("the Onboarding and Clients panels carry the task list", async () => {
   assert.equal(ob.tasks?.items.length, 1); assert.equal(ob.tasks?.items[0].title, "Ask Chad to set up a Stripe account"); assert.equal(ob.tasks?.error, undefined);
   const cl = await clientDetailGhl(LEAD, false);
   assert.deepEqual(cl.tasks, ob.tasks);
-  ghl.failures.push(...[0, 1, 2].map(() => ({ match: /^GET \/contacts\/[^/]+\/tasks$/, status: 500 })));
+  ghl.failures.push(...[0, 1].map(() => ({ match: /^GET \/contacts\/[^/]+\/tasks$/, status: 500 })));
   const still = await onboardingDetailGhl(LEAD);
   assert.equal(still.row.id, LEAD, "the panel still opens"); assert.match(still.tasks!.error!, /Could not read/);
 });
@@ -201,7 +228,7 @@ test("request checks: add and done", () => {
   assert.equal(validateTaskAdd({ ...ok, due: "2026-10-09", assignee: "Keaton" }).assignee, "Keaton");
   for (const bad of [
     { ...ok, title: "   " }, { ...ok, title: "x".repeat(201) }, { ...ok, due: "2099-12-31" }, { ...ok, due: "10/09/2026" }, { ...ok, due: "2026-02-30" },
-    { ...ok, assignee: "Andy" }, { ...ok, requestId: "short" }, { ...ok, source: "sales" }, { ...ok, extra: 1 }, { ...ok, title: "bad\u0007bell" }, null, [], "x",
+    { ...ok, assignee: "Andy" }, { ...ok, requestId: "short" }, { ...ok, title: "\u200B\u200B" }, { ...ok, source: "sales" }, { ...ok, extra: 1 }, { ...ok, title: "bad\u0007bell" }, null, [], "x",
   ]) assert.throws(() => validateTaskAdd(bad), { status: 400 }, JSON.stringify(bad));
   assert.deepEqual(validateTaskDone({ taskId: "lJpzYrWdpkC2hX6t2yue", completed: true }), { taskId: "lJpzYrWdpkC2hX6t2yue", completed: true });
   for (const bad of [{ taskId: "../x", completed: true }, { taskId: "lJpzYrWdpkC2hX6t2yue", completed: "yes" }, { taskId: "lJpzYrWdpkC2hX6t2yue" }, { taskId: "lJpzYrWdpkC2hX6t2yue", completed: true, title: "x" }]) assert.throws(() => validateTaskDone(bad), { status: 400 }, JSON.stringify(bad));
@@ -221,6 +248,42 @@ test("the task self-test: test contact only, proves every step, and removes exac
   assert.deepEqual(ghl.tasks.map((t) => t.id), ["taskKeep000000000001"], "only the tasks the run made are gone");
   assert.ok(ghl.requests.every((x) => !x.path.startsWith("/contacts/") || x.path.startsWith(`/contacts/${TEST_CONTACT_ID}`)), "never touches another contact");
   for (const s of r.steps!) assert.ok(!/[=?&]/.test(s), `report text must not look like a query string: ${s}`);
+  // An answer that names a task which was there before the run is never taken as the run's own (and never removed).
+  const fake = ghl as unknown as { handle: (url: string, init?: RequestInit) => Promise<Response> };
+  const real = fake.handle.bind(ghl);
+  ghl.taskNeedsDueDate = false;
+  let first = true;
+  fake.handle = async (url, init) => {
+    if (first && (init?.method || "GET") === "POST" && url.endsWith(`/contacts/${TEST_CONTACT_ID}/tasks`) && !String(init?.body || "").includes("dueDate")) {
+      first = false;
+      return new Response(JSON.stringify({ task: { id: "taskKeep000000000001", title: "odd answer" } }), { status: 201 });
+    }
+    return real(url, init);
+  };
+  try {
+    const odd = await deskTaskSelfTest(false, DAVE);
+    assert.match(odd.cleanup!, /^removed 2 of 2 /);
+    assert.ok(ghl.tasks.some((t) => t.id === "taskKeep000000000001"), "the older task is still there");
+  } finally { fake.handle = real; ghl.taskNeedsDueDate = true; }
+  // If the "same task twice" step does add a second task, that one is removed with the rest.
+  const listing = /^GET \/contacts\/C8FHl1LIfXEMI9isByB2\/tasks$/;
+  let lists = 0;
+  fake.handle = async (url, init) => {
+    const r = await real(url, init);
+    // The fourth list (start, A's look, B's look, then the retry's look for its own marker) comes back without descriptions,
+    // so the retry cannot find the task and adds a second one.
+    if ((init?.method || "GET") === "GET" && listing.test(`GET ${new URL(url).pathname}`) && ++lists === 4) {
+      const body = await r.json() as { tasks: Record<string, unknown>[] };
+      return new Response(JSON.stringify({ tasks: body.tasks.map(({ body: _b, ...t }) => t) }), { status: 200 });
+    }
+    return r;
+  };
+  try {
+    const leak = await deskTaskSelfTest(false, DAVE);
+    assert.deepEqual(leak.failed, ["the same task sent twice is added once"]);
+    assert.match(leak.cleanup!, /^removed 3 of 3 self-test tasks; the test contact has 1 tasks, as before the run$/);
+  } finally { fake.handle = real; }
+  assert.deepEqual(ghl.tasks.map((t) => t.id), ["taskKeep000000000001"]);
   // If GoHighLevel ever takes a task with no due date, the report says so — and that probe task is removed too.
   ghl.taskNeedsDueDate = false;
   const r2 = await deskTaskSelfTest(false, DAVE);

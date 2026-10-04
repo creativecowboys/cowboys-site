@@ -29,9 +29,10 @@ export function TaskList({ contactId, tasks, source, onTasks, onVersion }: {
   const [title, setTitle] = useState("");
   const [due, setDue] = useState("");
   const [assignee, setAssignee] = useState("");
-  const [adding, setAdding] = useState(false);
-  const [changing, setChanging] = useState(""); // the task being ticked off or opened again
-  const [loading, setLoading] = useState(false);
+  // One task request at a time (an add, a tick, or a reload): each answer replaces the whole list, so two in flight could
+  // end with the older list on screen, and a task that is in GoHighLevel would seem to be missing.
+  const [working, setWorking] = useState<"" | "add" | "load" | `tick:${string}`>("");
+  const adding = working === "add";
   const [error, setError] = useState("");
   // One reference per task being added, kept for a retry of the same text, so a dropped answer can never add it twice.
   const pending = useRef({ key: "", id: "" });
@@ -48,47 +49,48 @@ export function TaskList({ contactId, tasks, source, onTasks, onVersion }: {
   const add = async (e?: FormEvent) => {
     e?.preventDefault();
     const text = title.replace(/\s+/g, " ").trim();
-    if (!text || adding) return;
+    if (!text || working) return;
     const key = JSON.stringify([text, due, assignee]);
     if (pending.current.key !== key) pending.current = { key, id: crypto.randomUUID() };
-    setAdding(true); setError("");
+    setWorking("add"); setError("");
     try {
       await write("POST", { title: text, due, assignee, requestId: pending.current.id, source });
       setTitle(""); setDue(""); setAssignee(""); pending.current = { key: "", id: "" };
     } catch (err) { setError(err instanceof Error ? err.message : "Could not add the task."); }
-    finally { setAdding(false); }
+    finally { setWorking(""); }
   };
   // Enter in the task box adds it (the form would too; this also covers browsers and tools that skip implicit submission).
   const enter = (e: KeyboardEvent<HTMLInputElement>) => { if (e.key === "Enter" && !e.nativeEvent.isComposing) { e.preventDefault(); void add(); } };
   const toggle = async (task: DeskTask, completed: boolean) => {
-    if (changing) return;
-    setChanging(task.id); setError("");
+    if (working) return;
+    setWorking(`tick:${task.id}`); setError("");
     try { await write("PATCH", { taskId: task.id, completed }); }
     catch (err) { setError(err instanceof Error ? err.message : "Could not change the task."); }
-    finally { setChanging(""); }
+    finally { setWorking(""); }
   };
   const reload = async () => {
-    setLoading(true); setError("");
+    if (working) return;
+    setWorking("load"); setError("");
     try { onTasks((await answer<{ tasks: DeskTasks }>(await fetch(url, { cache: "no-store" }))).tasks); }
     catch (err) { setError(err instanceof Error ? err.message : "Could not load the tasks."); }
-    finally { setLoading(false); }
+    finally { setWorking(""); }
   };
 
   const row = (t: DeskTask) => {
     const state = taskState(t, today);
     return <li key={t.id} className={`ob-task is-${state}`}>
-      <label><input type="checkbox" checked={t.completed} disabled={!!changing} onChange={(e) => toggle(t, e.target.checked)} /><span>{t.title}</span></label>
-      <small>{changing === t.id ? "Saving…" : taskMeta(t, today)}</small>
+      <label><input type="checkbox" checked={t.completed} disabled={!!working} onChange={(e) => toggle(t, e.target.checked)} /><span>{t.title}</span></label>
+      <small>{working === `tick:${t.id}` ? "Saving…" : taskMeta(t, today)}</small>
       {t.note && <p className="ob-task-note">{t.note}</p>}
     </li>;
   };
   return <section className="ob-section ob-tasks" aria-label="Tasks"><h3>Tasks<small>{tasks ? taskCount(items) : ""}</small></h3>
-    {tasks?.error && <div className="call-alert" role="alert">{tasks.error}<button type="button" className="call-secondary" disabled={loading} onClick={reload}>{loading ? "Loading…" : "Try again"}</button></div>}
+    {tasks?.error && <div className="call-alert" role="alert">{tasks.error}<button type="button" className="call-secondary" disabled={!!working} onClick={reload}>{working === "load" ? "Loading…" : "Try again"}</button></div>}
     <form className="ob-task-add" onSubmit={add}>
       <input className="ob-task-title" value={title} maxLength={200} disabled={adding} placeholder="Add a task, e.g. ask the client to set up Stripe" aria-label="New task" onChange={(e) => setTitle(e.target.value)} onKeyDown={enter} />
       <input type="date" value={due} min="2000-01-01" max="2098-12-31" disabled={adding} aria-label="Due date (optional)" title="Due date (optional)" onChange={(e) => setDue(e.target.value)} />
       <select value={assignee} disabled={adding} aria-label="Assign to (optional)" onChange={(e) => setAssignee(e.target.value)}><option value="">Unassigned</option>{(tasks?.assignees || []).map((n) => <option key={n} value={n}>{n}</option>)}</select>
-      <button type="submit" className="call-secondary" disabled={adding || !title.trim()}>{adding ? "Adding…" : "Add task"}</button>
+      <button type="submit" className="call-secondary" disabled={!!working || !title.trim()}>{adding ? "Adding…" : "Add task"}</button>
     </form>
     {error && <p className="ob-task-error" role="alert">{error}</p>}
     {open.length > 0 ? <ul className="ob-task-list">{open.map(row)}</ul> : !tasks?.error && <p className="call-muted ob-task-empty">{done.length ? "Nothing open. Everything on the list is done." : "No tasks yet. Add the first one above."}</p>}
