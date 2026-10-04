@@ -191,7 +191,7 @@ export default function SmsTermsPage() {
                     {/* ── 1. Programs ── */}
                     <SectionHeading>1. Programs</SectionHeading>
                     <p style={bodyStyle}>
-                        Creative Cowboys Media, LLC operates two text message programs:
+                        Creative Cowboys Media, LLC operates three text message programs:
                     </p>
                     <p style={bodyStyle}>
                         <strong style={{ color: "#ffffff" }}>(a) Client Lead Alerts.</strong> If you are a Creative Cowboys
@@ -203,6 +203,29 @@ export default function SmsTermsPage() {
                         number and opt in through our website, our AI chat/voice agent, or a form, we send the
                         informational messages you request — links, follow-ups, confirmations, and appointment or demo
                         reminders related to your inquiry.
+                    </p>
+                    <p style={bodyStyle}>
+                        <strong style={{ color: "#ffffff" }}>(c) Howdy Website Update Texts.</strong> If you are a
+                        Creative Cowboys client and you opt in, we text you about the website update and support
+                        requests you send to howdy@creativecowboys.co — support replies about your request and a
+                        confirmation when the work is done. Message frequency depends on how many requests you send.
+                        You opt in on our{" "}
+                        <Link
+                            href="/sms-optin#howdy-updates"
+                            style={{ color: "#F15F2A", textDecoration: "underline", textDecorationColor: "rgba(241,95,42,0.4)" }}
+                        >
+                            SMS Opt-In page
+                        </Link>{" "}
+                        by entering your name, business, email and mobile number and ticking a box that is not
+                        pre-checked. Opting in records your consent for review; a person matches it to your client
+                        account before any message is sent, and no client is enrolled automatically.{" "}
+                        <strong style={{ color: "#ffffff" }}>
+                            This program is not sending messages yet
+                        </strong>{" "}
+                        — the sending number and its automatic STOP and HELP replies are still being set up. Until that
+                        is finished, update requests are answered by email as they are today, and a consent recorded now
+                        simply waits. To withdraw a recorded consent before the program starts, email
+                        support@creativecowboys.co.
                     </p>
 
                     <Divider />
@@ -233,7 +256,9 @@ export default function SmsTermsPage() {
                     <SectionHeading>5. Opt-out</SectionHeading>
                     <p style={bodyStyle}>
                         Reply <strong style={{ color: "#ffffff" }}>STOP</strong> at any time to unsubscribe. You will
-                        receive a one-time confirmation and no further messages.
+                        receive a one-time confirmation and no further messages. Program (c) is not sending yet and has
+                        no number to reply to; to withdraw a consent you recorded for it, email
+                        support@creativecowboys.co.
                     </p>
 
                     <Divider />

@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test:call-owner": "node scripts/test-call-owner.cjs",
     "test:onboarding": "node scripts/test-onboarding.cjs",
-    "test:desk": "node scripts/test-desk.cjs"
+    "test:desk": "node scripts/test-desk.cjs",
+    "test:howdy-consent": "node scripts/test-howdy-consent.cjs"
   },
   "dependencies": {
     "@elevenlabs/react": "^1.1.1",

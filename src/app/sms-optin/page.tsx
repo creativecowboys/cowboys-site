@@ -3,11 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Footer7 } from "@/components/ui/footer-7";
 import FloatingNav from "@/components/FloatingNav";
+import HowdyUpdatesForm from "./howdy-updates-form";
 
 export const metadata: Metadata = {
     title: "SMS Opt-In",
     description:
-        "How consumers and Creative Cowboys clients opt in to receive text messages from Creative Cowboys Media, LLC — the opt-in flow, consent language, and program details.",
+        "How consumers and Creative Cowboys clients opt in to receive text messages from Creative Cowboys Media, LLC — the opt-in flow, consent language, and program details. Clients can sign up here for Howdy website-update texts.",
     alternates: { canonical: "/sms-optin" },
     openGraph: {
         title: "SMS Opt-In | Creative Cowboys",
@@ -255,9 +256,10 @@ export default function SmsOptInPage() {
                     {/* ── Overview ── */}
                     <SectionHeading>How Opt-In Works</SectionHeading>
                     <p style={bodyStyle}>
-                        Creative Cowboys Media, LLC operates two text message programs. Opt-in is always affirmative —
+                        Creative Cowboys Media, LLC operates three text message programs. Opt-in is always affirmative —
                         you provide your mobile number and give consent before we ever text you. This page documents how
-                        each opt-in flow works.
+                        each opt-in flow works. Current clients can sign up for{" "}
+                        <ILink href="#howdy-updates">Howdy website-update texts</ILink> on this page.
                     </p>
 
                     <Divider />
@@ -334,6 +336,63 @@ export default function SmsOptInPage() {
 
                     <Divider />
 
+                    {/* ── Program (c): Howdy Website Update Texts ── */}
+                    {/* The sign-up form below writes a real consent record (POST /api/sms-consent) into the
+                        site's private store. It is not an enrolment: a person matches the record to a client
+                        account before any number is texted, and the program is not sending yet. Keep the
+                        wording here honest about that — see src/lib/howdy-sms/consent.ts. */}
+                    <section id="howdy-updates" style={{ scrollMarginTop: "90px" }}>
+                        <SectionHeading>
+                            Howdy Website Update Texts (for Creative Cowboys clients)
+                        </SectionHeading>
+                        <p style={bodyStyle}>
+                            Current Creative Cowboys clients send website update and support requests to{" "}
+                            <a href="mailto:howdy@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                                howdy@creativecowboys.co
+                            </a>
+                            . If you opt in below, you get a text when your request is done — plus support replies about
+                            that request — instead of waiting on an email. It is optional, it costs nothing, and it has
+                            no effect on your services either way.
+                        </p>
+
+                        <SubHeading>How you opt in</SubHeading>
+                        <p style={bodyStyle}>
+                            You fill in your name, your business, your email and your mobile number on the form below,
+                            then tick the consent box yourself — it is never pre-checked. Submitting saves your consent,
+                            the exact wording you agreed to, and the date and time, in our private records. A person at
+                            Creative Cowboys then matches that consent to your client account. We do not text a number
+                            that has not been matched.
+                        </p>
+
+                        <SubHeading>Sign up for Howdy texts</SubHeading>
+                        <HowdyUpdatesForm />
+
+                        <SubHeading>Where this program stands today</SubHeading>
+                        <p style={bodyStyle}>
+                            Straight with you: this program is still being set up, so signing up today records your
+                            consent and nothing else — <strong style={{ color: "#ffffff" }}>Howdy does not text yet</strong>.
+                            The Howdy sending number, the automatic STOP and HELP replies on it, and the link between a
+                            saved consent and our update system are not connected yet. Until they are, website update
+                            requests are answered by email from howdy@creativecowboys.co exactly as they are today. No
+                            client is signed up automatically, and no one is texted before their consent is matched to
+                            their account and the program is live. In the meantime you can withdraw consent by emailing{" "}
+                            <a href="mailto:support@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                                support@creativecowboys.co
+                            </a>
+                            .
+                        </p>
+
+                        <SubHeading>Consent language shown at opt-in</SubHeading>
+                        <p style={bodyStyle}>
+                            &ldquo;I agree to receive text messages from Creative Cowboys Media, LLC about my website
+                            update requests, including support replies and completion confirmations from Howdy. Message
+                            frequency varies. Message and data rates may apply. Consent is not a condition of purchasing
+                            any service. Reply STOP to unsubscribe or HELP for help.&rdquo;
+                        </p>
+                    </section>
+
+                    <Divider />
+
                     {/* ── Frequency, rates, opt-out ── */}
                     <SectionHeading>Frequency, Rates &amp; Opt-Out</SectionHeading>
                     <p style={bodyStyle}>
@@ -348,6 +407,14 @@ export default function SmsOptInPage() {
                             470-243-7517
                         </a>
                         .
+                    </p>
+                    <p style={bodyStyle}>
+                        STOP and HELP replies work today on our live programs. Howdy website-update texts are not
+                        sending yet, so there is nothing to reply to on that program — email{" "}
+                        <a href="mailto:support@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
+                            support@creativecowboys.co
+                        </a>{" "}
+                        to withdraw a Howdy consent in the meantime.
                     </p>
                     <p style={bodyStyle}>
                         For full details, see our <ILink href="/sms-terms">SMS Terms &amp; Conditions</ILink>,{" "}
