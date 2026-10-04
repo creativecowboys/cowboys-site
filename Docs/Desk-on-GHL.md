@@ -70,8 +70,8 @@ creates). A handoff from a lead also does what the Sales tab already did: Outrea
 handoff and import (the business name the rep types at handoff is the one exception), and edited on purpose from the
 Clients panel's contact fields (email and phone can be corrected there, never blanked). `assignedTo` only when empty.
 
-**Notes** (handoff summary, desk notes, imported Monday updates) and **one task** when a payment turns Card Failed or
-Overdue (see Stripe below).
+**Notes** (handoff summary, desk notes, imported Monday updates) and **tasks**: one when a payment turns Card Failed or
+Overdue (see Stripe below), and the ones the team adds on a client's Tasks list (see "Tasks" below).
 
 **Never:** any field named `LSE …`, any `lse:` tag, opportunities, pipelines, workflows, conversations, emails or texts.
 A write guard in `src/lib/desk/fields.ts` refuses any custom field whose live name does not start with "Desk", and
@@ -165,6 +165,42 @@ client group — Active, Payment issue, At risk, Paused, Churned. A note is idem
 a dropped connection finds the note instead of posting it twice) and needs no record version. Markers
 (`[CC-NOTE:…] [CC-SRC:…] [CC-BY:…]`) are stripped before anyone sees the text, on the Sales tab too.
 
+## Tasks (October 4, 2026)
+Dave: "we need a running task list for each client, while onboarding. something we can add to.. like now, i have to ask
+Chad to setup stripe.. but not all clients need that." Both panels (Onboarding: under Next action; Clients: first, under
+the flags) have a **Tasks** section, laid out like Notes.
+- **A task is a native GoHighLevel contact task** (`/contacts/{id}/tasks`), so it shows in GoHighLevel on the contact too,
+  and a task typed in GoHighLevel (or left by the package builder or a payment alert) shows on the desk. The desk keeps no
+  copy of its own.
+- **Add:** a short title (up to 200 characters), an optional due date, an optional assignee (everyone on the desk with a
+  GoHighLevel user: Dave, Josh, Keaton; anyone added with `GHL_REP_IDS` joins the list). Enter in the box adds it.
+- **Check it off** with its box; open it again by unticking it. Done tasks fold into "N done" at the foot, struck through.
+  Open tasks are listed by due date (overdue in red, "Due today"), the ones with no due date last.
+- **Due dates.** GoHighLevel's API will not save a task without one (its spec lists `dueDate` as required). A date is saved
+  as 5:00 pm Eastern on that day. **No due date is saved as Dec 31, 2099, 5:00 pm Eastern**, the task's description says
+  so in plain words, and the desk reads any date in 2099 or later as "No due date" (it never lets anyone pick one).
+  In GoHighLevel such a task shows "Dec 31, 2099" and sorts last.
+- **What a desk task carries:** its description reads "Added in the Back Office by Dave on Oct 4, 2026." (plus the
+  no-due-date line when there is none), then markers the desk reads back: `[CC-TASK:<id>]` (a browser-minted id; a retry
+  after a dropped connection finds the task instead of adding a second one), `[CC-SRC:onboarding|client]`, `[CC-BY:<name>]`
+  (a task made through the API records no author in GoHighLevel). The panel shows "added by Dave"; a task from anywhere
+  else says "from GoHighLevel" and shows its own description (three lines at most).
+- **Who it is on:** `assignedTo` only when someone is picked. An unassigned task notifies nobody. A task assigned to
+  someone may get them GoHighLevel's own "task assigned" notice if their GoHighLevel settings send one; the desk itself
+  sends nothing.
+- **What it never does:** delete a task, edit a task's title, date or assignee (do that in GoHighLevel), write a field or
+  a tag, or touch Monday. Adding or ticking a task writes nothing to the contact itself, so no workflow keyed on a field
+  or a tag can start from it.
+- **Version.** If a task write moves the contact's `dateUpdated`, the route answers with the version right before and
+  right after the change, and the panel takes the new one only if its copy was current before, so the next change in
+  the panel is not refused as "someone changed this client" (a change made by someone else still is).
+- **Routes:** `GET /api/team/tasks/<contact id>` (the list and who can be assigned), `POST` (add), `PATCH`
+  (`{ taskId, completed }`). Team sign-in; changes follow the desk's write rule (everyone, now the desk is on
+  GoHighLevel). A task can only be changed through the contact it is on. Any contact on the location can carry tasks
+  (Blue Ridge Golf Carts, still a Sales lead, was seeded this way); the panels show them for onboarding records and
+  clients. Each panel's first load carries the list (`tasks` on the detail answer), and a GoHighLevel hiccup on the list
+  never hides the client: the section says so and offers Try again.
+
 ## Operator tooling (owner-only; every write is a dry run unless the body says `dryRun: false`)
 - `GET /api/team/ghl/diag` → `desk` (owners; everyone else gets the Phase-1 part only): desk fields present / missing,
   every field and tag on the location by who owns them, record counts, and the exact write list.
@@ -178,6 +214,11 @@ a dropped connection finds the note instead of posting it twice) and needs no re
   names the field it refused (`checks[].error`) instead of failing on the first one. It also reports `version` (does the
   contact's `dateUpdated`, the desk's version token, move on a field write and on a tag add) and `searchCarries` (which of
   the fields the lists read a search result actually has).
+- `POST /api/team/ghl/desk-selftest` `{ "scope": "tasks", "dryRun": false }` → the task list on the same test contact:
+  sends one raw task with no due date (to record what GoHighLevel does with it: `noDueDate`), adds a desk task with no due
+  date and one due in a week (both unassigned), sends the second again (must not add another), reads both back, ticks one
+  off and opens it again, reports the field names GoHighLevel returns on a task (`taskFields`) and whether the contact's
+  version moved (`version`), then removes every task the run created and only those (`cleanup`).
 - `POST /api/team/ghl/desk-migrate` → the two Monday boards to GoHighLevel. Body: `dryRun` (default true), `onlyIds`
   (Monday item ids, for a one-row trial), `offset` / `limit`, `force` (re-write a row already imported), `map`
   (`{ "<monday item id>": "<contact id>" }` to pin a row), `boards` (`["onboarding"]` / `["clients"]`), `includeOffDesk`
@@ -483,13 +524,15 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   `intake.ts`, `winners.ts`, `validation.ts`, `http.ts`, `migrate.ts`, `admin.ts` (setup, diag, self-test),
   `legacy.ts` (legacy clients: what the marker means on the Clients tab — pure, shared with the browser),
   `clients-view.ts` (what the Clients tab lists and counts: churned clients are off the default view — pure, shared
-  with the browser), `names.ts` (how names are shown on the three tabs — pure, shared with the browser).
+  with the browser), `names.ts` (how names are shown on the three tabs — pure, shared with the browser),
+  `task-text.ts` (tasks: due dates, the stand-in, markers, order and labels — pure, shared with the browser),
+  `tasks.ts` (tasks on GoHighLevel: list, add, tick off, the task self-test).
 - Routes: each existing handler under `/api/team/onboarding`, `/api/team/clients`, `/api/stripe/webhook`,
   `/api/team/packages` and `/api/onboarding/[token]` gained an early GoHighLevel branch; the Monday code below it is
-  unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`.
-- UI: `src/app/leads/notes.tsx` (the timeline), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
+  unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`, `/api/team/tasks/[id]` (Oct 4).
+- UI: `src/app/leads/notes.tsx` (the timeline), `tasks.tsx` (the task list), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (128) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (142 since the task list) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.

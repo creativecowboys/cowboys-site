@@ -5,8 +5,18 @@ It seems like this has become more of an admin setup than just calling new leads
 Clients tabs) is now served at `/admin`. It was at `/leads` from September 21 to October 2, 2026.
 
 Nothing about the desk itself changed: same tabs, same query parameters (`tab`, `lead`, `client`, `desk`, `backend`),
-same owner rules, same APIs under `/api/team/*`. Only the browser title is new ("Admin"). What each tab does is still
+same owner rules, same APIs under `/api/team/*`. Only the browser title was new ("Admin"; "Back Office" since October 4,
+next section). What each tab does is still
 described in `Docs/Leads-Page.md` (Sales), `Docs/Onboarding.md`, `Docs/Clients-Tab.md` and `Docs/Desk-on-GHL.md`.
+
+## Named "Back Office" (October 4, 2026)
+Dave, asked what to call it: "ill just say backoffice for now." The visible name only:
+- the browser tab reads "Back Office | Creative Cowboys" (`metadata.title` in `src/app/admin/page.tsx`);
+- the bar that holds the tabs starts with **BACK OFFICE** at its left end (`.team-name` in `src/app/leads/shell.tsx`
+  and `onboarding.css`; on a phone it shares the top row with Sign out, and the tabs sit below);
+- the sign-in card's small heading says "Back Office" (it said "Admin Access").
+Not changed: the address (`/admin`, and `/leads` still forwards), every route and file name, the code's own words
+("desk"), and the sign-in email, which still says "the Creative Cowboys team desk".
 
 ## How it is wired
 - `src/app/admin/page.tsx` is a thin page: metadata (title, noindex) and the shell. The desk's own files are still in
@@ -83,7 +93,7 @@ These work through the forward and were left because the files belonged to work 
 - `src/app/leads/clients.tsx`: the "Onboarding record: open" link in a client panel.
 - Comments in `src/lib/desk/switch.ts` and `src/lib/desk/basics.test.ts`, the test expectations in
   `src/lib/desk/migrate.test.ts`, and `Docs/Desk-on-GHL.md`.
-- `src/components/TopBar.tsx` still hides the site's top bar on `/leads` as well as `/admin`; harmless.
+- (`src/components/TopBar.tsx`, which hid the site's top bar on `/leads` and `/admin`, was removed with that bar on October 4.)
 - Import paths such as `@/app/leads/types` are file locations, not addresses. They change only if the folder moves.
 
 ## Check it (signed out)
