@@ -351,8 +351,7 @@ export default function SmsOptInPage() {
                                 howdy@creativecowboys.co
                             </a>
                             . If you opt in below, you get a text when your request is done — plus support replies about
-                            that request — instead of waiting on an email. It is optional, it costs nothing, and it has
-                            no effect on your services either way.
+                            that request. It is optional, and it has no effect on your services either way.
                         </p>
 
                         <SubHeading>How you opt in</SubHeading>
@@ -369,17 +368,14 @@ export default function SmsOptInPage() {
 
                         <SubHeading>Where this program stands today</SubHeading>
                         <p style={bodyStyle}>
-                            Straight with you: this program is still being set up, so signing up today records your
-                            consent and nothing else — <strong style={{ color: "#ffffff" }}>Howdy does not text yet</strong>.
-                            The Howdy sending number, the automatic STOP and HELP replies on it, and the link between a
-                            saved consent and our update system are not connected yet. Until they are, website update
-                            requests are answered by email from howdy@creativecowboys.co exactly as they are today. No
-                            client is signed up automatically, and no one is texted before their consent is matched to
-                            their account and the program is live. In the meantime you can withdraw consent by emailing{" "}
+                            <strong style={{ color: "#ffffff" }}>Howdy texts are coming soon.</strong> Signing up now
+                            records your consent; messages will start after the program launches and we match your
+                            signup to your client account. To withdraw consent before then, email{" "}
                             <a href="mailto:support@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
                                 support@creativecowboys.co
                             </a>
-                            .
+                            . Once messages start, reply <strong style={{ color: "#ffffff" }}>STOP</strong> to opt out
+                            or <strong style={{ color: "#ffffff" }}>HELP</strong> for help.
                         </p>
 
                         <SubHeading>Consent language shown at opt-in</SubHeading>
@@ -409,12 +405,12 @@ export default function SmsOptInPage() {
                         .
                     </p>
                     <p style={bodyStyle}>
-                        STOP and HELP replies work today on our live programs. Howdy website-update texts are not
-                        sending yet, so there is nothing to reply to on that program — email{" "}
+                        Howdy website-update texts have not started yet. To withdraw a consent you recorded for that
+                        program before it launches, email{" "}
                         <a href="mailto:support@creativecowboys.co" style={{ color: "#F15F2A", textDecoration: "none" }}>
                             support@creativecowboys.co
-                        </a>{" "}
-                        to withdraw a Howdy consent in the meantime.
+                        </a>
+                        .
                     </p>
                     <p style={bodyStyle}>
                         For full details, see our <ILink href="/sms-terms">SMS Terms &amp; Conditions</ILink>,{" "}

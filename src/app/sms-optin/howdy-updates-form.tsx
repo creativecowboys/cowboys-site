@@ -93,14 +93,14 @@ export default function HowdyUpdatesForm() {
                     Consent saved. Thank you.
                 </p>
                 <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.65)", lineHeight: 1.8, margin: 0 }}>
-                    We recorded your consent, the exact wording you agreed to, and the time you gave it. Before any
-                    text is sent, someone here matches your number to your client account — so you will not get a
-                    message from this form alone. You can withdraw consent any time by replying{" "}
-                    <strong style={{ color: "#ffffff" }}>STOP</strong> once texting is on, or by emailing{" "}
+                    We recorded your consent, the exact wording you agreed to, and the time you gave it. Howdy texts
+                    are coming soon — messages will start after the program launches and we match your signup to your
+                    client account. To withdraw consent before then, email{" "}
                     <a href="mailto:support@creativecowboys.co" style={linkStyle}>
                         support@creativecowboys.co
                     </a>
-                    .
+                    . Once messages start, reply <strong style={{ color: "#ffffff" }}>STOP</strong> to opt out or{" "}
+                    <strong style={{ color: "#ffffff" }}>HELP</strong> for help.
                 </p>
             </div>
         );

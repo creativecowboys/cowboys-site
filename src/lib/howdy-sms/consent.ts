@@ -55,8 +55,10 @@ function str(raw: Record<string, unknown>, key: keyof typeof LIMITS, label: stri
 }
 
 /**
- * A US mobile, written any way a person writes one, as E.164. Area code and exchange cannot start
- * with 0 or 1, so typos and made-up numbers are refused rather than stored as consent.
+ * A US mobile, written any way a person writes one, as E.164. This checks shape only — ten digits,
+ * area code and exchange not starting with 0 or 1 — so it catches typos and mistyped lengths. It
+ * cannot tell whether the number exists or belongs to the person typing it; that is what matching a
+ * record to a real client account is for.
  */
 export function normalizeUsMobile(raw: string): string {
   const digits = raw.replace(/\D/g, "");

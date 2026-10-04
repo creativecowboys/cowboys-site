@@ -219,13 +219,10 @@ export default function SmsTermsPage() {
                         by entering your name, business, email and mobile number and ticking a box that is not
                         pre-checked. Opting in records your consent for review; a person matches it to your client
                         account before any message is sent, and no client is enrolled automatically.{" "}
-                        <strong style={{ color: "#ffffff" }}>
-                            This program is not sending messages yet
-                        </strong>{" "}
-                        — the sending number and its automatic STOP and HELP replies are still being set up. Until that
-                        is finished, update requests are answered by email as they are today, and a consent recorded now
-                        simply waits. To withdraw a recorded consent before the program starts, email
-                        support@creativecowboys.co.
+                        <strong style={{ color: "#ffffff" }}>Howdy texts are coming soon.</strong> Signing up now
+                        records your consent; messages will start after the program launches and we match your signup
+                        to your client account. To withdraw consent before then, email support@creativecowboys.co.
+                        Once messages start, reply STOP to opt out or HELP for help.
                     </p>
 
                     <Divider />
@@ -256,9 +253,8 @@ export default function SmsTermsPage() {
                     <SectionHeading>5. Opt-out</SectionHeading>
                     <p style={bodyStyle}>
                         Reply <strong style={{ color: "#ffffff" }}>STOP</strong> at any time to unsubscribe. You will
-                        receive a one-time confirmation and no further messages. Program (c) is not sending yet and has
-                        no number to reply to; to withdraw a consent you recorded for it, email
-                        support@creativecowboys.co.
+                        receive a one-time confirmation and no further messages. Program (c) has not started yet; to
+                        withdraw a consent you recorded for it before it launches, email support@creativecowboys.co.
                     </p>
 
                     <Divider />
