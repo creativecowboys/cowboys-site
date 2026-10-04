@@ -115,10 +115,10 @@ export default function IntakeForm({ token }: { token: string }) {
       </div>)}
     </section>
     <section className="intake-card"><h2>5. Google Business Profile</h2>
-      <p className="intake-help">Your Google listing (the map card with reviews). We manage it for you, but we never ask for your Google password. Instead, add <b>{GBP_AGENCY_EMAIL()}</b> as a <b>Manager</b>:</p>
-      <ol className="intake-steps"><li>Sign in to Google and open your Business Profile (search your business name while signed in, or go to business.google.com).</li><li>Open the menu (three dots) → <b>Business Profile settings</b> → <b>People and access</b>.</li><li>Choose <b>Add</b>, enter <b>{GBP_AGENCY_EMAIL()}</b>, pick the <b>Manager</b> role, and send the invitation.</li></ol>
+      <p className="intake-help">Your Google listing (the map card with reviews). We manage it for you, but we never ask for your Google password. Instead, add <b>{GBP_AGENCY_EMAIL()}</b> as an <b>Owner</b>:</p>
+      <ol className="intake-steps"><li>Sign in to Google and open your Business Profile (search your business name while signed in, or go to business.google.com).</li><li>Open the menu (three dots) → <b>Business Profile settings</b> → <b>People and access</b>.</li><li>Choose <b>Add</b>, enter <b>{GBP_AGENCY_EMAIL()}</b>, pick the <b>Owner</b> role, and send the invitation.</li></ol>
       <div className="intake-grid">{field("gbpUrl", "Link to your Google listing (optional)", "Search your business on Google Maps, tap Share, paste the link.")}</div>
-      <label className="intake-check"><input type="checkbox" checked={form.gbpInviteSent} onChange={(e) => set({ gbpInviteSent: e.target.checked })} /> I&rsquo;ve sent the Manager invitation to {GBP_AGENCY_EMAIL()}</label>
+      <label className="intake-check"><input type="checkbox" checked={form.gbpInviteSent} onChange={(e) => set({ gbpInviteSent: e.target.checked })} /> I&rsquo;ve sent the Owner invitation to {GBP_AGENCY_EMAIL()}</label>
       <label className="intake-check"><input type="checkbox" checked={form.gbpNoProfile} onChange={(e) => set({ gbpNoProfile: e.target.checked })} /> I don&rsquo;t have a Google Business Profile (or I&rsquo;m not sure)</label>
     </section>
     <section className="intake-card"><h2>6. Anything else</h2>{field("notes", "Notes for the team", "Questions, deadlines, things we should know.", 3)}</section>

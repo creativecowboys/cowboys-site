@@ -103,8 +103,11 @@ export function onboardingOwners(): { id: string; name: string }[] {
   return [...STAFF, ...extra];
 }
 
-/** Who the client invites as a Google Business Profile manager. Confirm before publishing the intake copy. */
-export const GBP_AGENCY_EMAIL = () => process.env.GBP_AGENCY_EMAIL || "howdy@creativecowboys.co";
+/** Who the client invites to their Google Business Profile (as an Owner, per Dave Oct 4 2026). */
+// Who clients add to their Google Business Profile. Dave, Oct 4 2026: add Dave as an Owner, then he adds anyone else.
+// NEXT_PUBLIC_ so the client-side intake page sees it (a plain GBP_AGENCY_EMAIL never reached the browser, which is why
+// the page kept showing the old howdy@ fallback even after GBP_AGENCY_EMAIL=dave@ was set on Vercel, Sep 24).
+export const GBP_AGENCY_EMAIL = () => process.env.NEXT_PUBLIC_GBP_AGENCY_EMAIL || "dave@creativecowboys.co";
 
 export const INTAKE_TOKEN_DAYS = 45;
 export const UPLOAD_MAX_BYTES = 25 * 1024 * 1024;
