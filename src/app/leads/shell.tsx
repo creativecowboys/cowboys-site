@@ -12,7 +12,9 @@ import type { DeskSystem } from "./notes";
 import { DESK_LOGIN_PATH, DESK_PATH } from "@/lib/desk-path";
 import "./onboarding.css";
 
-// The team desk, served at /admin (src/app/admin/page.tsx renders this; the files stay in this folder for now).
+// The team desk, served at /admin (src/app/admin/page.tsx renders this; the files stay in this folder for now). Its name on
+// screen is "Back Office" (Dave, Oct 4 2026: "ill just say backoffice for now"): the bar's left end and the browser tab.
+// The address stays /admin.
 // Three tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
 // so switching tabs only hides it; nothing is unmounted while a save is running.
 // `?desk=ghl|monday` previews the Onboarding / Clients desk on the other system and is kept while moving between
@@ -65,7 +67,8 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
   }, [router, preview]);
   return <div className="team-shell">
     <div className="team-bar">
-      <nav className="team-tabs" aria-label="Team desk sections">
+      <span className="team-name">Back Office</span>
+      <nav className="team-tabs" aria-label="Back Office sections">
         <button type="button" className={tab === "sales" ? "is-active" : ""} aria-current={tab === "sales" ? "page" : undefined} onClick={() => go("sales")}>Sales</button>
         <button type="button" className={tab === "onboarding" ? "is-active" : ""} aria-current={tab === "onboarding" ? "page" : undefined} onClick={() => go("onboarding")}>Onboarding</button>
         <button type="button" className={tab === "clients" ? "is-active" : ""} aria-current={tab === "clients" ? "page" : undefined} onClick={() => go("clients")}>Clients</button>

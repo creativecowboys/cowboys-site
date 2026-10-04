@@ -3,10 +3,12 @@
 .team-tabs{display:flex;gap:4px;padding:10px 4vw 0;background:#1f1a17;border-bottom:1px solid #3a2f28}
 .team-tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:#c7bba9;font:600 12px/1 Inter,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:12px 16px;cursor:pointer}
 .team-tabs button.is-active{color:#f6efe3;border-bottom-color:#e8603c}
-/* The bar the tabs sit in, with who is signed in and Sign out at its right end. On a phone that pair sits above the tabs. */
+/* The bar the tabs sit in: the page's name ("Back Office", Oct 4 2026) at its left, the tabs, and who is signed in with
+   Sign out at its right end. On a phone the name and that pair share the top row and the tabs sit below. */
 .team-bar{display:flex;align-items:flex-end;justify-content:space-between;background:#1f1a17;border-bottom:1px solid #3a2f28}
-.team-bar .team-tabs{border-bottom:0;min-width:0}
-.team-session{display:flex;align-items:baseline;gap:12px;padding:0 4vw 15px 12px;color:#9c8f7c;font:500 11px/1 Inter,Arial,sans-serif;white-space:nowrap}
+.team-name{flex-shrink:0;align-self:stretch;display:flex;align-items:flex-end;margin-top:10px;padding:0 18px 15px 4vw;border-right:1px solid #3a2f28;color:#f6efe3;font:700 12px/1 Inter,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.team-bar .team-tabs{border-bottom:0;min-width:0;padding-left:10px}
+.team-session{display:flex;align-items:baseline;gap:12px;margin-left:auto;padding:0 4vw 15px 12px;color:#9c8f7c;font:500 11px/1 Inter,Arial,sans-serif;white-space:nowrap}
 .team-signout{background:transparent;border:0;padding:9px 6px;margin:-9px -6px;color:#c7bba9;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .team-signout:hover,.team-signout:focus-visible{color:#f6efe3}
 .team-signout:disabled{opacity:.6;cursor:default}
@@ -111,8 +113,8 @@
 .ob-review h3{font-family:var(--font-anton),Anton,Impact,sans-serif;font-size:22px;font-weight:400;margin:0 0 12px}
 .ob-review dl{border:1px solid #e3d8c6;border-radius:4px;background:#f6efe3;padding:12px 14px}
 
-@media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-toggle{grid-column:1/-1}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}.team-session{padding-right:16px}.team-bar-alert{padding-left:16px;padding-right:16px}}
-@media(max-width:560px){.team-bar{flex-direction:column-reverse;align-items:stretch}.team-session{justify-content:flex-end;padding:10px 16px 0}}
+@media(max-width:900px){.ob-toolbar{grid-template-columns:1fr 1fr}.ob-toggle{grid-column:1/-1}.ob-row{grid-template-columns:1.4fr 1fr 1fr;gap:8px}.ob-row>span:nth-child(2),.ob-row>span:nth-child(6){display:none}.ob-controls{grid-template-columns:1fr}.ob-next{grid-template-columns:1fr}.ob-next textarea{grid-column:1}.ob-details dl,.ob-review dl{grid-template-columns:1fr}.ob-modal{padding:10px}.ob-modal-card{padding:20px 16px}.ob-panel{padding:20px 16px 60px}.team-tabs{padding-left:16px}.team-name{padding-left:16px}.team-session{padding-right:16px}.team-bar-alert{padding-left:16px;padding-right:16px}}
+@media(max-width:560px){.team-bar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end}.team-name{grid-area:1/1;align-self:end;margin-top:0;padding:10px 0 0 16px;border-right:0}.team-session{grid-area:1/2;justify-content:flex-end;margin-left:0;padding:10px 16px 0}.team-bar .team-tabs{grid-area:2/1/3/3;padding-left:16px}}
 
 /* Header actions + staff file uploads on the client panel */
 .ob-head-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
@@ -192,3 +194,28 @@
 /* Clients tab: a search on the default view found clients that have churned (they are not listed there). */
 .ob-churned-hint{font-size:11px;line-height:1.6;color:#71665a;margin:0 0 10px}
 @media(max-width:900px){.ob-toolbar.ob-toolbar-kind{grid-template-columns:1fr 1fr}.ob-kind{flex-direction:column;align-items:flex-start}}
+
+/* Tasks (Oct 4 2026): the client's running task list on the Onboarding and Clients panels — native GoHighLevel tasks on the
+   contact. Add row: the task on its own line, then due date, assignee and the button; on a phone the button takes a full row. */
+.ob-task-add{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.ob-task-add input,.ob-task-add select{min-width:0;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:8px 10px;font-size:13px;color:#1f1a17}
+.ob-task-add .ob-task-title{flex:1 1 100%}
+.ob-task-add input[type="date"]{flex:0 1 160px}
+.ob-task-add select{flex:0 1 150px}
+.ob-task-add button{margin-left:auto}
+.ob-task-error{color:#a83a1c;font-size:12px;margin:8px 0 0}
+.ob-task-list{list-style:none;margin:12px 0 0;padding:0}
+.ob-task{padding:8px 0;border-bottom:1px solid #efe6d7}
+.ob-task label{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4;cursor:pointer}
+.ob-task input[type="checkbox"]{flex:0 0 16px;width:16px;height:16px;margin:2px 0 0;accent-color:#e8603c;cursor:pointer}
+.ob-task label span{min-width:0;overflow-wrap:anywhere}
+.ob-task small{display:block;margin:3px 0 0 26px;font-size:11px;color:#746655}
+.ob-task.is-overdue small{color:#a83a1c;font-weight:600}
+.ob-task.is-done label span{color:#71665a;text-decoration:line-through}
+.ob-task-note{margin:4px 0 0 26px;font-size:11px;line-height:1.5;color:#71665a;white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ob-task-empty{font-size:12px;margin:12px 0 0}
+.ob-task-done{margin-top:10px}
+.ob-task-done summary{padding:4px 0;font-size:12px;font-weight:600;color:#756451;cursor:pointer}
+.ob-task-done .ob-task-list{margin-top:4px}
+@media(max-width:760px){.ob-task-add input,.ob-task-add select{font-size:16px}}
+@media(max-width:560px){.ob-task-add input[type="date"],.ob-task-add select{flex:1 1 40%}.ob-task-add button{flex:1 1 100%;margin-left:0}}

@@ -9,6 +9,7 @@ import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult }
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
 import { NotesTimeline, type DeskSystem } from "./notes";
+import { TaskList } from "./tasks";
 import { RowLine } from "./row-line";
 import { contactLine, personShown } from "@/lib/desk/names";
 
@@ -116,7 +117,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
     setBusy(label); setError("");
     try {
       const data: { row: OnboardingRow } = await json(await fetch(`/api/team/onboarding/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }), crm);
-      setDetail({ ...detail, row: data.row }); onRow(data.row);
+      setDetail((d) => d && { ...d, row: data.row }); onRow(data.row);
       if (body.action === "searchAtlasListing") await load(); // pick up the live card for the newly linked listing
       return true;
     } catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); return false; }
@@ -152,6 +153,8 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
   const pending = record ? (Object.entries(record.steps).filter(([, s]) => s.state !== "done").map(([k]) => k)) : [];
   const problems = readinessProblems(row);
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
+  // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
+  const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));
   return <aside className="ob-panel" aria-label={`${row.name} onboarding`}>
     <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
@@ -185,6 +188,8 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
       <div className="ob-next"><input value={next.action} placeholder="What happens next, and who does it" disabled={!!busy} onChange={(e) => setNext({ ...next, action: e.target.value })} /><input type="date" value={next.due} disabled={!!busy} onChange={(e) => setNext({ ...next, due: e.target.value })} aria-label="Due date" /><button className="call-secondary" disabled={!!busy} onClick={() => patch({ action: "next", nextAction: next.action, due: next.due }, "next")}>Save</button></div>
       {row.overdue && <p className="ob-overdue">Overdue.</p>}
     </section>
+
+    {system === "ghl" && <TaskList contactId={row.id} tasks={detail.tasks} source="onboarding" onTasks={(tasks) => setDetail((d) => d && { ...d, tasks })} onVersion={keepVersion} />}
 
     <section className="ob-section"><h3>Client intake &amp; files</h3>
       <div className="ob-grid"><div><span>Status</span><b>{row.intake || "Not sent"}</b></div><div><span>Link</span><b>{intake?.linkActive ? `Active until ${intake.tokenExpiresAt?.slice(0, 10)}` : "None active"}</b></div><div><span>Submitted</span><b>{intake?.submittedAt ? intake.submittedAt.slice(0, 10) : "—"}</b></div><div><span>Files</span><b>{intake?.files.length || 0}</b></div></div>

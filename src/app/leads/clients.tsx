@@ -3,6 +3,7 @@
 import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotesTimeline, type DeskSystem } from "./notes";
+import { TaskList } from "./tasks";
 import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from "@/lib/clients/config";
 import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
@@ -136,7 +137,7 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
   const patch = async (body: Record<string, unknown>, label: string): Promise<boolean> => {
     if (!detail || busy) return false;
     setBusy(label); setError("");
-    try { const data: { row: ClientRow } = await json(await fetch(`/api/team/clients/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }), crm); setDetail({ ...detail, row: data.row }); onRow(data.row); if (body.action === "searchAtlasListing") await load(); return true; }
+    try { const data: { row: ClientRow } = await json(await fetch(`/api/team/clients/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, expectedUpdatedAt: detail.row.updatedAt }) }), crm); setDetail((d) => d && { ...d, row: data.row }); onRow(data.row); if (body.action === "searchAtlasListing") await load(); return true; }
     catch (e) { setError(e instanceof Error ? e.message : "Could not save."); if ((e as { status?: number }).status === 409) void load(); return false; }
     finally { setBusy(""); }
   };
@@ -176,10 +177,14 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
   // sends the stored name back unchanged, exactly what it sent before, so nothing is written; a name typed in saves as ever.
   const contactRepeats = sameName(row.name, row.contact);
   const saveContact = () => patch({ action: "contact", ...contact, contact: contact.contact || (contactRepeats ? row.contact : "") }, "contact");
+  // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
+  const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
     <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {row.flags.length > 0 && <div className="call-alert" role="status"><strong>Needs a look:</strong> {row.flags.map((f) => FLAG[f]).join(" · ")}</div>}
+
+    {system === "ghl" && <TaskList contactId={row.id} tasks={detail.tasks} source="client" onTasks={(tasks) => setDetail((d) => d && { ...d, tasks })} onVersion={keepVersion} />}
 
     <section className="ob-section"><h3>Billing {outsideStripe ? <small>Billed outside the desk{row.payMethod && ` · ${row.payMethod}`}</small> : stripeConnected ? <small>Stripe connected</small> : <small>Stripe not connected — add the restricted key in Vercel</small>}</h3>
       <div className="ob-grid">

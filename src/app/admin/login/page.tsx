@@ -73,7 +73,7 @@ function LoginCard() {
             >
                 <div style={{ marginBottom: "24px", textAlign: "center" }}>
                     <span style={{ display: "inline-block", fontSize: "11px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(42,156,241,0.8)", marginBottom: "6px" }}>
-                        Admin Access
+                        Back Office
                     </span>
                     <h1 style={{ fontSize: "20px", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
                         Control Panel
