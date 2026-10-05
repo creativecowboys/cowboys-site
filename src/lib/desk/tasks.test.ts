@@ -91,7 +91,8 @@ test("add a task: a native GoHighLevel task on the contact — stand-in date, no
   assert.equal(ghl.tasks[1].dueDate, "2026-10-09T21:00:00.000Z"); assert.equal(ghl.tasks[1].assignedTo, reps.Josh);
   assert.ok(!ghl.tasks[1].body!.includes("No due date"));
   assert.equal(r2.task?.assignee, "Josh"); assert.equal(r2.task?.due, "2026-10-09"); assert.equal(r2.task?.addedBy, "Madison", "Madison has no GoHighLevel user; the task still says who added it");
-  assert.equal(r2.tasks.items.length, 2);
+  assert.deepEqual(r2.tasks.items.map((t) => t.id), [r.task!.id, r2.task!.id], "oldest first, the order they were added (GoHighLevel lists newest first)");
+  assert.deepEqual((await listDeskTasks(LEAD)).items.map((t) => t.id), r2.tasks.items.map((t) => t.id), "a fresh read gives the same order");
 });
 
 test("a retry with the same reference finds the task instead of adding a second one", async () => {

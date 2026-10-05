@@ -35,7 +35,9 @@ export function toDeskTask(t: GhlTask): DeskTask {
     note: taskNote(body),
   };
 }
-const board = (items: GhlTask[]): DeskTasks => ({ items: items.map(toDeskTask), assignees: taskAssignees() });
+// GoHighLevel lists a contact's tasks newest first (seen live Oct 4 2026: seven tasks added in order came back in reverse).
+// The desk shows them oldest first, the order they were added; the panel then puts the dated ones ahead (src/lib/desk/task-text.ts).
+const board = (newestFirst: GhlTask[]): DeskTasks => ({ items: [...newestFirst].reverse().map(toDeskTask), assignees: taskAssignees() });
 /** `base` with whatever GoHighLevel answered laid over it — but a null or missing value in the answer never wipes a known one. */
 const overlay = (base: GhlTask, answer: GhlTask | null): GhlTask => ({ ...base, ...Object.fromEntries(Object.entries(answer || {}).filter(([, v]) => v !== null && v !== undefined)) }) as GhlTask;
 
@@ -96,7 +98,7 @@ export async function addDeskTask(contactId: string, input: TaskAdd, actor: Acto
       const sent = { title: input.title, body: formatTaskBody({ requestId: input.requestId, source: input.source, by: actor.name, addedOn: easternDay(), due: input.due }), dueDate: dueIsoFor(input.due), completed: false, ...(assignedTo ? { assignedTo } : {}) };
       task = overlay({ id: "", ...sent }, await createTask(contactId, sent)); // what GoHighLevel answers wins; what was sent fills any gap
     }
-    const items = prior ? existing : [...existing, task!];
+    const items = prior ? existing : [task!, ...existing]; // the new task is the newest
     return { tasks: board(items), task: task ? toDeskTask(task) : null, existed: !!prior, before: version(before), after: await versionAfter(contactId, before) };
   } finally { adding.delete(key); }
 }

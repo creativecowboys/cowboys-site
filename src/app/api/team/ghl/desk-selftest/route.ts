@@ -4,6 +4,7 @@ import { assertSameOrigin, CallDeskError, readCallBody } from "@/lib/calls/valid
 import { failure, teamHeaders, unauthorized } from "@/lib/onboarding/http";
 import { deskSelfTest } from "@/lib/desk/admin";
 import { deskTaskSelfTest } from "@/lib/desk/tasks";
+import { deskNoteSelfTest } from "@/lib/desk/notes";
 import { actorFor } from "@/lib/desk/team";
 
 export const runtime = "nodejs";
@@ -17,7 +18,8 @@ export const maxDuration = 120;
  * Run it after the field setup and before importing anything. It never touches a client.
  * { scope: "tasks", dryRun: false } (Oct 4 2026) proves the client task list instead, on the same test contact: adds, retries,
  * reads back, ticks off and reopens tasks, records what GoHighLevel does with a task that has no due date, and removes
- * every task it created (only those).
+ * every task it created (only those). { scope: "notes", dryRun: false } proves note delete there: adds a labelled note, deletes
+ * it the way the panel does, checks it is gone in GoHighLevel and that nothing else changed.
  */
 export async function POST(req: Request) {
   try {
@@ -31,8 +33,10 @@ export async function POST(req: Request) {
     // A typo must not run something else for real: only these two keys, and dryRun only as true or false.
     if (Object.keys(body).some((k) => k !== "dryRun" && k !== "scope")) throw new CallDeskError("Only dryRun and scope are accepted. Nothing was run.", 400);
     if (body.dryRun !== undefined && typeof body.dryRun !== "boolean") throw new CallDeskError("dryRun is true or false. Nothing was run.", 400);
-    if (body.scope !== undefined && body.scope !== "tasks") throw new CallDeskError("scope is either left out (the field self-test) or \"tasks\". Nothing was run.", 400);
-    const dryRun = body?.dryRun !== false;
-    return NextResponse.json(body?.scope === "tasks" ? await deskTaskSelfTest(dryRun, actorFor(session.email)) : await deskSelfTest(dryRun, actorFor(session.email)), { headers: teamHeaders });
+    if (body.scope !== undefined && body.scope !== "tasks" && body.scope !== "notes") throw new CallDeskError("scope is left out (the field self-test), \"tasks\" or \"notes\". Nothing was run.", 400);
+    const dryRun = body.dryRun !== false;
+    const actor = actorFor(session.email);
+    const report = body.scope === "tasks" ? await deskTaskSelfTest(dryRun, actor) : body.scope === "notes" ? await deskNoteSelfTest(dryRun, actor) : await deskSelfTest(dryRun, actor);
+    return NextResponse.json(report, { headers: teamHeaders });
   } catch (error) { return failure(error); }
 }

@@ -237,7 +237,8 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
       <button className="call-primary" disabled={!!busy || row.stage === "new" || row.stage === "collecting"} onClick={async () => { const r = await post("graduate", "graduate") as { id: string; created: boolean } | null; if (r) { await load(); onGraduated?.(r.id); } }}>{busy === "graduate" ? "Graduating…" : "Mark launched → Clients"}</button>
     </section>
 
-    <NotesTimeline history={history} busy={!!busy} system={system} onAdd={async (text, noteId) => { const ok = await patch(system === "ghl" ? { action: "note", text, noteId } : { action: "note", text }, "note"); if (ok) await load(); return ok; }} />
+    <NotesTimeline history={history} busy={!!busy} system={system} onAdd={async (text, noteId) => { const ok = await patch(system === "ghl" ? { action: "note", text, noteId } : { action: "note", text }, "note"); if (ok) await load(); return ok; }}
+      onDelete={system === "ghl" ? async (noteId) => { const ok = await patch({ action: "deleteNote", id: noteId }, "note-delete"); if (ok) await load(); return ok; } : undefined} />
   </aside>;
 }
 

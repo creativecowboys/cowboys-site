@@ -3,7 +3,7 @@ import { validatePatch, type PatchAction } from "@/lib/onboarding/validation";
 import { validateClientPatch } from "@/lib/clients/validation";
 import type { ClientPatch } from "@/lib/clients/board";
 import { CHECK_STATUS } from "@/lib/onboarding/config";
-import { isNoteId } from "./notes";
+import { isGhlNoteId, isNoteId } from "./notes";
 import { isTeamName } from "./team";
 import { isDueDay, isTaskRequestId, type TaskSource } from "./task-text";
 
@@ -53,11 +53,20 @@ function ownerOf(raw: Record<string, unknown>): string {
 }
 
 export type DeskNote = { action: "note"; text: string; noteId: string };
-export type DeskOnboardingPatch = (Exclude<PatchAction, { action: "note" }> | DeskNote) & { expectedUpdatedAt: string };
+/** Delete one note (Oct 4 2026). `id` is the GoHighLevel note id from the timeline. Like adding one, it needs no record version. */
+export type DeskNoteDelete = { action: "deleteNote"; id: string };
+function noteDeleteOf(raw: Record<string, unknown>): { id: string } {
+  only(raw, ["id"]);
+  const id = str(raw, "id", 80);
+  if (!isGhlNoteId(id)) throw bad("Invalid note. Reload and try again.");
+  return { id };
+}
+export type DeskOnboardingPatch = (Exclude<PatchAction, { action: "note" }> | DeskNote | DeskNoteDelete) & { expectedUpdatedAt: string };
 export function validateDeskPatch(input: unknown): DeskOnboardingPatch {
   const raw = object(input);
   const action = str(raw, "action", 20);
   if (action === "note") return { action, ...noteOf(raw), expectedUpdatedAt: versionOf(raw, false) }; // a note is append-only: no version needed
+  if (action === "deleteNote") return { action, ...noteDeleteOf(raw), expectedUpdatedAt: versionOf(raw, false) };
   if (action === "owner") return { action, ownerId: ownerOf(raw), expectedUpdatedAt: versionOf(raw, true) };
   if (action === "checklist") {
     only(raw, ["subitemId", "status"]);
@@ -70,11 +79,12 @@ export function validateDeskPatch(input: unknown): DeskOnboardingPatch {
 }
 
 export type DeskLegacy = { action: "legacy"; value: boolean };
-export type DeskClientPatch = (Exclude<ClientPatch, { action: "note" }> | DeskNote | DeskLegacy) & { expectedUpdatedAt: string };
+export type DeskClientPatch = (Exclude<ClientPatch, { action: "note" }> | DeskNote | DeskNoteDelete | DeskLegacy) & { expectedUpdatedAt: string };
 export function validateDeskClientPatch(input: unknown): DeskClientPatch {
   const raw = object(input);
   const action = str(raw, "action", 20);
   if (action === "note") return { action, ...noteOf(raw), expectedUpdatedAt: versionOf(raw, false) };
+  if (action === "deleteNote") return { action, ...noteDeleteOf(raw), expectedUpdatedAt: versionOf(raw, false) };
   if (action === "manager") return { action, ownerId: ownerOf(raw), expectedUpdatedAt: versionOf(raw, true) };
   if (action === "legacy") {
     only(raw, ["value"]);

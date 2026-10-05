@@ -219,3 +219,10 @@
 .ob-task-done .ob-task-list{margin-top:4px}
 @media(max-width:760px){.ob-task-add input,.ob-task-add select{font-size:16px}}
 @media(max-width:560px){.ob-task-add input[type="date"],.ob-task-add select{flex:1 1 40%}.ob-task-add button{flex:1 1 100%;margin-left:0}}
+
+/* Notes: a small Delete on each note (GoHighLevel desk, Oct 4 2026). It shares the look of a file's Remove button. */
+.ob-history-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ob-history-head small{min-width:0}
+.ob-note-delete{flex-shrink:0}
+.ob-note-delete:hover:not(:disabled){border-color:#a83a1c;color:#a83a1c}
+.ob-note-delete:disabled{opacity:.55;cursor:default}

@@ -233,6 +233,12 @@ export class FakeGhl {
         return json(201, { note });
       }
     }
+    if ((m = /^\/contacts\/([^/]+)\/notes\/([^/]+)$/.exec(path)) && method === "DELETE") {
+      const note = this.notes.find((n) => n.id === m![2] && n.contactId === m![1]);
+      if (!note) return json(400, { message: "Note not found" });
+      this.notes = this.notes.filter((n) => n !== note);
+      return json(200, { succeded: true });
+    }
     if ((m = /^\/contacts\/([^/]+)\/tags$/.exec(path))) {
       const c = this.contacts.get(m[1]);
       if (!c) return json(400, { message: "Contact with id not found" });
@@ -245,7 +251,8 @@ export class FakeGhl {
     }
     if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "GET") {
       if (!this.contacts.has(m[1])) return json(400, { message: "Contact with id not found" });
-      return json(200, { tasks: this.tasks.filter((t) => t.contactId === m![1]).map((t) => structuredClone(t)) });
+      // Newest first, the way the real API lists them (seen live Oct 4 2026).
+      return json(200, { tasks: this.tasks.filter((t) => t.contactId === m![1]).map((t) => structuredClone(t)).reverse() });
     }
     if ((m = /^\/contacts\/([^/]+)\/tasks$/.exec(path)) && method === "POST") {
       if (!this.contacts.has(m[1])) return json(400, { message: "Contact with id not found" });

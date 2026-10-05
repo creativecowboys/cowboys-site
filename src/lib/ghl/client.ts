@@ -157,6 +157,8 @@ export async function addNote(contactId: string, body: string, userId?: string):
   if (!r.note?.id) throw new CallDeskError("GoHighLevel did not confirm the note. It may already be saved — reload before retrying.", 502);
   return r.note;
 }
+/** Delete a contact note (contacts.write). Permanent: GoHighLevel keeps no copy. Called by deleteDeskNote (src/lib/desk/notes.ts) and by the note self-test's cleanup, nothing else. */
+export const deleteNote = (contactId: string, noteId: string) => ghl<{ succeded?: boolean; succeeded?: boolean }>("DELETE", `/contacts/${encodeURIComponent(contactId)}/notes/${encodeURIComponent(noteId)}`);
 export function addTask(contactId: string, title: string, body: string, dueInDays = 1, assignedTo?: string) {
   const dueDate = new Date(Date.now() + dueInDays * 86400000).toISOString();
   return ghl("POST", `/contacts/${encodeURIComponent(contactId)}/tasks`, { title, body, dueDate, completed: false, ...(assignedTo ? { assignedTo } : {}) });
