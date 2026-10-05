@@ -129,6 +129,11 @@ const city: CityData = {
     { label: "Carrollton", href: "/digital-marketing-carrollton-ga" },
     { label: "Douglasville", href: "/digital-marketing-douglasville-ga" },
   ],
+  relatedLinks: [
+    { label: "web design in Carrollton, GA", href: "/web-design-carrollton-ga" },
+    { label: "web design in Villa Rica, GA", href: "/web-design-villa-rica-ga" },
+    { label: "web design in Douglasville, GA", href: "/web-design-douglasville-ga" },
+  ],
 };
 
 const serviceSchema = {

@@ -463,6 +463,13 @@ export default function CarrolltonClient() {
             When you hire Creative Cowboys, you work directly with the team doing the work — Josh and Dave — not a salesperson who hands you off.{" "}
             <Link href="/results" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">See our results for real West Georgia clients →</Link>
           </p>
+          <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 leading-relaxed">
+            Need the website first? See our{" "}
+            <Link href="/web-design-carrollton-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+              web design in Carrollton, GA
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
@@ -706,6 +713,7 @@ export default function CarrolltonClient() {
             <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-[#F2EBDA]/70">
               <Link href="/seo" className="hover:text-[#B5330E] transition-colors">SEO Programs</Link>
               <Link href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</Link>
+              <Link href="/web-design-carrollton-ga" className="hover:text-[#B5330E] transition-colors">Web Design in Carrollton, GA</Link>
               <Link href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
               <Link href="/digital-marketing-villa-rica-ga" className="hover:text-[#B5330E] transition-colors">Villa Rica</Link>
               <Link href="/digital-marketing-douglasville-ga" className="hover:text-[#B5330E] transition-colors">Douglasville</Link>

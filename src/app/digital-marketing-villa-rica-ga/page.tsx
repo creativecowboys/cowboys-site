@@ -129,6 +129,9 @@ const city: CityData = {
     { label: "Douglasville", href: "/digital-marketing-douglasville-ga" },
     { label: "Newnan", href: "/digital-marketing-newnan-ga" },
   ],
+  relatedLinks: [
+    { label: "web design in Villa Rica, GA", href: "/web-design-villa-rica-ga" },
+  ],
 };
 
 const serviceSchema = {
