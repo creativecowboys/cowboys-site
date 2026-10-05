@@ -238,7 +238,8 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
     </section>
 
     <NotesTimeline history={history} busy={!!busy} system={system} onAdd={async (text, noteId) => { const ok = await patch(system === "ghl" ? { action: "note", text, noteId } : { action: "note", text }, "note"); if (ok) await load(); return ok; }}
-      onDelete={system === "ghl" ? async (noteId) => { const ok = await patch({ action: "deleteNote", id: noteId }, "note-delete"); if (ok) await load(); return ok; } : undefined} />
+      onDelete={system === "ghl" ? async (noteId) => { const ok = await patch({ action: "deleteNote", id: noteId }, "note-delete"); if (ok) await load(); return ok; } : undefined}
+      onEdit={system === "ghl" ? async (noteId, text) => { const ok = await patch({ action: "editNote", id: noteId, text }, "note-edit"); if (ok) await load(); return ok; } : undefined} />
   </aside>;
 }
 

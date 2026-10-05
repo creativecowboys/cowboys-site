@@ -233,6 +233,12 @@ export class FakeGhl {
         return json(201, { note });
       }
     }
+    if ((m = /^\/contacts\/([^/]+)\/notes\/([^/]+)$/.exec(path)) && method === "PUT") {
+      const note = this.notes.find((n) => n.id === m![2] && n.contactId === m![1]);
+      if (!note) return json(400, { message: "Note not found" });
+      if (typeof body?.body === "string") note.body = body.body; // author (userId) and dateAdded stay as they were
+      return json(200, { note: structuredClone(note) });
+    }
     if ((m = /^\/contacts\/([^/]+)\/notes\/([^/]+)$/.exec(path)) && method === "DELETE") {
       const note = this.notes.find((n) => n.id === m![2] && n.contactId === m![1]);
       if (!note) return json(400, { message: "Note not found" });

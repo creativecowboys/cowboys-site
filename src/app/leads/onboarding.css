@@ -220,9 +220,16 @@
 @media(max-width:760px){.ob-task-add input,.ob-task-add select{font-size:16px}}
 @media(max-width:560px){.ob-task-add input[type="date"],.ob-task-add select{flex:1 1 40%}.ob-task-add button{flex:1 1 100%;margin-left:0}}
 
-/* Notes: a small Delete on each note (GoHighLevel desk, Oct 4 2026). It shares the look of a file's Remove button. */
-.ob-history-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+/* Notes (GoHighLevel desk, Oct 4 2026): Edit and Delete as small text controls at the far right of each note's header line,
+   Delete last and set apart from Edit (Delete is immediate, so it should take a deliberate aim). Edit opens the text in a box. */
+.ob-history-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .ob-history-head small{min-width:0}
-.ob-note-delete{flex-shrink:0}
-.ob-note-delete:hover:not(:disabled){border-color:#a83a1c;color:#a83a1c}
-.ob-note-delete:disabled{opacity:.55;cursor:default}
+.ob-note-actions{display:flex;align-items:baseline;gap:20px;flex-shrink:0}
+.ob-note-action{background:none;border:0;padding:2px 0;font-size:11px;line-height:1.3;color:#9a7051;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.ob-note-action:hover:not(:disabled){color:#1f1a17}
+.ob-note-delete:hover:not(:disabled){color:#a83a1c}
+.ob-note-action:disabled{opacity:.5;cursor:default}
+.ob-note-edited{color:#9a7051}
+.ob-note-edit textarea{width:100%;margin-top:6px;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:8px 10px;font-size:13px;line-height:1.5;color:#1f1a17;resize:vertical}
+.ob-note-edit .ob-buttons{align-items:center;gap:16px;margin-top:8px}
+@media(max-width:760px){.ob-note-edit textarea{font-size:16px}}

@@ -14,7 +14,7 @@ import { gbpCard, listLocations, searchAtlasConnected } from "@/lib/gbp/searchat
 import type { GbpCard } from "@/lib/gbp/types";
 import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, type StoredItem } from "./checklist-text";
 import { assertOption, DESK_TAGS, deskList, deskText, type DeskFields } from "./fields";
-import { addDeskNote, deleteDeskNote, toTimeline } from "./notes";
+import { addDeskNote, deleteDeskNote, editDeskNote, toTimeline } from "./notes";
 import { tasksFor } from "./tasks";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, hasTag, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageIdForLabel, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
 import { isGhlRecordId } from "./switch";
@@ -131,7 +131,7 @@ export async function patchOnboardingGhl(rawId: string, patch: DeskOnboardingPat
   const f = await allDeskFields();
   const contact = await onboardingContact(rawId, f);
   const id = contact.id;
-  if (patch.action !== "note" && patch.action !== "deleteNote" && version(contact) !== patch.expectedUpdatedAt) throw new CallDeskError(STALE, 409);
+  if (!["note", "deleteNote", "editNote"].includes(patch.action) && version(contact) !== patch.expectedUpdatedAt) throw new CallDeskError(STALE, 409);
   const before = mapOnboarding(contact, f);
   const touch: DeskValues = { lastTouch: todayEastern() };
   switch (patch.action) {
@@ -176,6 +176,7 @@ export async function patchOnboardingGhl(rawId: string, patch: DeskOnboardingPat
     case "next": await writeRecord(id, f, { ...touch, nextAction: patch.nextAction, nextDue: patch.due }); break;
     case "intakeReviewed": await writeRecord(id, f, { ...touch, intake: "Reviewed" }); break;
     case "deleteNote": await deleteDeskNote(id, patch.id); break; // changes no field: the record's own values are untouched
+    case "editNote": await editDeskNote(id, patch.id, patch.text, actor); break;
     case "note": {
       await addDeskNote(id, { text: patch.text, noteId: patch.noteId || crypto.randomUUID(), source: "onboarding", actor });
       await writeRecord(id, f, touch).catch((e) => console.error(`desk note: last-touch stamp failed for ${id}: ${e instanceof Error ? e.message : e}`)); // the note is saved; the stamp is advisory

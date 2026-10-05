@@ -11,7 +11,7 @@ import { gbpCard, listLocations, searchAtlasConnected } from "@/lib/gbp/searchat
 import type { GbpCard } from "@/lib/gbp/types";
 import { assertOption, type DeskFields } from "./fields";
 import { stripeFollowed } from "./legacy";
-import { addDeskNote, deleteDeskNote, toTimeline } from "./notes";
+import { addDeskNote, deleteDeskNote, editDeskNote, toTimeline } from "./notes";
 import { tasksFor } from "./tasks";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, isClientRecord, listRecords, mapClient, readContact, resolveRecordId, stillOnboarding, version, writeRecord, type DeskValues } from "./record";
 import { memberByName, teamOwners, type Actor } from "./team";
@@ -126,7 +126,7 @@ export async function patchClientGhl(rawId: string, patch: DeskClientPatch, acto
   const id = contact.id;
   // Whether a client is "legacy" decides what the tab flags for it, so only an owner changes it (checked before anything is read as stale or written).
   if (patch.action === "legacy" && !opts.owner) throw new CallDeskError("Only an owner can change whether a client is a legacy client.", 403);
-  if (patch.action !== "note" && patch.action !== "deleteNote" && version(contact) !== patch.expectedUpdatedAt) throw new CallDeskError(STALE, 409);
+  if (!["note", "deleteNote", "editNote"].includes(patch.action) && version(contact) !== patch.expectedUpdatedAt) throw new CallDeskError(STALE, 409);
   const before = mapClient(contact, f);
   const today = todayEastern();
   const write = (values: DeskValues) => writeRecord(id, f, values);
@@ -164,7 +164,9 @@ export async function patchClientGhl(rawId: string, patch: DeskClientPatch, acto
       break;
     }
     case "note": await addDeskNote(id, { text: patch.text, noteId: patch.noteId || crypto.randomUUID(), source: "client", actor }); break;
-    case "deleteNote": await deleteDeskNote(id, patch.id); break;
+    // Billing notes are owners-only on this tab (clientDetailGhl hides them from everyone else), so are changing and deleting them.
+    case "deleteNote": await deleteDeskNote(id, patch.id, { mayTouchBilling: !!opts.owner }); break;
+    case "editNote": await editDeskNote(id, patch.id, patch.text, actor, { mayTouchBilling: !!opts.owner }); break;
     // Always an explicit Yes or No — never a blank — so a later re-import of the old board (which marks blank rows only) leaves an owner's choice alone.
     case "legacy": { const value = patch.value ? "Yes" : "No"; assertOption(f, "legacy", value); await write({ legacy: value }); break; }
   }

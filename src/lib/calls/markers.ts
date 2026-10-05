@@ -22,6 +22,7 @@ export function readableHistory(text: string): string {
     .replace(/\[CC-HANDOFF(?:-SUMMARY)?:[^\]]+\]/g, "")
     .replace(/\[CC-MONDAY-UPDATE:[^\]]+\]/g, "")
     // Notes written from the Onboarding / Clients tabs (src/lib/desk/notes.ts) share the contact with the Sales tab.
-    .replace(/\[CC-(?:NOTE|SRC|BY):[^\]\n]*\]/g, "")
+    // A note changed from the desk also carries [CC-KIND] and [CC-EDITED] (src/lib/desk/notes.ts editDeskNote).
+    .replace(/\[CC-(?:NOTE|SRC|BY|KIND|EDITED):[^\]\n]*\]/g, "")
     .trim();
 }

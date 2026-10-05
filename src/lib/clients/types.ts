@@ -26,4 +26,4 @@ export type StripeSnapshot = {
   fetchedAt: string;
 };
 export type ClientFile = { key: string; name: string; size: number; category: string; uploadedAt: string };
-export type ClientDetail = { fileScope: string; files: ClientFile[]; row: ClientRow; history: { id: string; text: string; createdAt: string; author: string; source?: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean; gbpLocations: GbpLocationSummary[]; searchAtlasConnected: boolean; system?: "monday" | "ghl"; tasks?: DeskTasks /* GoHighLevel desk only: the client's running task list */ };
+export type ClientDetail = { fileScope: string; files: ClientFile[]; row: ClientRow; history: { id: string; text: string; createdAt: string; author: string; source?: string; edited?: string; editedBy?: string }[]; stripe: StripeSnapshot | null; stripeConnected: boolean; owners: { id: string; name: string }[]; canSeeMoney: boolean; gbpLocations: GbpLocationSummary[]; searchAtlasConnected: boolean; system?: "monday" | "ghl"; tasks?: DeskTasks /* GoHighLevel desk only: the client's running task list */ };

@@ -69,7 +69,7 @@ export type OnboardingRow = {
 export type OnboardingListData = { rows: OnboardingRow[]; cursor: string | null; boardName: string; system?: "monday" | "ghl"; systemName?: string };
 export type OnboardingDetail = {
   row: OnboardingRow;
-  history: { id: string; text: string; createdAt: string; author: string; source?: string }[]; // source: where a note came from (GoHighLevel desk only)
+  history: { id: string; text: string; createdAt: string; author: string; source?: string; edited?: string; editedBy?: string }[]; // source: where a note came from; edited: when it was last changed on the desk (GoHighLevel desk only)
   record: HandoffRecord | null;
   intake: (Omit<IntakeRecord, "tokenHash"> & { linkActive: boolean }) | null;
   owners: { id: string; name: string }[];

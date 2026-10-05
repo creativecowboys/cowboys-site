@@ -165,15 +165,23 @@ client group — Active, Payment issue, At risk, Paused, Churned. A note is idem
 a dropped connection finds the note instead of posting it twice) and needs no record version. Markers
 (`[CC-NOTE:…] [CC-SRC:…] [CC-BY:…]`) are stripped before anyone sees the text, on the Sales tab too.
 
-**Deleting a note (October 4, 2026).** Each note on the GoHighLevel desk has a small **Delete** at the right of its header
-line. It asks "Delete this note?" first, then deletes the note in GoHighLevel itself (`DELETE /contacts/{id}/notes/{noteId}`),
-so it is gone from the contact there too, not just hidden. It is permanent: GoHighLevel keeps no copy. Who may: the same
-people who may add a note (everyone on the team now the desk is on GoHighLevel). Any note on the contact can be deleted —
-the desk's own, a sales call note, the handoff summary, an imported Monday update, one typed in GoHighLevel. Only a note
-that is on THIS contact can be deleted through its panel, and the contact's notes are read back afterwards: a note
-GoHighLevel kept is an error, never shown as deleted. Request: `PATCH /api/team/onboarding/<id>` or
-`/api/team/clients/<id>` with `{ "action": "deleteNote", "id": "<note id>" }` (no record version needed, like adding one).
-Code: `deleteDeskNote` in `src/lib/desk/notes.ts`; the button in `src/app/leads/notes.tsx`.
+**Changing and deleting a note (October 4, 2026).** Dave: notes must be editable, and deleting one is one click. Each note
+on the GoHighLevel desk has two small text controls at the far right of its header line, **Edit** then **Delete**, set apart.
+- **Edit** turns the text into a box with **Save** and **Cancel**. Save sends the new text to GoHighLevel
+  (`PUT /contacts/{id}/notes/{noteId}`, the body only), so the note keeps its author and its date there; the timeline shows
+  "· edited" (hover for when and by whom). Every marker the note carried is kept (a sales call's `[CC-CALL]`, a desk
+  note's `[CC-NOTE]`…), plus `[CC-KIND:<label>]` (what it was: an edit never changes its label, so an edited billing note
+  stays owners-only) and `[CC-EDITED:<when>|<name>]`. Saving the same text writes nothing. The note is read back: a change
+  GoHighLevel did not keep is an error. The Sales tab strips the two new markers as well.
+- **Delete** deletes the note at once, no question asked (Dave's call), in GoHighLevel itself
+  (`DELETE /contacts/{id}/notes/{noteId}`), so it is gone there too. Permanent: GoHighLevel keeps no copy. The notes are
+  read back afterwards: a note GoHighLevel kept is an error, never shown as deleted.
+- Who may: the same people who may add a note (everyone on the team now the desk is on GoHighLevel), on any note on the
+  contact. One exception: on the Clients tab, billing notes (the package builder's) are shown to owners only, and only an
+  owner can change or delete one. Only a note that is on THIS contact can be touched through its panel.
+- Requests: `PATCH /api/team/onboarding/<id>` or `/api/team/clients/<id>` with `{ "action": "editNote", "id", "text" }` or
+  `{ "action": "deleteNote", "id" }` (no record version needed, like adding one). Code: `editDeskNote` and
+  `deleteDeskNote` in `src/lib/desk/notes.ts`; the controls in `src/app/leads/notes.tsx`.
 
 ## Tasks (October 4, 2026)
 Dave: "we need a running task list for each client, while onboarding. something we can add to.. like now, i have to ask
@@ -235,9 +243,10 @@ the flags) have a **Tasks** section, laid out like Notes.
   version moved (`version`), then removes every task the run created and only those (`cleanup`; a task that was on the
   test contact before the run is never removed, whatever an answer says). Unknown body keys are refused, so a typo never
   runs the field self-test for real.
-- `POST /api/team/ghl/desk-selftest` `{ "scope": "notes", "dryRun": false }` → note delete on the test contact: adds one
-  labelled note, deletes it the way the panel does, checks it is gone in GoHighLevel and that every other note is still
-  there, and that deleting it again is refused. A note it could not delete is removed at the end.
+- `POST /api/team/ghl/desk-selftest` `{ "scope": "notes", "dryRun": false }` → note edit and delete on the test contact:
+  adds one labelled note, changes its text the way the panel does (new text, same author and date, marked edited),
+  deletes it (gone in GoHighLevel, every other note still there), and checks that deleting it again is refused. A note it
+  could not delete is removed at the end.
 - `POST /api/team/ghl/desk-migrate` → the two Monday boards to GoHighLevel. Body: `dryRun` (default true), `onlyIds`
   (Monday item ids, for a one-row trial), `offset` / `limit`, `force` (re-write a row already imported), `map`
   (`{ "<monday item id>": "<contact id>" }` to pin a row), `boards` (`["onboarding"]` / `["clients"]`), `includeOffDesk`
@@ -551,7 +560,7 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`, `/api/team/tasks/[id]` (Oct 4).
 - UI: `src/app/leads/notes.tsx` (the timeline), `tasks.tsx` (the task list), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (147 since the task list and note delete) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (149 since the task list and note edit/delete) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.
