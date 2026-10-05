@@ -61,6 +61,8 @@ export type CityData = {
   footerLocation: string;
   /** other city cross-links in the footer */
   otherCities: CityLink[];
+  /** Web design city pages to surface in the body and footer. */
+  relatedLinks?: CityLink[];
 };
 
 /* ─── Generic (city-agnostic) content ───────────────────────────── */
@@ -418,6 +420,32 @@ export default function CityLandingClient({ city }: { city: CityData }) {
               )}
             </p>
           ))}
+          {city.relatedLinks && city.relatedLinks.length > 0 ? (
+            <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 leading-relaxed">
+              {city.relatedLinks.length === 1 ? (
+                <>
+                  Need the website first? See our{" "}
+                  <Link href={city.relatedLinks[0].href} className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+                    {city.relatedLinks[0].label}
+                  </Link>
+                  .
+                </>
+              ) : (
+                <>
+                  Web design in nearby West Georgia cities:{" "}
+                  {city.relatedLinks.map((link, i, links) => (
+                    <span key={link.href}>
+                      {i > 0 && (i === links.length - 1 ? ", and " : ", ")}
+                      <Link href={link.href} className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+                        {link.label}
+                      </Link>
+                    </span>
+                  ))}
+                  .
+                </>
+              )}
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -661,6 +689,9 @@ export default function CityLandingClient({ city }: { city: CityData }) {
             <div className="flex flex-col gap-2 font-bold text-xs uppercase tracking-widest text-[#F2EBDA]/70">
               <Link href="/seo" className="hover:text-[#B5330E] transition-colors">SEO Programs</Link>
               <Link href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</Link>
+              {city.relatedLinks?.map((link) => (
+                <Link key={link.href} href={link.href} className="hover:text-[#B5330E] transition-colors">{link.label}</Link>
+              ))}
               <Link href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
               {city.otherCities.map((c) => (
                 <Link key={c.href} href={c.href} className="hover:text-[#B5330E] transition-colors">{c.label}</Link>

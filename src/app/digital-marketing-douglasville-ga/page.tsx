@@ -129,6 +129,9 @@ const city: CityData = {
     { label: "Carrollton", href: "/digital-marketing-carrollton-ga" },
     { label: "Newnan", href: "/digital-marketing-newnan-ga" },
   ],
+  relatedLinks: [
+    { label: "web design in Douglasville, GA", href: "/web-design-douglasville-ga" },
+  ],
 };
 
 const serviceSchema = {

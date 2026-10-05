@@ -141,7 +141,11 @@ export default function WebDesignPage() {
               Your website shouldn't just look pretty. It should generate leads, close sales, and move your business forward.
             </p>
             <p className="font-inter text-xs md:text-sm text-[#5a5a5a]/80 leading-relaxed max-w-lg mb-8">
-              We build high-performance, revenue-generating websites for brands serious about growth — serving Villa Rica, Carrollton, Douglasville, and the Southeast.
+              We build high-performance, revenue-generating websites for brands serious about growth — serving{" "}
+              <Link href="/web-design-villa-rica-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/40">Villa Rica</Link>,{" "}
+              <Link href="/web-design-carrollton-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/40">Carrollton</Link>,{" "}
+              <Link href="/web-design-douglasville-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/40">Douglasville</Link>
+              , and the Southeast.
             </p>
             
             {/* CTAs */}
@@ -454,6 +458,50 @@ export default function WebDesignPage() {
                 <div className="font-anton text-base text-[#0a0a0a] tracking-wide mb-2 uppercase">{tag.title}</div>
                 <div className="font-inter text-xs text-[#5a5a5a] leading-relaxed">{tag.desc}</div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WEST GEORGIA CITY PAGES */}
+      <section className="py-20 md:py-28 px-6 md:px-12 bg-[#F2EBDA] border-b-[2.5px] border-[#0a0a0a]" id="cities">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-left mb-12">
+            <div className="font-anton text-xs text-[#B5330E] tracking-[2.5px] uppercase mb-3">— WEST GEORGIA —</div>
+            <h2 className="font-anton text-4xl sm:text-5xl md:text-[52px] leading-[0.92] text-[#0a0a0a] uppercase max-w-xl">
+              WEB DESIGN IN<br />
+              <span className="text-[#B5330E]">YOUR TOWN</span>.
+            </h2>
+            <p className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed max-w-xl mt-4">
+              The practice above covers the Southeast. These pages are the local version: what a site has to do in each West Georgia city, and what it costs.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                city: "Carrollton, GA",
+                href: "/web-design-carrollton-ga",
+                blurb: "County seat, University of West Georgia, Tanner, and Adamson Square. About 15 minutes from our Villa Rica office.",
+              },
+              {
+                city: "Villa Rica, GA",
+                href: "/web-design-villa-rica-ga",
+                blurb: "Our hometown. Downtown, The Mill, Mirror Lake, and the I-20 county line between Carroll and Douglas.",
+              },
+              {
+                city: "Douglasville, GA",
+                href: "/web-design-douglasville-ga",
+                blurb: "Douglas County on I-20: Arbor Place, Chapel Hill, downtown, and Lithia Springs. About 20 minutes from the office.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group border-[2.5px] border-[#0a0a0a] bg-white p-6 md:p-8 shadow-[4px_4px_0px_#0a0a0a] flex flex-col gap-3 hover:bg-[#F5C842] transition-colors"
+              >
+                <span className="font-anton text-2xl uppercase text-[#0a0a0a]">Web design {item.city}</span>
+                <span className="font-inter text-sm text-[#5a5a5a] leading-relaxed group-hover:text-[#0a0a0a]">{item.blurb}</span>
+              </Link>
             ))}
           </div>
         </div>
