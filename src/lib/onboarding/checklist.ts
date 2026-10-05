@@ -82,6 +82,7 @@ export function isRequiredName(name: string, packages: string[]): boolean {
   return checklistFor(packages).some((t) => t.name === name && t.required);
 }
 
+/** No longer gates anything (Oct 4 2026: Dave dropped the readiness gate from the "Ready for production?" step). Kept for its tests and as a record of the old rule. */
 export function readinessProblems(row: { checklist: ChecklistItem[]; gbpAccess: string; agreement: string; payment: string; intake: string; packages: string }): string[] {
   const problems = missingRequired(row.checklist).map((n) => `Checklist: ${n}`);
   const packages = row.packages.split(",").map((s) => s.trim()).filter(Boolean);

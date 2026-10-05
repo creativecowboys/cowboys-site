@@ -269,18 +269,17 @@ test("a checklist GoHighLevel did not keep whole is an error, never a quiet loss
   await assert.rejects(patch({ action: "checklist", subitemId: row.checklist[0].id, status: "Done" }), (e: Error & { status?: number }) => e.status === 502 && /kept \d+ of \d+ checklist rows/.test(e.message));
 });
 
-test("ready for production is refused with the reasons until everything required is done, then moves the stage", async () => {
+test("ready for production is the team's call: no checklist or blocker gate, the stage moves whatever is open (Oct 4 2026)", async () => {
   addLead(ghl);
   await startOnboardingGhl(validateHandoff(handoffForm(ghl)), ctx);
-  await assert.rejects(patch({ action: "ready" }), (e: Error & { status?: number }) => e.status === 409 && /Checklist: Intake link delivered to client/.test(e.message) && /GBP access is not verified by staff/.test(e.message) && /Agreement is Pending/.test(e.message) && /Payment is Pending/.test(e.message) && /Client intake has not been submitted/.test(e.message));
-  await assert.rejects(patch({ action: "stage", stage: "ready" }), { status: 409 });
-  let row = (await onboardingDetailGhl(LEAD)).row;
-  for (const item of row.checklist.filter((c) => c.required)) row = await patch({ action: "checklist", subitemId: item.id, status: "Done" });
-  await patch({ action: "gbp", value: "Verified" }); await patch({ action: "agreement", value: "Signed" }); await patch({ action: "payment", value: "Paid" });
-  await patch({ action: "intakeReviewed" });
-  row = await patch({ action: "ready" });
+  const open = (await onboardingDetailGhl(LEAD)).row;
+  assert.ok(open.missing.length > 0 && open.gbpAccess !== "Verified" && open.intake !== "Reviewed", "the old gate would have refused this record");
+  let row = await patch({ action: "ready" });
   assert.equal(row.stage, "ready"); assert.equal(row.health, "On Track"); assert.equal(row.profileComplete, true);
   assert.equal(ghl.value(LEAD, "Desk Profile Complete"), "Yes"); assert.equal(ghl.value(LEAD, "LSE Profile Complete"), undefined, "the LSE gate (which emails the client) is never set by the desk");
+  // The stage select reaches the same place without the gate too.
+  row = await patch({ action: "stage", stage: "collecting" }); assert.equal(row.stage, "collecting");
+  row = await patch({ action: "stage", stage: "ready" }); assert.equal(row.stage, "ready");
 });
 
 test("graduation: the same contact becomes a client; pressing twice changes nothing; one place at a time", async () => {

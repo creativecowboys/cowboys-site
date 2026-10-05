@@ -48,11 +48,15 @@ stalled), overdue and incomplete first. Clicking a row opens the client panel: w
 assignment (Onboarding Owner separate from Sales Owner), stage, health, agreement and payment, next action with due
 date, **intake link** (issue / copy once / revoke; 45-day expiry), what the client filled in and their files
 (downloadable), GBP access state, DNS path, the checklist with required rows flagged, **Mark ready for production**
-(refused with the list of problems until every required item is done), and append-only notes.
+(since October 4, 2026 always available: see Readiness), and notes.
 
-**Readiness** is a staff decision. Required checklist rows must be Done; for SEO packages GBP must be `Verified` or
-`No GBP Exists`; agreement must be Signed / Not required; payment Deposit paid / Paid; intake Client submitted /
-Reviewed. "Instructions sent" and "client says they invited us" are recorded separately and never count as access.
+**Readiness** is the team's call. Until October 4, 2026 the button (and the stage select) refused "Ready for production"
+until required checklist rows were Done, GBP was verified for SEO packages, the agreement was Signed / Not required,
+payment was Deposit paid / Paid and the intake was submitted. Dave dropped that gate: the "Ready for production?" section
+is now only the button, it works whatever is still open, and neither server (GoHighLevel or Monday) checks those things
+any more. Pressing it still moves the stage to Ready for production, ticks Desk Profile Complete and sets health On
+Track. `readinessProblems()` in `checklist.ts` is kept (with its tests) as a record of the old rule; nothing calls it.
+What used to be the gate now lives on each client's Tasks list as starter tasks (see `Docs/Desk-on-GHL.md`, "Tasks").
 
 ## Client intake — `/onboarding/<token>`
 Issued from the client panel. The token is 32 random bytes; only its SHA-256 lives in storage; it expires after 45
@@ -96,8 +100,7 @@ existing `npm run test:call-owner`. Neither touches Monday or Blob.
 ## Open decisions (carried from the brief, not blocking the build)
 1. Madison's Monday seat (Josh invites → `ONBOARDING_EXTRA_OWNERS`).
 2. Which address clients invite on GBP (`GBP_AGENCY_EMAIL`, default howdy@).
-3. Commercial gate: today readiness requires agreement Signed/Not required **and** payment Deposit/Paid. Loosen or
-   tighten in `readinessProblems()` once Dave and Josh settle it.
+3. ~~Commercial gate~~ — settled Oct 4, 2026: no readiness gate at all (see Readiness).
 4. Final package prices/scope per package — checklist templates are editable in `checklist.ts`.
 5. Shared staff login stays; the rep on a handoff is self-reported.
 6. Optional later: mirror client files to a Google shared drive / Dropbox folder and fill `Drive Folder`.

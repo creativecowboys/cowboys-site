@@ -3,7 +3,7 @@ import { CallDeskError, GHL_ID, MONDAY_ID } from "@/lib/calls/validation";
 import { ghlContactUrl } from "@/lib/ghl/links";
 import { escapeHtml, monday, mondayToken, todayEastern } from "./api";
 import { COL, GIVEAWAY_BOARD_ID, MONDAY_ORIGIN, PAYMENT_NO_CHARGE, PIPELINE_BOARD_ID, isGiveawayWinner, PIPELINE_CHECKLIST_BOARD_ID, STAGES, SUBITEM_COL, TEMPLATE_GROUP_ID, onboardingOwners, stageForGroup, STAFF } from "./config";
-import { checklistFor, isRequiredName, missingRequired, readinessProblems } from "./checklist";
+import { checklistFor, isRequiredName, missingRequired } from "./checklist";
 import type { ChecklistItem, HandoffForm, OnboardingListData, OnboardingRow } from "./types";
 import type { PatchAction } from "./validation";
 import { accessFromCard, parseListingId } from "@/lib/gbp/state";
@@ -255,17 +255,13 @@ export async function applyPatch(itemId: string, patch: PatchAction & { expected
   const touch = { [COL.lastTouch]: { date: todayEastern() } };
   switch (patch.action) {
     case "stage": {
-      if (patch.stage === "ready") {
-        const problems = readinessProblems(before);
-        if (problems.length) throw new CallDeskError(`Not ready for production yet: ${problems.join("; ")}.`, 409);
-        await setColumns(itemId, { ...touch, [COL.profileComplete]: { checked: "true" } });
-      } else await setColumns(itemId, touch);
+      // No readiness gate (Dave, Oct 4 2026): marking a client ready for production is the team's call. Same on GoHighLevel.
+      if (patch.stage === "ready") await setColumns(itemId, { ...touch, [COL.profileComplete]: { checked: "true" } });
+      else await setColumns(itemId, touch);
       await monday("mutation OnboardingStage($id: ID!, $group: String!) { move_item_to_group(item_id: $id, group_id: $group) { id } }", { id: itemId, group: STAGES.find((s) => s.id === patch.stage)!.group });
       break;
     }
     case "ready": {
-      const problems = readinessProblems(before);
-      if (problems.length) throw new CallDeskError(`Not ready for production yet: ${problems.join("; ")}.`, 409);
       await setColumns(itemId, { ...touch, [COL.profileComplete]: { checked: "true" }, [COL.health]: { label: "On Track" } });
       await monday("mutation OnboardingReady($id: ID!, $group: String!) { move_item_to_group(item_id: $id, group_id: $group) { id } }", { id: itemId, group: STAGES.find((s) => s.id === "ready")!.group });
       break;

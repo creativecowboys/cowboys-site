@@ -4,7 +4,6 @@ import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, PAYMENT_NO_CHARGE, STAGES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
-import { readinessProblems } from "@/lib/onboarding/checklist";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
 import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
@@ -151,7 +150,6 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
   const { row, record, intake, owners, history } = detail;
   const pending = record ? (Object.entries(record.steps).filter(([, s]) => s.state !== "done").map(([k]) => k)) : [];
-  const problems = readinessProblems(row);
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
   // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
   const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));
@@ -226,10 +224,9 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
       {!row.checklist.length && <p className="call-muted">No checklist rows on this record.</p>}
     </section>
 
+    {/* Ready for production (Dave, Oct 4 2026): the team's call, with no checklist or blocker list in front of it. */}
     <section className="ob-section"><h3>Ready for production?</h3>
-      {problems.length ? <ul className="ob-problems">{problems.map((p) => <li key={p}>{p}</li>)}</ul> : <p className="ob-ok">All required items are complete.</p>}
-      <button className="call-primary" disabled={!!busy || problems.length > 0 || row.stage === "ready" || row.stage === "building" || row.stage === "launched"} onClick={() => patch({ action: "ready" }, "ready")}>Mark ready for production</button>
-      <p className="call-muted ob-hint">This is a staff decision. Sending a link or a client saying they invited us never counts by itself.</p>
+      <button className="call-primary" disabled={!!busy || row.stage === "ready" || row.stage === "building" || row.stage === "launched"} onClick={() => patch({ action: "ready" }, "ready")}>Mark ready for production</button>
     </section>
 
     <section className="ob-section"><h3>Launch</h3>

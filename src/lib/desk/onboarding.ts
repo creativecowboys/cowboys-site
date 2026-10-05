@@ -4,7 +4,6 @@ import { handoffMarker } from "@/lib/calls/markers";
 import { addNote, contactUrl, createContact, fieldText, GhlError, ghlLocationId, listContacts, listNotes, normalizePhone, type GhlContact } from "@/lib/ghl/client";
 import { salesFields } from "@/lib/ghl/fields";
 import { todayEastern } from "@/lib/onboarding/api";
-import { readinessProblems } from "@/lib/onboarding/checklist";
 import { PAYMENT_NO_CHARGE, isGiveawayWinner } from "@/lib/onboarding/config";
 import { emptyIntake, pendingSteps, recordKey } from "@/lib/onboarding/handoff";
 import { readHandoff, readIntake, writeHandoff, writeIntake } from "@/lib/onboarding/store";
@@ -135,20 +134,14 @@ export async function patchOnboardingGhl(rawId: string, patch: DeskOnboardingPat
   const before = mapOnboarding(contact, f);
   const touch: DeskValues = { lastTouch: todayEastern() };
   switch (patch.action) {
+    // "Ready for production" is the team's call (Dave, Oct 4 2026): no checklist, access, agreement, payment or intake gate,
+    // here or in the panel. The stage, Desk Profile Complete and (for the button) health On Track are written as before.
     case "stage": {
-      if (patch.stage === "ready") {
-        const problems = readinessProblems(before);
-        if (problems.length) throw new CallDeskError(`Not ready for production yet: ${problems.join("; ")}.`, 409);
-        await writeRecord(id, f, { ...touch, obStage: stageLabel("ready"), profileComplete: "Yes" });
-      } else await writeRecord(id, f, { ...touch, obStage: stageLabel(patch.stage) });
+      if (patch.stage === "ready") await writeRecord(id, f, { ...touch, obStage: stageLabel("ready"), profileComplete: "Yes" });
+      else await writeRecord(id, f, { ...touch, obStage: stageLabel(patch.stage) });
       break;
     }
-    case "ready": {
-      const problems = readinessProblems(before);
-      if (problems.length) throw new CallDeskError(`Not ready for production yet: ${problems.join("; ")}.`, 409);
-      await writeRecord(id, f, { ...touch, obStage: stageLabel("ready"), profileComplete: "Yes", obHealth: "On Track" });
-      break;
-    }
+    case "ready": await writeRecord(id, f, { ...touch, obStage: stageLabel("ready"), profileComplete: "Yes", obHealth: "On Track" }); break;
     case "health": assertOption(f, "obHealth", patch.value); await writeRecord(id, f, { ...touch, obHealth: patch.value }); break;
     case "owner": await writeRecord(id, f, { ...touch, obOwner: patch.ownerId }); break;
     case "checklist": {
