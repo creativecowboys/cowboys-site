@@ -127,6 +127,23 @@ export function validateTaskAdd(input: unknown): TaskAddBody {
   if (source !== "onboarding" && source !== "client") throw bad("Invalid task source.");
   return { title, due, assignee, requestId: raw.requestId, source };
 }
+/** "Add starter tasks" (Oct 4 2026): `{ starter: true, source }`. */
+export function validateTaskStarter(input: unknown): { source: TaskSource } {
+  const raw = object(input);
+  onlyKeys(raw, ["starter", "source"]);
+  if (raw.starter !== true) throw bad("Invalid request.");
+  const source = str(raw, "source", 20);
+  if (source !== "onboarding" && source !== "client") throw bad("Invalid task source.");
+  return { source };
+}
+/** Delete a task (Oct 4 2026): `{ taskId }`. */
+export function validateTaskDelete(input: unknown): { taskId: string } {
+  const raw = object(input);
+  onlyKeys(raw, ["taskId"]);
+  const taskId = str(raw, "taskId", 80);
+  if (!TASK_ID.test(taskId)) throw bad("Invalid task.");
+  return { taskId };
+}
 export function validateTaskDone(input: unknown): { taskId: string; completed: boolean } {
   const raw = object(input);
   onlyKeys(raw, ["taskId", "completed"]);

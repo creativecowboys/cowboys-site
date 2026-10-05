@@ -187,7 +187,7 @@ export async function setTaskCompleted(contactId: string, taskId: string, comple
   const r = await ghl<{ task?: GhlTask }>("PUT", `/contacts/${encodeURIComponent(contactId)}/tasks/${encodeURIComponent(taskId)}/completed`, { completed });
   return r.task?.id ? r.task : null;
 }
-/** Only the desk's task self-test calls this, and only on tasks it created moments earlier on the test contact. The desk itself never deletes a task. */
+/** Delete a contact task (contacts.write). Permanent: GoHighLevel keeps no copy. Called by deleteDeskTask (the Delete on a task, src/lib/desk/tasks.ts) and by the task self-test's cleanup. */
 export const deleteTask = (contactId: string, taskId: string) => ghl<{ succeded?: boolean; succeeded?: boolean }>("DELETE", `/contacts/${encodeURIComponent(contactId)}/tasks/${encodeURIComponent(taskId)}`);
 
 // ───────────────────────────── custom fields ─────────────────────────────

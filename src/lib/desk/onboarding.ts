@@ -14,6 +14,7 @@ import type { GbpCard } from "@/lib/gbp/types";
 import { mergeTemplates, parseChecklist, serializeChecklist, setItemStatus, type StoredItem } from "./checklist-text";
 import { assertOption, DESK_TAGS, deskList, deskText, type DeskFields } from "./fields";
 import { addDeskNote, deleteDeskNote, editDeskNote, toTimeline } from "./notes";
+import { addStarterTasks } from "./tasks";
 import { tasksFor } from "./tasks";
 import { allDeskFields, businessName, fileScopeFor, groupLabel, handoffNative, handoffSummary, handoffValues, hasTag, isClientRecord, isOnboardingRecord, listRecords, mapOnboarding, nextDueOf, readContact, resolveRecordId, stageIdForLabel, stageLabel, ensureTag, version, writeRecord, type DeskValues } from "./record";
 import { isGhlRecordId } from "./switch";
@@ -191,8 +192,9 @@ export const summaryMarker = (handoffId: string) => `[CC-HANDOFF-SUMMARY:${hando
 function freshRecord(form: HandoffForm): HandoffRecord {
   const t = now();
   const pending = () => ({ state: "pending" as const });
-  // A client added by hand has no lead to mark Won, so that step is done from the start.
-  return { version: 1, leadId: form.leadId, handoffId: form.handoffId, itemId: null, itemUrl: null, createdAt: t, updatedAt: t, steps: { item: pending(), summary: pending(), checklist: pending(), sourceLead: form.manual ? { state: "done", at: t } : pending(), intake: pending() }, handoff: form };
+  // A client added by hand has no lead to mark Won, so that step is done from the start. The onboarding starter tasks are due
+  // on every handoff that starts onboarding (runSteps adds them; a record from before Oct 4 2026 has no such mark).
+  return { version: 1, leadId: form.leadId, handoffId: form.handoffId, itemId: null, itemUrl: null, createdAt: t, updatedAt: t, steps: { item: pending(), summary: pending(), checklist: pending(), sourceLead: form.manual ? { state: "done", at: t } : pending(), intake: pending() }, handoff: form, starterTasks: "due" };
 }
 
 /** Add client (no lead): reuse the contact GoHighLevel already has for this email or phone, else create one. */
@@ -282,8 +284,15 @@ async function runSteps(record: HandoffRecord, contactId: string, f: DeskFields,
     const scope = fileScopeFor(await readContact(contactId), f);
     if (!(await readIntake(scope))) await writeIntake({ ...emptyIntake(scope, record.leadId, form), contactId });
   });
+  // Starter tasks (Oct 4 2026): unassigned GoHighLevel tasks, only those whose title is not on the contact yet. A failure leaves
+  // the mark "due", so the handoff says so and Retry pending steps (or "Add starter tasks" on the panel) finishes it.
+  if (record.starterTasks === "due") {
+    try { await addStarterTasks(contactId, actor, "onboarding"); record.starterTasks = now(); record.updatedAt = now(); await writeHandoff(record); }
+    catch (e) { console.error(`desk handoff: starter tasks for ${contactId} not added yet: ${e instanceof Error ? e.message : e}`); }
+  }
   return record;
 }
+const pendingWithStarter = (record: HandoffRecord): StartResult["pending"] => [...pendingSteps(record), ...(record.starterTasks === "due" ? ["starter tasks" as const] : [])];
 
 export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: string; actor: Actor }): Promise<StartResult> {
   if (!form.manual && !isGhlRecordId(form.leadId)) throw new CallDeskError("This lead is on the old Monday board, and onboarding now lives in GoHighLevel. Find the same business on the Sales tab's GoHighLevel roster (every Monday lead was brought over) and hand it off from there.", 409);
@@ -337,7 +346,7 @@ export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: strin
         adopted = true;
         await ensureTag(contact, DESK_TAGS.onboarding);
         const t = now(); const done = { state: "done" as const, at: t };
-        const closed: HandoffRecord = { ...record, itemId: contact.id, itemUrl: contactUrl(contact.id), updatedAt: t, steps: { item: done, summary: done, checklist: done, sourceLead: done, intake: done } };
+        const closed: HandoffRecord = { ...record, itemId: contact.id, itemUrl: contactUrl(contact.id), updatedAt: t, steps: { item: done, summary: done, checklist: done, sourceLead: done, intake: done }, starterTasks: undefined };
         await writeHandoff(closed); // this draft's own marker: closed, nothing left to run
         record = (await findHandoffRecord(contact, f)) || closed; // the record's own handoff, whose unfinished steps (if any) are its to finish
       } else {
@@ -353,7 +362,7 @@ export async function startOnboardingGhl(form: HandoffForm, ctx: { origin: strin
       }
     }
     record = await runSteps(record, contact!.id, f, ctx.actor);
-    return { itemId: contact!.id, itemUrl: contactUrl(contact!.id), pending: pendingSteps(record), adopted, system: "ghl" };
+    return { itemId: contact!.id, itemUrl: contactUrl(contact!.id), pending: pendingWithStarter(record), adopted, system: "ghl" };
   } finally { inflight.delete(key); }
 }
 
@@ -370,7 +379,7 @@ export async function retryOnboardingGhl(rawId: string, actor: Actor): Promise<S
     await ensureTag(contact, DESK_TAGS.onboarding); // a first attempt can stop right after the fields were written
     if (record.steps.item.state !== "done") { record.steps.item = { state: "done", at: now() }; if (!record.itemId) { record.itemId = contact.id; record.itemUrl = contactUrl(contact.id); } await writeHandoff(record); }
     const done = await runSteps(record, contact.id, f, actor);
-    return { itemId: contact.id, itemUrl: contactUrl(contact.id), pending: STEPS.filter((s) => done.steps[s].state !== "done"), adopted: false, system: "ghl" };
+    return { itemId: contact.id, itemUrl: contactUrl(contact.id), pending: [...STEPS.filter((s) => done.steps[s].state !== "done"), ...(done.starterTasks === "due" ? ["starter tasks" as const] : [])], adopted: false, system: "ghl" };
   } finally { inflight.delete(key); }
 }
 

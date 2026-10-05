@@ -193,7 +193,22 @@ the flags) have a **Tasks** section, laid out like Notes.
 - **Add:** a short title (up to 200 characters), an optional due date, an optional assignee (everyone on the desk with a
   GoHighLevel user: Dave, Josh, Keaton; anyone added with `GHL_REP_IDS` joins the list). Enter in the box adds it.
 - **Check it off** with its box; open it again by unticking it. Done tasks fold into "N done" at the foot, struck through.
-  Open tasks are listed by due date (overdue in red, "Due today"), the ones with no due date last.
+  Open tasks are listed by due date (overdue in red, "Due today"), the ones with no due date last, otherwise in the order
+  they were added (GoHighLevel lists a contact's tasks newest first; the desk turns that round).
+- **Delete** (a small text control at the far right of each task) deletes it at once, no question, in GoHighLevel itself
+  (`DELETE /contacts/{id}/tasks/{taskId}`), read back afterwards. Any task on the contact. Permanent.
+- **Starter tasks** (Dave, Oct 4 2026; they replace the old "Ready for production" gate): nine tasks land on every client
+  that ENTERS onboarding (a handoff from the Sales tab, or Add client): Review client intake · Logo files received (vector
+  preferred) · Brand colors + fonts confirmed · Agreement confirmed (signed / not required) · Payment confirmed (deposit or
+  first payment) · Client added dave@creativecowboys.co as Owner on Google Business Profile (or confirm no GBP) · GBP
+  access verified by staff · Service list + target cities confirmed · Domain / DNS path confirmed with client
+  (`STARTER_TASKS` in `src/lib/desk/task-text.ts`). Unassigned, no due date, nothing written to the contact, so no notice
+  and no workflow. Each client's list stays editable: delete what does not apply, add custom ones. The handoff record
+  carries `starterTasks: "due"` until they are on the contact (then the time they were added); if GoHighLevel refused
+  them, the handoff says "Still pending: starter tasks" and **Retry pending steps** finishes it. A record from before
+  Oct 4 has no such mark, so a client already in onboarding never gets them on its own: the Onboarding panel's
+  **Add starter tasks** button (shown while any is missing) adds the ones whose title is not on the list yet, matched
+  ignoring case, done ones included. Pressing it twice adds nothing.
 - **Due dates.** GoHighLevel's API will not save a task without one (its spec lists `dueDate` as required). A date is saved
   as 5:00 pm Eastern on that day. **No due date is saved as Dec 31, 2099, 5:00 pm Eastern**, the task's description says
   so in plain words, and the desk reads any date in 2099 or later as "No due date" (it never lets anyone pick one).
@@ -206,8 +221,8 @@ the flags) have a **Tasks** section, laid out like Notes.
 - **Who it is on:** `assignedTo` only when someone is picked. An unassigned task notifies nobody. A task assigned to
   someone may get them GoHighLevel's own "task assigned" notice if their GoHighLevel settings send one; the desk itself
   sends nothing.
-- **What it never does:** delete a task, edit a task's title, date or assignee (do that in GoHighLevel), write a field or
-  a tag, or touch Monday. Adding or ticking a task writes nothing to the contact itself, so no workflow keyed on a field
+- **What it never does:** edit a task's title, date or assignee (do that in GoHighLevel), write a field or a tag, or
+  touch Monday. Adding or ticking a task writes nothing to the contact itself, so no workflow keyed on a field
   or a tag can start from it.
 - **Version.** If a task write moves the contact's `dateUpdated`, the route answers with the version right before and
   right after the change, and the panel takes the new one only if its copy was current before, so the next change in
@@ -216,8 +231,8 @@ the flags) have a **Tasks** section, laid out like Notes.
   caught by the panel's next save. The panel sends one task request at a time (each answer replaces the whole list).
 - **Known limit:** the same add sent at the same moment to two server instances (a double click that lands on two warm
   functions) could make two copies; on one instance, and on any retry after a dropped answer, it makes one.
-- **Routes:** `GET /api/team/tasks/<contact id>` (the list and who can be assigned), `POST` (add), `PATCH`
-  (`{ taskId, completed }`). Team sign-in; changes follow the desk's write rule (everyone, now the desk is on
+- **Routes:** `GET /api/team/tasks/<contact id>` (the list and who can be assigned), `POST` (add; or `{ starter: true,
+  source }` for the starter tasks), `PATCH` (`{ taskId, completed }`), `DELETE` (`{ taskId }`). Team sign-in; changes follow the desk's write rule (everyone, now the desk is on
   GoHighLevel). A task can only be changed through the contact it is on. Any contact on the location can carry tasks
   (Blue Ridge Golf Carts, still a Sales lead, was seeded this way); the panels show them for onboarding records and
   clients. Each panel's first load carries the list (`tasks` on the detail answer), and a GoHighLevel hiccup on the list
@@ -560,7 +575,7 @@ variable the Sales tab reads) · `ONBOARDING_EXTRA_OWNERS` (already set; the imp
   unchanged. New: `/api/team/ghl/desk-migrate`, `/api/team/ghl/desk-selftest`, `/api/team/tasks/[id]` (Oct 4).
 - UI: `src/app/leads/notes.tsx` (the timeline), `tasks.tsx` (the task list), `onboarding.tsx`, `clients.tsx`, `handoff.tsx`, `shell.tsx`, `page.tsx`,
   `packages.tsx` — the server names the system with every list and the copy follows it.
-- Tests: `npm run test:desk` (149 since the task list and note edit/delete) — an import-following runner with an in-memory GoHighLevel
+- Tests: `npm run test:desk` (157 since the task list, note edit/delete and starter tasks) — an import-following runner with an in-memory GoHighLevel
   (`src/lib/desk/testing/fake-ghl.ts`) and Blob; every flow ends by asserting that only desk fields and tags were written
   and Monday was never called. `npm run test:call-owner` and `npm run test:onboarding` are unchanged and still cover the
   Monday path.

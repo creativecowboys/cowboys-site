@@ -86,9 +86,9 @@ export function prettyDay(day: string, withYear = true): string {
 }
 
 /** The description a desk task is saved with. A person reading it in GoHighLevel sees who added it, when, and why a 2099 date is there. */
-export function formatTaskBody(o: { requestId: string; source: TaskSource; by: string; addedOn: string; due: string }): string {
+export function formatTaskBody(o: { requestId: string; source: TaskSource; by: string; addedOn: string; due: string; starter?: boolean }): string {
   const by = cleanName(o.by);
-  const lines = [`Added in the Back Office by ${by} on ${prettyDay(o.addedOn)}.`];
+  const lines = [`Added in the Back Office by ${by} on ${prettyDay(o.addedOn)}${o.starter ? ", as a starter task for onboarding" : ""}.`];
   if (!o.due) lines.push(`No due date. GoHighLevel needs one, so ${prettyDay(NO_DUE_DATE)} stands in.`);
   return `${lines.join("\n")}\n\n${taskMarker(o.requestId)} [CC-SRC:${o.source}] [CC-BY:${by}]`;
 }
@@ -132,3 +132,28 @@ export function taskCount(items: DeskTask[]): string {
   if (!items.length) return "none yet";
   return [`${open} open`, done && `${done} done`].filter(Boolean).join(" · ");
 }
+
+// Starter tasks (Dave, Oct 4 2026): what used to gate "Ready for production" is now a short list that lands on every client's
+// Tasks list when they ENTER onboarding (a handoff from the Sales tab, or Add client). Unassigned, no due date, so nobody is
+// notified. Each client's list stays editable: delete what does not apply, add custom ones. A client already in onboarding
+// gets them only when someone presses "Add starter tasks", which adds the ones whose title is not on the list yet.
+export const STARTER_TASKS: readonly string[] = [
+  "Review client intake",
+  "Logo files received (vector preferred)",
+  "Brand colors + fonts confirmed",
+  "Agreement confirmed (signed / not required)",
+  "Payment confirmed (deposit or first payment)",
+  "Client added dave@creativecowboys.co as Owner on Google Business Profile (or confirm no GBP)",
+  "GBP access verified by staff",
+  "Service list + target cities confirmed",
+  "Domain / DNS path confirmed with client",
+];
+/** How two task titles are compared: case, surrounding space and repeated spaces do not matter. */
+export const titleKey = (title: string): string => title.toLowerCase().replace(/\s+/g, " ").trim();
+/** The starter tasks whose title is not on this list yet (done or open, it does not matter: it is there). */
+export function missingStarterTitles(items: Pick<DeskTask, "title">[]): string[] {
+  const have = new Set(items.map((t) => titleKey(t.title)));
+  return STARTER_TASKS.filter((t) => !have.has(titleKey(t)));
+}
+/** The fixed reference a starter task is saved with ("starter-review-client-intake"), so it reads as a desk task. */
+export const starterRequestId = (title: string): string => `starter-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`.slice(0, 80).replace(/-+$/, "");

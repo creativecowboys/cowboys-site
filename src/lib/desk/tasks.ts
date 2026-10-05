@@ -3,14 +3,14 @@ import { TEST_CONTACT_ID } from "@/lib/calls/ghl";
 import { createTask, deleteTask, getContact, ghl, GhlError, listTasks, setTaskCompleted, type GhlContact, type GhlTask } from "@/lib/ghl/client";
 import { readContact, version } from "./record";
 import { deskTeam, memberByGhlUser, memberByName, type Actor } from "./team";
-import { dueFromIso, dueIsoFor, easternDay, formatTaskBody, isDeskTaskBody, isDueDay, isTaskRequestId, plusDays, taskAddedBy, taskMarker, taskNote, type DeskTask, type DeskTasks, type TaskSource } from "./task-text";
+import { dueFromIso, dueIsoFor, easternDay, formatTaskBody, isDeskTaskBody, isDueDay, isTaskRequestId, plusDays, STARTER_TASKS, starterRequestId, taskAddedBy, taskMarker, taskNote, titleKey, type DeskTask, type DeskTasks, type TaskSource } from "./task-text";
 
 // The client's running task list (Oct 4 2026) on the Onboarding and Clients panels. A task is a native GoHighLevel
 // contact task — the desk keeps no copy of its own — so it shows in GoHighLevel too, and anything typed there shows
 // here. The rules for due dates and the markers a desk task carries are in ./task-text.ts.
 //
-// What the desk does with tasks: list them, add one, tick one off or open it again. Nothing else:
-//   - it never deletes a task (only the owner-only self-test removes the tasks IT created on the test contact);
+// What the desk does with tasks: list them, add one, tick one off or open it again, delete one (one click, Oct 4 2026), and add
+// the onboarding starter tasks (on entering onboarding, or with "Add starter tasks"). Nothing else:
 //   - it never edits a task's title, date or assignee (do that in GoHighLevel);
 //   - adding a task sends nothing to the client and changes no field or tag, so no workflow keyed on those can start.
 //     A task assigned to someone may get them GoHighLevel's own "task assigned" notice, if their GoHighLevel settings send one.
@@ -116,6 +116,41 @@ export async function setDeskTaskDone(contactId: string, taskId: string, complet
     if (task.completed !== completed) throw new CallDeskError("GoHighLevel did not keep that change. Reload and try again.", 502);
   }
   return { tasks: board(existing.map((t) => (t.id === taskId ? task : t))), task: toDeskTask(task), before: version(before), after: await versionAfter(contactId, before) };
+}
+
+/** Delete a task (Oct 4 2026: "delete what doesn't apply"). One click on the desk. Only a task on THIS contact; read back afterwards. */
+export async function deleteDeskTask(contactId: string, taskId: string): Promise<TaskWrite> {
+  const before = await readContact(contactId);
+  if (!(await listTasks(contactId)).some((t) => t.id === taskId)) throw new CallDeskError("That task is not on this client any more (it may already have been deleted). Reload to see the latest.", 404);
+  await deleteTask(contactId, taskId);
+  const left = await listTasks(contactId);
+  if (left.some((t) => t.id === taskId)) throw new CallDeskError("GoHighLevel did not delete that task. Reload and try again.", 502);
+  return { tasks: board(left), task: null, before: version(before), after: await versionAfter(contactId, before) };
+}
+
+/**
+ * The onboarding starter tasks (./task-text.ts STARTER_TASKS) that are not on the contact yet, matched by title ignoring case.
+ * Unassigned and with no due date (the stand-in), so nobody gets a notice; nothing is written to the contact itself. Safe to
+ * run twice: the second run finds every title and adds nothing.
+ */
+export type StarterWrite = TaskWrite & { added: string[]; skipped: string[] };
+const starting = new Set<string>();
+export async function addStarterTasks(contactId: string, actor: Actor, source: TaskSource = "onboarding"): Promise<StarterWrite> {
+  if (starting.has(contactId)) throw new CallDeskError("The starter tasks are already being added. Give it a moment.", 409);
+  starting.add(contactId);
+  try {
+    const before = await readContact(contactId);
+    const existing = await listTasks(contactId);
+    const have = new Set(existing.map((t) => titleKey(typeof t.title === "string" ? t.title : "")));
+    const created: GhlTask[] = []; const added: string[] = []; const skipped: string[] = [];
+    for (const title of STARTER_TASKS) {
+      if (have.has(titleKey(title))) { skipped.push(title); continue; }
+      const sent = { title, body: formatTaskBody({ requestId: starterRequestId(title), source, by: actor.name, addedOn: easternDay(), due: "", starter: true }), dueDate: dueIsoFor(""), completed: false };
+      created.unshift(overlay({ id: "", ...sent }, await createTask(contactId, sent))); // newest first, the way GoHighLevel lists them
+      added.push(title); have.add(titleKey(title));
+    }
+    return { tasks: board([...created, ...existing]), task: null, before: version(before), after: await versionAfter(contactId, before), added, skipped };
+  } finally { starting.delete(contactId); }
 }
 
 // ───────────────────────────── self-test (test contact only, owner-only route) ─────────────────────────────

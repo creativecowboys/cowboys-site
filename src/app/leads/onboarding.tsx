@@ -149,7 +149,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
   };
   if (!detail) return <aside className="ob-panel"><div className="ob-panel-head"><h2>Loading…</h2><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div>{error && <div className="call-alert" role="alert">{error}<button onClick={load}>Try again</button></div>}</aside>;
   const { row, record, intake, owners, history } = detail;
-  const pending = record ? (Object.entries(record.steps).filter(([, s]) => s.state !== "done").map(([k]) => k)) : [];
+  const pending = record ? [...Object.entries(record.steps).filter(([, s]) => s.state !== "done").map(([k]) => k), ...(record.starterTasks === "due" ? ["starter tasks"] : [])] : [];
   const copy = async (text: string) => { try { await navigator.clipboard.writeText(text); } catch { /* the field below stays selectable */ } };
   // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
   const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));

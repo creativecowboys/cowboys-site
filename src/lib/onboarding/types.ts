@@ -29,6 +29,11 @@ export type HandoffRecord = {
   createdAt: string; updatedAt: string;
   steps: Record<StepName, StepState>;
   handoff: HandoffForm;
+  /**
+   * Onboarding starter tasks on the GoHighLevel desk (Oct 4 2026): "due" on a handoff that starts onboarding, then the time
+   * they were added. Absent on records from before, so a client already in onboarding never gets them on its own.
+   */
+  starterTasks?: string;
 };
 
 export type IntakeFile = { key: string; name: string; size: number; type: string; category: FileCategory; uploadedAt: string };
@@ -81,4 +86,4 @@ export type OnboardingDetail = {
   system?: "monday" | "ghl";
   tasks?: DeskTasks; // the client's running task list: GoHighLevel tasks on the contact (GoHighLevel desk only)
 };
-export type StartResult = { itemId: string; itemUrl: string; pending: StepName[]; adopted: boolean; system?: "monday" | "ghl" };
+export type StartResult = { itemId: string; itemUrl: string; pending: (StepName | "starter tasks")[]; adopted: boolean; system?: "monday" | "ghl" };
