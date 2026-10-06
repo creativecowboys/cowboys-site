@@ -9,7 +9,7 @@ import { breadcrumb, graph, providerBlock, SITE_URL } from "@/lib/seo";
 const anton = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton" });
 
 export const metadata: Metadata = {
-    title: "Digital Marketing Services for the Southeast",
+    title: "Digital Marketing Services",
     description:
         "Web design, SEO, Google Ads, social media, branding, and content — everything a Southeast small business needs to get found and grow. Creative Cowboys, Villa Rica, GA.",
     alternates: { canonical: "/services" },
