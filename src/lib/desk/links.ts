@@ -1,4 +1,4 @@
-import { BlobNotFoundError, BlobPreconditionFailedError, get, head, put } from "@vercel/blob";
+import { BlobNotFoundError, BlobPreconditionFailedError, BlobServiceRateLimited, get, head, put } from "@vercel/blob";
 import { CallDeskError } from "@/lib/calls/validation";
 import { byLinkName, checkLinkFields, LINK_LIMITS, type LinkFields } from "./link-rules";
 
@@ -18,7 +18,7 @@ import { byLinkName, checkLinkFields, LINK_LIMITS, type LinkFields } from "./lin
 // trusted when both heads agree.
 export const LINKS_PATH = "team/links.json";
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ATTEMPTS = 5;
+const ATTEMPTS = 6;
 
 export type StoredLink = LinkFields & {
   id: string;
@@ -47,6 +47,11 @@ const isNotFound = (error: unknown): boolean =>
 const isConflict = (error: unknown): boolean =>
   (typeof BlobPreconditionFailedError === "function" && error instanceof BlobPreconditionFailedError) ||
   /precondition|already exists/i.test(error instanceof Error ? error.message : "");
+// Blob turns away bursts of writes to one file with "Too many requests" (seen on production Oct 9 2026 with five deletes
+// at once). Nothing was written, so it is retried like a lost race.
+const isBusy = (error: unknown): boolean =>
+  (typeof BlobServiceRateLimited === "function" && error instanceof BlobServiceRateLimited) ||
+  /too many requests/i.test(error instanceof Error ? error.message : "");
 
 export const blobLinkStorage: LinkStorage = {
   async read(forWrite = false) {
@@ -68,6 +73,7 @@ export const blobLinkStorage: LinkStorage = {
       return { text: body, etag: before };
     } catch (error) {
       if (error instanceof LinkStorageConflict) throw error;
+      if (isBusy(error)) throw new LinkStorageConflict("storage busy");
       if (isNotFound(error)) return null;
       throw new CallDeskError("The links could not be read right now. Please try again.");
     }
@@ -79,7 +85,7 @@ export const blobLinkStorage: LinkStorage = {
       else if (etag === "") await put(LINKS_PATH, text, { ...base, allowOverwrite: true }); // a read that came back without an ETag: plain overwrite
       else await put(LINKS_PATH, text, { ...base, allowOverwrite: false });
     } catch (error) {
-      if (isConflict(error)) throw new LinkStorageConflict("changed since it was read");
+      if (isConflict(error) || isBusy(error)) throw new LinkStorageConflict("changed since it was read, or storage busy");
       throw new CallDeskError("The link could not be saved right now. Nothing was changed; please try again.");
     }
   },
@@ -97,7 +103,7 @@ const toData = (links: StoredLink[]): LinksData => ({ links: [...links].sort(byL
 const sameUrl = (links: StoredLink[], url: string, except = "") => links.find((l) => l.id !== except && l.url === url);
 
 /** A short, growing, jittered wait between attempts, so two people retrying do not collide again in step. */
-const backoff = (attempt: number) => new Promise<void>((resolve) => setTimeout(resolve, 80 * attempt + Math.floor(Math.random() * 120)));
+const backoff = (attempt: number) => new Promise<void>((resolve) => setTimeout(resolve, 150 * attempt + Math.floor(Math.random() * 250)));
 
 /**
  * Read, change, write-if-unchanged. `change` returns the new list, or the same array to mean "nothing to write"

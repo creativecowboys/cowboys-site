@@ -147,6 +147,15 @@ test("two first-ever adds at once: the second is applied on top of the first", a
   assert.deepEqual(data.links.map((l) => l.name), ["First", "Second"]);
 });
 
+test("a write turned away as too busy is tried again, and lands", async () => {
+  const m = memory([stored(1, "Alpha", "https://alpha.com/")]);
+  let refusals = 1;
+  const busy: LinkStorage = { read: m.storage.read, async write(text, etag) { if (refusals-- > 0) throw new LinkStorageConflict("storage busy"); return m.storage.write(text, etag); } };
+  const data = await deleteLink(id(1), busy);
+  assert.deepEqual(data.links, []);
+  assert.deepEqual(m.links(), []);
+});
+
 test("a write that keeps losing gives up and asks the person to try again", async () => {
   const storage: LinkStorage = { async read() { return { text: JSON.stringify({ version: 1, links: [] }), etag: '"x"' }; }, async write() { throw new LinkStorageConflict("busy"); } };
   await fails(addLink({ id: id(1), name: "x", url: "x.co" }, dave, now, storage), 409, /same moment/);
