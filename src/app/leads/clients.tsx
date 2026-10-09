@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { NotesTimeline, type DeskSystem } from "./notes";
 import { TaskList } from "./tasks";
 import { CLIENT_GBP, CLIENT_GROUPS, CLIENT_HEALTH, PAY_METHOD, PAY_STATUS } from "@/lib/clients/config";
-import { FILE_CATEGORIES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
+import { FILE_CATEGORIES, FILE_CATEGORY_LABELS, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { ClientDetail, ClientFlag, ClientRow, ClientsListData } from "@/lib/clients/types";
 import { billedOutside, gbpTracked, isLegacyRow, stripeFollowed, type ClientKind } from "@/lib/desk/legacy";
@@ -244,9 +244,9 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
 
     <section className="ob-section"><h3>Files <small>{files.length} on file{row.onboardingItem ? " · from onboarding" : ""}</small></h3>
       <div className="ob-files-box">
-        <div className="ob-files-head"><strong>Logo, photos, content, references</strong><small>Everything the client uploaded during onboarding, plus anything the team adds here. Up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each, private to the team.</small></div>
+        <div className="ob-files-head"><strong>Logo, photos, content, docs/misc</strong><small>Everything the client uploaded during onboarding, plus anything the team adds here. Up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each, private to the team.</small></div>
         {FILE_CATEGORIES.map((cat) => <div key={cat} className="ob-files-cat">
-          <div className="ob-files-cat-head"><span>{cat}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
+          <div className="ob-files-cat-head"><span>{FILE_CATEGORY_LABELS[cat]}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
           <ul className="ob-files">{files.filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${fileScope}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
         </div>)}
       </div>

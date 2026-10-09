@@ -111,6 +111,9 @@ export const GBP_AGENCY_EMAIL = () => process.env.NEXT_PUBLIC_GBP_AGENCY_EMAIL |
 
 export const INTAKE_TOKEN_DAYS = 45;
 export const UPLOAD_MAX_BYTES = 25 * 1024 * 1024;
-export const UPLOAD_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif", "image/heic", "application/pdf", "application/zip", "application/postscript", "image/vnd.adobe.photoshop", "application/illustrator", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
+export const UPLOAD_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/gif", "image/heic", "application/pdf", "application/zip", "application/postscript", "image/vnd.adobe.photoshop", "application/illustrator", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain", "text/csv", "text/markdown", "application/json", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation"];
 export const FILE_CATEGORIES = ["Brand", "Photos", "Content", "Reference"] as const;
 export type FileCategory = (typeof FILE_CATEGORIES)[number];
+
+/** Display labels are separate from stored category keys so existing files keep their paths. */
+export const FILE_CATEGORY_LABELS: Record<FileCategory, string> = { Brand: "Brand", Photos: "Photos", Content: "Content", Reference: "Docs/Misc" };

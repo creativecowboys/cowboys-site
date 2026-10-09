@@ -2,7 +2,7 @@
 
 import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, PAYMENT_NO_CHARGE, STAGES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
+import { AGREEMENT, CHECK_STATUS, DNS_PATHS, FILE_CATEGORIES, FILE_CATEGORY_LABELS, GBP_ACCESS, GBP_AGENCY_EMAIL, HEALTH, PAYMENT, PAYMENT_NO_CHARGE, STAGES, UPLOAD_MAX_BYTES, isGiveawayWinner } from "@/lib/onboarding/config";
 import { uploadPath } from "@/lib/onboarding/validation";
 import type { OnboardingDetail, OnboardingListData, OnboardingRow, StartResult } from "@/lib/onboarding/types";
 import { CloseIcon, RefreshIcon } from "./icons";
@@ -203,7 +203,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
       <div className="ob-files-box">
         <div className="ob-files-head"><strong>Files</strong><small>{intake?.files.length || 0} on file · up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB each · private to the team</small></div>
         {FILE_CATEGORIES.map((cat) => <div key={cat} className="ob-files-cat">
-          <div className="ob-files-cat-head"><span>{cat}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
+          <div className="ob-files-cat-head"><span>{FILE_CATEGORY_LABELS[cat]}</span><label className="call-secondary ob-upload"><input type="file" multiple disabled={!!busy} onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} />Add files</label></div>
           <ul className="ob-files">{(intake?.files || []).filter((f) => f.category === cat).map((f) => <li key={f.key}><a href={`/api/team/onboarding/${scope}/file?key=${encodeURIComponent(f.key)}`}>{f.name}</a> <small>{(f.size / 1024).toFixed(0)} KB · {f.uploadedAt.slice(0, 10)}</small><button type="button" className="ob-file-remove" disabled={!!busy} onClick={() => removeFile(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{uploading.map((n) => <li key={`up-${n}`} className="is-uploading">{n} <small>uploading…</small></li>)}</ul>
         </div>)}
       </div>

@@ -2,7 +2,7 @@
 
 import { upload } from "@vercel/blob/client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FILE_CATEGORIES, GBP_AGENCY_EMAIL, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
+import { FILE_CATEGORIES, FILE_CATEGORY_LABELS, GBP_AGENCY_EMAIL, UPLOAD_MAX_BYTES } from "@/lib/onboarding/config";
 import type { IntakeForm as Form } from "@/lib/onboarding/types";
 import { uploadPath } from "@/lib/onboarding/validation";
 import "./intake.css";
@@ -12,7 +12,7 @@ const CATEGORY_HELP: Record<(typeof FILE_CATEGORIES)[number], string> = {
   Brand: "Logo files (SVG, AI, EPS or the largest PNG you have), brand guide, fonts.",
   Photos: "Your team, your work, your trucks, your storefront. Real photos beat stock.",
   Content: "Service descriptions, bios, testimonials, anything written you already use.",
-  Reference: "Screenshots or PDFs of sites you like, price lists, old brochures.",
+  Reference: "Documents, spreadsheets, instructions, price lists, and other project files.",
 };
 
 async function api<T>(res: Response): Promise<T> {
@@ -109,7 +109,7 @@ export default function IntakeForm({ token }: { token: string }) {
     </section>
     <section className="intake-card"><h2>4. Files</h2><p className="intake-help">Upload straight from your phone or computer. Up to {Math.round(UPLOAD_MAX_BYTES / 1048576)} MB per file. Nothing is public; only our team can open these.</p>
       {FILE_CATEGORIES.map((cat) => <div key={cat} className="intake-upload">
-        <div><strong>{cat}</strong><small>{CATEGORY_HELP[cat]}</small></div>
+        <div><strong>{FILE_CATEGORY_LABELS[cat]}</strong><small>{CATEGORY_HELP[cat]}</small></div>
         <label className="intake-upload-button">Add files<input type="file" multiple onChange={(e) => { void addFiles(cat, e.target.files); e.target.value = ""; }} /></label>
         <ul>{view.files.filter((f) => f.category === cat).map((f) => <li key={f.key}>{f.name} <small>{(f.size / 1024).toFixed(0)} KB</small><button type="button" onClick={() => remove(f.key)} aria-label={`Remove ${f.name}`}>Remove</button></li>)}{busyUploads.length > 0 && Object.entries(uploading).filter(([k]) => k.startsWith(`${cat}/`)).map(([k, name]) => <li key={k} className="is-uploading">{name} <small>uploading…</small></li>)}</ul>
       </div>)}
