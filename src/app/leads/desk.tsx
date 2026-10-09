@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
-import type { CallDraft, CallHistory, CallLead, CallsPageData, DeskLeave, LeadsBackend, SaveCallResult, SignedIn } from "./types";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
+import type { CallDraft, CallHistory, CallLead, CallsPageData, DeskHiddenLead, DeskLeave, DeskTabName, LeadsBackend, SaveCallResult, SignedIn } from "./types";
 import { CALL_OUTCOMES, isCallOutcome, mondayOutcome, outreachStatus, type CallOutcome } from "@/lib/calls/outcomes";
-import { CALL_OWNERS, filterRoster, isOffCallList, mergeRoster, offListReasons, OFF_LIST_LABELS, OFF_LIST_VIEW, type OffListReason } from "@/lib/calls/roster";
+import { CALL_OWNERS, deskHiddenLabel, filterRoster, isOffCallList, mergeDeskHidden, mergeRoster, offListReasons, OFF_LIST_LABELS, OFF_LIST_VIEW, withoutDeskRecords, type OffListReason } from "@/lib/calls/roster";
 import { HOUR_OPTIONS, prettyTime } from "@/lib/calls/followup-time";
 import { REP_NAMES, type RepName } from "@/lib/ghl/reps";
 import { businessShown, contactLine, displayName, personShown } from "@/lib/desk/names";
@@ -77,9 +77,19 @@ async function json<T>(response: Response): Promise<T> {
   if (!response.ok) throw Object.assign(new Error(data.error || (response.status === 401 ? "Your team session expired. Sign in again; your draft stays in this tab." : "The lead system could not complete that request. Please try again.")), { status: response.status });
   return data;
 }
-export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, onWho, leaveRef }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void; onOpenPackages?: (lead: CallLead | null) => void; onWho?: (who: SignedIn | null) => void; leaveRef?: RefObject<DeskLeave> }) {
+/**
+ * `moved`: leads handed off to onboarding from this browser tab (the shell keeps them), hidden at once — GoHighLevel's search can take
+ * a few seconds to show the change. `onOpenDeskRecord`: open a business on the Onboarding or Clients tab (a calendar link to a lead
+ * that has moved on lands there instead of on an empty Sales panel).
+ */
+export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, onWho, leaveRef, moved, onOpenDeskRecord }: { demo?: boolean; onStartOnboarding?: (lead: CallLead) => void; onOpenPackages?: (lead: CallLead | null) => void; onWho?: (who: SignedIn | null) => void; leaveRef?: RefObject<DeskLeave>; moved?: DeskHiddenLead[]; onOpenDeskRecord?: (tab: DeskTabName, id: string) => void }) {
   const storageKey = demo ? "cc-call-desk-demo-v1" : "cc-call-desk-v1";
   const [leads, setLeads] = useState<CallLead[]>([]);
+  // Businesses on the Onboarding or Clients tab are not leads to call (Dave, Oct 9 2026). The server leaves them out of `leads` and
+  // names them here; a handoff made in this tab adds its lead straight away. Every list, filter, count and search below uses `shown`.
+  const [deskHidden, setDeskHidden] = useState<DeskHiddenLead[]>([]);
+  const offDesk = useMemo(() => mergeDeskHidden(deskHidden, moved ?? [], true), [deskHidden, moved]);
+  const shown = useMemo(() => withoutDeskRecords(leads, offDesk), [leads, offDesk]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [board, setBoard] = useState("Giveaway leads");
   const [system, setSystem] = useState<LeadsBackend>("monday");
@@ -214,10 +224,13 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
     listLock.current = true; setListLoading(true); setListError("");
     try {
       // ?backend=ghl|monday on the page URL previews the other system's roster without flipping LEADS_BACKEND.
-      const preview = new URLSearchParams(window.location.search).get("backend");
+      const page = new URLSearchParams(window.location.search);
+      const preview = page.get("backend"); const deskPreview = page.get("desk"); // ?desk= also says which system the Onboarding and Clients tabs are on
       const q = new URLSearchParams(); if (nextCursor) q.set("cursor", nextCursor); if (preview === "ghl" || preview === "monday") q.set("backend", preview);
+      if (deskPreview === "ghl" || deskPreview === "monday") q.set("desk", deskPreview);
       const data: CallsPageData = demo ? demoPage : await json(await fetch(`/api/team/calls${q.toString() ? `?${q}` : ""}`, { cache: "no-store" }));
       setLeads(prev => mergeRoster(prev, data.leads, !!nextCursor));
+      setDeskHidden(prev => mergeDeskHidden(prev, Array.isArray(data.deskHidden) ? data.deskHidden : [], !!nextCursor));
       setTagsRead(prev => (nextCursor ? prev : true) && data.noCallTagsRead !== false);
       setCursor(data.cursor); setBoard(data.boardName); setSystem(data.system); setCrm(data.systemName); setOwners(data.owners); setLeadSources(data.leadSources);
       if (!nextCursor) whoRef.current?.(data.me ?? null);
@@ -229,11 +242,17 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
   // Calendar events link to /admin?lead=<id> (older ones to /leads?lead=<id>, which forwards): select that lead once, after the first load.
   const deepLinked = useRef(false);
   const revealLinked = useRef(false); // …and bring its card into sight in the list (see the list effect below the filters)
+  // A lead that has moved on to the Onboarding or Clients tab is opened there (read through a ref so a new callback never re-runs this).
+  const openDeskRef = useRef(onOpenDeskRecord);
+  useEffect(() => { openDeskRef.current = onOpenDeskRecord; }, [onOpenDeskRecord]);
   useEffect(() => {
-    if (deepLinked.current || demo || !ready || !leads.length) return;
+    if (deepLinked.current || demo || !ready || (!shown.length && !offDesk.length)) return;
     const wanted = new URLSearchParams(window.location.search).get("lead");
-    if (wanted && /^[A-Za-z0-9]{1,64}$/.test(wanted) && leads.some(l => l.id === wanted)) { deepLinked.current = true; revealLinked.current = true; setSelected(wanted); }
-  }, [leads, ready, demo]);
+    if (!wanted || !/^[A-Za-z0-9]{1,64}$/.test(wanted)) return;
+    if (shown.some(l => l.id === wanted)) { deepLinked.current = true; revealLinked.current = true; setSelected(wanted); return; }
+    const moved = offDesk.find(h => h.id === wanted);
+    if (moved && openDeskRef.current) { deepLinked.current = true; openDeskRef.current(moved.tab, moved.id); }
+  }, [shown, offDesk, ready, demo]);
   // On two-column widths the roster is pinned in the window (calls.css, "Pinned roster") and is as tall as the window below whatever
   // part of the header is still on screen. That part is measured here, on scroll and on any change of size, and handed to the CSS as
   // --call-roster-gap. Without this script the roster is simply a full window tall. Phone widths stack the columns and ignore it.
@@ -321,7 +340,7 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
   };
   // Off the call list (Not Interested, or a do-not-contact / fake-lead tag in GHL): out of every view except "Not interested / do not call".
   const offView = queue === OFF_LIST_VIEW;
-  const filtered = filterRoster(leads, { view: queue, owner, status, source, search });
+  const filtered = filterRoster(shown, { view: queue, owner, status, source, search });
   // The list scrolls inside the roster. After a filter change it shows the opened lead's card if the new list has it, otherwise it
   // starts again from the top; while a search is typed the results always start from the top (a search is looking for someone else).
   // A calendar link (?lead=) brings that lead's card into sight. Only the list moves, never the page, and a lead picked by clicking
@@ -343,16 +362,19 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
     if (at.top >= box.top && at.bottom <= box.bottom) return; // already in sight
     list.scrollTop += at.top - box.top - Math.max(0, (box.height - at.height) / 2); // centred in the list
   }, [filterKey, searching, selected]);
-  const offCount = leads.filter(isOffCallList).length;
+  const offCount = shown.filter(isOffCallList).length;
   // Status choices come from the leads this view can show, so the normal list never offers a status that only off-list leads have.
-  const statusOptions = [...new Set(leads.filter(l => isOffCallList(l) === offView).map(x => x.outreach).filter(Boolean))].sort();
+  const statusOptions = [...new Set(shown.filter(l => isOffCallList(l) === offView).map(x => x.outreach).filter(Boolean))].sort();
   // A search on the normal list never returns an off-list lead. It only says that some exist, so nobody is left wondering where a lead went.
-  const hiddenMatches = !offView && search.trim() ? filterRoster(leads, { view: OFF_LIST_VIEW, owner, status: "", source, search }).length : 0;
+  const hiddenMatches = !offView && search.trim() ? filterRoster(shown, { view: OFF_LIST_VIEW, owner, status: "", source, search }).length : 0;
+  // Call notes typed for a lead that has since moved to Onboarding or Clients (handed off with the draft still open, or by someone
+  // else): the lead is no longer in the list, so the notes are reached from here until they are saved.
+  const strandedDrafts = offDesk.filter(h => h.id !== selected && entries[h.id]?.dirty && !entries[h.id]?.result);
   // The selected lead as the roster holds it (a save updates the row at once; the lead record follows a moment later).
   const current = detail ? leads.find(l => l.id === detail.id) || detail : null;
   const offReasons = current ? offListReasons(current) : [];
   const savedOff = !!entry?.result && !entry.result.warning && draft?.outcome === "Not interested" && offReasons.includes("not-interested");
-  const sourceOptions = [...new Set([...leadSources, ...leads.map(l => l.leadSource).filter(Boolean)])];
+  const sourceOptions = [...new Set([...leadSources, ...shown.map(l => l.leadSource).filter(Boolean)])];
   const lastConversation = history.find(h => h.isCallNote) || history[0];
   const field = (key: keyof Pick<CallDraft, "goal" | "currentMarketing" | "challenge" | "budget" | "timing" | "recommendation" | "notes" | "nextStep">, label: string, placeholder: string, wide = false) => <label className={wide ? "call-field call-wide" : "call-field"}>{label}<textarea rows={key === "notes" ? 4 : 3} value={draft?.[key] || ""} onChange={e => patch({ [key]: e.target.value })} placeholder={placeholder} maxLength={key === "notes" ? 8000 : key === "budget" || key === "timing" ? 500 : 2000} /></label>;
   const link = (value: string | undefined, label: string) => { const href = safeUrl(value); return href ? <a href={href} target="_blank" rel="noreferrer">{label} ↗</a> : null; };
@@ -368,13 +390,14 @@ export default function Desk({ demo = false, onStartOnboarding, onOpenPackages, 
       {(system === "ghl" || sourceOptions.length > 0) && <label className="call-queue-filter">Lead source<select aria-label="Filter by lead source" value={source} onChange={e => setSource(e.target.value)}><option value="">All sources</option>{sourceOptions.map(x => <option key={x} value={x}>{x}</option>)}<option value="none">No source set</option></select></label>}
       <label className="call-queue-filter">Show leads<select aria-label="Filter by contact stage" value={queue} onChange={e => { setQueue(e.target.value); setStatus(""); }}><option value="all">All leads</option><option value="new">Not contacted yet</option><option value="active">Contacted / working on</option><option value="closed">Closed / bad number</option><option value={OFF_LIST_VIEW}>Not interested / do not call</option></select></label>
       <p className="call-order-hint">{offView ? `These leads are off the call list. ${system === "ghl" ? "They stay in GoHighLevel for email campaigns and newsletters" : "They stay on the Monday board"}. To put one back, save a call with a different outcome${system === "ghl" ? " or change its Outreach Status in GoHighLevel. A do-not-contact or fake-lead tag is removed in GoHighLevel, not here." : "."}` : "Not contacted first, then oldest contact. Choose an owner to see their leads."}</p>
-      <div className="call-list-count">{filtered.length} shown · {leads.length} loaded{!offView && offCount > 0 ? ` · ${offCount} off the call list` : ""}{cursor ? " · more available" : ""}</div>
+      <div className="call-list-count">{filtered.length} shown · {shown.length} loaded{!offView && offCount > 0 ? ` · ${offCount} off the call list` : ""}{offDesk.length > 0 ? ` · ${deskHiddenLabel(offDesk.length)}` : ""}{cursor ? " · more available" : ""}</div>
+      {strandedDrafts.map(h => <p key={h.id} className="call-off-hint">Unsaved call notes for {displayName(h.name)}, now on the {h.tab === "clients" ? "Clients" : "Onboarding"} tab. <button type="button" onClick={() => choose(h.id)} disabled={saving || assigning}>Open the notes</button></p>)}
       {!tagsRead && <div className="call-alert" role="alert">GoHighLevel sent this list without contact tags, so a lead tagged do-not-contact or fake-lead may still be showing. Check the lead in GoHighLevel before you call.</div>}
       {hiddenMatches > 0 && <p className="call-off-hint">{hiddenMatches} {filtered.length ? "more " : ""}{hiddenMatches === 1 ? "match is" : "matches are"} off the call list. <button type="button" onClick={() => { setQueue(OFF_LIST_VIEW); setStatus(""); }}>Show not interested / do not call</button></p>}
       {listError && <div className="call-alert" role="alert">{listError}<button onClick={() => loadList(cursor || undefined)}>Try again</button></div>}
       <div className="call-person-list" ref={listRef}>{filtered.map(lead => { const chip = toldChip(lead); return <button key={lead.id} onClick={() => choose(lead.id)} disabled={saving || assigning} className={`call-person ${selected === lead.id ? "is-active" : ""}`} aria-pressed={selected === lead.id}><span className="call-person-top"><span>{businessShown(lead.name, lead.contact)}</span><span aria-hidden="true">↗</span></span><span className="call-person-contact">{contactLine(lead.name, lead.contact, [lead.city], "Contact not supplied")}</span><span className="call-person-bottom"><span className="call-status">{lead.outreach || "No status"}</span><span>{entries[lead.id]?.dirty ? "Draft saved here" : lead.owner || "Unassigned"}</span></span><OffBadges lead={lead} />{lead.leadSource && <span className="call-person-source">{lead.leadSource}</span>}{chip && <span className="call-person-told" title="What they told us on the form">{chip}</span>}</button>; })}</div>
       {listLoading && <p role="status" className="call-roster-message">Loading entrants…</p>}
-      {!listLoading && !filtered.length && <p className="call-roster-message">{!leads.length ? "No entrants are available yet." : offView ? (offCount ? "No off-list leads match these filters." : "Nobody is off the call list.") : "No leads match these filters. Try All leads or another owner."}</p>}
+      {!listLoading && !filtered.length && <p className="call-roster-message">{!shown.length ? "No entrants are available yet." : offView ? (offCount ? "No off-list leads match these filters." : "Nobody is off the call list.") : "No leads match these filters. Try All leads or another owner."}</p>}
       {cursor && <button className="call-secondary call-load-more" disabled={listLoading} onClick={() => loadList(cursor)}>Load more entrants</button>}
       <CalendarFeed />
     </aside><section className="call-workspace" aria-label="Guided conversation">

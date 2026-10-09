@@ -1,4 +1,4 @@
-import type { CallLead } from "@/app/leads/types";
+import type { CallLead, DeskHiddenLead } from "@/app/leads/types";
 import { phoneMatches } from "@/lib/desk/phone";
 
 // Fixed choices stay available even before someone has a lead assigned to them.
@@ -104,3 +104,23 @@ export function mergeRoster(prev: CallLead[], incoming: CallLead[], append = fal
   for (const row of incoming) merged.set(row.id, fresher(row));
   return [...merged.values()];
 }
+
+// ───────────────────────────── on the Onboarding or Clients tab ─────────────────────────────
+// Dave, Oct 9 2026: "Once they move to onboarding and active clients, we don't need to be able to find those people in the
+// sales section." The server leaves those businesses out of the roster (src/lib/desk/record.ts deskTabOf decides, the same rule
+// the two tabs list by) and names them in `deskHidden`. A handoff made in this browser tab hides its lead at once, before
+// GoHighLevel's search catches up. Nothing here changes a contact; it only decides what the Sales list shows.
+/** The businesses the Sales list leaves out: a fresh list replaces the old one, a further page (or a handoff made here) adds to it. One row per id. */
+export function mergeDeskHidden(prev: readonly DeskHiddenLead[], incoming: readonly DeskHiddenLead[], append = false): DeskHiddenLead[] {
+  const out = new Map((append ? prev : []).map((h) => [h.id, h]));
+  for (const h of incoming) if (h && typeof h.id === "string" && !out.has(h.id)) out.set(h.id, h);
+  return [...out.values()];
+}
+/** The roster minus the businesses that are on the Onboarding or Clients tab. */
+export function withoutDeskRecords(leads: CallLead[], hidden: readonly DeskHiddenLead[]): CallLead[] {
+  if (!hidden.length) return leads;
+  const gone = new Set(hidden.map((h) => h.id));
+  return leads.filter((l) => !gone.has(l.id));
+}
+/** The quiet line under the list: "12 hidden (in Onboarding or Clients)". Empty when nothing is hidden. */
+export const deskHiddenLabel = (count: number): string => (count > 0 ? `${count} hidden (in Onboarding or Clients)` : "");

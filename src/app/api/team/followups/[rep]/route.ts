@@ -12,6 +12,9 @@ export const maxDuration = 30;
 // call list (Not Interested, or a do-not-contact / fake-lead tag in GHL), which buildFeed skips. Calendar apps poll this on
 // their own schedule. Event UIDs carry the lead id, so a lead keeps its event across the cutover only
 // if its id is the same — after the Monday → GHL import the events are re-issued under the GHL ids.
+// Unlike the Sales tab, the feed keeps businesses that moved on to the Onboarding or Clients tab (it does not pass
+// hideDeskRecords): a handed-off client's booked kickoff or check-in is a real appointment (Dave, Sep 28 2026). Its link
+// opens the business on that tab.
 export async function GET(req: Request, context: { params: Promise<{ rep: string }> }) {
   const slugRaw = (await context.params).rep;
   const slug = slugRaw.replace(/\.ics$/i, "").toLowerCase();

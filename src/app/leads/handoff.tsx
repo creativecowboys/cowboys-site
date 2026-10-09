@@ -30,7 +30,8 @@ function blank(lead: CallLead | null): HandoffForm {
 function readDrafts(): Drafts { try { return JSON.parse(sessionStorage.getItem(STORAGE) || "{}"); } catch { return {}; } }
 function writeDrafts(d: Drafts) { try { sessionStorage.setItem(STORAGE, JSON.stringify(d)); } catch { /* keep in memory only */ } }
 
-export default function Handoff({ lead, onClose, onDone, system = "monday", preview = "" }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void; system?: DeskSystem; preview?: string }) {
+/** `onStarted` hears about every handoff the server accepted (created, adopted or with steps pending), however the panel is closed after. */
+export default function Handoff({ lead, onClose, onDone, onStarted, system = "monday", preview = "" }: { lead: CallLead | null; onClose: () => void; onDone: (itemId: string) => void; onStarted?: (itemId: string) => void; system?: DeskSystem; preview?: string }) {
   const ghl = system === "ghl"; // the onboarding record will live in GoHighLevel (DESK_BACKEND=ghl, or an owner previewing it)
   const draftKey = lead ? lead.id : MANUAL_KEY;
   // A saved draft keeps the lead version it was started against. If the lead changed since (a note,
@@ -75,6 +76,7 @@ export default function Handoff({ lead, onClose, onDone, system = "monday", prev
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || (res.status === 401 ? "Your team session expired. Sign in again; this handoff draft stays in this tab." : "The handoff could not be saved. Your draft is still here."));
       setResult(data as StartResult);
+      if (typeof (data as StartResult).itemId === "string") onStarted?.((data as StartResult).itemId);
       if (!(data as StartResult).pending?.length) { const d = readDrafts(); delete d[draftKey]; writeDrafts(d); }
     } catch (e) { setError(e instanceof Error ? e.message : "The handoff could not be saved."); }
     finally { setBusy(false); }

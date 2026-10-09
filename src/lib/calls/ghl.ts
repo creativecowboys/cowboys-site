@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import type { CallDraft, CallHistory, CallLead, CallsPageData, SaveCallResult } from "@/app/leads/types";
+import type { CallDraft, CallHistory, CallLead, CallsPageData, DeskHiddenLead, DeskTabName, SaveCallResult } from "@/app/leads/types";
 import { CallDeskError, GHL_ID, MONDAY_ID } from "./validation";
 import { isCallOutcome, outreachStatus, type CallOutcome } from "./outcomes";
 import { prettyTime } from "./followup-time";
@@ -65,6 +65,8 @@ export function isoDate(v: string): string {
   if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0 && d.getUTCSeconds() === 0) return d.toISOString().slice(0, 10);
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
 }
+/** The name a lead goes by on the desk: the business, else the person, else the address. */
+const leadName = (c: GhlContact, person = contactDisplayName(c)): string => (c.companyName || c.businessName || person || c.email || "(no name)").trim();
 export function mapLead(c: GhlContact, fields: SalesFields): CallLead {
   const f = (key: keyof SalesFields) => fieldText(c, fields[key]?.id);
   const person = contactDisplayName(c);
@@ -74,7 +76,7 @@ export function mapLead(c: GhlContact, fields: SalesFields): CallLead {
   const quoted = f("quotedMonthly").replace(/[^\d.]/g, "").replace(/\.0+$/, "");
   const leadSource = f("leadSource");
   return {
-    id: c.id, name: (c.companyName || c.businessName || person || c.email || "(no name)").trim(), contact: person,
+    id: c.id, name: leadName(c, person), contact: person,
     email: c.email || "", phone: c.phone || "", website: c.website || "", city: [c.city, c.state].filter(Boolean).join(", "),
     owner: ownerName || (ownerId ? "Assigned in GHL" : ""), ownerId, ownerIds: ownerId ? [ownerId] : [], ownerName,
     outreach, interest: f("interest"), notes: f("salesNotes"), lastContact: isoDate(f("lastContact")),
@@ -114,11 +116,19 @@ export function unwrapCursor(value: string | null): number {
 
 export const ghlOwners = () => { const ids = ghlRepIds(); return REP_NAMES.map((name) => ({ id: ids[name], name })); };
 
+/**
+ * Leave a contact off the roster: the desk tab it is on, or null to keep it. The Sales tab passes the desk's own rule
+ * (src/lib/desk/record.ts deskTabRule) so a business on the Onboarding or Clients tab is not called as a lead; the calendar
+ * feeds pass nothing, so a handed-off client's booked call stays on the rep's calendar (Dave, Sep 28 2026).
+ */
+export type RosterHide = (c: GhlContact) => DeskTabName | null;
+
 /** Whole roster in one call when it fits (≤ 2,000), newest first; the cursor continues otherwise. */
-export async function getCallsPage(cursor: string | null): Promise<CallsPageData> {
+export async function getCallsPage(cursor: string | null, opts: { hide?: RosterHide } = {}): Promise<CallsPageData> {
   const fields = await salesFields();
   const start = unwrapCursor(cursor);
   const leads: CallLead[] = [];
+  const hidden: DeskHiddenLead[] = [];
   let next: number | null = null;
   let seen = 0, tagged = 0;
   let filters = rosterFilters(fields.leadSource?.id);
@@ -134,13 +144,18 @@ export async function getCallsPage(cursor: string | null): Promise<CallsPageData
       } else throw e;
     }
     seen += result.contacts.length; tagged += result.contacts.filter((c) => Array.isArray(c.tags) && c.tags.length > 0).length;
-    leads.push(...result.contacts.filter((c) => c.id !== TEST_CONTACT_ID).map((c) => mapLead(c, fields)));
+    for (const c of result.contacts) {
+      if (c.id === TEST_CONTACT_ID) continue;
+      const tab = opts.hide ? opts.hide(c) : null;
+      if (tab) hidden.push({ id: c.id, name: leadName(c), tab });
+      else leads.push(mapLead(c, fields));
+    }
     if (result.contacts.length < PAGE) { next = null; break; }
     next = page + 1;
   }
   // Leads are found by tag, so a roster that comes back with no tags at all means GHL left them out of the search results. The desk
   // then says it cannot see do-not-contact / fake-lead, rather than quietly listing someone who should not be called.
-  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields), noCallTagsRead: seen === 0 || tagged > 0 };
+  return { leads, cursor: wrapCursor(next), boardName: "GoHighLevel · Creative Cowboys contacts", system: "ghl", systemName: "GoHighLevel", owners: ghlOwners(), leadSources: leadSourceOptions(fields), noCallTagsRead: seen === 0 || tagged > 0, ...(opts.hide ? { deskHidden: hidden } : {}) };
 }
 
 function mapHistory(notes: GhlNote[]): CallHistory[] {

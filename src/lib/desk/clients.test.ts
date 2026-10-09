@@ -10,6 +10,9 @@ import { resetDeskFieldCheck } from "./fields";
 import { todayEastern } from "@/lib/onboarding/api";
 import type { FakeGhl } from "./testing/fake-ghl";
 import { assertOnlyDeskWrites, DAVE, MADISON, reps, setUp, tearDown } from "./testing/harness";
+import { getCallsPage } from "@/lib/calls/backend";
+import { listOnboardingGhl } from "./onboarding";
+import { deskTabOf, deskTabRule } from "./record";
 
 const CLIENT = "ClientSquirrel000001";
 let ghl: FakeGhl;
@@ -350,4 +353,55 @@ test("a payment problem someone records on a legacy client is still a payment pr
   const row = await patch({ action: "payStatus", value: "Overdue" }, DAVE, LEGACY);
   assert.equal(row.group, "issue"); assert.deepEqual(row.flags, ["payment"]);
   assert.equal(ghl.tasks.length, 1); assert.equal(ghl.tasks[0].title, "Whiten Pools, Inc. is overdue on payment. Chase it before the service lapses."); assert.equal(ghl.tasks[0].assignedTo, reps.Josh);
+});
+
+// ───────────────────────────── the Sales list leaves out the desk's businesses (Dave, Oct 9 2026) ─────────────────────────────
+test("the Sales list leaves out every business on the Onboarding or Clients tab — decided by the same rule the two tabs list by", async () => {
+  const lead = (id: string, name: string, fields: Record<string, unknown> = {}, tags: string[] = ["giveaway-entrant"]) =>
+    ghl.addContact({ id, companyName: name, firstName: "Pat", lastName: name.split(" ")[0], email: `${id.toLowerCase()}@example.com`, phone: "+14045550199", tags, assignedTo: reps.Dave, fields: { "Lead Source": "The Big Giveaway", "Outreach Status": "Call Booked", ...fields } });
+  // Still leads: nothing on the desk yet. A Won lead nobody has handed off is on neither tab, so it stays on Sales.
+  lead("PlainLead00000000001", "Plain Lead Co");
+  lead("WonNoHandoff00000001", "Won Not Handed Off", { "Outreach Status": "Won" }, ["giveaway-entrant", "sales-won"]);
+  // On the Onboarding tab: by the tag alone, by the stage alone, launched without becoming a client, and a client whose onboarding is not finished.
+  lead("ObTagOnly00000000001", "Blue Ridge Golf Carts LLC", {}, ["giveaway-entrant", "desk-onboarding"]);
+  lead("ObStageOnly000000001", "Stage Only Co", { "Desk Onboarding Stage": "Collecting assets / access" }, ["playbook-lead"]);
+  lead("ObLaunched0000000001", "Launched Not Client", { "Desk Onboarding Stage": "Launched" }, ["giveaway-entrant", "desk-onboarding"]);
+  lead("StillOnboarding00001", "Client Still Onboarding", { "Desk Onboarding Stage": "New handoff", "Desk Client Status": "Active" }, ["giveaway-entrant", "desk-onboarding", "desk-client"]);
+  // On the Clients tab: every status the tab can show — active, at risk, paused, churned, payment issue, legacy — and a launched graduate.
+  lead("ClActive000000000001", "Arctic Law Alaska", { "Desk Client Status": "Active" }, ["playbook-lead", "desk-client"]);
+  lead("ClChurned00000000001", "Churned Co", { "Desk Client Status": "Churned" }, ["giveaway-entrant", "desk-client"]);
+  lead("ClPaused000000000001", "Paused Co", { "Desk Client Status": "Paused" }, ["sales-lead"]);
+  lead("ClRisk00000000000001", "At Risk Co", { "Desk Client Status": "At risk" }, ["giveaway-entrant", "desk-client"]);
+  lead("ClIssue0000000000001", "Payment Issue Co", { "Desk Client Status": "Payment issue" }, ["giveaway-entrant", "desk-client"]);
+  lead("ClLegacy000000000001", "Choice Enterprises", { "Desk Client Status": "Active", "Desk Legacy Client": "Yes" }, ["website-form", "desk-client"]);
+  lead("Graduated00000000001", "Graduated Co", { "Desk Onboarding Stage": "Launched", "Desk Client Status": "Active" }, ["giveaway-entrant", "desk-onboarding", "desk-client"]);
+  // A client that never was a lead: the roster search never finds it, so it is neither listed nor counted.
+  addClient({}, "NeverALead0000000001");
+  ghl.get("NeverALead0000000001").tags = ["desk-client"];
+
+  const page = await getCallsPage(null, "ghl", { hideDeskRecords: true });
+  assert.deepEqual(page.leads.map((l) => l.id).sort(), ["PlainLead00000000001", "WonNoHandoff00000001"]);
+  // The tabs' own lists are the truth: what Sales hides is exactly the roster's contacts that appear on them, under the tab that lists them.
+  const onTab = new Map<string, string>();
+  for (const r of (await listOnboardingGhl()).rows) onTab.set(r.id, "onboarding");
+  for (const r of (await listClientsGhl()).rows) onTab.set(r.id, "clients"); // a launched graduate is listed on both; the Clients tab is where it lives
+  const expected = [...onTab].filter(([id]) => id !== "NeverALead0000000001").sort();
+  assert.deepEqual(page.deskHidden!.map((h) => [h.id, h.tab]).sort(), expected);
+  assert.equal(page.deskHidden!.length, 11);
+  assert.equal(page.deskHidden!.find((h) => h.id === "StillOnboarding00001")!.tab, "onboarding", "one place at a time: a client still onboarding is on the Onboarding tab");
+  assert.equal(page.deskHidden!.find((h) => h.id === "ObTagOnly00000000001")!.name, "Blue Ridge Golf Carts LLC");
+  // Looking is not changing: the Sales list read the definitions and searched, and wrote nothing.
+  assert.deepEqual(ghl.writes(), []);
+  // The calendar feeds ask without the rule and still get every lead (a handed-off client's booked call stays on the calendar).
+  const feed = await getCallsPage(null, "ghl");
+  assert.equal(feed.leads.length, 13); assert.equal(feed.deskHidden, undefined);
+});
+test("the desk-tab rule without the desk fields (a location before setup) places contacts by the desk tags alone", async () => {
+  const rule = await deskTabRule();
+  const c = (tags: string[]) => ({ id: "Anyone00000000000001", tags, customFields: [] });
+  assert.equal(rule(c(["giveaway-entrant"])), null);
+  assert.equal(deskTabOf(c(["desk-onboarding"]), {}), "onboarding");
+  assert.equal(deskTabOf(c(["desk-client"]), {}), "clients");
+  assert.equal(deskTabOf(c(["desk-client", "desk-onboarding"]), {}), "onboarding", "no stage to say it launched: still onboarding, which is where the Clients tab leaves it too");
+  assert.equal(deskTabOf(c(["lse:client", "sales-won"]), {}), null, "Josh's LSE tags and the Won tag are not the desk's: they move nobody off Sales");
 });

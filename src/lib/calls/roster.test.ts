@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { CallLead } from "@/app/leads/types";
+import type { CallLead, DeskHiddenLead } from "@/app/leads/types";
 import { CALL_OUTCOMES, mondayOutcome, outreachStatus } from "./outcomes";
-import { CALL_OWNERS, compareLeads, contactStage, filterRoster, inRosterView, isOffCallList, matchesOwner, mergeRoster, NO_CALL_TAGS, noCallTagsOf, OFF_LIST_LABELS, OFF_LIST_VIEW, offListReasons } from "./roster";
+import { CALL_OWNERS, compareLeads, contactStage, deskHiddenLabel, filterRoster, inRosterView, isOffCallList, matchesOwner, mergeDeskHidden, mergeRoster, NO_CALL_TAGS, noCallTagsOf, OFF_LIST_LABELS, OFF_LIST_VIEW, offListReasons, withoutDeskRecords } from "./roster";
 
 function lead(id: string, changes: Partial<CallLead> & { ownerIds?: string[] } = {}): CallLead & { ownerIds?: string[] } {
   return {
@@ -245,4 +245,36 @@ test("saving a Not interested lead as In progress puts it back on the call list;
   assert.equal(inRosterView(off, "all"), false); assert.equal(inRosterView(back, "all"), true); assert.equal(inRosterView(back, "active"), true);
   assert.equal(inRosterView({ ...back, outreach: "Not Interested" }, "all"), false);
   assert.equal(inRosterView({ ...back, noCallTags: ["do-not-contact"] }, "all"), false); // a no-call tag still wins over any status
+});
+
+// ───────────────────────────── on the Onboarding or Clients tab (Dave, Oct 9 2026) ─────────────────────────────
+const hidden = (id: string, tab: DeskHiddenLead["tab"] = "onboarding", name = `Business ${id}`): DeskHiddenLead => ({ id, name, tab });
+test("a business on the Onboarding or Clients tab is not in any Sales list, search, filter or count", () => {
+  const leads = [
+    lead("plain", { name: "Plain Lead Co", contact: "Pat Lead", phone: "+14045550101", leadSource: "The Big Giveaway", ownerIds: ["dave"] }),
+    lead("blueridge", { name: "Blue Ridge Golf Carts LLC", contact: "Chad Tollison", phone: "+18285550142", leadSource: "The Big Giveaway", ownerIds: ["dave"], outreach: "Won" }),
+    lead("arctic", { name: "Arctic Law Alaska", contact: "Kaden Vanwey", phone: "+19075550188", leadSource: "Ebook download", outreach: "Call Held", lastContact: "2026-10-01" }),
+    lead("choice", { name: "Choice Enterprises", contact: "Reese Pownall", outreach: "Not Interested" }), // even off the call list, a client stays out of that view too
+  ];
+  // What the server sends when the lagging search still lists a moved business: the desk leaves it out anyway.
+  const off = [hidden("blueridge"), hidden("arctic", "clients"), hidden("choice", "clients")];
+  const shown = withoutDeskRecords(leads, off);
+  assert.deepEqual(shown.map((l) => l.id), ["plain"]);
+  const pick = (f: Partial<Parameters<typeof filterRoster>[1]>) => filterRoster(shown, { view: "all", owner: "", status: "", source: "", search: "", ...f }).map(({ id }) => id);
+  for (const view of ["all", "new", "active", "closed", OFF_LIST_VIEW]) for (const search of ["Blue Ridge", "Arctic", "Choice", "Chad", "Kaden", "Reese", "828-555-0142", "(907) 555", "9075550188"]) {
+    assert.deepEqual(filterRoster(shown, { view, owner: "", status: "", source: "", search }), [], `${view} / ${search}`);
+  }
+  assert.deepEqual(pick({ owner: "dave" }), ["plain"]); assert.deepEqual(pick({ status: "Won" }), []); assert.deepEqual(pick({ source: "Ebook download" }), []);
+  assert.deepEqual(pick({ search: "Plain" }), ["plain"]); assert.deepEqual(pick({ search: "404-555-0101" }), ["plain"], "phone search still finds a lead that is on the list");
+  assert.equal(withoutDeskRecords(leads, []), leads, "nothing hidden: the same list, untouched");
+});
+test("the hidden list: a fresh load replaces it, a further page or a handoff made in this tab adds to it, one row per business", () => {
+  const first = mergeDeskHidden([], [hidden("a"), hidden("b", "clients"), hidden("a")]);
+  assert.deepEqual(first.map((h) => h.id), ["a", "b"]);
+  assert.deepEqual(mergeDeskHidden(first, [hidden("c")]).map((h) => h.id), ["c"], "a fresh roster says who is hidden now");
+  assert.deepEqual(mergeDeskHidden(first, [hidden("b", "onboarding"), hidden("c")], true).map((h) => `${h.id}:${h.tab}`), ["a:onboarding", "b:clients", "c:onboarding"], "a further page adds; the first word on a business stands");
+  assert.deepEqual(mergeDeskHidden(first, [], false), []);
+  // A roster from an older server (no deskHidden) or junk in it never breaks the desk.
+  assert.deepEqual(mergeDeskHidden([], [null as unknown as DeskHiddenLead, { id: 7 } as unknown as DeskHiddenLead, hidden("ok")]).map((h) => h.id), ["ok"]);
+  assert.equal(deskHiddenLabel(0), ""); assert.equal(deskHiddenLabel(1), "1 hidden (in Onboarding or Clients)"); assert.equal(deskHiddenLabel(12), "12 hidden (in Onboarding or Clients)");
 });

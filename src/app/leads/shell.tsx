@@ -8,7 +8,7 @@ import Onboarding from "./onboarding";
 import Clients from "./clients";
 import Packages from "./packages";
 import Links from "./links";
-import type { CallLead, DeskLeave, SignedIn } from "./types";
+import type { CallLead, DeskHiddenLead, DeskLeave, SignedIn } from "./types";
 import type { DeskSystem } from "./notes";
 import { DESK_LOGIN_PATH, DESK_PATH } from "@/lib/desk-path";
 import "./onboarding.css";
@@ -35,6 +35,13 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
   const deskSystem: DeskSystem = reported || preview || deskDefault;
   const [handoff, setHandoff] = useState<{ lead: CallLead | null } | null>(null);
   const [packages, setPackages] = useState<{ lead: CallLead | null } | null>(null);
+  // Leads handed off to onboarding from this tab: the Sales list drops them at once (the server's list follows once GoHighLevel's
+  // search has caught up). Only when the onboarding record IS the lead's own contact — that is what the server's rule will see.
+  const [moved, setMoved] = useState<DeskHiddenLead[]>([]);
+  const handedOff = (lead: CallLead | null, itemId: string) => {
+    if (!lead || itemId !== lead.id) return;
+    setMoved((list) => (list.some((m) => m.id === lead.id) ? list : [...list, { id: lead.id, name: lead.name, tab: "onboarding" }]));
+  };
   const [who, setWho] = useState<SignedIn | null>(null);
   // The Sales desk is always mounted and holds the unsaved call notes: it is asked before the session ends (see DeskLeave).
   const leaveRef = useRef<DeskLeave>({ unsaved: () => "", leaving: false });
@@ -82,11 +89,11 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
       </div>
     </div>
     {leaveError && <div className="team-bar-alert" role="alert">{leaveError}</div>}
-    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} onOpenPackages={(lead) => setPackages({ lead })} onWho={setWho} leaveRef={leaveRef} /></div>
+    <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} onOpenPackages={(lead) => setPackages({ lead })} onWho={setWho} leaveRef={leaveRef} moved={moved} onOpenDeskRecord={go} /></div>
     {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} system={deskSystem} preview={preview} onSystem={setReported} />}
     {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} system={deskSystem} preview={preview} onSystem={setReported} />}
     {tab === "links" && <Links />}
     {packages && <Packages lead={packages.lead} onClose={() => setPackages(null)} />}
-    {handoff && <Handoff lead={handoff.lead} system={deskSystem} preview={preview} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
+    {handoff && <Handoff lead={handoff.lead} system={deskSystem} preview={preview} onClose={() => setHandoff(null)} onStarted={(itemId) => handedOff(handoff.lead, itemId)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
   </div>;
 }

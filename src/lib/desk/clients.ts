@@ -13,7 +13,7 @@ import { assertOption, type DeskFields } from "./fields";
 import { stripeFollowed } from "./legacy";
 import { addDeskNote, deleteDeskNote, editDeskNote, toTimeline } from "./notes";
 import { tasksFor } from "./tasks";
-import { allDeskFields, businessName, fileScopeFor, groupLabel, isClientRecord, listRecords, mapClient, readContact, resolveRecordId, stillOnboarding, version, writeRecord, type DeskValues } from "./record";
+import { allDeskFields, businessName, fileScopeFor, groupLabel, isClientRecord, listRecords, mapClient, onClientsTab, readContact, resolveRecordId, version, writeRecord, type DeskValues } from "./record";
 import { memberByName, teamOwners, type Actor } from "./team";
 import type { DeskClientPatch } from "./validation";
 
@@ -27,7 +27,7 @@ const STALE = "Someone changed this client since you loaded it. Reload to see th
 export async function listClientsGhl(): Promise<ClientsListData> {
   const f = await allDeskFields();
   const today = todayEastern();
-  const rows = (await listRecords("client", f)).filter((c) => !stillOnboarding(c, f)).map((c) => mapClient(c, f, today));
+  const rows = (await listRecords("client", f)).filter((c) => onClientsTab(c, f)).map((c) => mapClient(c, f, today));
   return { rows: await withLiveGbp(rows), cursor: null, boardName: "GoHighLevel", stripeConnected: stripeConnected(), canSeeMoney: false /* the route decides per session */, searchAtlasConnected: searchAtlasConnected(), system: "ghl", systemName: "GoHighLevel" };
 }
 
@@ -209,7 +209,7 @@ export async function findClientByStripeCustomerGhl(customerId: string, email?: 
   const byId = contacts.map((c) => mapClient(c, f)).find((r) => r.stripeCustomer === customerId);
   if (byId) return byId;
   if (!email) return null;
-  return contacts.filter((c) => !stillOnboarding(c, f)).map((c) => mapClient(c, f)).find((r) => r.email.toLowerCase() === email.toLowerCase() && !r.stripeCustomer && stripeFollowed(r)) || null;
+  return contacts.filter((c) => onClientsTab(c, f)).map((c) => mapClient(c, f)).find((r) => r.email.toLowerCase() === email.toLowerCase() && !r.stripeCustomer && stripeFollowed(r)) || null;
 }
 
 /** The clients the nightly Stripe reconcile re-reads: a stored customer id, or an email to find one by — and, for a legacy client, only when Stripe is part of its record. */

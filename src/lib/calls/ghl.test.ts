@@ -96,6 +96,25 @@ test("getCallsPage never lists the designated test contact", async () => {
   queue.push(defs(), { status: 200, body: { contacts: [contact(), contact({ id: "C8FHl1LIfXEMI9isByB2", companyName: "Test — Claude" })], total: 2 } });
   assert.deepEqual((await getCallsPage(null)).leads.map((l) => l.id), [ID]);
 });
+test("getCallsPage with a hide rule: businesses on the Onboarding or Clients tab are left out and named in deskHidden, from the same single search", async () => {
+  const onboarding = contact({ id: "onboard0000000000000", companyName: "Blue Ridge Golf Carts LLC", tags: ["giveaway-entrant", "desk-onboarding"] });
+  const client = contact({ id: "client00000000000000", companyName: "", firstName: "Kaden", lastName: "Vanwey", contactName: "Kaden Vanwey", tags: ["playbook-lead", "desk-client"] });
+  const test = contact({ id: "C8FHl1LIfXEMI9isByB2", companyName: "Test — Claude", tags: ["desk-client"] });
+  const all = [contact(), onboarding, client, test];
+  queue.push(defs(), { status: 200, body: { contacts: all, total: 4 } });
+  const seen: string[] = [];
+  const hide = (c: { id: string; tags?: string[] }) => { seen.push(c.id); return c.tags?.includes("desk-client") ? "clients" as const : c.tags?.includes("desk-onboarding") ? "onboarding" as const : null; };
+  const page = await getCallsPage(null, { hide });
+  assert.deepEqual(page.leads.map((l) => l.id), [ID]);
+  assert.deepEqual(page.deskHidden, [{ id: "onboard0000000000000", name: "Blue Ridge Golf Carts LLC", tab: "onboarding" }, { id: "client00000000000000", name: "Kaden Vanwey", tab: "clients" }]);
+  assert.ok(!seen.includes("C8FHl1LIfXEMI9isByB2"), "the test contact is dropped before the rule: never listed, never counted as hidden");
+  assert.deepEqual(paths(), ["GET /locations/LOCtest000000000000/customFields", "POST /contacts/search"], "no request of its own: the same definitions and the same search, no write");
+  assert.deepEqual((requests[1].body as { filters: unknown }).filters, rosterFilters(F.ls), "the roster search itself is unchanged");
+  // Without a rule (the calendar feeds, the Monday-desk preview) every lead comes back and there is no deskHidden at all.
+  queue.push({ status: 200, body: { contacts: all, total: 4 } });
+  const feed = await getCallsPage(null);
+  assert.deepEqual(feed.leads.map((l) => l.id), [ID, "onboard0000000000000", "client00000000000000"]); assert.equal("deskHidden" in feed, false);
+});
 test("mapLead carries the contact's no-call tags (and only those) for the desk", () => {
   assert.deepEqual(mapLead(contact(), fields).noCallTags, []);
   assert.deepEqual(mapLead(contact({ tags: ["giveaway-entrant", "do-not-contact", "concept-not-interested", "Fake-Lead"] }), fields).noCallTags, ["do-not-contact", "fake-lead"]);

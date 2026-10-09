@@ -5,6 +5,7 @@ import { todayEastern } from "@/lib/onboarding/api";
 import { STAGES, isGiveawayWinner, type StageId } from "@/lib/onboarding/config";
 import { missingRequired } from "@/lib/onboarding/checklist";
 import type { HandoffForm, OnboardingRow } from "@/lib/onboarding/types";
+import type { DeskTabName } from "@/app/leads/types";
 import { CLIENT_GROUPS, type ClientGroupId } from "@/lib/clients/config";
 import { flagsFor } from "@/lib/clients/board";
 import type { ClientRow } from "@/lib/clients/types";
@@ -102,6 +103,31 @@ export function mapClient(c: GhlContact, f: DeskFields, today = todayEastern()):
 }
 /** "One place at a time": a client whose onboarding is not Launched yet stays on the Onboarding tab. */
 export const stillOnboarding = (c: GhlContact, f: DeskFields): boolean => isOnboardingRecord(c, f) && stageIdForLabel(deskText(c, f, "obStage")) !== "launched";
+
+// ───────────────────────────── which tab a contact is on ─────────────────────────────
+// The one definition of "this business is on the Onboarding tab / the Clients tab". The two tabs list by it, and the Sales tab
+// leaves out every contact it places (Dave, Oct 9 2026: "Once they move to onboarding and active clients, we don't need to be
+// able to find those people in the sales section") — so the three tabs cannot disagree about where a business is.
+/** The Onboarding tab lists every onboarding record, whatever its stage (a launched one waits under "Show launched"). */
+export const onOnboardingTab = (c: GhlContact, f: DeskFields): boolean => isOnboardingRecord(c, f);
+/** The Clients tab lists every client record that is not still onboarding ("one place at a time"): active, paused, at risk, churned, legacy — all of them. */
+export const onClientsTab = (c: GhlContact, f: DeskFields): boolean => isClientRecord(c, f) && !stillOnboarding(c, f);
+export type DeskTab = DeskTabName;
+/** Where on the desk this contact is, or null when it is on neither tab. A launched record that is also a client reads as "clients" (the Onboarding tab hides launched records unless asked). */
+export function deskTabOf(c: GhlContact, f: DeskFields): DeskTab | null {
+  if (onClientsTab(c, f)) return "clients";
+  if (onOnboardingTab(c, f)) return "onboarding";
+  return null;
+}
+/**
+ * The Sales tab's rule, ready to apply to each contact on the roster. It reads the desk field definitions from the same
+ * ten-minute cache the roster itself uses, so it costs no request of its own, and it never refuses: a location where a desk
+ * field is missing places contacts by the desk tags alone (as the tabs' own lists do when the field filter is refused).
+ */
+export async function deskTabRule(): Promise<(c: GhlContact) => DeskTab | null> {
+  const f = await deskFields();
+  return (c) => deskTabOf(c, f);
+}
 
 // ───────────────────────────── reads ─────────────────────────────
 /** `fresh` re-reads the definitions from GoHighLevel instead of the 10-minute cache — for the moment after someone changed a field's options there. */

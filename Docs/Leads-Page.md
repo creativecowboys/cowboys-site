@@ -281,3 +281,28 @@ need the sidebar to be scrollable."
   header is on screen and hands it to the CSS as `--call-roster-gap` on `.call-layout` (kept current on scroll and
   resize; without the script the roster is simply a full window tall), and holds the rules for keeping the opened lead
   in sight. The Onboarding and Clients tabs share nothing with it.
+
+## Businesses on Onboarding or Clients are not on Sales (October 9, 2026)
+
+Dave: "if a lead is moved to the active clients or even in the onboarding part, they get removed from the column where it says 'sales'
+… Once they move to onboarding and active clients, we don't need to be able to find those people in the sales section."
+
+- **Rule** (one definition, `src/lib/desk/record.ts`): `onOnboardingTab` = an onboarding record (the `desk-onboarding` tag or a
+  Desk Onboarding Stage), any stage; `onClientsTab` = a client record (the `desk-client` tag or a Desk Client Status) that is not still
+  onboarding; `deskTabOf` = which of the two a contact is on, or null. The Clients tab's own list filters with `onClientsTab`, the
+  Onboarding tab lists exactly the onboarding records, and the Sales roster leaves out every contact `deskTabOf` places — so the three
+  tabs cannot disagree. Every client status counts (active, at risk, paused, payment issue, churned, legacy), and so does a launched
+  onboarding record.
+- **Where it is applied**: on the server, in the roster itself (`GET /api/team/calls` → `getCallsPage(…, { hideDeskRecords })` in
+  `src/lib/calls/backend.ts` → the `hide` hook in `src/lib/calls/ghl.ts`). Hidden businesses are not in `leads` at all, so the list,
+  search (names and phone digits), owner / status / source filters, the "Show leads" views and every count leave them out. They come
+  back only as `deskHidden: [{ id, name, tab }]`. No extra GoHighLevel request: the same definitions cache and the same search.
+  Applied when the desk is on GoHighLevel (`DESK_BACKEND=ghl`, or `?desk=ghl` on the page); the Monday path is unchanged.
+- **On screen**: one quiet line in the count, e.g. `804 shown · 809 loaded · 5 off the call list · 5 hidden (in Onboarding or Clients)`.
+  No toggle. A handoff made from this tab hides its lead at once (GoHighLevel's search takes a few seconds to catch up).
+- **Calendar links**: a follow-up feed still lists a handed-off client's booked call (Dave, Sep 28 2026 — the feeds do not ask for
+  the rule). Its `/admin?lead=<id>` link now opens the business on the Onboarding or Clients tab instead of an empty Sales panel.
+- **Unsaved call notes** for a lead that moved on (handed off with notes still open, or by a teammate) are reached from a line under
+  the count, "Unsaved call notes for X, now on the Onboarding tab. Open the notes", until they are saved.
+- **Not changed**: nothing is written to GoHighLevel (no tag, stage, owner or status), the Onboarding and Clients tabs, the package
+  builder's customer search (GoHighLevel's own search), and the calendar feeds.

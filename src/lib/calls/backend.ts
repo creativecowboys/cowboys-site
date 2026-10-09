@@ -5,12 +5,20 @@ import * as ghl from "./ghl";
 import { markSourceLead as markMondayLead, readLeadVersion as readMondayLeadVersion } from "@/lib/onboarding/pipeline";
 import { backendForLeadId, defaultBackend } from "./switch";
 import type { RepName } from "@/lib/ghl/reps";
+import { deskTabRule } from "@/lib/desk/record";
 export { backendForLeadId, defaultBackend, leadsBackend, repIdFor, systemName } from "./switch";
 
 // Dispatch for the LEADS_BACKEND switch (Oct 1 2026) — see ./switch.ts for the rules. Routes and the
 // onboarding handoff import from here, never from ./monday or ./ghl directly.
-export const getCallsPage = (cursor: string | null, backend: LeadsBackend = defaultBackend()): Promise<CallsPageData> =>
-  backend === "ghl" ? ghl.getCallsPage(cursor) : monday.getCallsPage(cursor);
+//
+// `hideDeskRecords` is the Sales tab's list (Dave, Oct 9 2026): a business on the Onboarding or Clients tab is not a lead to call,
+// so it is left out of the roster by the desk's own rule (src/lib/desk/record.ts deskTabOf) and comes back only as a count in
+// `deskHidden`. It applies to GoHighLevel leads with the desk on GoHighLevel — the route decides that; the Monday boards are frozen
+// and keep their old roster. The calendar feeds do not ask for it: a handed-off client's booked call stays on the calendar.
+export async function getCallsPage(cursor: string | null, backend: LeadsBackend = defaultBackend(), opts: { hideDeskRecords?: boolean } = {}): Promise<CallsPageData> {
+  if (backend !== "ghl") return monday.getCallsPage(cursor);
+  return ghl.getCallsPage(cursor, opts.hideDeskRecords ? { hide: await deskTabRule() } : {});
+}
 export const getCallLead = (id: string): Promise<{ lead: CallLead; history: CallHistory[] }> =>
   backendForLeadId(id) === "ghl" ? ghl.getCallLead(id) : monday.getCallLead(id);
 export const assignOwner = (id: string, owner: RepName | "", expectedUpdatedAt: string): Promise<CallLead> =>

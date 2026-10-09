@@ -48,5 +48,14 @@ export type CallsPageData = {
   noCallTagsRead?: boolean;
   /** Who is signed in. Added by the route to every roster answer (not by either lead system); null when the session carries no address. */
   me?: SignedIn | null;
+  /**
+   * GHL with the desk on GHL: the contacts the roster search found that are on the Onboarding or Clients tab, left OUT of `leads`
+   * (Dave, Oct 9 2026 — src/lib/desk/record.ts deskTabOf decides). Only id, name and tab: the desk counts them, opens a calendar
+   * link to one on its own tab, and finds unsaved call notes for one. Absent when nothing is left out by rule (Monday, the feeds).
+   */
+  deskHidden?: DeskHiddenLead[];
 };
+/** The two desk tabs a business can be on besides Sales. */
+export type DeskTabName = "onboarding" | "clients";
+export type DeskHiddenLead = { id: string; name: string; tab: DeskTabName };
 export type SaveCallResult = { saved: true; updateId: string; recordUrl: string; warning?: string; /** @deprecated see CallLead.mondayUrl */ mondayUrl?: string };
