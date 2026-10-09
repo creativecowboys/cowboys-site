@@ -6,7 +6,7 @@ import BookingEmbed from "../BookingEmbed";
 import { BOOKING_URL, PHONE_DISPLAY, PHONE_TEL } from "../content";
 
 /**
- * Where the checkout sends people after they pay: book the 15-minute
+ * Where the checkout sends people after they pay: book the 30-minute
  * onboarding call. Also reachable from the offer page for anyone who paid
  * and closed the tab. Set this URL as the payment link's post-purchase redirect.
  */
@@ -20,7 +20,7 @@ const ACCENT = "#B5330E";
 const YELLOW = "#F5C842";
 
 const NEXT = [
-    "Pick a 15-minute slot below. It's a Google Meet, and the link lands in your confirmation email and on your calendar.",
+    "Pick a 30-minute onboarding call below. It's a Google Meet, and the link lands in your confirmation email and on your calendar.",
     "Check your inbox in a few minutes for your welcome email and onboarding link.",
     "Onboarding takes about 15 minutes online and saves as you go.",
     "Your build starts as soon as it's complete. Live in about three weeks.",
@@ -64,8 +64,8 @@ export default function LocalMaxWelcomePage() {
                             </span>
                         </h1>
                         <p className="text-[#5a5a5a] leading-relaxed text-base md:text-lg">
-                            Fifteen minutes with our team so we start your site with the right picture of
-                            your business. Grab whatever slot works.
+                            A 30-minute onboarding call with our team so we start your site with the right
+                            picture of your business. Grab whatever slot works.
                         </p>
                         <ul className="flex flex-col gap-3 mt-2">
                             {NEXT.map((t) => (
