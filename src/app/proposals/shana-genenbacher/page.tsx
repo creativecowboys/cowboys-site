@@ -717,7 +717,7 @@ export default function ShanaProposalPage() {
             <footer>
                 <div className="wrap">
                     <div className="fmeta">
-                        Joshua Pack &amp; Dave Column · Creative Cowboys Media · Villa Rica, GA ·
+                        Joshua Pack &amp; Dave Collum · Creative Cowboys Media · Villa Rica, GA ·
                         Franklin, TN (new office) · howdy@creativecowboys.co
                     </div>
                 </div>

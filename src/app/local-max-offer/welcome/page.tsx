@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Check } from "lucide-react";
-import CalendlyEmbed from "../CalendlyEmbed";
-import { CALENDLY_URL, PHONE_DISPLAY, PHONE_TEL } from "../content";
+import BookingEmbed from "../BookingEmbed";
+import { BOOKING_URL, PHONE_DISPLAY, PHONE_TEL } from "../content";
 
 /**
  * Where the checkout sends people after they pay: book the 15-minute
@@ -88,7 +88,7 @@ export default function LocalMaxWelcomePage() {
                             .
                         </p>
                     </div>
-                    <CalendlyEmbed url={CALENDLY_URL} />
+                    <BookingEmbed url={BOOKING_URL} />
                 </div>
             </section>
 

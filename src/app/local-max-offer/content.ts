@@ -2,15 +2,15 @@
  * Local Max entrant offer — page copy and the handful of values that change.
  *
  * Everything a non-developer might need to edit lives here: the checkout link,
- * the Calendly link, the closing date, and every block of copy. The page files
+ * the booking link, the closing date, and every block of copy. The page files
  * only lay it out.
  */
 
 /** GHL payment link for "Local Max — 12-month commitment" ($297/mo). */
 export const CHECKOUT_URL = "https://link.fastpaydirect.com/payment-link/6a9d9346a7f78e147447f2e8";
 
-/** 15-minute onboarding call (Calendly event "Local Max Onboarding Call"). */
-export const CALENDLY_URL = "https://calendly.com/creativecowboys/local-max-onboarding-call";
+/** Onboarding call (GoHighLevel calendar "Cowboys Onboarding Call", 30 min). */
+export const BOOKING_URL = "https://api.leadconnectorhq.com/widget/bookings/cowboys-onboarding-call-30min";
 
 /** Shown wherever the deadline is mentioned. */
 export const OFFER_CLOSES = "Friday, October 3";
