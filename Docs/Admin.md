@@ -30,8 +30,10 @@ often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
 - **Who can change it:** anyone signed in to the Back Office (same team cookie as every `/api/team/*` route). No owner gate.
 - **Where it is stored:** one private JSON document, `team/links.json`, in the site's existing Vercel Blob store
   (`BLOB_READ_WRITE_TOKEN`, the same store as the onboarding handoffs and client files). No new service. Writes are
-  read → change → write-if-unchanged (Blob `ifMatch` on the ETag that was read; the first ever write is create-only), so
-  two people saving at the same moment cannot lose each other's change. Each link carries a `rev`; an edit made from a
+  read → change → write-if-unchanged (Blob `ifMatch`; the first ever write is create-only), so two people saving at the
+  same moment cannot lose each other's change. The ETag a write names comes from `head()`, read on both sides of an
+  uncached `get()` and trusted only when the two agree: the ETag that `get()` itself returns did not match what
+  `put({ ifMatch })` checks on production (the first build refused every delete with "Someone else is saving links"). Each link carries a `rev`; an edit made from a
   stale screen gets a 409 and the list reloads. The adder's email is kept in storage but never sent to the browser.
 - **Rules (server-side, `src/lib/desk/link-rules.ts`):** http and https only (`javascript:`, `data:`, `mailto:`, `file:`
   and the rest are refused); an address typed without a scheme gets `https://`; a link carrying `user:password@` is

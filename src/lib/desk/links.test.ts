@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { byLinkName, checkLinkFields, linkLabel, linkMatches, normalizeLinkUrl, safeLinkHref, LINK_LIMITS } from "./link-rules";
-import { addLink, deleteLink, editLink, listLinks, LinkStorageConflict, type LinkStorage, type StoredLink } from "./links";
+import { addLink, blobLinkStorage, deleteLink, editLink, LINKS_PATH, listLinks, LinkStorageConflict, type LinkStorage, type StoredLink } from "./links";
+import { blobJson, blobReset } from "./testing/blob-stub";
 import { CallDeskError } from "@/lib/calls/validation";
 
 // The Back Office Links tab (Oct 9 2026): what a link may hold, and the shared list's read → change → write-if-unchanged.
@@ -191,4 +192,30 @@ test("an unreadable document is reported, never overwritten", async () => {
   await fails(listLinks(storage), 500, /unreadable/);
   await fails(addLink({ id: id(1), name: "x", url: "x.co" }, dave, now, storage), 500, /unreadable/);
   assert.equal(wrote, false);
+});
+
+test("the Blob adapter (in-memory stand-in): nothing stored reads as empty, the first add creates the document, the rest edit it", async () => {
+  const before = process.env.BLOB_READ_WRITE_TOKEN;
+  process.env.BLOB_READ_WRITE_TOKEN = "test-only";
+  blobReset();
+  try {
+    assert.deepEqual((await listLinks()).links, []);
+    assert.equal(await blobLinkStorage.read(true), null, "a read for a write of a missing document is null, so the write is create-only");
+    await addLink({ id: id(1), name: "Alpha", url: "alpha.com" }, dave, now);
+    await addLink({ id: id(2), name: "Beta", url: "beta.com" }, josh, now);
+    await editLink(id(1), { name: "Alpha 2", url: "alpha.com", note: "", rev: 1 }, josh, now);
+    await deleteLink(id(2));
+    assert.deepEqual(blobJson<{ version: number; links: StoredLink[] }>(LINKS_PATH)?.links.map((l) => [l.name, l.rev]), [["Alpha 2", 2]]);
+    assert.deepEqual((await listLinks()).links.map((l) => l.name), ["Alpha 2"]);
+  } finally {
+    blobReset();
+    if (before === undefined) delete process.env.BLOB_READ_WRITE_TOKEN; else process.env.BLOB_READ_WRITE_TOKEN = before;
+  }
+});
+
+test("without the storage token the tab says so instead of failing quietly", async () => {
+  const before = process.env.BLOB_READ_WRITE_TOKEN;
+  delete process.env.BLOB_READ_WRITE_TOKEN;
+  try { await fails(listLinks(), 503, /not connected/); }
+  finally { if (before !== undefined) process.env.BLOB_READ_WRITE_TOKEN = before; }
 });

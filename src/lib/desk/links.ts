@@ -1,4 +1,4 @@
-import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
+import { BlobNotFoundError, BlobPreconditionFailedError, get, head, put } from "@vercel/blob";
 import { CallDeskError } from "@/lib/calls/validation";
 import { byLinkName, checkLinkFields, LINK_LIMITS, type LinkFields } from "./link-rules";
 
@@ -12,6 +12,10 @@ import { byLinkName, checkLinkFields, LINK_LIMITS, type LinkFields } from "./lin
 // write carries the ETag that was read (`ifMatch`); if someone saved in between, Blob refuses it and the change is
 // re-applied to the fresh list (a few times, then the person is asked to try again). The very first write creates the
 // document only if it does not exist yet. A link's own `rev` guards an edit made from a stale screen.
+// The ETag a write names comes from head() (the Blob API), never from the get() response: on production the ETag that
+// get() hands back did not match what put({ ifMatch }) checks against, and every second write was refused (Oct 9 2026).
+// So a read for a write is head → get (uncached, which Blob guarantees is the latest content) → head, and is only
+// trusted when both heads agree.
 export const LINKS_PATH = "team/links.json";
 const ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ATTEMPTS = 5;
@@ -31,25 +35,40 @@ type Who = { name: string; email: string };
 
 /** Where the document is kept. Swappable so the tests can run against an in-memory copy with real ETag behaviour. */
 export type LinkStorage = {
-  read(): Promise<{ text: string; etag: string } | null>;
+  /** `forWrite`: also return the ETag a conditional write must name (a plain list read does not need one). */
+  read(forWrite?: boolean): Promise<{ text: string; etag: string } | null>;
   /** `etag` null = create, and fail if it already exists. A write that lost a race throws LinkStorageConflict. */
   write(text: string, etag: string | null): Promise<void>;
 };
 export class LinkStorageConflict extends Error {}
 
+const isNotFound = (error: unknown): boolean =>
+  (typeof BlobNotFoundError === "function" && error instanceof BlobNotFoundError) || (error as { statusCode?: number })?.statusCode === 404;
 const isConflict = (error: unknown): boolean =>
   (typeof BlobPreconditionFailedError === "function" && error instanceof BlobPreconditionFailedError) ||
   /precondition|already exists/i.test(error instanceof Error ? error.message : "");
 
 export const blobLinkStorage: LinkStorage = {
-  async read() {
+  async read(forWrite = false) {
     if (!process.env.BLOB_READ_WRITE_TOKEN) throw new CallDeskError("Link storage is not connected yet. Ask your administrator to finish the storage connection.", 503);
-    try {
+    const text = async (): Promise<string | null> => {
       const res = await get(LINKS_PATH, { access: "private", useCache: false });
-      if (!res || res.statusCode !== 200 || !res.stream) return null;
-      return { text: await new Response(res.stream).text(), etag: res.blob.etag || "" };
+      return res && res.statusCode === 200 && res.stream ? await new Response(res.stream).text() : null;
+    };
+    const tag = async (): Promise<string | null> => {
+      try { return (await head(LINKS_PATH)).etag || ""; } catch (error) { if (isNotFound(error)) return null; throw error; }
+    };
+    try {
+      if (!forWrite) { const body = await text(); return body === null ? null : { text: body, etag: "" }; }
+      const before = await tag();
+      const body = await text();
+      const after = await tag();
+      if (before === null && after === null && body === null) return null; // not created yet
+      if (before === null || after === null || body === null || before !== after) throw new LinkStorageConflict("changed while it was being read");
+      return { text: body, etag: before };
     } catch (error) {
-      if ((error as { statusCode?: number })?.statusCode === 404) return null;
+      if (error instanceof LinkStorageConflict) throw error;
+      if (isNotFound(error)) return null;
       throw new CallDeskError("The links could not be read right now. Please try again.");
     }
   },
@@ -77,19 +96,23 @@ const shown = ({ id, name, url, note, addedBy, addedAt, updatedBy, updatedAt, re
 const toData = (links: StoredLink[]): LinksData => ({ links: [...links].sort(byLinkName).map(shown), limits: LINK_LIMITS });
 const sameUrl = (links: StoredLink[], url: string, except = "") => links.find((l) => l.id !== except && l.url === url);
 
+/** A short, growing, jittered wait between attempts, so two people retrying do not collide again in step. */
+const backoff = (attempt: number) => new Promise<void>((resolve) => setTimeout(resolve, 80 * attempt + Math.floor(Math.random() * 120)));
+
 /**
  * Read, change, write-if-unchanged. `change` returns the new list, or the same array to mean "nothing to write"
  * (an add that is a retry of one already saved, a delete of a link already gone). Throws CallDeskError for anything
  * the person should be told.
  */
-async function mutate(storage: LinkStorage, change: (links: StoredLink[]) => StoredLink[]): Promise<LinksData> {
+async function mutate(storage: LinkStorage, change: (links: StoredLink[]) => StoredLink[], pause = backoff): Promise<LinksData> {
   for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
-    const current = await storage.read();
-    const links = current ? parse(current.text) : [];
-    const next = change(links);
-    if (next === links) return toData(links);
-    const doc: Doc = { version: 1, links: [...next].sort(byLinkName) };
+    if (attempt) await pause(attempt);
     try {
+      const current = await storage.read(true);
+      const links = current ? parse(current.text) : [];
+      const next = change(links);
+      if (next === links) return toData(links);
+      const doc: Doc = { version: 1, links: [...next].sort(byLinkName) };
       await storage.write(JSON.stringify(doc), current ? current.etag : null);
       return toData(doc.links);
     } catch (error) {
