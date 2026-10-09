@@ -1,9 +1,15 @@
 import { BlobNotFoundError, BlobPreconditionFailedError, BlobServiceRateLimited, get, head, put } from "@vercel/blob";
 import { CallDeskError } from "@/lib/calls/validation";
-import { byLinkName, checkLinkFields, LINK_LIMITS, type LinkFields } from "./link-rules";
+import { checkLinkFields, LINK_LIMITS, type LinkFields } from "./link-rules";
 
 // The Back Office Links tab (Oct 9 2026): the team's shared list of links they use often, each with a name, the
-// address, an optional short note, and who added it and when. Any signed-in team member can add, change or delete.
+// address, an optional short note, and who added it and when. Any signed-in team member can add, change, delete or
+// reorder. The order is the team's own (Dave, Oct 9 2026: drag a grab handle to reorder, saved for everyone): the
+// document's `links` array IS the order. A new link goes to the top; an edit keeps its place.
+// A reorder is sent as one move ("put this link right after that one", or "at the top"), not as a whole list, and is
+// applied to whatever the list is when it lands — so a move made from a screen that missed someone's add, edit or
+// delete never undoes it. If the link it names as its neighbour has been deleted meanwhile, the move is refused (409)
+// and the screen reloads.
 //
 // Where it lives: ONE private JSON document in the site's existing Vercel Blob store (BLOB_READ_WRITE_TOKEN, the same
 // store that holds onboarding handoffs and client files), at `team/links.json`. No new service, no database.
@@ -109,7 +115,7 @@ function parse(text: string): StoredLink[] {
 }
 const shown = ({ id, name, url, note, addedBy, addedAt, updatedBy, updatedAt, rev }: StoredLink): TeamLink =>
   ({ id, name, url, note, addedBy, addedAt, rev, ...(updatedBy ? { updatedBy } : {}), ...(updatedAt ? { updatedAt } : {}) });
-const toData = (links: StoredLink[]): LinksData => ({ links: [...links].sort(byLinkName).map(shown), limits: LINK_LIMITS });
+const toData = (links: StoredLink[]): LinksData => ({ links: links.map(shown), limits: LINK_LIMITS });
 const sameUrl = (links: StoredLink[], url: string, except = "") => links.find((l) => l.id !== except && l.url === url);
 
 /** A short, growing, jittered wait between attempts, so two people retrying do not collide again in step. */
@@ -128,7 +134,7 @@ async function mutate(storage: LinkStorage, change: (links: StoredLink[]) => Sto
       const links = current ? parse(current.text) : [];
       const next = change(links);
       if (next === links) return toData(links);
-      const doc: Doc = { version: 1, links: [...next].sort(byLinkName) };
+      const doc: Doc = { version: 1, links: next };
       await storage.write(JSON.stringify(doc), current ? current.etag : null);
       return toData(doc.links);
     } catch (error) {
@@ -157,7 +163,7 @@ export async function addLink(input: unknown, who: Who, now = new Date(), storag
     const twin = sameUrl(links, fields.url);
     if (twin) throw new CallDeskError(`That link is already saved, as “${twin.name}”.`, 409);
     if (links.length >= LINK_LIMITS.count) throw new CallDeskError(`The list is full (${LINK_LIMITS.count} links). Delete a few old ones first.`, 400);
-    return [...links, { id, ...fields, addedBy: who.name, addedByEmail: who.email, addedAt: now.toISOString(), rev: 1 }];
+    return [{ id, ...fields, addedBy: who.name, addedByEmail: who.email, addedAt: now.toISOString(), rev: 1 }, ...links]; // new links go on top
   });
 }
 
@@ -188,4 +194,30 @@ export async function deleteLink(id: string, storage: LinkStorage = blobLinkStor
   if (!ID.test(id)) throw new CallDeskError("That link was not found.", 404);
   const key = id.toLowerCase();
   return mutate(storage, (links) => (links.some((l) => l.id === key) ? links.filter((l) => l.id !== key) : links));
+}
+
+/**
+ * Move one link: right after `after` (another link's id), or to the top when `after` is null. Applied to the list as it
+ * is now, so it never undoes a change it did not see. A move to where the link already is writes nothing.
+ */
+export async function moveLink(id: string, input: unknown, storage: LinkStorage = blobLinkStorage): Promise<LinksData> {
+  if (!ID.test(id)) throw new CallDeskError("That link was not found.", 404);
+  const raw = input && typeof input === "object" && !Array.isArray(input) ? (input as Record<string, unknown>) : {};
+  if (!("after" in raw) || (raw.after !== null && (typeof raw.after !== "string" || !ID.test(raw.after)))) throw new CallDeskError("Reload the page and try again.", 400);
+  const key = id.toLowerCase();
+  const after = raw.after === null ? null : (raw.after as string).toLowerCase();
+  if (after === key) throw new CallDeskError("Reload the page and try again.", 400);
+  return mutate(storage, (links) => {
+    const moving = links.find((l) => l.id === key);
+    if (!moving) throw new CallDeskError("That link was deleted by someone else. The list has been refreshed.", 404);
+    const rest = links.filter((l) => l.id !== key);
+    let at = 0;
+    if (after !== null) {
+      const anchor = rest.findIndex((l) => l.id === after);
+      if (anchor < 0) throw new CallDeskError("The list changed while you were moving that link. It has been refreshed; try again.", 409);
+      at = anchor + 1;
+    }
+    const next = [...rest.slice(0, at), moving, ...rest.slice(at)];
+    return next.every((l, i) => l === links[i]) ? links : next;
+  });
 }

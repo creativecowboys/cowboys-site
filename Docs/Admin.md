@@ -21,12 +21,22 @@ Not changed: the address (`/admin`, and `/leads` still forwards), every route an
 ## Links tab (October 9, 2026)
 Dave: "can you make a new tab for links? next to these. Then give us the ability to name and post links that we use
 often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
-- **What it is:** one shared list for the whole team, A to Z by name. Each link has a name, the address, an optional short
+- **What it is:** one shared list for the whole team, in the team's own order. Each link has a name, the address, an optional short
   note, and who added it and when (and "edited by …" once changed). The name opens the link in a new tab
   (`target="_blank" rel="noopener noreferrer"`); **Copy link** puts the address on the clipboard. A search box filters by
   name, address, note or who added it. Under the add form: links only, never passwords, API keys or logins.
 - **Edit and Delete work like the notes on the client panels** (Dave, Oct 4 2026): Edit turns the row into boxes with
   Save and Cancel (Escape cancels); Delete is immediate, no question, and sits apart at the far right.
+- **Reorder (Dave, same day: "a grab handle… drag to reorder… saved and shared for everyone"):** a ⋮⋮ handle at the left
+  of each row. Drag it with a mouse or a finger (plain pointer events, no new library; the handle has `touch-action:none`
+  so dragging it never scrolls the page, and the page scrolls by itself once a row is pulled to the top or bottom edge
+  of the window). Keyboard: Tab to the handle, then ↑ / ↓ move one place, Home / End to the top / bottom; focus stays
+  on the handle and the move is announced. **New links go on top**; an edit keeps its place. The order replaced A to Z.
+  While the search box has text the handles are switched off ("clear the search to change the order").
+  Each move is saved as one step, `POST /api/team/links/<id>/move { after: <id of the link it now follows> | null }`
+  (null = top), applied to the list as it is when it lands, so a reorder from a stale screen never undoes someone's
+  add, edit or delete; if its new neighbour was deleted meanwhile it is refused (409) and the list reloads. Quick
+  moves queue and save one after another; the screen shows the new order at once.
 - **Who can change it:** anyone signed in to the Back Office (same team cookie as every `/api/team/*` route). No owner gate.
 - **Where it is stored:** one private JSON document, `team/links.json`, in the site's existing Vercel Blob store
   (`BLOB_READ_WRITE_TOKEN`, the same store as the onboarding handoffs and client files). No new service. Writes are
@@ -40,8 +50,8 @@ often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
   refused; no spaces or control characters; name ≤ 120, link ≤ 2048, note ≤ 500 characters; 500 links at most; the same
   address cannot be saved twice ("That link is already saved, as …").
 - **Code:** `src/app/leads/links.tsx` + `links.css` (the tab), `src/lib/desk/links.ts` (storage), `src/lib/desk/link-rules.ts`
-  (pure checks, used by the browser and the server), `src/app/api/team/links/route.ts` (GET list, POST add) and
-  `src/app/api/team/links/[id]/route.ts` (PATCH edit, DELETE). Tests: `src/lib/desk/links.test.ts` (`npm run test:desk -- links`).
+  (pure checks, used by the browser and the server), `src/app/api/team/links/route.ts` (GET list, POST add),
+  `src/app/api/team/links/[id]/route.ts` (PATCH edit, DELETE) and `src/app/api/team/links/[id]/move/route.ts` (POST move). Tests: `src/lib/desk/links.test.ts` (`npm run test:desk -- links`).
 - **Phones:** with four tabs the tab row is a little tighter below 560px wide and scrolls sideways on the narrowest
   screens (`onboarding.css`, last rule). Desktop is unchanged.
 

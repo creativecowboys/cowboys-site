@@ -71,10 +71,6 @@ export function linkLabel(value: string): string {
   } catch { return value; }
 }
 
-/** A to Z by name, ignoring capitals; ties by address so the order never shuffles. */
-export const byLinkName = (a: { name: string; url: string }, b: { name: string; url: string }): number =>
-  a.name.localeCompare(b.name, "en", { sensitivity: "base", numeric: true }) || a.url.localeCompare(b.url);
-
 /** What the search box matches: name, address, note and who added it. */
 export function linkMatches(link: { name: string; url: string; note: string; addedBy?: string }, query: string): boolean {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { byLinkName, checkLinkFields, linkLabel, linkMatches, normalizeLinkUrl, safeLinkHref, LINK_LIMITS } from "./link-rules";
-import { addLink, blobLinkStorage, deleteLink, editLink, LINKS_PATH, listLinks, LinkStorageConflict, type LinkStorage, type StoredLink } from "./links";
+import { checkLinkFields, linkLabel, linkMatches, normalizeLinkUrl, safeLinkHref, LINK_LIMITS } from "./link-rules";
+import { addLink, blobLinkStorage, deleteLink, editLink, LINKS_PATH, listLinks, LinkStorageConflict, moveLink, type LinkStorage, type StoredLink } from "./links";
 import { blobJson, blobReset } from "./testing/blob-stub";
 import { CallDeskError } from "@/lib/calls/validation";
 
@@ -81,7 +81,7 @@ test("fields: name required and on one line, note optional, the first problem is
   }
 });
 
-test("display helpers: only http(s) ever reaches an href; labels, order and search", () => {
+test("display helpers: only http(s) ever reaches an href; labels and search", () => {
   assert.equal(safeLinkHref("https://example.com/a"), "https://example.com/a");
   assert.equal(safeLinkHref("javascript:alert(1)"), null);
   assert.equal(safeLinkHref("data:text/html,x"), null);
@@ -89,8 +89,6 @@ test("display helpers: only http(s) ever reaches an href; labels, order and sear
   assert.equal(safeLinkHref(undefined), null);
   assert.equal(linkLabel("https://www.searchatlas.com/"), "searchatlas.com");
   assert.equal(linkLabel("https://app.gohighlevel.com/v2/location/x?tab=1"), "app.gohighlevel.com/v2/location/x?tab=1");
-  const list = [{ name: "beta", url: "b" }, { name: "Alpha", url: "a" }, { name: "alpha", url: "0" }, { name: "Link 10", url: "c" }, { name: "Link 9", url: "d" }];
-  assert.deepEqual([...list].sort(byLinkName).map((l) => `${l.name}|${l.url}`), ["alpha|0", "Alpha|a", "beta|b", "Link 9|d", "Link 10|c"]);
   const link = { name: "GHL sub-account", url: "https://app.gohighlevel.com/", note: "Creative Cowboys location", addedBy: "Josh" };
   assert.equal(linkMatches(link, ""), true);
   assert.equal(linkMatches(link, "  ghl  cowboys "), true, "every word, anywhere");
@@ -99,7 +97,7 @@ test("display helpers: only http(s) ever reaches an href; labels, order and sear
   assert.equal(linkMatches(link, "ghl stripe"), false);
 });
 
-test("add: saved A to Z with who and when; the browser never gets an email address", async () => {
+test("add: newest on top, with who and when; the browser never gets an email address", async () => {
   const m = memory();
   assert.deepEqual((await listLinks(m.storage)).links, [], "no document yet = an empty list");
   await addLink({ id: id(2), name: "Stripe", url: "dashboard.stripe.com", note: "Billing" }, dave, now, m.storage);
@@ -136,15 +134,15 @@ test("two people saving at once: neither change is lost", async () => {
   m.raceWith([...m.links(), stored(2, "Josh's link", "https://josh.example.com/", { addedBy: "Josh" })]);
   const data = await addLink({ id: id(3), name: "Dave's link", url: "dave.example.com" }, dave, now, m.storage);
   assert.equal(m.log.conflicts, 1, "the first write was refused");
-  assert.deepEqual(data.links.map((l) => l.name), ["Alpha", "Dave's link", "Josh's link"]);
-  assert.deepEqual(m.links().map((l) => l.name).sort(), ["Alpha", "Dave's link", "Josh's link"]);
+  assert.deepEqual(data.links.map((l) => l.name), ["Dave's link", "Alpha", "Josh's link"]);
+  assert.deepEqual(m.links().map((l) => l.name), ["Dave's link", "Alpha", "Josh's link"]);
 });
 
 test("two first-ever adds at once: the second is applied on top of the first", async () => {
   const m = memory();
   m.raceWith([stored(2, "First", "https://first.com/")]);
   const data = await addLink({ id: id(1), name: "Second", url: "second.com" }, dave, now, m.storage);
-  assert.deepEqual(data.links.map((l) => l.name), ["First", "Second"]);
+  assert.deepEqual(data.links.map((l) => l.name), ["Second", "First"]);
 });
 
 test("a write turned away as too busy is tried again, and lands", async () => {
@@ -166,7 +164,7 @@ test("edit: changes name, address and note, bumps rev, keeps who added it", asyn
   const data = await editLink(id(1), { name: "Zulu", url: "zulu.com/x", note: "renamed", rev: 1 }, josh, now, m.storage);
   const zulu = data.links.find((l) => l.id === id(1));
   assert.deepEqual(zulu, { id: id(1), name: "Zulu", url: "https://zulu.com/x", note: "renamed", addedBy: "Dave", addedAt: "2026-10-01T12:00:00.000Z", updatedBy: "Josh", updatedAt: now.toISOString(), rev: 2 });
-  assert.deepEqual(data.links.map((l) => l.name), ["Beta", "Zulu"], "re-sorted");
+  assert.deepEqual(data.links.map((l) => l.name), ["Zulu", "Beta"], "an edit keeps its place");
   // Saving the same text again writes nothing, even from a screen that still says rev 1.
   const writes = m.log.writes;
   await editLink(id(1), { name: "Zulu", url: "https://zulu.com/x", note: "renamed", rev: 1 }, josh, now, m.storage);
@@ -227,4 +225,48 @@ test("without the storage token the tab says so instead of failing quietly", asy
   delete process.env.BLOB_READ_WRITE_TOKEN;
   try { await fails(listLinks(), 503, /not connected/); }
   finally { if (before !== undefined) process.env.BLOB_READ_WRITE_TOKEN = before; }
+});
+
+const names = (data: { links: { name: string }[] }) => data.links.map((l) => l.name);
+const four = () => [stored(1, "A", "https://a.com/"), stored(2, "B", "https://b.com/"), stored(3, "C", "https://c.com/"), stored(4, "D", "https://d.com/")];
+
+test("move: after another link, to the top, to the bottom; the order is kept for everyone", async () => {
+  const m = memory(four());
+  assert.deepEqual(names(await moveLink(id(4), { after: id(1) }, m.storage)), ["A", "D", "B", "C"]);
+  assert.deepEqual(names(await moveLink(id(3), { after: null }, m.storage)), ["C", "A", "D", "B"], "null = the top");
+  assert.deepEqual(names(await moveLink(id(3), { after: id(2) }, m.storage)), ["A", "D", "B", "C"], "after the last = the bottom");
+  assert.deepEqual(names(await listLinks(m.storage)), ["A", "D", "B", "C"], "read back in the saved order");
+  const writes = m.log.writes;
+  assert.deepEqual(names(await moveLink(id(4), { after: id(1) }, m.storage)), ["A", "D", "B", "C"]);
+  assert.equal(m.log.writes, writes, "a move to where it already is writes nothing");
+});
+
+test("move: a stale reorder never undoes someone else's add, edit or delete", async () => {
+  // Josh adds E, renames B and deletes C between Dave's read and Dave's write; Dave's move of D to the top still lands on top of all of it.
+  const m = memory(four());
+  const now2 = "2026-10-09T15:01:00.000Z";
+  m.raceWith([stored(5, "E", "https://e.com/", { addedBy: "Josh" }), stored(1, "A", "https://a.com/"), stored(2, "B renamed", "https://b.com/", { rev: 2, updatedBy: "Josh", updatedAt: now2 }), stored(4, "D", "https://d.com/")]);
+  const data = await moveLink(id(4), { after: null }, m.storage);
+  assert.equal(m.log.conflicts, 1, "the stale write was refused and the move re-applied");
+  assert.deepEqual(names(data), ["D", "E", "A", "B renamed"]);
+  assert.equal(m.links().find((l) => l.id === id(2))?.rev, 2, "the edit survived");
+});
+
+test("move: the link or its new neighbour gone, or a bad request, changes nothing", async () => {
+  const m = memory(four());
+  await fails(moveLink(id(9), { after: id(1) }, m.storage), 404, /deleted/);
+  await fails(moveLink(id(1), { after: id(9) }, m.storage), 409, /changed while you were moving/);
+  await fails(moveLink(id(1), { after: id(1) }, m.storage), 400, /Reload/);
+  await fails(moveLink(id(1), {}, m.storage), 400, /Reload/);
+  await fails(moveLink(id(1), { after: "top" }, m.storage), 400, /Reload/);
+  await fails(moveLink(id(1), { after: 3 }, m.storage), 400, /Reload/);
+  await fails(moveLink("nope", { after: null }, m.storage), 404, /not found/);
+  assert.deepEqual(m.links().map((l) => l.name), ["A", "B", "C", "D"]);
+  assert.equal(m.log.writes, 0);
+});
+
+test("move then add: the new link goes on top of the team's order", async () => {
+  const m = memory(four());
+  await moveLink(id(1), { after: id(4) }, m.storage);
+  assert.deepEqual(names(await addLink({ id: id(7), name: "New", url: "new.com" }, dave, now, m.storage)), ["New", "B", "C", "D", "A"]);
 });
