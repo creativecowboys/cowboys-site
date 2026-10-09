@@ -53,6 +53,13 @@ const isBusy = (error: unknown): boolean =>
   (typeof BlobServiceRateLimited === "function" && error instanceof BlobServiceRateLimited) ||
   /too many requests/i.test(error instanceof Error ? error.message : "");
 
+/** A short, safe note on what storage answered, for the error line (no URLs, no query strings, no tokens). */
+const storageNote = (error: unknown): string => {
+  const name = error instanceof Error ? error.constructor?.name || error.name : "Error";
+  const message = (error instanceof Error ? error.message : String(error)).replace(/^Vercel Blob:\s*/i, "").replace(/https?:\/\/\S+/g, "").replace(/[=?&]/g, " ").slice(0, 90);
+  return `${name}: ${message}`.trim();
+};
+
 export const blobLinkStorage: LinkStorage = {
   async read(forWrite = false) {
     if (!process.env.BLOB_READ_WRITE_TOKEN) throw new CallDeskError("Link storage is not connected yet. Ask your administrator to finish the storage connection.", 503);
@@ -86,7 +93,7 @@ export const blobLinkStorage: LinkStorage = {
       else await put(LINKS_PATH, text, { ...base, allowOverwrite: false });
     } catch (error) {
       if (isConflict(error) || isBusy(error)) throw new LinkStorageConflict("changed since it was read, or storage busy");
-      throw new CallDeskError("The link could not be saved right now. Nothing was changed; please try again.");
+      throw new CallDeskError(`The link could not be saved right now. Nothing was changed; please try again. (${storageNote(error)})`);
     }
   },
 };
