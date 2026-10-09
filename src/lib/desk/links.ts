@@ -44,9 +44,12 @@ export class LinkStorageConflict extends Error {}
 
 const isNotFound = (error: unknown): boolean =>
   (typeof BlobNotFoundError === "function" && error instanceof BlobNotFoundError) || (error as { statusCode?: number })?.statusCode === 404;
+// Two shapes of "someone else wrote first", both seen on production Oct 9 2026: the ETag no longer matches (precondition
+// failed), and two conditional writes landing at the same instant ("The conditional request cannot succeed due to a
+// conflicting operation against this resource"). Neither wrote anything, so both are retried on a fresh read.
 const isConflict = (error: unknown): boolean =>
   (typeof BlobPreconditionFailedError === "function" && error instanceof BlobPreconditionFailedError) ||
-  /precondition|already exists/i.test(error instanceof Error ? error.message : "");
+  /precondition|already exists|conflicting operation|conditional request/i.test(error instanceof Error ? error.message : "");
 // Blob turns away bursts of writes to one file with "Too many requests" (seen on production Oct 9 2026 with five deletes
 // at once). Nothing was written, so it is retried like a lost race.
 const isBusy = (error: unknown): boolean =>
