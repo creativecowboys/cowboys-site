@@ -18,6 +18,31 @@ Dave, asked what to call it: "ill just say backoffice for now." The visible name
 Not changed: the address (`/admin`, and `/leads` still forwards), every route and file name, the code's own words
 ("desk"), and the sign-in email, which still says "the Creative Cowboys team desk".
 
+## Links tab (October 9, 2026)
+Dave: "can you make a new tab for links? next to these. Then give us the ability to name and post links that we use
+often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
+- **What it is:** one shared list for the whole team, A to Z by name. Each link has a name, the address, an optional short
+  note, and who added it and when (and "edited by …" once changed). The name opens the link in a new tab
+  (`target="_blank" rel="noopener noreferrer"`); **Copy link** puts the address on the clipboard. A search box filters by
+  name, address, note or who added it. Under the add form: links only, never passwords, API keys or logins.
+- **Edit and Delete work like the notes on the client panels** (Dave, Oct 4 2026): Edit turns the row into boxes with
+  Save and Cancel (Escape cancels); Delete is immediate, no question, and sits apart at the far right.
+- **Who can change it:** anyone signed in to the Back Office (same team cookie as every `/api/team/*` route). No owner gate.
+- **Where it is stored:** one private JSON document, `team/links.json`, in the site's existing Vercel Blob store
+  (`BLOB_READ_WRITE_TOKEN`, the same store as the onboarding handoffs and client files). No new service. Writes are
+  read → change → write-if-unchanged (Blob `ifMatch` on the ETag that was read; the first ever write is create-only), so
+  two people saving at the same moment cannot lose each other's change. Each link carries a `rev`; an edit made from a
+  stale screen gets a 409 and the list reloads. The adder's email is kept in storage but never sent to the browser.
+- **Rules (server-side, `src/lib/desk/link-rules.ts`):** http and https only (`javascript:`, `data:`, `mailto:`, `file:`
+  and the rest are refused); an address typed without a scheme gets `https://`; a link carrying `user:password@` is
+  refused; no spaces or control characters; name ≤ 120, link ≤ 2048, note ≤ 500 characters; 500 links at most; the same
+  address cannot be saved twice ("That link is already saved, as …").
+- **Code:** `src/app/leads/links.tsx` + `links.css` (the tab), `src/lib/desk/links.ts` (storage), `src/lib/desk/link-rules.ts`
+  (pure checks, used by the browser and the server), `src/app/api/team/links/route.ts` (GET list, POST add) and
+  `src/app/api/team/links/[id]/route.ts` (PATCH edit, DELETE). Tests: `src/lib/desk/links.test.ts` (`npm run test:desk -- links`).
+- **Phones:** with four tabs the tab row is a little tighter below 560px wide and scrolls sideways on the narrowest
+  screens (`onboarding.css`, last rule). Desktop is unchanged.
+
 ## How it is wired
 - `src/app/admin/page.tsx` is a thin page: metadata (title, noindex) and the shell. The desk's own files are still in
   `src/app/leads/` (`shell.tsx`, `desk.tsx`, `onboarding.tsx`, `clients.tsx`, …). That folder has no `page.tsx` any

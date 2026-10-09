@@ -237,3 +237,7 @@
 .ob-note-edit textarea{width:100%;margin-top:6px;background:#fffaf2;border:1px solid #cabcaa;border-radius:4px;padding:8px 10px;font-size:13px;line-height:1.5;color:#1f1a17;resize:vertical}
 .ob-note-edit .ob-buttons{align-items:center;gap:16px;margin-top:8px}
 @media(max-width:760px){.ob-note-edit textarea{font-size:16px}}
+
+/* Four tabs on a phone (Links joined Oct 9 2026): at the old 16px padding the fourth tab ran past a 390px screen. On phones only,
+   the tabs sit a little tighter, and on the narrowest screens the row scrolls sideways (no scrollbar drawn) rather than spill. */
+@media(max-width:560px){.team-bar .team-tabs{gap:0;overflow-x:auto;scrollbar-width:none}.team-bar .team-tabs::-webkit-scrollbar{display:none}.team-bar .team-tabs button{flex-shrink:0;padding:12px 10px;letter-spacing:.08em}}

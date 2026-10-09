@@ -3,13 +3,13 @@ import { Suspense } from "react";
 import Shell from "@/app/leads/shell";
 import { DESK_PATH } from "@/lib/desk-path";
 
-// The team desk: Sales, Onboarding and Clients tabs over one sign-in. It was served at /leads until Oct 2 2026
+// The team desk: Sales, Onboarding, Clients and Links tabs over one sign-in. It was served at /leads until Oct 2 2026
 // (Dave: "this has become more of an admin setup than just calling new leads"); /leads now forwards here with its
 // query string (next.config.ts). The desk's own files still live in src/app/leads/; this page only mounts them.
 // Named "Back Office" on screen since Oct 4 2026 (Dave: "ill just say backoffice for now"); the address stays /admin.
 export const metadata: Metadata = {
   title: "Back Office",
-  description: "Creative Cowboys team desk: sales follow-up, new-client onboarding and active clients.",
+  description: "Creative Cowboys team desk: sales follow-up, new-client onboarding, active clients and the team's saved links.",
   alternates: { canonical: DESK_PATH },
   robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
 };

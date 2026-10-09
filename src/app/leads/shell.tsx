@@ -7,6 +7,7 @@ import Handoff from "./handoff";
 import Onboarding from "./onboarding";
 import Clients from "./clients";
 import Packages from "./packages";
+import Links from "./links";
 import type { CallLead, DeskLeave, SignedIn } from "./types";
 import type { DeskSystem } from "./notes";
 import { DESK_LOGIN_PATH, DESK_PATH } from "@/lib/desk-path";
@@ -15,7 +16,7 @@ import "./onboarding.css";
 // The team desk, served at /admin (src/app/admin/page.tsx renders this; the files stay in this folder for now). Its name on
 // screen is "Back Office" (Dave, Oct 4 2026: "ill just say backoffice for now"): the bar's left end and the browser tab.
 // The address stays /admin.
-// Three tabs over one sign-in. The Sales desk keeps its own state (drafts live in sessionStorage),
+// Four tabs over one sign-in (Links, the team's saved links, joined Oct 9 2026). The Sales desk keeps its own state (drafts live in sessionStorage),
 // so switching tabs only hides it; nothing is unmounted while a save is running.
 // `?desk=ghl|monday` previews the Onboarding / Clients desk on the other system and is kept while moving between
 // tabs and clients. (`?backend=` is the Sales roster's own preview from Phase 1; the Sales tab reads it itself.)
@@ -24,7 +25,8 @@ import "./onboarding.css";
 export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSystem }) {
   const params = useSearchParams();
   const router = useRouter();
-  const tab = params.get("tab") === "onboarding" ? "onboarding" : params.get("tab") === "clients" ? "clients" : "sales";
+  const asked = params.get("tab");
+  const tab = asked === "onboarding" || asked === "clients" || asked === "links" ? asked : "sales";
   const client = params.get("client") || "";
   const desk = params.get("desk");
   const preview = desk === "ghl" || desk === "monday" ? desk : "";
@@ -58,7 +60,7 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
     leaveRef.current.leaving = true; // the person has already said yes to leaving unsaved notes: the browser does not ask again
     window.location.assign(DESK_LOGIN_PATH); // a full load, so nothing the desk had on screen stays in memory
   };
-  const go = useCallback((next: "sales" | "onboarding" | "clients", clientId?: string) => {
+  const go = useCallback((next: "sales" | "onboarding" | "clients" | "links", clientId?: string) => {
     const q = new URLSearchParams();
     if (next !== "sales") q.set("tab", next);
     if (clientId) q.set("client", clientId);
@@ -72,6 +74,7 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
         <button type="button" className={tab === "sales" ? "is-active" : ""} aria-current={tab === "sales" ? "page" : undefined} onClick={() => go("sales")}>Sales</button>
         <button type="button" className={tab === "onboarding" ? "is-active" : ""} aria-current={tab === "onboarding" ? "page" : undefined} onClick={() => go("onboarding")}>Onboarding</button>
         <button type="button" className={tab === "clients" ? "is-active" : ""} aria-current={tab === "clients" ? "page" : undefined} onClick={() => go("clients")}>Clients</button>
+        <button type="button" className={tab === "links" ? "is-active" : ""} aria-current={tab === "links" ? "page" : undefined} onClick={() => go("links")}>Links</button>
       </nav>
       <div className="team-session">
         {who && <span className="team-who" title={`Signed in as ${who.email}`}><span className="call-sr-only">Signed in as </span>{who.name}</span>}
@@ -82,6 +85,7 @@ export default function Shell({ deskDefault = "monday" }: { deskDefault?: DeskSy
     <div hidden={tab !== "sales"}><Desk onStartOnboarding={(lead) => setHandoff({ lead })} onOpenPackages={(lead) => setPackages({ lead })} onWho={setWho} leaveRef={leaveRef} /></div>
     {tab === "onboarding" && <Onboarding clientId={client} onOpenClient={(id) => go("onboarding", id)} onGraduated={(id) => go("clients", id)} onAddClient={() => setHandoff({ lead: null })} system={deskSystem} preview={preview} onSystem={setReported} />}
     {tab === "clients" && <Clients clientId={client} onOpenClient={(id) => go("clients", id)} system={deskSystem} preview={preview} onSystem={setReported} />}
+    {tab === "links" && <Links />}
     {packages && <Packages lead={packages.lead} onClose={() => setPackages(null)} />}
     {handoff && <Handoff lead={handoff.lead} system={deskSystem} preview={preview} onClose={() => setHandoff(null)} onDone={(itemId) => { setHandoff(null); go("onboarding", itemId); }} />}
   </div>;
