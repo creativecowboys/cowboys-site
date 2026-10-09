@@ -155,7 +155,7 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
       if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB.`); continue; }
       setUploading((u) => [...u, file.name]);
       try {
-        const blob = await upload(uploadPath(scope, category, file.name), file, { access: "private", handleUploadUrl: `/api/team/onboarding/${scope}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        const blob = await upload(uploadPath(scope, category, file.name), file, { access: "private", multipart: true, handleUploadUrl: `/api/team/onboarding/${scope}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
         await json(await fetch(`/api/team/onboarding/${scope}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }), crm);
       } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload.`); }
       finally { setUploading((u) => u.filter((n) => n !== file.name)); }

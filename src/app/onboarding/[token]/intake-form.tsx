@@ -68,7 +68,7 @@ export default function IntakeForm({ token }: { token: string }) {
       if (file.size > UPLOAD_MAX_BYTES) { setError(`${file.name} is larger than ${Math.round(UPLOAD_MAX_BYTES / 1048576)} MB. Send it another way or compress it.`); continue; }
       setUploading((u) => ({ ...u, [id]: file.name }));
       try {
-        const blob = await upload(uploadPath(folder, category, file.name), file, { access: "private", handleUploadUrl: `${base}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
+        const blob = await upload(uploadPath(folder, category, file.name), file, { access: "private", multipart: true, handleUploadUrl: `${base}/upload`, clientPayload: JSON.stringify({ category, name: file.name }), contentType: file.type || "application/octet-stream" });
         const v: View = await api(await fetch(`${base}/files`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pathname: blob.pathname, category, name: file.name }) }));
         setView(v);
       } catch (e) { setError(e instanceof Error && e.message ? `${file.name}: ${e.message}` : `${file.name} did not upload. Please try again.`); }
