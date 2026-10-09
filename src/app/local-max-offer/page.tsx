@@ -350,7 +350,7 @@ export default function LocalMaxOfferPage() {
                         <p className="text-[#5a5a5a] leading-relaxed text-base md:text-lg">
                             Checkout is a secure page from our billing system. The agreement is on it in
                             plain English, and you&rsquo;ll get a receipt by email. As soon as it&rsquo;s
-                            done, you&rsquo;ll book your 15-minute onboarding call with our team.
+                            done, you&rsquo;ll book your 30-minute onboarding call with our team.
                         </p>
                         <p className="text-sm text-[#5a5a5a]">
                             Rather talk first? Call{" "}
@@ -388,7 +388,7 @@ export default function LocalMaxOfferPage() {
                                 2
                             </span>
                             <div className="flex-1">
-                                <div className="font-anton text-xl uppercase leading-none">Book your 15-minute call</div>
+                                <div className="font-anton text-xl uppercase leading-none">Book your 30-minute call</div>
                                 <div className="text-sm text-[#5a5a5a] mt-1.5">
                                     You&rsquo;ll land on the scheduler right after checkout. Already paid?
                                 </div>
