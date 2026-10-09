@@ -42,6 +42,15 @@ test("the default view leaves churned clients out; the Churned filter is the way
   assert.deepEqual(names(currentClients(rows)).length, 16);
 });
 
+test("a search typed as a phone number finds a client by its phone (Oct 9 2026)", () => {
+  const rows = [row("Anchor Pay", { phone: "+14176239318", email: "tracy@anchorpayservices.com" }), row("Other Co", { phone: "7705550100" }), row("Gone Co", { phone: "4176239318", group: "churned", groupTitle: "Churned" })];
+  for (const search of ["4176239318", "417-623-9318", "(417) 623", "+1 417 623 9318"]) assert.deepEqual(names(filterClients(rows, { ...ALL, search })), ["Anchor Pay"], search);
+  assert.deepEqual(names(filterClients(rows, { ...ALL, search: "770.555" })), ["Other Co"]);
+  assert.deepEqual(names(filterClients(rows, { ...ALL, search: "anchor" })), ["Anchor Pay"], "the name search is unchanged");
+  assert.equal(churnedMatches(rows, { ...ALL, search: "(417) 623" }), 1, "a churned client found by phone is counted, not listed");
+  assert.deepEqual(names(filterClients(rows, { ...ALL, group: "churned", search: "417-623" })), ["Gone Co"]);
+});
+
 test("a search on the default view does not surface a churned client; with the Churned filter on it does", () => {
   const rows = desk();
   assert.deepEqual(names(filterClients(rows, { ...ALL, search: "cdm" })), []);

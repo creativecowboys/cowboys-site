@@ -145,6 +145,28 @@ test("search finds an off-list lead only when the off-list view is on", () => {
   assert.deepEqual(view(leads, OFF_LIST_VIEW, "VINTAGE VAULT"), ["1"]);
 });
 
+// ── Phone search (Oct 9 2026): a search typed as a phone number finds the lead by its phone, however either is written ──
+test("a search typed as a phone number finds the lead by its phone; a name search finds what it always found", () => {
+  const leads = [
+    lead("anchor", { name: "Anchor Pay Services", contact: "Tracy", email: "tracy@anchorpayservices.com", phone: "+14176239318" }),
+    lead("bare", { name: "Bare Digits Plumbing", phone: "4175550100" }),
+    lead("none", { name: "No Phone Roofing" }),
+    lead("studio", { name: "Studio 417 Salon", phone: "+17705550100" }),
+    lead("off", { name: "Off List Pay", phone: "+14176239318", outreach: "Not Interested" }),
+  ];
+  for (const typed of ["4176239318", "417-623-9318", "(417) 623", "(417) 623-9318", "+1 417 623 9318", "14176239318", "623-9318"]) {
+    assert.deepEqual(view(leads, "all", typed), ["anchor"], typed);
+  }
+  assert.deepEqual(view(leads, "all", "(417) 555-0100"), ["bare"]);
+  assert.deepEqual(view(leads, "all", "417").sort(), ["anchor", "bare", "studio"], "three digits: the phones with 417 in them, and the name that says 417");
+  assert.deepEqual(view(leads, "all", "Studio 417"), ["studio"], "letters in the search: the name search alone, as before");
+  assert.deepEqual(view(leads, "all", "tracy"), ["anchor"]);
+  assert.deepEqual(view(leads, "all", "anchorpay"), ["anchor"]);
+  assert.deepEqual(view(leads, "all", "62"), [], "two digits are too few to look for on a phone (and no name here has 62 in it)");
+  assert.equal(view(leads, "all", "").length, 4, "an empty search shows the whole view");
+  assert.deepEqual(view(leads, OFF_LIST_VIEW, "417-623-9318"), ["off"], "a phone search keeps to the view like any search");
+});
+
 test("changing the status back puts a lead back on the list; a tag keeps it off until the tag is gone", () => {
   const marked = lead("x", { outreach: "Not Interested", lastContact: "2026-10-01" });
   assert.equal(inRosterView(marked, "all"), false);

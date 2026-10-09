@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, buildLines, monthlyTotal, termFor, type CatalogItem, type Selection } from "@/lib/packages/catalog";
+import { formatPhone } from "@/lib/desk/phone";
 import { CloseIcon } from "./icons";
 import type { CallLead } from "./types";
 
@@ -88,7 +89,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
 
     <section className="ob-section"><h3>1. Customer <small>from GoHighLevel</small></h3>
       {contact?.winner && <div className="call-alert pk-winner" role="alert"><strong>Giveaway winner — no charge.</strong> {contact.winner.name} is tagged Giveaway Winner on the {contact.winner.system === "ghl" ? `team desk (${contact.winner.board} tab)` : `${contact.winner.board} board`}, so the package builder won&apos;t create a plan or invoice for them. <a href={contact.winner.url} target="_blank" rel="noreferrer">{contact.winner.system === "ghl" ? "Open in GoHighLevel ↗" : "Open in Monday ↗"}</a></div>}
-      {contact ? <div className="pk-contact"><div><b>{contact.company || contact.name}</b><small>{contact.company ? `${contact.name} · ` : ""}{contact.email}{contact.phone ? ` · ${contact.phone}` : ""}</small></div><button type="button" className="call-secondary" onClick={() => { setContact(null); setResult(null); }}>Change</button></div>
+      {contact ? <div className="pk-contact"><div><b>{contact.company || contact.name}</b><small>{contact.company ? `${contact.name} · ` : ""}{contact.email}{contact.phone ? ` · ${formatPhone(contact.phone)}` : ""}</small></div><button type="button" className="call-secondary" onClick={() => { setContact(null); setResult(null); }}>Change</button></div>
       : showNew ? <div className="ob-controls">
           <label>First name *<input value={nc.firstName} onChange={(e) => setNc({ ...nc, firstName: e.target.value })} /></label>
           <label>Last name<input value={nc.lastName} onChange={(e) => setNc({ ...nc, lastName: e.target.value })} /></label>
@@ -100,7 +101,7 @@ export default function Packages({ lead, onClose }: { lead: CallLead | null; onC
       : <div className="pk-search">
           <input autoFocus placeholder="Search GHL by name, business, email or phone…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search GoHighLevel contacts" />
           {searching && <small className="call-muted">Searching…</small>}
-          {hits.length > 0 && <ul className="pk-hits">{hits.map((h) => <li key={h.id}><button type="button" onClick={() => { setContact(h); setHits([]); }}><b>{h.company || h.name}{h.winner && <span className="pk-tag pk-tag-winner">giveaway winner · no charge</span>}</b><small>{h.company ? `${h.name} · ` : ""}{h.email}{h.phone ? ` · ${h.phone}` : ""}</small></button></li>)}</ul>}
+          {hits.length > 0 && <ul className="pk-hits">{hits.map((h) => <li key={h.id}><button type="button" onClick={() => { setContact(h); setHits([]); }}><b>{h.company || h.name}{h.winner && <span className="pk-tag pk-tag-winner">giveaway winner · no charge</span>}</b><small>{h.company ? `${h.name} · ` : ""}{h.email}{h.phone ? ` · ${formatPhone(h.phone)}` : ""}</small></button></li>)}</ul>}
           {!searching && q.trim().length >= 2 && !hits.length && <small className="call-muted">No match in GHL.</small>}
           <button type="button" className="pk-link" onClick={() => setShowNew(true)}>Not in GHL yet? Add them{lead ? " (prefilled from this lead)" : ""}</button>
         </div>}

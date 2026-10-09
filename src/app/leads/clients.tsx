@@ -15,6 +15,7 @@ import { CloseIcon, RefreshIcon } from "./icons";
 import { GbpLink } from "./gbp-card";
 import { RowLine } from "./row-line";
 import { contactLine, personShown, sameName } from "@/lib/desk/names";
+import { formatPhone, phoneToSave } from "@/lib/desk/phone";
 
 // Clients tab, problems first: the Team-desk rows of Josh's Active Clients board on Monday, or the desk's
 // client contacts in GoHighLevel once DESK_BACKEND=ghl (the server says which with every list).
@@ -128,7 +129,8 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
       const d: ClientDetail = await json(await fetch(`/api/team/clients/${id}`, { cache: "no-store" }), crm);
       setDetail(d); onRow(d.row); setCustomerId(d.row.stripeCustomer); setGbpUrl(d.row.gbpUrl);
       // A contact that only repeats the business name (a legacy client was imported that way) is shown as an empty field.
-      setContact({ contact: sameName(d.row.name, d.row.contact) ? "" : d.row.contact, email: d.row.email, phone: d.row.phone, website: d.row.website });
+      // The phone box shows the number the way people read it; phoneToSave sends it back exactly as stored unless it was changed.
+      setContact({ contact: sameName(d.row.name, d.row.contact) ? "" : d.row.contact, email: d.row.email, phone: formatPhone(d.row.phone), website: d.row.website });
       setDates({ nextBill: d.row.nextBill, termEnds: d.row.termEnds, billingDay: d.row.billingDay });
     } catch (e) { setError(e instanceof Error ? e.message : "Could not load this client."); }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- crm only words an error message
@@ -176,11 +178,11 @@ function ClientPanel({ id, listSystem, preview, onClose, onRow }: { id: string; 
   // Display only. The Contact box is empty while the record's "contact" is just the business name again. Left empty, a blur
   // sends the stored name back unchanged, exactly what it sent before, so nothing is written; a name typed in saves as ever.
   const contactRepeats = sameName(row.name, row.contact);
-  const saveContact = () => patch({ action: "contact", ...contact, contact: contact.contact || (contactRepeats ? row.contact : "") }, "contact");
+  const saveContact = () => patch({ action: "contact", ...contact, contact: contact.contact || (contactRepeats ? row.contact : ""), phone: phoneToSave(contact.phone, row.phone) }, "contact");
   // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
   const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));
   return <aside className="ob-panel" aria-label={`${row.name} client`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{groupLabel(row.group)} · {row.health || "No health"}{legacy && " · Legacy client"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, formatPhone(row.phone)].filter(Boolean).join(" · ") || "No contact details"}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {row.flags.length > 0 && <div className="call-alert" role="status"><strong>Needs a look:</strong> {row.flags.map((f) => FLAG[f]).join(" · ")}</div>}
 

@@ -11,6 +11,7 @@ import { NotesTimeline, type DeskSystem } from "./notes";
 import { TaskList } from "./tasks";
 import { RowLine } from "./row-line";
 import { contactLine, personShown } from "@/lib/desk/names";
+import { formatPhone, phoneMatches } from "@/lib/desk/phone";
 
 // Madison's view: every client in onboarding, what is missing, and one-click updates that write to
 // the system that holds the record — Monday, or GoHighLevel once DESK_BACKEND=ghl (the server says which
@@ -58,7 +59,7 @@ export default function Onboarding({ clientId, onOpenClient, onGraduated, onAddC
     (!stage || r.stage === stage) &&
     (showLaunched || stage === "launched" || r.stage !== "launched") &&
     (only !== "overdue" || r.overdue) && (only !== "missing" || r.missing.length > 0) && (only !== "stalled" || r.stage === "hold" || r.health === "Blocked" || r.health === "Waiting on Client") &&
-    `${r.name} ${r.contact} ${r.email} ${r.city} ${r.packages}`.toLowerCase().includes(search.toLowerCase()),
+    (`${r.name} ${r.contact} ${r.email} ${r.city} ${r.packages}`.toLowerCase().includes(search.toLowerCase()) || phoneMatches(r.phone, search)),
   ).sort((a, b) => Number(b.overdue) - Number(a.overdue) || (a.stage === "launched" ? 1 : 0) - (b.stage === "launched" ? 1 : 0) || b.missing.length - a.missing.length || a.name.localeCompare(b.name));
   // A record opened by id that the list does not have yet (a brand-new handoff — GoHighLevel's search runs a few seconds behind) joins the list.
   const update = useCallback((row: OnboardingRow) => setRows((prev) => prev.some((r) => r.id === row.id) ? prev.map((r) => r.id === row.id ? row : r) : [row, ...prev]), []);
@@ -154,7 +155,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
   // A task change can move the contact's version: take the new one only if the panel's copy was current just before it.
   const keepVersion = (before: string, after: string) => setDetail((d) => (d && d.row.updatedAt === before && after !== before ? { ...d, row: { ...d.row, updatedAt: after } } : d));
   return <aside className="ob-panel" aria-label={`${row.name} onboarding`}>
-    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, row.phone].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
+    <div className="ob-panel-head"><div><span className="call-eyebrow">{stageLabel(row.stage)} · {row.health || "No health"}</span><h2>{row.name}</h2><p className="call-muted">{[personShown(row.name, row.contact), row.email, formatPhone(row.phone)].filter(Boolean).join(" · ") || "No contact details"}{row.city && ` · ${row.city}`}</p></div><div className="ob-panel-actions"><a href={row.url} target="_blank" rel="noreferrer">{system === "ghl" ? "Open in GoHighLevel ↗" : "Monday ↗"}</a><button className="call-icon-button" aria-label="Close" onClick={onClose}><CloseIcon /></button></div></div>
     {error && <div className="call-alert" role="alert">{error}</div>}
     {pending.length > 0 && <div className="call-alert" role="alert"><strong>Handoff steps still pending:</strong> {pending.join(", ")}.<button className="call-secondary" disabled={!!busy} onClick={async () => { const r = await post("retry", "retry") as StartResult | null; if (r) { if (r.pending.length) setError(`Still pending: ${r.pending.join(", ")}. Try again in a moment.`); await load(); } }}>{busy === "retry" ? "Retrying…" : "Retry pending steps"}</button></div>}
 
@@ -242,7 +243,7 @@ function ClientPanel({ id, listSystem, onClose, onRow, onGraduated }: { id: stri
 
 function FormRow({ k, v }: { k: string; v: string | boolean }) {
   const labels: Record<string, string> = { business: "Business", contact: "Contact", email: "Email", phone: "Phone", address: "Address", serviceAreas: "Service areas", services: "Services", goals: "Goals", brandColors: "Brand colors", fonts: "Fonts", website: "Website", references: "Reference sites", competitors: "Competitors", social: "Social links", hours: "Hours", gbpUrl: "GBP link", gbpInviteSent: "Says GBP invite sent", gbpNoProfile: "Says no GBP", notes: "Notes" };
-  const text = typeof v === "boolean" ? (v ? "Yes" : "No") : v;
+  const text = typeof v === "boolean" ? (v ? "Yes" : "No") : k === "phone" ? formatPhone(v) : v;
   if (!text) return null;
   return <><dt>{labels[k] || k}</dt><dd className="call-preserve">{text}</dd></>;
 }

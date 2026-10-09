@@ -1,5 +1,6 @@
 import type { ClientRow } from "@/lib/clients/types";
 import { clientOrder, deskCountLabel, effectiveKind, isKind, kindCounts, type ClientKind } from "./legacy";
+import { phoneMatches } from "./phone";
 
 // What the Clients tab lists and counts (Oct 2 2026). Dave: "on the legacy list, we can remove CDM, we can remove
 // Georgia Truck Parking." A client that has left is moved to the Churned group; from then on it is off the list, the
@@ -41,12 +42,12 @@ export const monthlyTotal = (rows: readonly Pick<ClientRow, "group" | "mrr">[]):
 /** The desk / legacy choice the list really applies: it only means something while a current client is legacy (see effectiveKind). */
 export const appliedKind = (kind: ClientKind, rows: readonly (Grouped & Pick<ClientRow, "legacy">)[]): ClientKind => effectiveKind(kind, currentClients(rows));
 
-/** Everything about a row except which group it is in: the kind, manager, "show only" and search filters. */
+/** Everything about a row except which group it is in: the kind, manager, "show only" and search filters. A search typed as a phone number also finds the client by its phone. */
 function matches(row: ClientRow, f: ClientFilters, kind: ClientKind): boolean {
   return isKind(row, kind) &&
     (!f.manager || (f.manager === "unassigned" ? row.accountManagerIds.length === 0 : row.accountManagerIds.includes(f.manager))) &&
     (f.only !== "problems" || row.flags.length > 0) && (f.only !== "payment" || row.flags.includes("payment")) && (f.only !== "gbp" || row.flags.includes("gbp") || row.flags.includes("gbp-recheck")) &&
-    `${row.name} ${row.contact} ${row.email} ${row.packages}`.toLowerCase().includes(f.search.toLowerCase());
+    (`${row.name} ${row.contact} ${row.email} ${row.packages}`.toLowerCase().includes(f.search.toLowerCase()) || phoneMatches(row.phone, f.search));
 }
 
 /**

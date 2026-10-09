@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AGREEMENT, BUSINESS_TYPES, GIVEAWAY_WINNER, PACKAGES, PAYMENT, PAYMENT_NO_CHARGE, isGiveawayWinner } from "@/lib/onboarding/config";
 import type { HandoffForm, StartResult } from "@/lib/onboarding/types";
+import { formatPhone } from "@/lib/desk/phone";
 import type { CallLead } from "./types";
 import type { DeskSystem } from "./notes";
 import { CloseIcon } from "./icons";
@@ -98,7 +99,7 @@ export default function Handoff({ lead, onClose, onDone, system = "monday", prev
           {problems.length > 0 && <div className="call-alert" role="alert"><strong>Still needed:</strong> {problems.join(" · ")}</div>}
           {staleDraft && <div className="call-alert" role="status">This lead changed since you started this draft. Check the details above before confirming.</div>}
           <dl>
-            <dt>Business</dt><dd>{form.business} · {[form.contact, form.email, form.phone].filter(Boolean).join(" · ") || "no contact details"}{form.city && ` · ${form.city}`}{form.businessType && ` · ${form.businessType}`}</dd>
+            <dt>Business</dt><dd>{form.business} · {[form.contact, form.email, formatPhone(form.phone)].filter(Boolean).join(" · ") || "no contact details"}{form.city && ` · ${form.city}`}{form.businessType && ` · ${form.businessType}`}</dd>
             <dt>Sales owner</dt><dd>{form.salesOwner}</dd>
             <dt>Packages</dt><dd>{form.packages.join(", ") || "none"}</dd>
             <dt>Agreed amounts</dt><dd>{winner ? "Giveaway winner — no charge ($0 monthly, $0 setup). Nobody invoices this client." : <>Monthly {form.monthlyAgreed ? `$${form.monthlyAgreed}` : "not recorded"} · Setup {form.setupAgreed ? `$${form.setupAgreed}` : "not recorded"}</>}</dd>

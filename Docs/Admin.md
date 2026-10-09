@@ -55,6 +55,26 @@ often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
 - **Phones:** with four tabs the tab row is a little tighter below 560px wide and scrolls sideways on the narrowest
   screens (`onboarding.css`, last rule). Desktop is unchanged.
 
+## Phone numbers (October 9, 2026)
+Dave: "can you make all these phone numbers easier to read". Display only: nothing stored in GoHighLevel changes, no
+API request changes, and every `tel:` link still dials the stored number (`tel:+14176239318`).
+
+- One formatter, `formatPhone` in `src/lib/desk/phone.ts` (pure, shared with the browser). A US or Canadian number,
+  however it is stored (`+14176239318`, `4176239318`, `14176239318`, any punctuation), shows as `(417) 623-9318`; a
+  readable extension (`x12`, `ext 12`, `#12`) as ` ext. 12`. Anything else (another country, a short code, a
+  number that is not a real North American one, a note typed into the field) shows exactly as stored, trimmed.
+- Where: the lead's number on the Sales tab (the big one above the email), the Onboarding and Clients panel headers,
+  the client intake answers, the handoff review line, and the package builder's customer search and chosen customer.
+- **The Clients panel's Phone box** shows the number formatted. Left as it is, it sends the stored number back exactly
+  as stored when you leave the box (`phoneToSave`), so nothing is written. A number typed in is sent as typed, the way
+  it always was.
+- Left alone on purpose: the handoff form's Phone box (it already filled in a formatted US number and that value is
+  what gets submitted) and the package builder's "new contact" Phone box (submitted as typed).
+- **Search.** The Sales, Onboarding and Clients search boxes also find someone by phone when what you type is a
+  phone number with at least three digits: `4176239318`, `417-623-9318`, `(417) 623`, `+1 417`, `623-9318` all find
+  the same lead. A search with letters in it is a name/business/email search exactly as before. The package builder's
+  search is GoHighLevel's own: a whole number in any format finds the contact, part of a number does not.
+
 ## How it is wired
 - `src/app/admin/page.tsx` is a thin page: metadata (title, noindex) and the shell. The desk's own files are still in
   `src/app/leads/` (`shell.tsx`, `desk.tsx`, `onboarding.tsx`, `clients.tsx`, …). That folder has no `page.tsx` any

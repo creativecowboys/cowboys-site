@@ -14,7 +14,7 @@ const sources = {
   'monday': '../src/lib/calls/monday.ts', 'ghl': '../src/lib/calls/ghl.ts', 'switch': '../src/lib/calls/switch.ts',
   'ghl-client': '../src/lib/ghl/client.ts', 'ghl-fields': '../src/lib/ghl/fields.ts', 'ghl-reps': '../src/lib/ghl/reps.ts', 'ghl-links': '../src/lib/ghl/links.ts',
   'ghl-website-form': '../src/lib/ghl-website-form.ts', 'ghl-admin': '../src/lib/ghl/admin.ts', 'onboarding-api': '../src/lib/onboarding/api.ts',
-  'desk-path': '../src/lib/desk-path.ts', 'desk-path.test': '../src/lib/desk-path.test.ts',
+  'desk-path': '../src/lib/desk-path.ts', 'desk-path.test': '../src/lib/desk-path.test.ts', 'desk-phone': '../src/lib/desk/phone.ts',
   'told': '../src/lib/calls/told.ts', 'playbooks': '../src/lib/playbooks.ts', 'told.test': '../src/lib/calls/told.test.ts',
   'roster.test': '../src/lib/calls/roster.test.ts', 'owner.test': '../src/lib/calls/owner.test.ts', 'followups.test': '../src/lib/calls/followups.test.ts', 'outcomes.test': '../src/lib/calls/outcomes.test.ts',
   'ghl.test': '../src/lib/calls/ghl.test.ts', 'switch.test': '../src/lib/calls/switch.test.ts',
@@ -26,7 +26,7 @@ const rewrites = [
   [/from "@\/lib\/ghl\/reps"/g, 'from "./ghl-reps"'], [/from "@\/lib\/ghl\/links"/g, 'from "./ghl-links"'],
   [/from "@\/lib\/ghl-website-form"/g, 'from "./ghl-website-form"'], [/from "@\/lib\/onboarding\/api"/g, 'from "./onboarding-api"'],
   [/from "@\/lib\/calls\/monday"/g, 'from "./monday"'], [/from "@\/lib\/calls\/ghl"/g, 'from "./ghl"'], [/from "\.\/admin"/g, 'from "./ghl-admin"'],
-  [/from "@\/lib\/desk-path"/g, 'from "./desk-path"'], [/from "@\/lib\/playbooks"/g, 'from "./playbooks"'], [/from "@\/lib\/calls\/told"/g, 'from "./told"'],
+  [/from "@\/lib\/desk-path"/g, 'from "./desk-path"'], [/from "@\/lib\/desk\/phone"/g, 'from "./desk-phone"'], [/from "@\/lib\/playbooks"/g, 'from "./playbooks"'], [/from "@\/lib\/calls\/told"/g, 'from "./told"'],
   [/from "\.\/links"/g, 'from "./ghl-links"'], [/from "\.\/client"/g, 'from "./ghl-client"'], [/from "\.\/fields"/g, 'from "./ghl-fields"'], [/from "\.\/reps"/g, 'from "./ghl-reps"'],
   [/from "\.\/ghl\/client"/g, 'from "./ghl-client"'], [/from "\.\/ghl\/fields"/g, 'from "./ghl-fields"'], [/from "\.\/ghl-website-form"/g, 'from "./ghl-website-form"'],
 ];

@@ -1,4 +1,5 @@
 import type { CallLead } from "@/app/leads/types";
+import { phoneMatches } from "@/lib/desk/phone";
 
 // Fixed choices stay available even before someone has a lead assigned to them.
 export const CALL_OWNERS = [
@@ -80,12 +81,12 @@ export function inRosterView(lead: CallLead, view: string): boolean {
 }
 
 export type RosterFilters = { view: string; owner: string; status: string; source: string; search: string };
-/** The roster as the desk shows it: view, owner, status, lead source and search, in calling order. Search runs inside the view, so a name typed on the normal list never returns an off-list lead. */
+/** The roster as the desk shows it: view, owner, status, lead source and search, in calling order. Search runs inside the view, so a name typed on the normal list never returns an off-list lead. A search typed as a phone number ("417-623-9318", "(417) 623") also finds the lead by its phone (src/lib/desk/phone.ts). */
 export function filterRoster(leads: CallLead[], f: RosterFilters): CallLead[] {
   const text = f.search.toLowerCase();
   return leads.filter((l) => inRosterView(l, f.view) && matchesOwner(l, f.owner) && (!f.status || l.outreach === f.status)
     && (!f.source || (f.source === "none" ? !l.leadSource : l.leadSource === f.source))
-    && `${l.name} ${l.contact} ${l.email} ${l.city}`.toLowerCase().includes(text)).sort(compareLeads);
+    && (`${l.name} ${l.contact} ${l.email} ${l.city}`.toLowerCase().includes(text) || phoneMatches(l.phone, f.search))).sort(compareLeads);
 }
 
 const versionTime = (lead: CallLead): number => { const t = Date.parse(lead.updatedAt); return Number.isFinite(t) ? t : Number.NEGATIVE_INFINITY; };
