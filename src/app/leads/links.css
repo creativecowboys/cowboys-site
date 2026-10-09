@@ -32,12 +32,19 @@
 .lk-desk .lk-item.is-dragging .lk-grip{cursor:grabbing;color:#d95330}
 body.lk-dragging,body.lk-dragging *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}
 .lk-desk .lk-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+/* The card body opens the link (Oct 9 2026): one real <a> over name, address and note, with the whole area showing it is
+   clickable. The negative margins give it a comfortable target without moving the text. */
+.lk-desk a.lk-open{margin:-8px -10px;padding:8px 10px;border-radius:6px;color:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:#e8603c22;transition:background .15s,box-shadow .15s}
+.lk-desk a.lk-open:hover{background:#f3e9d9}
+.lk-desk a.lk-open:focus-visible{outline:2px solid #d95330;outline-offset:0;background:#f3e9d9}
+.lk-desk a.lk-open:hover .lk-name,.lk-desk a.lk-open:focus-visible .lk-name{color:#a8462b;text-decoration:underline;text-underline-offset:3px}
+.lk-desk a.lk-open:active{background:#eadfcd}
+.lk-desk .lk-list.is-sorting a.lk-open{pointer-events:none}
 .lk-desk .lk-name{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;max-width:100%;color:#1f1a17;font-weight:600;font-size:14px;line-height:1.35;text-decoration:none;overflow-wrap:anywhere}
 .lk-desk .lk-name svg{flex-shrink:0;color:#d95330}
-.lk-desk a.lk-name:hover,.lk-desk a.lk-name:focus-visible{color:#a8462b;text-decoration:underline;text-underline-offset:3px}
 .lk-desk .lk-url{font-size:12px;color:#746655;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lk-desk .lk-note{margin:4px 0 0;font-size:12.5px;line-height:1.5;color:#4b3423;overflow-wrap:anywhere}
-.lk-desk .lk-meta{font-size:11px;color:#9a7051;margin-top:4px}
+.lk-desk .lk-note{display:block;margin:4px 0 0;font-size:12.5px;line-height:1.5;color:#4b3423;overflow-wrap:anywhere}
+.lk-desk .lk-meta{display:block;font-size:11px;color:#9a7051;margin-top:4px}
 .lk-desk .lk-actions{display:flex;align-items:center;gap:22px;flex-shrink:0}
 .lk-desk .lk-actions .ob-note-action{font-size:12px;line-height:1.3}
 .lk-desk .lk-copy{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid #bca98f;border-radius:4px;padding:6px 10px;font-size:11px;font-weight:600;line-height:1.3;color:#554432;cursor:pointer;white-space:nowrap}

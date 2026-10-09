@@ -25,6 +25,12 @@ often." A fourth tab, **LINKS**, after Clients: `/admin?tab=links`.
   note, and who added it and when (and "edited by …" once changed). The name opens the link in a new tab
   (`target="_blank" rel="noopener noreferrer"`); **Copy link** puts the address on the clipboard. A search box filters by
   name, address, note or who added it. Under the add form: links only, never passwords, API keys or logins.
+- **Click a card to open it** (Dave, same day: "if we click on the link (maybe on the left side in the card), it just
+  opens up that link in a new window"): the whole name / address / note block is one real link
+  (`<a target="_blank" rel="noopener noreferrer">`), so click, tap, Enter, middle-click and cmd-click all work, with a
+  pointer cursor and a hover / focus highlight on the whole area. Nothing clickable is inside it (the ⋮⋮ handle is to its
+  left, Copy / Edit / Delete to its right), it is switched off while a row is being dragged and for a moment after a drag
+  ends, and a card being edited has no link.
 - **Edit and Delete work like the notes on the client panels** (Dave, Oct 4 2026): Edit turns the row into boxes with
   Save and Cancel (Escape cancels); Delete is immediate, no question, and sits apart at the far right.
 - **Reorder (Dave, same day: "a grab handle… drag to reorder… saved and shared for everyone"):** a ⋮⋮ handle at the left

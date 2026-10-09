@@ -15,7 +15,12 @@ import "./links.css";
 // drag on it never scrolls the page, and the page scrolls by itself near the top or bottom of the window), and with the
 // keyboard: focus the handle, then ↑ / ↓ move one place, Home / End to the top / bottom. New links go on top. Each move
 // is saved as one "after that link" step (POST /api/team/links/<id>/move), in order, one at a time; the list shows the
-// new order at once. While the search box has text the handles are off (a filtered list has no honest neighbours). Add a link (name + address + optional note); the name opens it in a new tab; Copy puts the
+// new order at once. While the search box has text the handles are off (a filtered list has no honest neighbours).
+// Click to open (Dave, Oct 9 2026: "if we click on the link (maybe on the left side in the card), it just opens up that
+// link in a new window"): the whole name / address / note block is one real <a target="_blank" rel="noopener noreferrer">,
+// so a click, a tap, Enter, middle-click and cmd-click all work. Nothing clickable sits inside it: the ⋮⋮ handle is to its
+// left and Copy / Edit / Delete to its right, as siblings. It never fires during a drag or for a moment after one ends
+// (a drag that ends over a card), and a card in edit mode has no link at all. Add a link (name + address + optional note); the name opens it in a new tab; Copy puts the
 // address on the clipboard. Edit and Delete work like the notes on the client panels (Dave, Oct 4 2026): Edit turns the
 // row into boxes with Save and Cancel, Delete is immediate with no question and sits apart at the far right.
 // Links only: never passwords, keys or logins (said under the form; a link carrying user:password@ is refused).
@@ -148,6 +153,8 @@ export default function Links() {
     commitMove(link.id, to === 0 ? null : rest[to - 1].id, true);
   };
   const drag = useRef<Drag | null>(null);
+  const dragEnded = useRef(0); // when the last drag ended: a click that lands right after it is part of the drag, not a request to open
+  const guardOpen = (e: { preventDefault(): void }) => { if (drag.current || Date.now() - dragEnded.current < 400) e.preventDefault(); };
   const [dragging, setDragging] = useState("");
   const layout = (d: Drag) => {
     const sy = window.scrollY, h = d.heights[d.from];
@@ -198,6 +205,7 @@ export default function Links() {
     const d = drag.current;
     if (!d) return;
     drag.current = null;
+    dragEnded.current = Date.now();
     window.cancelAnimationFrame(d.raf);
     document.body.classList.remove("lk-dragging");
     // Put every row back where the DOM has it, with no glide; the new order arrives with the same render.
@@ -283,6 +291,7 @@ export default function Links() {
     {formError.text && <p className="lk-form-error" role="alert">{formError.text}</p>}
     <p className="call-muted ob-hint lk-hint">Links only. Never put passwords, API keys or logins here; those stay in the password manager. Everyone signed in to the Back Office sees this list and can change or delete any link.</p>
     <p className="call-sr-only" role="status" aria-live="polite">{status}</p>
+    <span className="call-sr-only" id="lk-newtab">(opens in a new tab)</span>
     <p className="call-sr-only" id="lk-grip-help">Drag this handle, or press the up and down arrow keys, to move the link. Home and End move it to the top or the bottom. The order is saved for the whole team.</p>
 
     {error && <div className="call-alert" role="alert">{error}<button type="button" className="call-secondary" onClick={() => load()}>Reload the list</button></div>}
@@ -318,14 +327,20 @@ export default function Links() {
                   onKeyDown={(e) => onGripKey(e, link)}>
                   <GripVertical size={18} strokeWidth={2.25} aria-hidden="true" />
                 </button>
-                <div className="lk-main">
-                  {href
-                    ? <a className="lk-name" href={href} target="_blank" rel="noopener noreferrer">{link.name}<ArrowUpRight size={14} strokeWidth={2.25} aria-hidden="true" /><span className="call-sr-only"> (opens in a new tab)</span></a>
-                    : <b className="lk-name">{link.name}</b>}
-                  <span className="lk-url" title={link.url}>{linkLabel(link.url)}</span>
-                  {link.note && <p className="lk-note">{link.note}</p>}
-                  <small className="lk-meta">Added by {link.addedBy}{when(link.addedAt) && ` · ${when(link.addedAt)}`}{link.updatedAt && <span title={`Edited ${when(link.updatedAt)}${link.updatedBy ? ` by ${link.updatedBy}` : ""}`}> · edited{link.updatedBy ? ` by ${link.updatedBy}` : ""}</span>}</small>
-                </div>
+                {(() => {
+                  const body = <>
+                    <span className="lk-name" id={`lk-name-${link.id}`}>{link.name}{href && <ArrowUpRight size={14} strokeWidth={2.25} aria-hidden="true" />}</span>
+                    <span className="lk-url" id={`lk-url-${link.id}`} title={link.url}>{linkLabel(link.url)}</span>
+                    {link.note && <span className="lk-note" id={`lk-note-${link.id}`}>{link.note}</span>}
+                    <small className="lk-meta">Added by {link.addedBy}{when(link.addedAt) && ` · ${when(link.addedAt)}`}{link.updatedAt && <span title={`Edited ${when(link.updatedAt)}${link.updatedBy ? ` by ${link.updatedBy}` : ""}`}> · edited{link.updatedBy ? ` by ${link.updatedBy}` : ""}</span>}</small>
+                  </>;
+                  // The card body is the link. Its name is the link's name; the address and note describe it.
+                  return href
+                    ? <a className="lk-main lk-open" href={href} target="_blank" rel="noopener noreferrer" draggable={false}
+                        aria-labelledby={`lk-name-${link.id} lk-newtab`} aria-describedby={`lk-url-${link.id}${link.note ? ` lk-note-${link.id}` : ""}`}
+                        onClick={guardOpen} onAuxClick={guardOpen}>{body}</a>
+                    : <div className="lk-main">{body}</div>;
+                })()}
                 <div className="lk-actions">
                   <button type="button" className={`lk-copy${copied === link.id ? " is-copied" : ""}`} onClick={() => copy(link)} aria-label={`Copy the link for ${link.name}`}>
                     {copied === link.id ? <><Check size={13} strokeWidth={2.5} aria-hidden="true" />Copied</> : <><Copy size={13} strokeWidth={2.25} aria-hidden="true" />Copy link</>}
