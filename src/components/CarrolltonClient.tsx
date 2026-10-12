@@ -470,6 +470,21 @@ export default function CarrolltonClient() {
             </Link>
             .
           </p>
+          <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 leading-relaxed">
+            The same work in nearby cities:{" "}
+            <Link href="/digital-marketing-villa-rica-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+              digital marketing in Villa Rica, GA
+            </Link>
+            ,{" "}
+            <Link href="/digital-marketing-douglasville-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+              digital marketing in Douglasville, GA
+            </Link>
+            , and{" "}
+            <Link href="/digital-marketing-newnan-ga" className="text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+              digital marketing in Newnan, GA
+            </Link>
+            .
+          </p>
         </div>
       </section>
 
@@ -715,9 +730,9 @@ export default function CarrolltonClient() {
               <Link href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</Link>
               <Link href="/web-design-carrollton-ga" className="hover:text-[#B5330E] transition-colors">Web Design in Carrollton, GA</Link>
               <Link href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
-              <Link href="/digital-marketing-villa-rica-ga" className="hover:text-[#B5330E] transition-colors">Villa Rica</Link>
-              <Link href="/digital-marketing-douglasville-ga" className="hover:text-[#B5330E] transition-colors">Douglasville</Link>
-              <Link href="/digital-marketing-newnan-ga" className="hover:text-[#B5330E] transition-colors">Newnan</Link>
+              <Link href="/digital-marketing-villa-rica-ga" className="hover:text-[#B5330E] transition-colors normal-case tracking-normal">Digital marketing in Villa Rica, GA</Link>
+              <Link href="/digital-marketing-douglasville-ga" className="hover:text-[#B5330E] transition-colors normal-case tracking-normal">Digital marketing in Douglasville, GA</Link>
+              <Link href="/digital-marketing-newnan-ga" className="hover:text-[#B5330E] transition-colors normal-case tracking-normal">Digital marketing in Newnan, GA</Link>
             </div>
           </div>
         </div>

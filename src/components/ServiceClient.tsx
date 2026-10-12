@@ -3,6 +3,8 @@ import { Anton } from "next/font/google";
 import { ArrowUpRight, Check } from "lucide-react";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
+import AreasWeServe from "@/components/AreasWeServe";
+import type { CityAreaGroup } from "@/lib/city-pages";
 
 const anton = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton" });
 
@@ -30,6 +32,11 @@ export type ServiceData = {
     ctaHeadline: string;
     /** closing CTA sub-line */
     ctaSub?: string;
+    /**
+     * City landing pages to surface before the footer. Omitted on service
+     * pages that are not a parent of those landings.
+     */
+    cityAreas?: CityAreaGroup[];
 };
 
 const STATS = [
@@ -168,6 +175,10 @@ export default function ServiceClient({ data }: { data: ServiceData }) {
                     </div>
                 </section>
             )}
+
+            {data.cityAreas && data.cityAreas.length > 0 ? (
+                <AreasWeServe groups={data.cityAreas} id="service-areas" />
+            ) : null}
 
             {/* CTA band */}
             <section className="w-full py-16 md:py-24 px-6 md:px-12 bg-[#B5330E] text-[#F2EBDA] border-b-4 border-[#0a0a0a]">

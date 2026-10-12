@@ -70,6 +70,7 @@ const data: ServiceData = {
     faqs,
     ctaHeadline: "READY TO SHOW UP WHERE IT COUNTS?",
     ctaSub: "Free consultation. We'll pull up your current local visibility and tell you straight what's holding it back.",
+    cityAreas: ["digital-marketing"],
 };
 
 const pageSchema = graph(
