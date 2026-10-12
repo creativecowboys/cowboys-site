@@ -15,6 +15,17 @@ import {
   Clock,
 } from "lucide-react";
 import ProposalModal from "@/components/ProposalModal";
+import { DIGITAL_MARKETING_CITY_PAGES } from "@/lib/city-pages";
+
+const cityLinkClass =
+  "text-[#B5330E] font-bold underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]";
+
+function marketingAnchor(href: string, cityName: string): string {
+  return (
+    DIGITAL_MARKETING_CITY_PAGES.find((page) => page.href === href)?.label ??
+    `Digital marketing in ${cityName}, GA`
+  );
+}
 
 const anton = Anton({
   subsets: ["latin"],
@@ -446,6 +457,24 @@ export default function CityLandingClient({ city }: { city: CityData }) {
               )}
             </p>
           ) : null}
+          {city.otherCities.length > 0 ? (
+            <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 leading-relaxed">
+              The same work in nearby cities:{" "}
+              {city.otherCities.map((link, i) => {
+                const last = i === city.otherCities.length - 1;
+                const separator = i === 0 ? "" : last ? ", and " : ", ";
+                return (
+                  <span key={link.href}>
+                    {separator}
+                    <Link href={link.href} className={cityLinkClass}>
+                      {marketingAnchor(link.href, link.label)}
+                    </Link>
+                  </span>
+                );
+              })}
+              .
+            </p>
+          ) : null}
         </div>
       </section>
 
@@ -694,7 +723,9 @@ export default function CityLandingClient({ city }: { city: CityData }) {
               ))}
               <Link href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
               {city.otherCities.map((c) => (
-                <Link key={c.href} href={c.href} className="hover:text-[#B5330E] transition-colors">{c.label}</Link>
+                <Link key={c.href} href={c.href} className="hover:text-[#B5330E] transition-colors normal-case tracking-normal">
+                  {marketingAnchor(c.href, c.label)}
+                </Link>
               ))}
             </div>
           </div>

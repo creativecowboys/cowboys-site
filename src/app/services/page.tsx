@@ -5,6 +5,7 @@ import { ArrowUpRight, Check } from "lucide-react";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import { breadcrumb, graph, providerBlock, SITE_URL } from "@/lib/seo";
+import AreasWeServe from "@/components/AreasWeServe";
 
 const anton = Anton({ subsets: ["latin"], weight: ["400"], variable: "--font-anton" });
 
@@ -174,6 +175,8 @@ export default function ServicesPage() {
                     ))}
                 </div>
             </section>
+
+            <AreasWeServe id="services-areas" />
 
             {/* CTA band */}
             <section className="w-full py-16 md:py-24 px-6 md:px-12 bg-[#0a0a0a] text-[#F2EBDA] border-y-4 border-[#0a0a0a]">
