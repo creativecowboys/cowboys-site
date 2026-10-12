@@ -8,11 +8,6 @@ import {
     FaLinkedin,
     FaTwitter,
 } from "react-icons/fa";
-import {
-    DIGITAL_MARKETING_CITY_PAGES,
-    FRANKLIN_WEB_DESIGN,
-    WEB_DESIGN_CITY_PAGES,
-} from "@/lib/city-pages";
 
 /* ── Types ──────────────────────────────────────────────────── */
 interface Footer7Props {
@@ -54,15 +49,13 @@ const defaultSections: Footer7Props["sections"] = [
         ],
     },
     {
-        title: "Web design",
+        title: "Locations Served",
         links: [
-            ...WEB_DESIGN_CITY_PAGES.map((page) => ({ name: page.label, href: page.href })),
-            { name: FRANKLIN_WEB_DESIGN.label, href: FRANKLIN_WEB_DESIGN.href },
+            { name: "Villa Rica, GA", href: "/digital-marketing-villa-rica-ga" },
+            { name: "Carrollton, GA", href: "/digital-marketing-carrollton-ga" },
+            { name: "Douglasville, GA", href: "/digital-marketing-douglasville-ga" },
+            { name: "Newnan, GA", href: "/digital-marketing-newnan-ga" },
         ],
-    },
-    {
-        title: "Digital marketing",
-        links: DIGITAL_MARKETING_CITY_PAGES.map((page) => ({ name: page.label, href: page.href })),
     },
 ];
 
@@ -171,7 +164,7 @@ export const Footer7 = ({
                         style={{
                             flex: "2 1 500px",
                             display: "grid",
-                            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                            gridTemplateColumns: "repeat(3, 1fr)",
                             gap: "32px",
                         }}
                     >

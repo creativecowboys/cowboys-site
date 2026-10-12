@@ -4,7 +4,6 @@ import Footer from "@/components/global/Footer";
 import ClientScripts from "@/components/seo/ClientScripts";
 import dynamic from "next/dynamic";
 import { breadcrumb, serviceSchema } from "@/lib/seo";
-import AreasWeServe from "@/components/AreasWeServe";
 
 const SEOChartsSection = dynamic(() => import("@/components/seo/SEOChartsSection"), {
   loading: () => <div className="h-[400px] bg-[#0a0a0a]/20 animate-pulse border-[2.5px] border-[#F5C842]" />
@@ -430,8 +429,6 @@ export default function SEOPage() {
                         </div>
                     </div>
                 </section>
-
-                <AreasWeServe groups={["digital-marketing"]} id="seo-areas" />
 
                 {/* ── PPC CROSS-SELL BAND ── */}
                 <section className="py-12 px-6 md:px-12 bg-[#F2EBDA] border-b-[2.5px] border-[#0a0a0a]">

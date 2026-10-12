@@ -3,7 +3,6 @@ import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import ClientScripts from "@/components/web-design/ClientScripts";
 import { breadcrumb, serviceSchema } from "@/lib/seo";
-import { FRANKLIN_WEB_DESIGN, WEB_DESIGN_CITY_PAGES } from "@/lib/city-pages";
 
 export default function WebDesignPage() {
   return (
@@ -477,26 +476,34 @@ export default function WebDesignPage() {
               The practice above covers the Southeast. These pages are the local version: what a site has to do in each West Georgia city, and what it costs.
             </p>
           </div>
-          <ul className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {WEB_DESIGN_CITY_PAGES.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="group h-full border-[2.5px] border-[#0a0a0a] bg-white p-6 md:p-8 shadow-[4px_4px_0px_#0a0a0a] flex flex-col gap-3 hover:bg-[#F5C842] transition-colors"
-                >
-                  <span className="font-anton text-2xl uppercase text-[#0a0a0a]">{item.label}</span>
-                  <span className="font-inter text-sm text-[#5a5a5a] leading-relaxed group-hover:text-[#0a0a0a]">{item.note}</span>
-                </Link>
-              </li>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                city: "Carrollton, GA",
+                href: "/web-design-carrollton-ga",
+                blurb: "County seat, University of West Georgia, Tanner, and Adamson Square. About 15 minutes from our Villa Rica office.",
+              },
+              {
+                city: "Villa Rica, GA",
+                href: "/web-design-villa-rica-ga",
+                blurb: "Our hometown. Downtown, The Mill, Mirror Lake, and the I-20 county line between Carroll and Douglas.",
+              },
+              {
+                city: "Douglasville, GA",
+                href: "/web-design-douglasville-ga",
+                blurb: "Douglas County on I-20: Arbor Place, Chapel Hill, downtown, and Lithia Springs. About 20 minutes from the office.",
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group border-[2.5px] border-[#0a0a0a] bg-white p-6 md:p-8 shadow-[4px_4px_0px_#0a0a0a] flex flex-col gap-3 hover:bg-[#F5C842] transition-colors"
+              >
+                <span className="font-anton text-2xl uppercase text-[#0a0a0a]">Web design {item.city}</span>
+                <span className="font-inter text-sm text-[#5a5a5a] leading-relaxed group-hover:text-[#0a0a0a]">{item.blurb}</span>
+              </Link>
             ))}
-          </ul>
-          <p className="font-inter text-sm text-[#5a5a5a] leading-relaxed max-w-xl mt-8">
-            Middle Tennessee is separate:{" "}
-            <Link href={FRANKLIN_WEB_DESIGN.href} className="text-[#B5330E] font-bold underline decoration-[#B5330E]/40">
-              {FRANKLIN_WEB_DESIGN.label}
-            </Link>
-            . {FRANKLIN_WEB_DESIGN.note}
-          </p>
+          </div>
         </div>
       </section>
 

@@ -18,7 +18,6 @@ import {
   ArrowRight
 } from "lucide-react";
 import ProposalModal from "@/components/ProposalModal";
-import AreasWeServe, { AreasFooterLinks } from "@/components/AreasWeServe";
 
 const anton = Anton({
   subsets: ["latin"],
@@ -895,8 +894,6 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <AreasWeServe />
-
       {/* Selected Works Portfolio Section */}
       <section id="portfolio" className="w-full py-12 md:py-20 px-6 md:px-12 bg-[#F2EBDA] border-b-4 border-[#0a0a0a] z-10">
         <div className="max-w-7xl mx-auto">
@@ -1315,7 +1312,6 @@ export default function HomeClient() {
             </div>
           </div>
 
-          <AreasFooterLinks />
         </div>
       </footer>
 
