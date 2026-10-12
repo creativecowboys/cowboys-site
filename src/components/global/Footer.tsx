@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { Clock, Mail, Phone, MapPin } from "lucide-react";
-import { AreasFooterLinks } from "@/components/AreasWeServe";
 
 export default function Footer() {
   return (
@@ -80,7 +79,6 @@ export default function Footer() {
           </div>
         </div>
 
-        <AreasFooterLinks />
       </div>
     </footer>
   );

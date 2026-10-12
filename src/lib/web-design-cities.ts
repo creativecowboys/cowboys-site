@@ -101,8 +101,8 @@ export const carrolltonWebDesign: WebDesignCity = {
   digitalMarketingHref: "/digital-marketing-carrollton-ga",
   digitalMarketingLabel: "digital marketing in Carrollton, GA",
   nearby: [
-    { label: "Web design in Villa Rica, GA", href: "/web-design-villa-rica-ga" },
-    { label: "Web design in Douglasville, GA", href: "/web-design-douglasville-ga" },
+    { label: "Web design Villa Rica, GA", href: "/web-design-villa-rica-ga" },
+    { label: "Web design Douglasville, GA", href: "/web-design-douglasville-ga" },
   ],
 };
 
@@ -177,8 +177,8 @@ export const villaRicaWebDesign: WebDesignCity = {
   digitalMarketingHref: "/digital-marketing-villa-rica-ga",
   digitalMarketingLabel: "digital marketing in Villa Rica, GA",
   nearby: [
-    { label: "Web design in Carrollton, GA", href: "/web-design-carrollton-ga" },
-    { label: "Web design in Douglasville, GA", href: "/web-design-douglasville-ga" },
+    { label: "Web design Carrollton, GA", href: "/web-design-carrollton-ga" },
+    { label: "Web design Douglasville, GA", href: "/web-design-douglasville-ga" },
   ],
 };
 
@@ -253,8 +253,8 @@ export const douglasvilleWebDesign: WebDesignCity = {
   digitalMarketingHref: "/digital-marketing-douglasville-ga",
   digitalMarketingLabel: "digital marketing in Douglasville, GA",
   nearby: [
-    { label: "Web design in Carrollton, GA", href: "/web-design-carrollton-ga" },
-    { label: "Web design in Villa Rica, GA", href: "/web-design-villa-rica-ga" },
+    { label: "Web design Carrollton, GA", href: "/web-design-carrollton-ga" },
+    { label: "Web design Villa Rica, GA", href: "/web-design-villa-rica-ga" },
   ],
 };
 
