@@ -96,10 +96,10 @@ const MONTHLY_SERVICES: Service[] = [
         billing: "monthly",
         icon: IoSparklesOutline,
         bullets: [
-            "$97/mo added to Local Growth or Max Growth",
-            "$297/mo on its own, without an SEO plan",
+            "Added to Local Growth, Max Growth or any website we host",
             "Your business structured so AI tools can read it",
             "Tracking for the questions people ask about your trade",
+            "A new answer on your site every month where you're missing",
         ],
     },
     {
@@ -146,14 +146,14 @@ const MONTHLY_SERVICES: Service[] = [
     {
         id: "ai-chat",
         name: "AI Chat",
-        tagline: "The website chat on its own, without the CRM.",
-        priceLabel: "$47/mo",
+        tagline: "Answers your website visitors 24/7 and texts you the lead.",
+        priceLabel: "$19/mo",
         billing: "monthly",
         icon: IoChatbubblesOutline,
         bullets: [
             "Answers visitors after hours",
-            "Catches the lead and hands it to you",
-            "No CRM required",
+            "Texts you the lead the moment it comes in",
+            "Add-on for any website we host",
         ],
     },
     {

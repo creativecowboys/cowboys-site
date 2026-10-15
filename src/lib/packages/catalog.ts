@@ -90,11 +90,13 @@ export const CATALOG: CatalogItem[] = [
     amount: 97,
   },
   {
+    // Josh, Oct 15 2026: $19 (was $47), and only on a site we host. Priced to be an easy add-on to the $30 hosting.
     key: "ai-chat",
     name: "AI Chat only",
-    blurb: "Just the website chat, without the CRM. Answers after hours and catches the lead.",
+    blurb: "Answers your website visitors 24/7 and texts you the lead. For websites we host.",
     group: "addon",
-    amount: 47,
+    amount: 19,
+    requires: ["website-hosting"],
   },
   {
     key: "expanded-reach",
@@ -105,22 +107,14 @@ export const CATALOG: CatalogItem[] = [
     requires: ["local-growth"],
   },
   {
+    // Josh, Oct 15 2026: $97 on an SEO plan or on any site we built and host (we own the code, so the
+    // work is cheap to do). The $297 standalone price for sites we don't host is retired.
     key: "ai-seo",
     name: "AI SEO",
-    blurb: "Show up in ChatGPT, Perplexity and Google AI answers. Rides on an SEO plan.",
+    blurb: "Show up in ChatGPT, Perplexity and Google AI answers. With an SEO plan or a website we host.",
     group: "addon",
     amount: 97,
-    requires: ["local-growth", "max-growth"],
-  },
-  {
-    // Same work as ai-seo, priced for a client with no SEO plan underneath it.
-    // Blocked against the plans so a rep can't bill $297 to someone entitled to $97.
-    key: "ai-seo-standalone",
-    name: "AI SEO (standalone)",
-    blurb: "The same AI visibility work for a client who isn't on an SEO plan.",
-    group: "addon",
-    amount: 297,
-    conflictsWith: ["local-growth", "max-growth", "ai-seo"],
+    requires: ["local-growth", "max-growth", "website-hosting"],
   },
   {
     key: "website-hosting",

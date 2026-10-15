@@ -39,10 +39,19 @@ test("monthly totals add the chosen term to the other lines", () => {
   assert.equal(monthlyTotal(buildLines([{ key: "local-growth", term: "month-to-month" }, { key: "crm" }, { key: "google-ads", tier: "1000" }])), 497 + 97 + 1000);
 });
 
+// Josh, Oct 15 2026: AI Chat is $19 and only rides on hosting; AI SEO is $97 on an SEO plan or on hosting.
+test("AI Chat and AI SEO ride on a website we host", () => {
+  assert.equal(monthlyTotal(buildLines([{ key: "website-hosting" }, { key: "ai-chat" }])), 30 + 19);
+  assert.equal(monthlyTotal(buildLines([{ key: "website-hosting" }, { key: "ai-seo" }])), 30 + 97);
+  assert.equal(monthlyTotal(buildLines([{ key: "local-growth" }, { key: "ai-seo" }])), 297 + 97);
+});
+
 test("catalog rules: one plan, add-on requirements, conflicts, tiers, custom lines", () => {
   assert.throws(() => buildLines([{ key: "local-growth" }, { key: "max-growth" }]), /one plan/);
   assert.throws(() => buildLines([{ key: "expanded-reach" }]), /requires/);
-  assert.throws(() => buildLines([{ key: "ai-seo-standalone" }, { key: "local-growth" }]), /can't be combined/);
+  assert.throws(() => buildLines([{ key: "ai-chat" }]), /requires Website Hosting/);
+  assert.throws(() => buildLines([{ key: "ai-seo" }]), /requires/);
+  assert.throws(() => buildLines([{ key: "ai-seo-standalone" }]), /Unknown item/);
   assert.throws(() => buildLines([{ key: "social-ads" }]), /Pick a tier/);
   assert.throws(() => buildLines([{ key: "custom", name: "", amount: 50 }]), /Custom line/);
   assert.throws(() => buildLines([]), /at least one/);
