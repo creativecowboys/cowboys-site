@@ -86,7 +86,7 @@ test("list prices match the two Monday formulas label for label", () => {
   const formula: Record<string, number> = {
     "Local Growth": 497, "Local Growth — First Year $297": 297, "Max Growth": 1497, "Expanded Reach (+5 cities)": 200,
     "Social Ads $300": 300, "Social Ads $600": 600, "Social Ads $1,200": 1200, "Google Ads $500": 500, "Google Ads $1,000": 1000, "Google Ads $1,500": 1500,
-    "CRM (incl. AI Chat)": 97, "AI Chat only": 19,
+    "CRM (incl. AI Chat)": 97, "AI Chat only": 47,
     // not in the formulas: carried by Custom $/mo (or one-time)
     "AI SEO": 0, "Social Ads Custom": 0, "Google Ads Custom": 0, "Growth Strategy Session": 0, "Website hosting / care": 0, "Custom retainer": 0, "Giveaway Winner": 0,
   };

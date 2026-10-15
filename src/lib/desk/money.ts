@@ -7,8 +7,9 @@ import { CLIENT_PACKAGES } from "@/lib/clients/config";
 // The numbers come from the package catalog (src/lib/packages/catalog.ts) — one price list for the
 // package builder and the desk — and match the two Monday formulas label for label (unit-tested):
 //   Local Growth 497 · Local Growth — First Year $297 → 297 · Max Growth 1497 · Expanded Reach 200 ·
-//   Social Ads 300 / 600 / 1,200 · Google Ads 500 / 1,000 / 1,500 · CRM 97 · AI Chat only 19 · + Custom $/mo.
-// AI Chat only dropped from 47 to 19 on Oct 15 2026 (Josh); the Monday formula needs the same edit.
+//   Social Ads 300 / 600 / 1,200 · Google Ads 500 / 1,000 / 1,500 · CRM 97 · AI Chat only 47 · + Custom $/mo.
+// "AI Chat only" stays 47 even though the catalog's AI Chat is $19 since Oct 15 2026: Josh kept every client
+// already on it at $47, and the label is only on those clients. New $19 chat clients need a label of their own.
 // Labels with no fixed price (AI SEO, the two "Custom" ads tiers, Growth Strategy Session — a one-time fee,
 // Website hosting / care, Custom retainer) count 0 here and are carried by Custom $/mo, exactly as on Monday.
 // A Giveaway Winner is never billed, so their monthly is 0 whatever else is ticked.
@@ -17,7 +18,7 @@ import { CLIENT_PACKAGES } from "@/lib/clients/config";
 /** Every package label the desk knows, byte-for-byte as on the two Monday dropdowns (Onboarding first, then the Clients-only ones). */
 export const ALL_PACKAGE_LABELS: readonly string[] = [...PACKAGES, ...CLIENT_PACKAGES.filter((p) => !(PACKAGES as readonly string[]).includes(p))];
 
-const LABEL_TO_CATALOG: Record<string, { key: string; tier?: string; term?: string }> = {
+const LABEL_TO_CATALOG: Record<string, { key: string; tier?: string; term?: string; legacy?: number }> = {
   "Local Growth": { key: "local-growth", term: "month-to-month" },
   "Local Growth — First Year $297": { key: "local-growth", term: "12-month" },
   "Max Growth": { key: "max-growth" },
@@ -29,13 +30,14 @@ const LABEL_TO_CATALOG: Record<string, { key: string; tier?: string; term?: stri
   "Google Ads $1,000": { key: "google-ads", tier: "1000" },
   "Google Ads $1,500": { key: "google-ads", tier: "1500" },
   "CRM (incl. AI Chat)": { key: "crm" },
-  "AI Chat only": { key: "ai-chat" },
+  "AI Chat only": { key: "ai-chat", legacy: 47 },
 };
 
 /** List price of one package label per month; 0 for custom-quoted, one-time and unknown labels. */
 export function listPrice(label: string): number {
   const ref = LABEL_TO_CATALOG[label.trim()];
   if (!ref) return 0;
+  if (ref.legacy !== undefined) return ref.legacy;
   const item = CATALOG.find((c) => c.key === ref.key);
   if (!item) return 0;
   if (ref.tier) return item.tiers?.find((t) => t.key === ref.tier)?.amount ?? 0;
