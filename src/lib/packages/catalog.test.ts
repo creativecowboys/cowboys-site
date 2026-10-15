@@ -44,6 +44,20 @@ test("AI Chat and AI SEO ride on a website we host", () => {
   assert.equal(monthlyTotal(buildLines([{ key: "website-hosting" }, { key: "ai-chat" }])), 30 + 19);
   assert.equal(monthlyTotal(buildLines([{ key: "website-hosting" }, { key: "ai-seo" }])), 30 + 97);
   assert.equal(monthlyTotal(buildLines([{ key: "local-growth" }, { key: "ai-seo" }])), 297 + 97);
+  assert.equal(monthlyTotal(buildLines([{ key: "website-pro" }, { key: "ai-seo" }])), 69 + 97);
+});
+
+// Josh, Oct 15 2026: Website Pro ($69) is the second hosting tier and already includes the chat, the
+// domain and the text alerts, so those can't be billed on top of it; booking and AI SEO still can.
+test("Website Pro replaces hosting and swallows the add-ons it includes", () => {
+  assert.throws(() => buildLines([{ key: "website-hosting" }, { key: "website-pro" }]), /can't be combined/);
+  for (const k of ["ai-chat", "custom-domain", "lead-text-alerts"]) {
+    // Rejected either way: the add-on needs plain hosting, and it clashes with Pro.
+    assert.throws(() => buildLines([{ key: "website-pro" }, { key: k }]), /requires Website Hosting|can't be combined/, k);
+    assert.throws(() => buildLines([{ key: k }]), /requires Website Hosting/, k);
+  }
+  assert.equal(monthlyTotal(buildLines([{ key: "website-hosting" }, { key: "custom-domain" }, { key: "lead-text-alerts" }, { key: "online-booking" }])), 30 + 5 + 5 + 19);
+  assert.equal(monthlyTotal(buildLines([{ key: "website-pro" }, { key: "online-booking" }])), 69 + 19);
 });
 
 test("catalog rules: one plan, add-on requirements, conflicts, tiers, custom lines", () => {

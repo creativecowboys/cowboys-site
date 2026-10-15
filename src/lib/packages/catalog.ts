@@ -91,12 +91,14 @@ export const CATALOG: CatalogItem[] = [
   },
   {
     // Josh, Oct 15 2026: $19 (was $47), and only on a site we host. Priced to be an easy add-on to the $30 hosting.
+    // Website Pro already includes it, so the two can't be billed together.
     key: "ai-chat",
     name: "AI Chat only",
     blurb: "Answers your website visitors 24/7 and texts you the lead. For websites we host.",
     group: "addon",
     amount: 19,
     requires: ["website-hosting"],
+    conflictsWith: ["website-pro"],
   },
   {
     key: "expanded-reach",
@@ -114,14 +116,51 @@ export const CATALOG: CatalogItem[] = [
     blurb: "Show up in ChatGPT, Perplexity and Google AI answers. With an SEO plan or a website we host.",
     group: "addon",
     amount: 97,
-    requires: ["local-growth", "max-growth", "website-hosting"],
+    requires: ["local-growth", "max-growth", "website-hosting", "website-pro"],
   },
   {
     key: "website-hosting",
     name: "Website Hosting & Support",
-    blurb: "Hosting, support and minor updates. Required with every website build.",
+    blurb: "Hosting, security and on-demand web updates (10 credits a month). Required with every website build.",
     group: "addon",
     amount: 30,
+    conflictsWith: ["website-pro"],
+  },
+  {
+    // Josh, Oct 15 2026: the second hosting tier for the free-website program. Hosting plus everything a
+    // client would otherwise add on, so none of those add-ons can be billed next to it.
+    key: "website-pro",
+    name: "Website Pro",
+    blurb: "Hosting, advanced on-demand web updates (50 credits a month), AI chat, lead text alerts, custom domain and priority team requests.",
+    group: "addon",
+    amount: 69,
+    conflictsWith: ["website-hosting"],
+  },
+  {
+    key: "custom-domain",
+    name: "Custom Domain",
+    blurb: "We register and manage a domain for a client who doesn't have one. Included in Website Pro.",
+    group: "addon",
+    amount: 5,
+    requires: ["website-hosting"],
+    conflictsWith: ["website-pro"],
+  },
+  {
+    key: "lead-text-alerts",
+    name: "Lead Text Alerts",
+    blurb: "A text for every website form lead. Included in Website Pro.",
+    group: "addon",
+    amount: 5,
+    requires: ["website-hosting"],
+    conflictsWith: ["website-pro"],
+  },
+  {
+    key: "online-booking",
+    name: "Online Booking",
+    blurb: "Customers book a time straight from the website.",
+    group: "addon",
+    amount: 19,
+    requires: ["website-hosting", "website-pro"],
   },
 ];
 
