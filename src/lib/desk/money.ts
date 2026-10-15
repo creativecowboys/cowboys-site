@@ -7,7 +7,8 @@ import { CLIENT_PACKAGES } from "@/lib/clients/config";
 // The numbers come from the package catalog (src/lib/packages/catalog.ts) — one price list for the
 // package builder and the desk — and match the two Monday formulas label for label (unit-tested):
 //   Local Growth 497 · Local Growth — First Year $297 → 297 · Max Growth 1497 · Expanded Reach 200 ·
-//   Social Ads 300 / 600 / 1,200 · Google Ads 500 / 1,000 / 1,500 · CRM 97 · AI Chat only 47 · + Custom $/mo.
+//   Social Ads 300 / 600 / 1,200 · Google Ads 500 / 1,000 / 1,500 · CRM 97 · AI Chat only 19 · + Custom $/mo.
+// AI Chat only dropped from 47 to 19 on Oct 15 2026 (Josh); the Monday formula needs the same edit.
 // Labels with no fixed price (AI SEO, the two "Custom" ads tiers, Growth Strategy Session — a one-time fee,
 // Website hosting / care, Custom retainer) count 0 here and are carried by Custom $/mo, exactly as on Monday.
 // A Giveaway Winner is never billed, so their monthly is 0 whatever else is ticked.
