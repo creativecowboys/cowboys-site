@@ -4,8 +4,28 @@
     {
       "name": "cowboys-site",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "-p", "3007"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--",
+        "-p",
+        "3007"
+      ],
       "port": 3007
+    },
+    {
+      "name": "onboarding-chat",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "/Users/cowboysmac/Documents/Claude/local-seo-engine/onboarding-chat",
+        "--",
+        "-p",
+        "3011"
+      ],
+      "port": 3011
     }
   ]
 }

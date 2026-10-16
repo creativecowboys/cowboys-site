@@ -32,23 +32,33 @@ Existing clients on the old $47 "AI Chat only" label stay at $47 (`src/lib/desk/
 - `ClaimBuilder.tsx` — pick a plan, tick add-ons, see "Today / Then", claim.
 
 ### Two ways the claim button can work
-1. **GoHighLevel order form** (the plan): set on Vercel
+1. **GoHighLevel payment links** (live since Oct 16 2026, one per plan; built in the GHL UI, Payments → Payment Links):
+   - Hosting & Support ($30/mo): https://link.fastpaydirect.com/payment-link/6ad23ea8c0e70c7fefb75120
+   - Website Pro ($69/mo): https://link.fastpaydirect.com/payment-link/6ad23ee5c0e70c7fefb75122
+
+   Each requires a phone number, carries the platform/refund terms line, charges the first month and starts the
+   monthly subscription, then redirects to `/free-website/thanks`. Set on Vercel (production + preview):
    - `NEXT_PUBLIC_FREE_SITE_CHECKOUT_URL_BASIC` — the order form for Hosting & Support
    - `NEXT_PUBLIC_FREE_SITE_CHECKOUT_URL_PRO` — the order form for Website Pro
 
-   The button becomes a link to the form for the chosen plan, carrying `plan`, `addons` (comma-separated keys from
-   the table above), `one_time` and any ad parameters (`utm_*`, `fbclid`, `gclid`…) as query parameters. GoHighLevel
-   can prefill custom fields from URL parameters, so a hidden "Add-ons picked" field on the form gets the cart.
-   The add-ons themselves are sold as order bumps on the form. The Meta pixel fires `InitiateCheckout` on click.
+   The button becomes a link to the payment link for the chosen plan, carrying `plan`, `addons` (comma-separated
+   keys from the table above), `one_time` and any ad parameters (`utm_*`, `fbclid`, `gclid`…) as query parameters.
+   The Meta pixel fires `InitiateCheckout` on click. **A payment link bills one product, so the add-ons ticked on
+   the claim page are not charged at checkout**: they are on the contact (the onboarding chat records lead-text and
+   domain choices in `lse_*` fields) and get added to the subscription after onboarding from the Sales tab, or by a
+   second payment (the "Add-on — …" products exist in GHL). A true cart needs Stripe Checkout on our site.
 2. **No URL set (today):** the button opens a four-field claim form. It posts to `/api/contact` like every other
    form (honeypot, time trap, team email, GoHighLevel contact when `LEADS_BACKEND=ghl`) with the cart as the
    message, e.g. `Claimed: Website Pro + Online Booking · $88 today, then $88/mo. Send the checkout link.` A
    person then sends the checkout link. The pixel fires `Lead`.
 
-**Before building the order forms, test this in GoHighLevel:** its changelog for order bumps in forms says only one
-product on a form can be recurring (the main product or a bump). If funnel order forms are the same, one form
-can't sell $30 hosting plus a $19/mo chat bump. Fallbacks: preset bundles as single products, or Stripe Checkout
-for payment with the sale pushed into GoHighLevel.
+**What happens in GoHighLevel after payment (built Oct 16 2026, see `local-seo-engine/CLAUDE.md`):** workflow
+`FWP-01 · Free website paid (Hosting & Support)` / `(Website Pro)` triggers on Payment Received for the plan's
+product → tags `free-site`, `plan:basic|plan:pro`, `lse:client` → opportunity "<Company> — Free Website" in
+`Local SEO — Clients` at `1 · Signed` → webhook mints the onboarding link → 2 min → welcome email with the link →
+stage `2 · Onboarding` → notifies Josh. `FWP-02 · Add-on paid (Custom Domain)` tags `addon:custom-domain`. `LSE-03`
+now forks on the `free-site` tag: free-site contacts get a "Build website — <Business>" task for Josh instead of the
+Local Max build-week task and email. Products for every plan and add-on exist under Payments → Products.
 
 ### The VSL
 `NEXT_PUBLIC_FREE_SITE_VSL_URL` — the embed URL (YouTube `https://www.youtube.com/embed/<id>`, Vimeo, Wistia).
@@ -68,8 +78,10 @@ Phase 1 proves the offer before the automation is built. Per client:
 8. Review request at day 14.
 
 ## Still outside this repo
-- The GoHighLevel order forms (and the recurring-bump test above).
-- The onboarding chat's Site Brief and its copy of the price list (`creativecowboys/local-seo-engine`).
+- Add-ons at checkout (a payment link bills one product): Stripe Checkout on our site, or add-ons invoiced after
+  onboarding from the Sales tab. Tags for add-ons other than the custom domain (`addon:ai-chat` …) are not yet set
+  by any workflow.
+- The onboarding chat's copy of the price list (`creativecowboys/local-seo-engine`).
 - A Monday / GoHighLevel package label for $19 chat clients ("AI Chat only" stays 47).
 - Terms of service: the platform rule, the $297 move-off, the refund rule, domain ownership.
 - Twilio: confirm the campaign covers lead-alert texts; lead-alert opt-in wording.
