@@ -1320,7 +1320,6 @@ export default function HomeClient() {
         isOpen={isProposalModalOpen} 
         onClose={() => setIsProposalModalOpen(false)} 
         source={modalSource} 
-        hidePhone
       />
     </div>
   );

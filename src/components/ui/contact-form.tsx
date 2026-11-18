@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check } from 'lucide-react';
+import { PHONE_PATTERN, PHONE_TITLE } from '@/lib/phone';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -112,8 +113,8 @@ export default function ContactForm() {
             {/* Phone + Company */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label className={labelCls} htmlFor="phone">Phone (optional)</label>
-                    <input id="phone" name="phone" type="tel" placeholder="(555) 555-5555"
+                    <label className={labelCls} htmlFor="phone">Phone *</label>
+                    <input id="phone" name="phone" type="tel" required autoComplete="tel" pattern={PHONE_PATTERN} title={PHONE_TITLE} placeholder="(555) 555-5555"
                         value={form.phone} onChange={handleChange} className={inputCls} />
                 </div>
                 <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { PHONE_PATTERN, PHONE_TITLE } from '@/lib/phone';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock, MessageSquareText, Phone, Star } from 'lucide-react';
@@ -392,6 +393,10 @@ export default function AIDemoPageClient() {
                                             id="phone"
                                             name="phone"
                                             type="tel"
+                                            required
+                                            autoComplete="tel"
+                                            pattern={PHONE_PATTERN}
+                                            title={PHONE_TITLE}
                                             placeholder="(470) 555-0100"
                                             value={form.phone}
                                             onChange={handleChange}
