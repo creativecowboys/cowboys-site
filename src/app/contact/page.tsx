@@ -137,7 +137,7 @@ export default function ContactPage() {
                                     </span>
                                     <span className="flex flex-col">
                                         <span className="font-anton text-[10px] tracking-[1.5px] uppercase text-[#0a0a0a]/50">Location</span>
-                                        <span className="font-inter text-sm font-bold text-[#0a0a0a]">222 West Montgomery St · Villa Rica, GA 30180</span>
+                                        <span className="font-inter text-sm font-bold text-[#0a0a0a]">222 W Montgomery St · Villa Rica, GA 30180</span>
                                     </span>
                                 </div>
                             </div>

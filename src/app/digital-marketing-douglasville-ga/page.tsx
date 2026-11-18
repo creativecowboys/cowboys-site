@@ -141,13 +141,14 @@ const serviceSchema = {
   serviceType: "Digital Marketing Agency",
   url: "https://www.creativecowboys.co/digital-marketing-douglasville-ga",
   provider: {
+    "@id": "https://www.creativecowboys.co/#business",
     "@type": "LocalBusiness",
     name: "Creative Cowboys Media",
     telephone: "+1-470-243-7517",
     email: "howdy@creativecowboys.co",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "222 West Montgomery St",
+      streetAddress: "222 W Montgomery St",
       addressLocality: "Villa Rica",
       addressRegion: "GA",
       postalCode: "30180",

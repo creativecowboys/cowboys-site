@@ -44,6 +44,8 @@ const defaultSections: Footer7Props["sections"] = [
             { name: "Services", href: "/services" },
             { name: "Pricing", href: "/pricing" },
             { name: "Results", href: "/results" },
+            { name: "About", href: "/about" },
+            { name: "AI Chat", href: "/ai" },
             { name: "Blog", href: "/blog" },
             { name: "Contact", href: "/contact" },
         ],
@@ -55,6 +57,7 @@ const defaultSections: Footer7Props["sections"] = [
             { name: "Carrollton, GA", href: "/digital-marketing-carrollton-ga" },
             { name: "Douglasville, GA", href: "/digital-marketing-douglasville-ga" },
             { name: "Newnan, GA", href: "/digital-marketing-newnan-ga" },
+            { name: "All areas we serve", href: "/areas-we-serve" },
         ],
     },
 ];
@@ -147,7 +150,7 @@ export const Footer7 = ({
                                 marginBottom: "24px",
                             }}
                         >
-                            222 West Montgomery St.<br />
+                            222 W Montgomery St.<br />
                             Villa Rica, GA 30180
                         </p>
 

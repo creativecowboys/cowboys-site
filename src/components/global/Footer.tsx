@@ -74,8 +74,10 @@ export default function Footer() {
             <Link prefetch={false} href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</Link>
             <Link prefetch={false} href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</Link>
             <Link prefetch={false} href="/brand-strategy" className="hover:text-[#B5330E] transition-colors">Brand Strategy</Link>
-            <Link prefetch={false} href="/franklin-tn/web-design" className="text-[#F5C842] hover:text-white transition-colors mt-1 font-extrabold">Franklin, TN Hub</Link>
-            <Link prefetch={false} href="/contact" className="hover:text-[#B5330E] transition-colors mt-2">Privacy Policy</Link>
+            <Link prefetch={false} href="/areas-we-serve" className="text-[#F5C842] hover:text-white transition-colors mt-1 font-extrabold">Areas We Serve</Link>
+            <Link prefetch={false} href="/franklin-tn/web-design" className="hover:text-[#B5330E] transition-colors">Franklin, TN</Link>
+            <Link prefetch={false} href="/about" className="hover:text-[#B5330E] transition-colors">About</Link>
+            <Link prefetch={false} href="/privacy-policy" className="hover:text-[#B5330E] transition-colors mt-2">Privacy Policy</Link>
           </div>
         </div>
 

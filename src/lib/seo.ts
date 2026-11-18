@@ -13,10 +13,13 @@
 
 export const SITE_URL = "https://www.creativecowboys.co";
 
+/** One id for the business entity, so every page's schema points at the same node. */
+export const BUSINESS_ID = `${SITE_URL}/#business`;
+
 export const NAP = {
   name: "Creative Cowboys Media",
   alternateName: "Creative Cowboys",
-  streetAddress: "222 West Montgomery St",
+  streetAddress: "222 W Montgomery St",
   addressLocality: "Villa Rica",
   addressRegion: "GA",
   postalCode: "30180",
@@ -92,6 +95,7 @@ export const SERVICE_AREA = [
  */
 export function providerBlock() {
   return {
+    "@id": BUSINESS_ID,
     "@type": "LocalBusiness",
     name: NAP.name,
     url: SITE_URL,

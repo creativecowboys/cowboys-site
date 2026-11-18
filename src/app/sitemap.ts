@@ -23,6 +23,9 @@ const PRIVATE_SEGMENTS = ["admin", "clients", "proposals", "api"];
 
 /** Individually excluded routes — internal design references and ad landing pages. */
 const NOINDEX_ROUTES = new Set([
+  // The giveaway is over: /thebiggiveaway redirects to "/" and /draw is noindex.
+  "/thebiggiveaway",
+  "/thebiggiveaway/draw",
   "/home2",
   "/home3",
   // Paid-social landing page for the free-website promotion. Kept out of the
@@ -59,6 +62,7 @@ const ROUTE_RULES: Record<
   "/web-design-carrollton-ga": { priority: 0.8, changeFrequency: "monthly" },
   "/web-design-villa-rica-ga": { priority: 0.8, changeFrequency: "monthly" },
   "/web-design-douglasville-ga": { priority: 0.8, changeFrequency: "monthly" },
+  "/areas-we-serve": { priority: 0.8, changeFrequency: "weekly" },
   "/about": { priority: 0.8, changeFrequency: "monthly" },
   "/contact": { priority: 0.8, changeFrequency: "monthly" },
   "/results": { priority: 0.8, changeFrequency: "monthly" },
@@ -73,7 +77,33 @@ const ROUTE_RULES: Record<
 /** Legal / compliance pages: real pages, but they shouldn't compete for crawl budget. */
 const LOW_PRIORITY_PREFIXES = ["/privacy-policy", "/sms-", "/legal/"];
 
-type Discovered = { route: string; lastModified: Date };
+type Discovered = { route: string; lastModified?: Date };
+
+/**
+ * Real "last changed" dates for the city landing pages, read from each page's
+ * content file. Other routes get no lastmod at all: on Vercel every file's
+ * mtime is the build time, so a date from disk would be the same meaningless
+ * timestamp on every URL.
+ */
+const CITY_DIR = path.join(process.cwd(), "src", "content", "city-pages");
+function cityPageDates(): Map<string, Date> {
+  const dates = new Map<string, Date>();
+  let files: string[] = [];
+  try {
+    files = fs.readdirSync(CITY_DIR).filter((f) => f.endsWith(".json"));
+  } catch {
+    return dates;
+  }
+  for (const file of files) {
+    try {
+      const page = JSON.parse(fs.readFileSync(path.join(CITY_DIR, file), "utf8"));
+      if (page.path && page.updated) dates.set(page.path, new Date(page.updated));
+    } catch {
+      // A malformed file is caught by the city page validator; skip it here.
+    }
+  }
+  return dates;
+}
 
 function walk(dir: string, segments: string[] = []): Discovered[] {
   let entries: fs.Dirent[];
@@ -91,10 +121,7 @@ function walk(dir: string, segments: string[] = []): Discovered[] {
   );
   if (pageFile) {
     const route = "/" + segments.join("/");
-    found.push({
-      route: route === "/" ? "/" : route,
-      lastModified: fs.statSync(path.join(dir, pageFile.name)).mtime,
-    });
+    found.push({ route: route === "/" ? "/" : route });
   }
 
   for (const entry of entries) {
@@ -129,6 +156,9 @@ function ruleFor(route: string) {
   if (LOW_PRIORITY_PREFIXES.some((p) => route.startsWith(p))) {
     return { priority: 0.3, changeFrequency: "yearly" as const };
   }
+  if (route.startsWith("/web-design-")) {
+    return { priority: 0.7, changeFrequency: "monthly" as const };
+  }
   if (route.startsWith("/blog/")) {
     return { priority: 0.7, changeFrequency: "monthly" as const };
   }
@@ -136,14 +166,16 @@ function ruleFor(route: string) {
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const cityDates = cityPageDates();
   return walk(APP_DIR)
     .filter(({ route }) => isPublic(route))
     .sort((a, b) => a.route.localeCompare(b.route))
-    .map(({ route, lastModified }) => {
+    .map(({ route }) => {
       const { priority, changeFrequency } = ruleFor(route);
+      const lastModified = cityDates.get(route);
       return {
         url: route === "/" ? `${BASE_URL}/` : `${BASE_URL}${route}`,
-        lastModified,
+        ...(lastModified ? { lastModified } : {}),
         changeFrequency,
         priority,
       };
