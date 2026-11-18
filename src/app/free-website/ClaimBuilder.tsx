@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { trackFb } from "@/lib/fbq";
+import { PHONE_PATTERN, PHONE_TITLE } from "@/lib/phone";
 import {
     ADDONS, ONE_TIME, PHONE_DISPLAY, PHONE_HREF, PLANS, SLOTS, TERMS_LINE,
     checkoutUrl, summarize, totals, type AddonKey, type OneTime, type PlanKey, type Selection,
@@ -295,7 +296,7 @@ function ClaimForm({ sel, search, planName }: { sel: Selection; search: string; 
                 </div>
                 <div>
                     <label className={labelCls} htmlFor="claim-phone">Mobile *</label>
-                    <input id="claim-phone" name="phone" type="tel" required autoComplete="tel" placeholder="(555) 555-5555" value={form.phone} onChange={onChange} className={inputCls} />
+                    <input id="claim-phone" name="phone" type="tel" required autoComplete="tel" pattern={PHONE_PATTERN} title={PHONE_TITLE} placeholder="(555) 555-5555" value={form.phone} onChange={onChange} className={inputCls} />
                 </div>
                 <div>
                     <label className={labelCls} htmlFor="claim-email">Email *</label>

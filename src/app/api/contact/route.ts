@@ -1,6 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { pushWebsiteFormToGHL } from "@/lib/ghl-website-form";
+import { isValidPhone } from "@/lib/phone";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,6 +62,12 @@ export async function POST(request: NextRequest) {
     if (!name || !name.trim() || !email || !email.trim()) {
       return NextResponse.json(
         { error: "Required fields missing: Name and Email are required." },
+        { status: 400 }
+      );
+    }
+    if (!isValidPhone(phone)) {
+      return NextResponse.json(
+        { error: "Please enter a phone number with area code." },
         { status: 400 }
       );
     }
@@ -130,7 +137,7 @@ export async function POST(request: NextRequest) {
     // then this is a no-op and the form behaves exactly as it always has. Runs AFTER the response is sent
     // (Next `after`, kept alive by the platform), so a GHL problem can never fail or slow the visitor's submit.
     const lead = {
-      name: String(name), email: String(email), phone: typeof phone === "string" ? phone : undefined,
+      name: String(name), email: String(email), phone,
       company: typeof (company || business) === "string" ? String(company || business) : undefined,
       message: typeof message === "string" ? message : undefined, service: typeof service === "string" ? service : undefined,
       industry: typeof industry === "string" ? industry : undefined, source: typeof source === "string" ? source : undefined,
