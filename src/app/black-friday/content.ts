@@ -117,9 +117,9 @@ export const PACKAGES = [
 export const BUILD_TIME = "Most sites go live within about two weeks of the call.";
 export const TIMELINE = [
     { when: "Today", title: "Send the form", body: "Tell us your name, your business and how to reach you.", yours: "About a minute" },
-    { when: "Right after", title: "Talk with Josh", body: "Pick a time on the calendar. Josh asks about your business and helps you choose a package.", yours: "One 15-minute call" },
-    { when: "While we build", title: "We design and write it", body: "We design the site and write every page. You send your logo and a few photos of your work.", yours: "A logo and a few photos" },
-    { when: "Launch", title: "You review it, then it's live", body: `You look it over before anyone else sees it. ${BUILD_TIME}`, yours: "One look to approve it" },
+    { when: "Right after", title: "Book a call", body: "Pick a time on the calendar. We ask about your business and help you choose a package.", yours: "One 15-minute call" },
+    { when: "While we build", title: "We build it", body: "We design the site and write every page. You send your logo and a few photos of your work.", yours: "A logo and a few photos" },
+    { when: "Launch", title: "It goes live", body: `You look it over before anyone else sees it. ${BUILD_TIME}`, yours: "One look to approve it" },
 ];
 
 /**

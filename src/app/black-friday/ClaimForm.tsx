@@ -142,7 +142,7 @@ export default function ClaimForm({ phoneDisplay, phoneHref }: { phoneDisplay: s
             <div className="next">
                 <span className="mono">WHAT HAPPENS AFTER YOU CLICK</span>
                 <ol>
-                    <li>You pick a time for a 15-minute call with Josh.</li>
+                    <li>You pick a time for a 15-minute call with us.</li>
                     <li>We design and write your website.</li>
                     <li>You review it, then we put it live.</li>
                 </ol>

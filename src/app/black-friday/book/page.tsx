@@ -9,7 +9,7 @@ const PHONE_HREF = `tel:${NAP.telephone.replace(/[^+\d]/g, "")}`;
 
 export const metadata: Metadata = {
     title: "Pick a Time for Your Call",
-    description: "You're on the list for the Black Friday free website. Pick a time for a 15-minute call with Josh.",
+    description: "You're on the list for the Black Friday free website. Pick a time for a 15-minute call with us.",
     alternates: { canonical: "/black-friday/book" },
     robots: { index: false, follow: false },
 };
@@ -38,16 +38,17 @@ export default function BlackFridayBookPage() {
                                 <span className="pill">Black Friday deal</span>
                             </div>
                             <h1 className="h-display h2">Got it. Now <span className="grad">pick a time</span>.</h1>
-                            <p className="lede">We have your details. Choose a time for a 15-minute call with Josh and we&apos;ll get your free website started.</p>
+                            <p className="lede">We have your details. Choose a time for a 15-minute call and we&apos;ll get your free website started.</p>
                             <div className="crew">
                                 <span className="faces">
                                     <Image src="/night-ride/team/josh-face.jpg" alt="Josh" width={160} height={160} />
+                                    <Image src="/night-ride/team/dave-face.jpg" alt="Dave" width={160} height={160} />
                                 </span>
-                                <p>You&apos;ll talk to Josh, one of the two owners.</p>
+                                <p>You&apos;ll talk to Josh or Dave, the two owners.</p>
                             </div>
                             <ul className="ticks" style={{ marginTop: 0 }}>
-                                <li><Check /> He&apos;ll ask about your business and what you want the site to do</li>
-                                <li><Check /> He&apos;ll help you choose the marketing package that fits</li>
+                                <li><Check /> We&apos;ll ask about your business and what you want the site to do</li>
+                                <li><Check /> We&apos;ll help you choose the marketing package that fits</li>
                                 <li><Check /> No pressure and no contract</li>
                             </ul>
                             <p className="muted" style={{ margin: 0, fontSize: 15 }}>
