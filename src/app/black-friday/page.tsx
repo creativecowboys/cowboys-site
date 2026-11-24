@@ -34,6 +34,12 @@ export default function BlackFridayPage() {
             </noscript>
             <Reveal />
 
+            {/* Top bar + hero share one backdrop: the Christmas loft set from the ads, kept faint. */}
+            <div className="hero-zone">
+            <div className="hero-bg" aria-hidden="true">
+                <Image src="/night-ride/loft-christmas.jpg" alt="" fill priority sizes="100vw" />
+            </div>
+
             {/* Top bar. No site navigation on purpose: this page has one job. */}
             <div className="bar wrap">
                 <div className="bar-in">
@@ -46,8 +52,7 @@ export default function BlackFridayPage() {
                 </div>
             </div>
 
-            <main>
-                {/* HERO */}
+            {/* HERO */}
                 <section className="hero">
                     <div className="wrap hero-grid">
                         <div>
@@ -79,7 +84,9 @@ export default function BlackFridayPage() {
                         <ClaimForm phoneDisplay={PHONE_DISPLAY} phoneHref={PHONE_HREF} />
                     </div>
                 </section>
+            </div>
 
+            <main>
                 {/* WHAT'S INCLUDED */}
                 <section>
                     <div className="wrap">
