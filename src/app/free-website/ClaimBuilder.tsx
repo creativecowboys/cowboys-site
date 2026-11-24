@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { trackFb } from "@/lib/fbq";
+import { trackLead } from "@/lib/analytics";
 import {
     ADDONS, ONE_TIME, PHONE_DISPLAY, PHONE_HREF, PLANS, SLOTS, TERMS_LINE,
     checkoutUrl, summarize, totals, type AddonKey, type OneTime, type PlanKey, type Selection,
@@ -259,6 +260,7 @@ function ClaimForm({ sel, search, planName }: { sel: Selection; search: string; 
             });
             if (!res.ok) throw new Error("Send failed");
             trackFb("Lead", { content_name: "Free Website Program", content_category: planName });
+            trackLead("Free Website Program", { meta: false });
             setStatus("success");
         } catch {
             setStatus("error");

@@ -1307,6 +1307,9 @@ export default function HomeClient() {
               <a href="/web-design" className="hover:text-[#B5330E] transition-colors">Web Design</a>
               <a href="/ppc" className="hover:text-[#B5330E] transition-colors">PPC Campaigns</a>
               <a href="/brand-strategy" className="hover:text-[#B5330E] transition-colors">Brand Strategy</a>
+              <a href="/results" className="hover:text-[#B5330E] transition-colors">Results</a>
+              <a href="/about" className="hover:text-[#B5330E] transition-colors">About</a>
+              <a href="/blog" className="hover:text-[#B5330E] transition-colors">Blog</a>
               <a href="/privacy-policy" className="hover:text-[#B5330E] transition-colors mt-2">Privacy Policy</a>
               <a href="/sms-terms" className="hover:text-[#B5330E] transition-colors">SMS Terms</a>
             </div>

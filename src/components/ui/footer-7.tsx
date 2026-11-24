@@ -44,6 +44,8 @@ const defaultSections: Footer7Props["sections"] = [
             { name: "Services", href: "/services" },
             { name: "Pricing", href: "/pricing" },
             { name: "Results", href: "/results" },
+            { name: "About", href: "/about" },
+            { name: "AI Chat", href: "/ai" },
             { name: "Blog", href: "/blog" },
             { name: "Contact", href: "/contact" },
         ],
@@ -147,7 +149,7 @@ export const Footer7 = ({
                                 marginBottom: "24px",
                             }}
                         >
-                            222 West Montgomery St.<br />
+                            222 W Montgomery St.<br />
                             Villa Rica, GA 30180
                         </p>
 

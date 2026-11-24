@@ -460,7 +460,7 @@ export default function FreeWebsitePage() {
                         <div className="font-inter text-xs text-[#F2EBDA]/60 leading-relaxed">
                             <span className="font-bold text-[#F2EBDA]">Creative Cowboys Media, LLC</span>
                             <br />
-                            222 West Montgomery St, Villa Rica, GA 30180
+                            222 W Montgomery St, Villa Rica, GA 30180
                             <br />
                             <a href={PHONE_HREF} className="hover:text-[#B5330E] transition-colors">{PHONE_DISPLAY}</a>{" "}
                             ·{" "}

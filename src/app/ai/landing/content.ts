@@ -184,7 +184,7 @@ export const roofingContent: IndustryContent = {
 
   offerBanner:
     "🏠 Free Custom Website ($3,499 Value) — Included with Every AI Signup",
-  offerTag: "Only 5 Spots Left This Month",
+  offerTag: "Free Website Included",
 
   painHeadline: "EVERY MISSED CALL IS A MISSED JOB",
   painSubhead:
@@ -290,26 +290,9 @@ export const roofingContent: IndustryContent = {
   pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT ROOFING CONTRACTORS ARE SAYING",
-  testimonials: [
-    {
-      quote:
-        "Before the AI, I missed calls constantly while on jobs. Now every lead gets answered instantly. Booked 4 new roofs in the first week it went live.",
-      name: "Mike T.",
-      company: "Owner, Tri-State Roofing · Atlanta, GA",
-    },
-    {
-      quote:
-        "AI caught a storm damage lead at 11pm — turned into a $12,000 job. It paid for itself the first night. My only regret is not getting it sooner.",
-      name: "Jason R.",
-      company: "Owner, Ridge Line Roofing · Marietta, GA",
-    },
-    {
-      quote:
-        "I used to spend 2 hours a day returning missed calls. Now I spend that time on jobs. Revenue is up 30% since we went live.",
-      name: "Chris B.",
-      company: "Owner, Benchmark Roofing · Douglasville, GA",
-    },
-  ],
+  // Emptied Nov 24 2026: the quotes here could not be matched to real clients.
+  // Add only reviews a named client has approved; the section hides itself while this is empty.
+  testimonials: [],
 
   faqs: [
     {
@@ -346,7 +329,7 @@ export const roofingContent: IndustryContent = {
     "Every day without AI is a day your leads are going to the roofer who picks up first. Fill out the form — we'll reach out within 1 business day.",
   ctaNote: "📍 Serving roofing contractors nationwide.",
   ctaFormTitle: "CLAIM YOUR SPOT",
-  ctaFormSubtitle: "Free website + AI setup — Only 5 spots left this month",
+  ctaFormSubtitle: "Free website + AI setup. No obligation.",
 
   agentId: "agent_7301kpdvynhxf17ta4j1271y2a20",
 };
@@ -419,7 +402,7 @@ export const plumbingContent: IndustryContent = {
 
   offerBanner:
     "🔧 Free Custom Website ($3,499 Value) — Included with Every AI Signup",
-  offerTag: "Only 5 Spots Left This Month",
+  offerTag: "Free Website Included",
 
   painHeadline: "EVERY UNANSWERED EMERGENCY IS A LOST JOB",
   painSubhead:
@@ -525,26 +508,9 @@ export const plumbingContent: IndustryContent = {
   pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT PLUMBERS ARE SAYING",
-  testimonials: [
-    {
-      quote:
-        "I used to lose at least 3–4 calls a week while on jobs. The AI catches every single one now. Paid for itself in the first two emergency calls.",
-      name: "Dave W.",
-      company: "Owner, Williams Plumbing · Carrollton, GA",
-    },
-    {
-      quote:
-        "Midnight emergency call — burst pipe. AI answered, got their address, told them to shut off the main. By the time I called back, the job was basically mine. $850 for 2 hours.",
-      name: "Rick K.",
-      company: "Owner, K&L Plumbing · Villa Rica, GA",
-    },
-    {
-      quote:
-        "I was skeptical about AI. But the leads it captures while I sleep are real jobs — not junk. It's like having a dispatcher who never takes a day off.",
-      name: "Tom M.",
-      company: "Owner, Metro Plumbing · Douglasville, GA",
-    },
-  ],
+  // Emptied Nov 24 2026: the quotes here could not be matched to real clients.
+  // Add only reviews a named client has approved; the section hides itself while this is empty.
+  testimonials: [],
 
   faqs: [
     {
@@ -581,7 +547,7 @@ export const plumbingContent: IndustryContent = {
     "Will your AI answer it, or will the plumber down the street? Fill out the form — we'll reach out within 1 business day.",
   ctaNote: "📍 Serving plumbing contractors nationwide.",
   ctaFormTitle: "CLAIM YOUR SPOT",
-  ctaFormSubtitle: "Free website + AI setup — Only 5 spots left this month",
+  ctaFormSubtitle: "Free website + AI setup. No obligation.",
 
   agentId: "agent_3101kpdxbcm3ejzvwgh7y7ha405f",
 };
@@ -654,7 +620,7 @@ export const lawContent: IndustryContent = {
 
   offerBanner:
     "⚖️ New Professional Website — Included with Every AI Signup",
-  offerTag: "Limited Availability",
+  offerTag: "Website Included",
 
   painHeadline: "YOUR COMPETITORS ANSWER WHEN YOU DON'T",
   painSubhead:
@@ -760,26 +726,9 @@ export const lawContent: IndustryContent = {
   pricingGuarantee: "No contracts. No setup fees. Cancel anytime.",
 
   testimonialsHeadline: "WHAT ATTORNEYS ARE SAYING",
-  testimonials: [
-    {
-      quote:
-        "We were losing consultation requests every weekend. Since the AI went live, we haven't missed a single inquiry. Three of our last five cases came in after hours.",
-      name: "Sarah M., Esq.",
-      company: "Managing Partner, Mitchell Law Group",
-    },
-    {
-      quote:
-        "The intake quality improved dramatically. The AI pre-screens cases so thoroughly that by the time I get on a consultation call, I already know it's worth taking.",
-      name: "James P., Esq.",
-      company: "Founder, Peterson & Associates",
-    },
-    {
-      quote:
-        "I was skeptical AI could handle legal intake appropriately. It does — professionally and discreetly. Our new website alone was worth the signup.",
-      name: "Linda H., Esq.",
-      company: "Partner, Harrison Family Law",
-    },
-  ],
+  // Emptied Nov 24 2026: the quotes here could not be matched to real clients.
+  // Add only reviews a named client has approved; the section hides itself while this is empty.
+  testimonials: [],
 
   faqs: [
     {

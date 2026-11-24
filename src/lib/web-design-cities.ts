@@ -83,7 +83,7 @@ export const carrolltonWebDesign: WebDesignCity = {
     },
     {
       q: "Do you meet Carrollton clients in person?",
-      a: "Yes. Creative Cowboys is based at 222 West Montgomery St in Villa Rica, about 15 minutes from Carrollton, and we work across Carroll County. We will meet you in town.",
+      a: "Yes. Creative Cowboys is based at 222 W Montgomery St in Villa Rica, about 15 minutes from Carrollton, and we work across Carroll County. We will meet you in town.",
     },
     {
       q: "Can you rebuild a Carrollton site that is already on Wix, Squarespace, or GoDaddy?",
@@ -112,9 +112,9 @@ export const villaRicaWebDesign: WebDesignCity = {
   path: "/web-design-villa-rica-ga",
   county: "Carroll County",
   areaName: "Carroll County, Georgia",
-  eyebrow: "Headquarters · 222 West Montgomery St, downtown Villa Rica",
+  eyebrow: "Headquarters · 222 W Montgomery St, downtown Villa Rica",
   localHeading: "Villa Rica web design, written from the town on the county line.",
-  lead: "Web design in Villa Rica, GA from the agency headquartered downtown. Creative Cowboys is at 222 West Montgomery St. This is the home market, not a city we claim from somewhere else.",
+  lead: "Web design in Villa Rica, GA from the agency headquartered downtown. Creative Cowboys is at 222 W Montgomery St. This is the home market, not a city we claim from somewhere else.",
   paragraphs: [
     "Villa Rica sits on I-20 between Atlanta and Carrollton, straddling the Carroll and Douglas County line. New rooftops keep showing up around Mirror Lake and Fairfield Plantation. Shops and restaurants around historic downtown and The Mill serve a different customer than the contractors and professional firms along Highway 61 and Interstate West. Those buyers do not type the same search.",
     "A Villa Rica website has to say which of those places you actually cover. Downtown and The Mill are not the same job as Gold City, Pine Mountain, Temple, or Winston. We write pages for the neighborhoods you serve and leave off the ones you do not. We are a short drive from a lot of the businesses on this page, so you can sit down with us instead of onboarding through a ticket queue.",
@@ -123,7 +123,7 @@ export const villaRicaWebDesign: WebDesignCity = {
   includes: [
     {
       title: "Written in Villa Rica, for Villa Rica.",
-      body: "The office is downtown at 222 West Montgomery St. The copy is about this town, not a swapped city name on a regional template.",
+      body: "The office is downtown at 222 W Montgomery St. The copy is about this town, not a swapped city name on a regional template.",
     },
     {
       title: "Both sides of the county line, when that is real.",
@@ -159,7 +159,7 @@ export const villaRicaWebDesign: WebDesignCity = {
     },
     {
       q: "Are you actually based in Villa Rica?",
-      a: "Yes. Creative Cowboys is headquartered at 222 West Montgomery St in downtown Villa Rica. We are neighbors, and we will meet you in person.",
+      a: "Yes. Creative Cowboys is headquartered at 222 W Montgomery St in downtown Villa Rica. We are neighbors, and we will meet you in person.",
     },
     {
       q: "What does the $30 a month cover?",
@@ -235,7 +235,7 @@ export const douglasvilleWebDesign: WebDesignCity = {
     },
     {
       q: "How far is your office from Douglasville?",
-      a: "About 20 minutes west, at 222 West Montgomery St in Villa Rica. We are a West Georgia shop, and we will meet you in Douglasville.",
+      a: "About 20 minutes west, at 222 W Montgomery St in Villa Rica. We are a West Georgia shop, and we will meet you in Douglasville.",
     },
     {
       q: "Do you already build for Douglasville businesses?",
@@ -266,7 +266,7 @@ export const WEB_DESIGN_CITIES = [
 
 export function webDesignCityMetadata(city: WebDesignCity): Metadata {
   const title = `Web Design ${city.name}, GA`;
-  const description = `Web design ${city.name} GA from Creative Cowboys. A one-time $497 website plus $30/month for hosting, security, backups, updates, and edits — or $297/month Google Business Profile local SEO.`;
+  const description = `Web design in ${city.name}, GA from Creative Cowboys: a custom $497 website plus $30/month hosting and edits, built by a team based in Villa Rica.`;
 
   return {
     title,

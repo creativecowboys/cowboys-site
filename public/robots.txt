@@ -1,9 +1,8 @@
 User-agent: *
 Allow: /
 
-# Block private/admin paths
-Disallow: /cia/
-Disallow: /proposals/
+# /proposals/ is deliberately not blocked here: those pages send a noindex
+# header, and Google has to be able to fetch them to see it.
 Disallow: /api/
 
 # Sitemap location

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { trackLead } from "@/lib/analytics";
 import Link from "next/link";
 import Image from "next/image";
 import { Anton, Roboto_Condensed, Syne, Playfair_Display, Alfa_Slab_One, Lobster } from "next/font/google";
@@ -390,6 +391,7 @@ export default function WebDesignFranklinPage() {
         body: JSON.stringify({ ...form, source: "Franklin Landing Page" }),
       });
       if (!res.ok) throw new Error("Submission failed");
+      trackLead("Franklin Landing Page");
       setFormStatus("success");
       setForm({
         name: "",
