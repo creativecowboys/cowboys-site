@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 const faqEntries = [
   {
     q: "How much does digital marketing cost in Carrollton, GA?",
-    a: "Most Carrollton small businesses start one of two ways: ongoing from $497/mo with $0 upfront, or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
+    a: "Most Carrollton small businesses start one of two ways: our $297/mo Local Marketing Package, month to month with no contract, which includes local SEO, ads management, and a free website ($3,500 value); or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
   },
   {
     q: "How long until I see SEO results in Carrollton?",

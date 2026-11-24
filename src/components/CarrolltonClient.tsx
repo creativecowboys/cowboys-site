@@ -129,15 +129,15 @@ const pricing = [
   {
     name: "ONGOING",
     badge: "MOST POPULAR",
-    price: "$497",
+    price: "$297",
     unit: "/mo",
-    sub: "$0 upfront · 12-month agreement",
+    sub: "Month to month · no contracts",
     features: [
-      "New custom website",
+      "Free custom website ($3,500 value)",
+      "Local SEO + Google Business Profile",
+      "Paid ads management (ad budget separate)",
       "Hosting, SSL & security",
       "Minor updates included",
-      "Local SEO + Google Business Profile",
-      "Launch in ~2 weeks",
       "Monthly performance report",
     ],
   },
@@ -188,7 +188,7 @@ const faqs = [
     category: "PRICING",
     question: "HOW MUCH DOES DIGITAL MARKETING COST IN CARROLLTON?",
     answer:
-      "Most Carrollton small businesses start one of two ways: ongoing from $497/mo with $0 upfront, or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
+      "Most Carrollton small businesses start one of two ways: our $297/mo Local Marketing Package, month to month with no contract, which includes local SEO, ads management, and a free website ($3,500 value); or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
   },
   {
     index: "02",

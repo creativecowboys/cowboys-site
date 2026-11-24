@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { allCityPages } from "@/lib/city-pages";
 import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import ClientScripts from "@/components/web-design/ClientScripts";
@@ -503,6 +504,21 @@ export default function WebDesignPage() {
                 <span className="font-inter text-sm text-[#5a5a5a] leading-relaxed group-hover:text-[#0a0a0a]">{item.blurb}</span>
               </Link>
             ))}
+          </div>
+          <div className="mt-10 border-[2.5px] border-[#0a0a0a] bg-white p-6 md:p-8 shadow-[4px_4px_0px_#0a0a0a]">
+            <h3 className="font-anton text-2xl uppercase text-[#0a0a0a] mb-4">More cities we serve</h3>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 mb-6">
+              {allCityPages().map((p) => (
+                <li key={p.path}>
+                  <Link href={p.path} className="font-inter text-sm font-bold text-[#B5330E] underline decoration-[#B5330E]/30 hover:decoration-[#B5330E]">
+                    {p.city}, {p.state}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link href="/areas-we-serve" className="font-anton text-sm uppercase tracking-wider bg-[#0a0a0a] text-white py-3 px-5 inline-block">
+              See every area we serve
+            </Link>
           </div>
         </div>
       </section>

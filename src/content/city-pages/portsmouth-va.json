@@ -1,0 +1,129 @@
+{
+  "slug": "portsmouth-va",
+  "path": "/web-design-portsmouth-va",
+  "city": "Portsmouth",
+  "state": "VA",
+  "stateName": "Virginia",
+  "county": "Independent city",
+  "metro": "Virginia Beach",
+  "lat": 36.8593,
+  "lon": -76.357,
+  "population": 96482,
+  "published": "2026-11-18",
+  "updated": "2026-11-18",
+  "title": "Portsmouth, VA Web Design & Local SEO",
+  "metaDescription": "Web design in Portsmouth, VA for shipyard-side shops, Olde Towne restaurants and Churchland contractors. Free website with our $297/month local package.",
+  "eyebrow": "Olde Towne · Norfolk Naval Shipyard · Elizabeth River",
+  "lead": "Web design in Portsmouth, VA for owners who sell to shipyard crews, Navy families, and neighbors from Churchland to Cradock. We build fast custom websites and handle the local SEO behind them, so a Portsmouth business gets picked over the Norfolk and Chesapeake names that show up in the same search.",
+  "local": {
+    "heading": "In Portsmouth, half your customers live on the other side of a tunnel.",
+    "paragraphs": [
+      "This is an independent city sitting across the Elizabeth River from Norfolk, and the river shapes how people shop here. The Midtown and Downtown tunnels and the Elizabeth River Ferry tie it to Norfolk's Waterside and Harbor Park. That makes it easy for a customer to cross over. It also means a search typed on High Street pulls up businesses from three or four cities at once, and the local one has to make its case fast.",
+      "The work here runs on the water. Norfolk Naval Shipyard, the oldest continuously operating shipyard in the country, covers about 810 acres on the Southern Branch of the river. The city also holds two Port of Virginia terminals, Portsmouth Marine Terminal and Virginia International Gateway in West Norfolk. Ship repair, logistics, and advanced manufacturing companies cluster around them, and they buy from local welders, fabricators, trucking outfits, and staffing firms.",
+      "Healthcare is the other big anchor. Naval Medical Center Portsmouth sits on the waterfront by Olde Towne, and Bon Secours Maryview Medical Center runs a full hospital in the city as well. Hampton Roads as a whole counts 15 military installations and about 80,000 active-duty personnel. A lot of local customers are new to the area, just in on orders, and they find a dentist, a mechanic, or a daycare the only way a stranger can. They search, they read reviews, and they call whoever looks real.",
+      "The city keeps adding storefronts too. Its economic development office says more than 360 businesses opened in 2024, and Rivers Casino Portsmouth opened on Victory Boulevard in January 2023 as the anchor of a new entertainment district. More new competitors means a plain, outdated site loses ground every month it sits there."
+    ]
+  },
+  "industries": {
+    "heading": "Portsmouth businesses we build sites for",
+    "intro": "The shipyard, the port, the hospitals, and the older neighborhoods drive most of the local searching here. These are the businesses that feel it most.",
+    "items": [
+      {
+        "name": "Marine trades and shipyard suppliers",
+        "body": "Fabricators, electrical subs, coatings crews, and industrial suppliers who sell to ship repair contractors near the yard. The site needs certifications, capabilities, and a clear contact path so a purchasing manager can vet you in two minutes."
+      },
+      {
+        "name": "Logistics and trucking near the terminals",
+        "body": "Drayage, warehousing, and freight services working Portsmouth Marine Terminal and Virginia International Gateway. Pages that spell out service area, equipment, and turnaround help a shipper decide before they ever pick up the phone."
+      },
+      {
+        "name": "Medical, dental, and family services",
+        "body": "Practices near Naval Medical Center Portsmouth and Bon Secours Maryview, plus childcare and counseling. Military families compare you on a phone, so insurance details, hours, and online booking belong up front."
+      },
+      {
+        "name": "Olde Towne restaurants and shops",
+        "body": "Places on and around High Street that live on ferry riders, theater crowds from the Commodore, and pavilion concert nights. Menus, hours, parking notes, and photos have to match your Google profile exactly."
+      },
+      {
+        "name": "Home services for older houses",
+        "body": "Roofers, plumbers, HVAC, and remodelers working the historic homes of Port Norfolk, Park View, and Cradock along with newer streets in Churchland. Neighborhood pages and tap-to-call do most of the selling."
+      }
+    ]
+  },
+  "includes": [
+    {
+      "title": "Pages for the side of the river you work",
+      "body": "Olde Towne, Churchland, Cradock, Port Norfolk, and the nearby cities you cover, each with its own page only if you really take jobs there."
+    },
+    {
+      "title": "Made for a phone in tunnel traffic",
+      "body": "Quick load times, a tap-to-call number at the top, and a short form. Plenty of local searches happen at a shift change or stuck waiting on the Midtown Tunnel."
+    },
+    {
+      "title": "Local SEO built in, not bolted on",
+      "body": "Titles, headings, schema, and your Google Business Profile all tell the same story about where you are, so Google can match you to Portsmouth searches instead of Norfolk ones."
+    },
+    {
+      "title": "Proof a newcomer can trust",
+      "body": "Reviews, real photos of your crew and shop, and licenses shown plainly. A family that arrived on orders last month has no neighbor to ask, so the site has to answer for you."
+    }
+  ],
+  "areas": {
+    "intro": "The city has a lot of distinct neighborhoods packed between the river and the interstate. We write your site around the ones you actually serve.",
+    "places": [
+      "Olde Towne",
+      "Churchland",
+      "Cradock",
+      "Port Norfolk",
+      "Park View",
+      "West Norfolk",
+      "Westhaven",
+      "Cavalier Manor",
+      "Midtown and Victory Boulevard",
+      "Norfolk",
+      "Chesapeake",
+      "Suffolk"
+    ]
+  },
+  "howWeWork": {
+    "heading": "How we work with Portsmouth businesses",
+    "paragraphs": [
+      "Creative Cowboys is a two-man shop in Villa Rica, Georgia, west of Atlanta. We're a long drive from Hampton Roads, so we run Portsmouth projects the way most of our out-of-state work runs. A video call to learn the business, a working draft of the site you can click through on your phone, and changes made from your notes until it's right.",
+      "You talk to Josh and Dave directly, the same two people who design the site and handle the SEO after launch. If a project calls for us to come see your shop or your jobsite, we'll plan a trip. Most Portsmouth owners find they never need one."
+    ]
+  },
+  "faqs": [
+    {
+      "q": "How much does web design in Portsmouth, VA cost?",
+      "a": "Most Portsmouth businesses start on our Local Marketing Package: $297 a month, month to month, with no contract. That covers local SEO, management of paid ads if you want them (your ad budget is separate), and a custom website valued at $3,500 at no extra cost."
+    },
+    {
+      "q": "Can a Portsmouth business show up ahead of Norfolk companies?",
+      "a": "For searches made in Portsmouth, it often can. Google weighs location heavily on local searches. A site that clearly names Portsmouth and the neighborhoods you serve, plus a complete Google profile and steady reviews from local customers, gives you a fair shot against bigger Norfolk and Chesapeake firms."
+    },
+    {
+      "q": "Do you build sites for companies that sell to the shipyard or the port?",
+      "a": "Yes. Business-to-business sites need different things than a restaurant site. We put your capabilities, certifications, equipment, and past work where a buyer can find them, and keep contact simple so a quote request comes straight to you."
+    },
+    {
+      "q": "Will my site work for military families new to the area?",
+      "a": "That's a big part of how we write Portsmouth sites. Newcomers need hours, location, insurance or payment details, and reviews without digging. We also make sure your Google Business Profile matches the site, since that's often the first thing they see."
+    },
+    {
+      "q": "Do we have to meet in person?",
+      "a": "No. We're based in Villa Rica, Georgia, and nearly all of the work happens over video calls and shared drafts. If an in-person visit would make the project better, we'll talk about it and set it up."
+    },
+    {
+      "q": "How long until my new Portsmouth website is live?",
+      "a": "Usually a few weeks. The biggest factor is how fast we get your photos, service list, and feedback on the draft. We start the local SEO at the same time, so the site goes live ready to be found."
+    }
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Portsmouth,_Virginia",
+    "https://www.navfac.navy.mil/Divisions/Environmental/Products-and-Services/Environmental-Restoration/Mid-Atlantic/Norfolk-NSY/",
+    "https://hamptonroadsalliance.com/portsmouth/",
+    "https://www.accessportsmouthva.com/",
+    "https://oldetowneportsmouth.com/",
+    "https://www.portsmouthva.gov/portsmouth-history"
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "slug": "matthews-nc",
+  "path": "/web-design-matthews-nc",
+  "city": "Matthews",
+  "state": "NC",
+  "stateName": "North Carolina",
+  "county": "Mecklenburg County",
+  "metro": "Charlotte",
+  "lat": 35.1198,
+  "lon": -80.7097,
+  "population": 32048,
+  "published": "2026-11-18",
+  "updated": "2026-11-18",
+  "title": "Web Design in Matthews, NC",
+  "metaDescription": "Matthews, NC web design for Trade Street shops, Independence Boulevard businesses and local contractors. Free custom website in our $297/month package.",
+  "eyebrow": "Downtown Trade Street · Southeast Mecklenburg",
+  "lead": "Web design in Matthews, NC for local owners who compete with every Charlotte company that lists the east side as a service area. We build custom websites that load fast and do the local SEO work behind them, so people in Matthews find the business down the road before they find one across the county.",
+  "local": {
+    "heading": "Matthews is a small town that Google treats like part of Charlotte.",
+    "paragraphs": [
+      "Matthews sits in the southeast corner of Mecklenburg County. Charlotte wraps around it on the northwest and southwest, Mint Hill borders it to the northeast, and Stallings in Union County sits just past the southeast line. Search for a roofer or a CPA from a kitchen in the 28105 ZIP code and Google pulls results from all four places, plus a long list of Charlotte firms that claim to cover everywhere. A local company has to tell Google plainly where it works.",
+      "The town started as a stagecoach stop between Charlotte and Monroe and earned the nickname Stumptown for the tree stumps left after land was cleared for cotton. The railroad arrived in December 1874, and the town incorporated in 1879. That old core is still downtown along Trade Street, and the town is now putting money into it: a streetscape project from McDowell Street to Matthews Street and more than 100 new parking spaces, including the Heritage Lane lot.",
+      "Most of the daily traffic runs on Independence Boulevard, the US 74 corridor lined with retail centers, car dealerships, offices, and restaurants. Sycamore Commons alone covers about 400,000 square feet with Costco, Lowe's, and Best Buy, and Windsor Square sits nearby. I-485 and NC 51 cross the town too, so customers from Mint Hill, Indian Trail, and south Charlotte reach Matthews shops in a few minutes. Harris Teeter also keeps its headquarters here.",
+      "Healthcare is the other big draw. Novant Health Matthews Medical Center, on Matthews Township Parkway, opened in 1994 and finished a four-story critical care tower in early 2025. It handles emergency, heart, stroke, surgical, maternity, and cancer care, and the town is building a 10-foot path along Matthews-Mint Hill Road from Trade Street to the hospital entrance. Doctors' offices, pharmacies, and therapy clinics that want those patients need to show up when someone searches from that end of town."
+    ]
+  },
+  "industries": {
+    "heading": "Who we build for in Matthews",
+    "intro": "Matthews has a working downtown, a big retail strip, a hospital campus, and neighborhoods full of families. These are the businesses that do most of the competing for local searches.",
+    "items": [
+      {
+        "name": "Downtown Trade Street shops and restaurants",
+        "body": "Boutiques, cafes, and restaurants that fill up on Saturdays and around events. Hours, menus, parking help, and good photos need to match your Google profile, because that's what a visitor checks before heading downtown."
+      },
+      {
+        "name": "Medical practices near Novant Health Matthews",
+        "body": "Specialists, dentists, physical therapists, and family doctors near the hospital campus. Patients compare offices on a phone, so insurance details, service pages, and a simple way to book carry more weight than a fancy homepage."
+      },
+      {
+        "name": "Businesses along Independence Boulevard",
+        "body": "Auto service shops, dealerships, gyms, and retail along US 74. Plenty of competition sits within a mile of you, so the site has to give a driver a reason to choose you and a fast way to call."
+      },
+      {
+        "name": "Home services for Matthews neighborhoods",
+        "body": "Roofers, HVAC, plumbers, painters, and lawn crews working subdivisions off Sam Newell Road, Pleasant Plains Road, and McKee Road. Pages that name the areas you cover and tap-to-call buttons do the heavy lifting."
+      },
+      {
+        "name": "Youth sports, fitness, and family services",
+        "body": "Coaches, training facilities, tutors, and childcare for families drawn to the Sportsplex at Matthews and its 5,000-seat stadium. Parents want schedules, pricing, and sign-up links without hunting for them."
+      }
+    ]
+  },
+  "includes": [
+    {
+      "title": "Service pages that name the east side",
+      "body": "Matthews, Mint Hill, Stallings, Indian Trail, and the Charlotte neighborhoods you cover, each written as its own page only if you actually take jobs there."
+    },
+    {
+      "title": "Fast on a phone in US 74 traffic",
+      "body": "Light pages, a call button at the top, and a short form. A lot of local searches happen from a car on Independence Boulevard or in a school pickup line."
+    },
+    {
+      "title": "Local SEO from the first draft",
+      "body": "Page titles, headings, schema, and your Google Business Profile all agree on your name, address, and service area, so Google can match you to searches made in and around Matthews."
+    },
+    {
+      "title": "Leads you can trace",
+      "body": "Calls and form fills land in one place, so you can see which jobs came from search, which came from ads, and which came from your Google profile."
+    }
+  ],
+  "areas": {
+    "intro": "Matthews covers about 17 square miles, and its customers come from all sides of the town line. We build your pages around the places you really serve.",
+    "places": [
+      "Downtown Matthews and Trade Street",
+      "Independence Boulevard (US 74)",
+      "Sycamore Commons and Windsor Square",
+      "Sam Newell Road",
+      "Matthews-Mint Hill Road",
+      "McKee Road and Pleasant Plains Road",
+      "Mint Hill",
+      "Stallings",
+      "Indian Trail",
+      "South Charlotte"
+    ]
+  },
+  "howWeWork": {
+    "heading": "How we work with Matthews businesses",
+    "paragraphs": [
+      "We're Josh and Dave, and Creative Cowboys is based in Villa Rica, Georgia, on the west side of metro Atlanta. Matthews is a long drive from us, so the work runs on video calls and shared drafts. We learn your business on a call, build a version of the site you can click through, and adjust it from your notes.",
+      "There's no account manager in the middle. The two of us design the site, write the local pages, and run your SEO after it launches. When a visit to your shop or jobsite would help, we'll talk about making the trip."
+    ]
+  },
+  "faqs": [
+    {
+      "q": "How much does web design in Matthews, NC cost?",
+      "a": "Most Matthews businesses start on our Local Marketing Package: $297 a month, month to month, no contract. It includes local SEO, paid ads management if you want ads (your ad budget is separate), and a custom website valued at $3,500 at no extra cost."
+    },
+    {
+      "q": "Can a Matthews business show up ahead of Charlotte companies?",
+      "a": "For people searching in and near Matthews, it often can. Google leans on location for local searches. A site that clearly names the town and the areas you serve, backed by a complete Google profile and reviews from nearby customers, holds up well against Charlotte firms that list every suburb."
+    },
+    {
+      "q": "Should my site mention Mint Hill and Stallings too?",
+      "a": "If you take work there, yes. Customers cross those town lines all the time, and a separate page for each area you really serve helps you show up there. We leave off places you don't cover, since those pages bring the wrong calls."
+    },
+    {
+      "q": "I'm a medical office near the hospital. What does my site need?",
+      "a": "Clear service pages, the insurance you take, hours, directions, and a simple way to book or call. Patients usually look at two or three offices before deciding, so reviews and real photos of your staff and space matter a lot."
+    },
+    {
+      "q": "Do I need to meet you in person?",
+      "a": "No. We're based in Villa Rica, Georgia, and most of the project happens over video calls and drafts you can review on your phone. If a sit-down would make the site better, we'll plan for it."
+    },
+    {
+      "q": "How long does a new website take?",
+      "a": "Most sites launch in a few weeks. Speed depends mostly on how quickly we get your photos, service details, and feedback. We start the local SEO work at the same time, so your Matthews site goes live ready to be found."
+    }
+  ],
+  "sources": [
+    "https://en.wikipedia.org/wiki/Matthews,_North_Carolina",
+    "https://www.matthewsnc.gov/pview.aspx?id=20847",
+    "https://www.novanthealth.org/locations/medical-centers/matthews-medical-center/about/",
+    "https://www.providencegroup.com/wp-content/uploads/2019/10/Matthews_Sycamore_Commons_Flyer_2026.pdf",
+    "https://webuildclt.com/areas/matthews"
+  ]
+}
