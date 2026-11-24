@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PHONE_PATTERN, PHONE_TITLE } from '@/lib/phone';
+import { trackLead } from '@/lib/analytics';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock, MessageSquareText, Phone, Star } from 'lucide-react';
@@ -66,6 +67,7 @@ export default function AIDemoPageClient() {
                 body: JSON.stringify({ ...form, source: 'AI Demo Page' }),
             });
             if (!res.ok) throw new Error('Send failed');
+            trackLead('AI Demo Page');
             setStatus('success');
         } catch {
             setStatus('error');

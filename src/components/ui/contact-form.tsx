@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Check } from 'lucide-react';
 import { PHONE_PATTERN, PHONE_TITLE } from '@/lib/phone';
+import { trackLead } from '@/lib/analytics';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -38,6 +39,7 @@ export default function ContactForm() {
                 }),
             });
             if (!res.ok) throw new Error('Send failed');
+            trackLead('Contact Page');
             setStatus('success');
         } catch {
             setStatus('error');

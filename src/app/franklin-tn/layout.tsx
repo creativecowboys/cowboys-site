@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Web Design & Digital Marketing in Franklin, TN",
   description:
-    "Creative Cowboys builds websites, SEO, and ad campaigns for Franklin and Williamson County businesses. Villa Rica, GA roots — now with a Franklin, TN office.",
+    "Creative Cowboys builds websites, SEO, and ad campaigns for Franklin and Williamson County businesses, from our base in Villa Rica, GA.",
+  alternates: { canonical: "/franklin-tn/web-design" },
 };
 
 export default function FranklinLayout({

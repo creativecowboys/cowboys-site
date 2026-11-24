@@ -4,8 +4,9 @@ import { Space_Grotesk, Manrope, Anton, Inter, Lobster } from "next/font/google"
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import MetaPixel from "@/components/MetaPixel";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import ChatWidget from "@/components/ChatWidget";
-import { NAP, POSTAL_ADDRESS, SERVICE_AREA, SITE_URL, SOCIAL_PROFILES } from "@/lib/seo";
+import { BUSINESS_ID, NAP, POSTAL_ADDRESS, SERVICE_AREA, SITE_URL, SOCIAL_PROFILES } from "@/lib/seo";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -66,9 +67,9 @@ export const metadata: Metadata = {
   description:
     "Creative Cowboys is a no-fluff digital marketing agency serving small businesses across the Southeast. SEO, Google Ads, web design & branding. Villa Rica, GA roots. Free consultation.",
   metadataBase: new URL("https://www.creativecowboys.co"),
-  alternates: {
-    canonical: "/",
-  },
+  // No site-wide canonical here. A root `alternates.canonical: "/"` is inherited
+  // by every page that doesn't set its own, which told Google those pages were
+  // copies of the homepage. Each page sets its own canonical instead.
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -125,6 +126,7 @@ export const viewport: Viewport = {
 // with the other pages the way they did before.
 const localBusinessSchema = {
   "@context": "https://schema.org",
+  "@id": BUSINESS_ID,
   "@type": ["LocalBusiness", "ProfessionalService"],
   name: NAP.name,
   alternateName: NAP.alternateName,
@@ -140,6 +142,16 @@ const localBusinessSchema = {
   description:
     "No-fluff digital marketing agency serving small businesses across the Southeast, with roots in West Georgia. Specializing in SEO, Google Ads (PPC), web design, social media advertising, and brand strategy for contractors, law firms, and industrial B2B.",
   priceRange: "$$",
+  logo: `${SITE_URL}/logo.png`,
+  image: `${SITE_URL}/Main%20logo%202.png`,
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "09:00",
+      closes: "17:00",
+    },
+  ],
   serviceArea: SERVICE_AREA.map((a) => ({ ...a })),
   areaServed: SERVICE_AREA.map((a) => ({ ...a })),
   hasOfferCatalog: {
@@ -178,6 +190,7 @@ export default function RootLayout({
 
 
         <MetaPixel />
+        <GoogleAnalytics />
         <ChatWidget />
         <ScrollToTop />
         {children}

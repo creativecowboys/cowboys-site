@@ -58,6 +58,7 @@ const aboutSchema = {
   name: "About Creative Cowboys",
   url: "https://www.creativecowboys.co/about",
   mainEntity: {
+    "@id": "https://www.creativecowboys.co/#business",
     "@type": "Organization",
     name: "Creative Cowboys Media",
     alternateName: "Creative Cowboys",
@@ -68,7 +69,7 @@ const aboutSchema = {
       "Digital marketing agency serving small businesses across the Southeast. Web design, local SEO, Google Ads, social advertising, and brand strategy.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "222 West Montgomery St",
+      streetAddress: "222 W Montgomery St",
       addressLocality: "Villa Rica",
       addressRegion: "GA",
       postalCode: "30180",
@@ -87,7 +88,7 @@ const aboutSchema = {
       name: "Creative Cowboys — Villa Rica, GA",
       address: {
         "@type": "PostalAddress",
-        streetAddress: "222 West Montgomery St",
+        streetAddress: "222 W Montgomery St",
         addressLocality: "Villa Rica",
         addressRegion: "GA",
         postalCode: "30180",
@@ -135,7 +136,7 @@ const services = [
 const offices = [
   {
     city: "Villa Rica, GA",
-    detail: "222 West Montgomery St · Villa Rica, GA 30180",
+    detail: "222 W Montgomery St · Villa Rica, GA 30180",
     note: "Where we started, and still home base.",
     tile: "#008f4c",
   },

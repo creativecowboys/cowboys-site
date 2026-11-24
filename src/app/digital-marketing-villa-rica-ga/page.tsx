@@ -43,7 +43,7 @@ const faqEntries = [
   },
   {
     q: "Are you really based in Villa Rica?",
-    a: "Yes — Creative Cowboys is headquartered right here at 222 West Montgomery St in downtown Villa Rica. We're your neighbors, not an out-of-town call center. We'll meet you in person.",
+    a: "Yes — Creative Cowboys is headquartered right here at 222 W Montgomery St in downtown Villa Rica. We're your neighbors, not an out-of-town call center. We'll meet you in person.",
   },
   {
     q: "What makes you different from other Villa Rica marketing agencies?",
@@ -141,13 +141,14 @@ const serviceSchema = {
   serviceType: "Digital Marketing Agency",
   url: "https://www.creativecowboys.co/digital-marketing-villa-rica-ga",
   provider: {
+    "@id": "https://www.creativecowboys.co/#business",
     "@type": "LocalBusiness",
     name: "Creative Cowboys Media",
     telephone: "+1-470-243-7517",
     email: "howdy@creativecowboys.co",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "222 West Montgomery St",
+      streetAddress: "222 W Montgomery St",
       addressLocality: "Villa Rica",
       addressRegion: "GA",
       postalCode: "30180",
