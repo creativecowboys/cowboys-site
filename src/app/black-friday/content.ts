@@ -15,6 +15,40 @@ export const CALENDLY_URL = "https://calendly.com/creativecowboys/lets-talk";
 /** sessionStorage key: carries the visitor's name and email from the form to the calendar. */
 export const LEAD_KEY = "cc_bf_lead";
 
+/**
+ * "Why work with us", shown right under the hero with Josh's and Dave's headshots.
+ * Points and the 99% retention figure are Josh's (Nov 24 2026).
+ */
+export const CREW = [
+    { img: "josh", name: "Josh", role: "Websites, SEO and ads.", alt: "Josh, smiling, in a black Creative Cowboys cap and T-shirt" },
+    { img: "dave", name: "Dave", role: "Clients and strategy.", alt: "Dave, smiling, in a white Creative Cowboys T-shirt" },
+];
+
+export const WHY = [
+    {
+        title: "We learn your business first",
+        body: "Before we build anything, we ask how your business works, who your customers are and what you want more of.",
+    },
+    {
+        title: "Nothing cookie-cutter",
+        body: "Your website and your marketing are made for your trade and your town. We don't drop your logo into a template.",
+    },
+    {
+        title: "We treat it like our own",
+        body: "We work as a partner in your business. When you call, one of us answers.",
+    },
+    {
+        title: "Clients stay with us",
+        body: "99% of the clients we've worked with over the last few years are still with us. Our business is built on their results and their word.",
+    },
+];
+
+export const CREW_FACTS = [
+    { label: "Client retention", value: "99%" },
+    { label: "Google rating", value: "5.0" },
+    { label: "Contracts", value: "None" },
+];
+
 export const INCLUDED = [
     { title: "Designed for your business", body: "A custom design built around your work, your photos and your town." },
     { title: "Every page written for you", body: "Services, about, contact and the pages Google looks for. You review it, we write it." },

@@ -6,7 +6,7 @@ import { ArrowRight, Check, Corners, GoogleG, PhoneIcon, Plus, Stars } from "@/c
 import { NAP } from "@/lib/seo";
 import ClaimForm from "./ClaimForm";
 import StickyCta from "./StickyCta";
-import { FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, REVIEWS, STEPS, WORK } from "./content";
+import { CREW, CREW_FACTS, FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, REVIEWS, STEPS, WORK, WHY } from "./content";
 
 const PHONE_DISPLAY = NAP.telephoneDisplay;
 const PHONE_HREF = `tel:${NAP.telephone.replace(/[^+\d]/g, "")}`;
@@ -87,6 +87,53 @@ export default function BlackFridayPage() {
             </div>
 
             <main>
+                {/* WHO YOU WORK WITH */}
+                <section>
+                    <div className="wrap why">
+                        <div className="why-head rv">
+                            <span className="eyebrow">Who you&apos;ll work with</span>
+                            <h2 className="h-display h2">Meet <span className="grad">Josh and Dave</span>.</h2>
+                            <p className="lede">
+                                We run Creative Cowboys out of Villa Rica, Georgia. The people you meet on the first call are the people who build your site and run your marketing.
+                            </p>
+                        </div>
+                        <div className="why-cards">
+                            {CREW.map((c, i) => (
+                                <figure key={c.img} className="card person rv" style={{ ["--d" as string]: `${i * 120}ms` }}>
+                                    <div className="photo vf">
+                                        <Corners />
+                                        <Image src={`/night-ride/team/${c.img}.jpg`} alt={c.alt} width={800} height={1000} sizes="(max-width: 1020px) 50vw, 300px" />
+                                        <span className="stamp mono">NO. {pad(i + 1)} · VILLA RICA</span>
+                                    </div>
+                                    <figcaption>
+                                        <h3 className="h3">{c.name}</h3>
+                                        <p>{c.role}</p>
+                                    </figcaption>
+                                </figure>
+                            ))}
+                        </div>
+                        <div className="why-points">
+                            <div className="why-list">
+                                {WHY.map((w, i) => (
+                                    <div key={w.title} className="why-item rv" style={{ ["--d" as string]: `${(i % 2) * 80}ms` }}>
+                                        <span className="n mono">{pad(i + 1)}</span>
+                                        <h3 className="h3">{w.title}</h3>
+                                        <p>{w.body}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="facts rv">
+                                {CREW_FACTS.map((f) => (
+                                    <div key={f.label}>
+                                        <span>{f.label}</span>
+                                        <b>{f.value}</b>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* WHAT'S INCLUDED */}
                 <section>
                     <div className="wrap">
@@ -95,7 +142,7 @@ export default function BlackFridayPage() {
                                 <span className="eyebrow">What you get</span>
                                 <h2 className="h-display h2">The website is <span className="grad">on us</span>.</h2>
                             </div>
-                            <p className="lede">A real website, built by the same two people who build our paid ones.</p>
+                            <p className="lede">A real website, built by the same team that builds our paid ones.</p>
                         </div>
                         <div className="grid-3">
                             {INCLUDED.map((item, i) => (
