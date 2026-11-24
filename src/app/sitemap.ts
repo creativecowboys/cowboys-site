@@ -23,6 +23,9 @@ const PRIVATE_SEGMENTS = ["admin", "clients", "proposals", "api"];
 
 /** Individually excluded routes — internal design references and ad landing pages. */
 const NOINDEX_ROUTES = new Set([
+  // Black Friday 2026 Facebook-ad landing page and its booking step. Paid traffic only.
+  "/black-friday",
+  "/black-friday/book",
   // The giveaway is over: /thebiggiveaway redirects to "/" and /draw is noindex.
   "/thebiggiveaway",
   "/thebiggiveaway/draw",
