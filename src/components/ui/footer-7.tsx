@@ -57,7 +57,6 @@ const defaultSections: Footer7Props["sections"] = [
             { name: "Carrollton, GA", href: "/digital-marketing-carrollton-ga" },
             { name: "Douglasville, GA", href: "/digital-marketing-douglasville-ga" },
             { name: "Newnan, GA", href: "/digital-marketing-newnan-ga" },
-            { name: "All areas we serve", href: "/areas-we-serve" },
         ],
     },
 ];

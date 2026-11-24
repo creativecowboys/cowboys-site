@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, ArrowRight, Check } from "lucide-react";
+import { trackLead } from "@/lib/analytics";
 
 interface ProposalModalProps {
   isOpen: boolean;
@@ -132,6 +133,7 @@ export default function ProposalModal({ isOpen, onClose, source, hidePhone = fal
       const data = await res.json();
       if (res.ok && data.success) {
         setStatus("success");
+        trackLead(`Proposal Popup (${source})`);
         // Dispatch GA4 Event
         if (typeof window !== "undefined") {
           (window as any).dataLayer = (window as any).dataLayer || [];

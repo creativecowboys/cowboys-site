@@ -14,10 +14,9 @@ declare global {
 /**
  * GA4 event.
  *
- * NOTE: no gtag/GTM snippet exists in this codebase — the site's GA4 arrives
- * through server-side GTM (see the handoff, §8). If GA4 is not actually on the
- * page these calls are silent no-ops rather than errors, so wiring GTM later
- * turns them on with no code change here.
+ * The gtag snippet is loaded by <GoogleAnalytics /> in the root layout, and only
+ * when NEXT_PUBLIC_GA_MEASUREMENT_ID is set. Without it these calls are silent
+ * no-ops rather than errors.
  */
 export function gaEvent(name: string, params?: Record<string, unknown>) {
     if (typeof window === "undefined") return;
@@ -28,4 +27,19 @@ export function gaEvent(name: string, params?: Record<string, unknown>) {
     }
 }
 
-export { trackFb } from "./fbq";
+import { trackFb } from "./fbq";
+
+/**
+ * A lead: someone sent a form. One call per successful submission.
+ *
+ * Fires GA4's recommended `generate_lead` event (mark it as a key event in GA4,
+ * and import it into Google Ads as a conversion) and Meta's standard `Lead`.
+ * Pass `meta: false` where the form already fires its own Meta event.
+ */
+export function trackLead(formName: string, opts: { meta?: boolean } = {}) {
+    if (typeof window === "undefined") return;
+    gaEvent("generate_lead", { form_name: formName, page_path: window.location.pathname });
+    if (opts.meta !== false) trackFb("Lead", { content_name: formName });
+}
+
+export { trackFb };

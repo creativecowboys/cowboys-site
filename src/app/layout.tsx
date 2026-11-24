@@ -4,6 +4,7 @@ import { Space_Grotesk, Manrope, Anton, Inter, Lobster } from "next/font/google"
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import MetaPixel from "@/components/MetaPixel";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import ChatWidget from "@/components/ChatWidget";
 import { BUSINESS_ID, NAP, POSTAL_ADDRESS, SERVICE_AREA, SITE_URL, SOCIAL_PROFILES } from "@/lib/seo";
 
@@ -189,6 +190,7 @@ export default function RootLayout({
 
 
         <MetaPixel />
+        <GoogleAnalytics />
         <ChatWidget />
         <ScrollToTop />
         {children}

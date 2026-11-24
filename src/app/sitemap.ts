@@ -26,8 +26,6 @@ const NOINDEX_ROUTES = new Set([
   // The giveaway is over: /thebiggiveaway redirects to "/" and /draw is noindex.
   "/thebiggiveaway",
   "/thebiggiveaway/draw",
-  "/home2",
-  "/home3",
   // Paid-social landing page for the free-website promotion. Kept out of the
   // index so it can't compete with /local-seo; remove when the promo ends.
   "/free-website",
@@ -62,7 +60,6 @@ const ROUTE_RULES: Record<
   "/web-design-carrollton-ga": { priority: 0.8, changeFrequency: "monthly" },
   "/web-design-villa-rica-ga": { priority: 0.8, changeFrequency: "monthly" },
   "/web-design-douglasville-ga": { priority: 0.8, changeFrequency: "monthly" },
-  "/areas-we-serve": { priority: 0.8, changeFrequency: "weekly" },
   "/about": { priority: 0.8, changeFrequency: "monthly" },
   "/contact": { priority: 0.8, changeFrequency: "monthly" },
   "/results": { priority: 0.8, changeFrequency: "monthly" },

@@ -47,6 +47,13 @@ export async function middleware(request: NextRequest) {
         res.headers.set("Referrer-Policy", "no-referrer");
         return res;
     }
+    // ── Client proposals (unlisted, never indexed) ───────────────────────────
+    // robots.txt no longer blocks /proposals/, so Google can fetch these and read the noindex.
+    if (pathname === "/proposals" || pathname.startsWith("/proposals/")) {
+        const res = NextResponse.next();
+        res.headers.set("X-Robots-Tag", "noindex, nofollow");
+        return res;
+    }
     // ── Giveaway winner draw (unlisted, never indexed) ───────────────────────
     if (pathname === "/thebiggiveaway/draw") {
         const res = NextResponse.next();
