@@ -7,8 +7,11 @@ export const dynamic = "force-dynamic";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Where all form leads get emailed
-const TO_EMAILS = ["dave@creativecowboys.co", "keaton@creativecowboys.co", "josh@creativecowboys.co"];
+// Where all form leads get emailed (Josh, Nov 24 2026: Dave and Josh only).
+const TO_EMAILS = ["dave@creativecowboys.co", "josh@creativecowboys.co"];
+
+// `source` sent by the Black Friday landing page form (FORM_NAME in src/app/black-friday/content.ts).
+const BLACK_FRIDAY_SOURCE = "Black Friday Free Website";
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,6 +83,10 @@ export async function POST(request: NextRequest) {
       subject = `New proposal request — ${name} (${service})`;
     } else if (industry) {
       subject = `🔥 New ${industry} AI Lead — ${name}`;
+    } else if (source === BLACK_FRIDAY_SOURCE) {
+      // Labelled so these stand out from ordinary contact-form mail in the inbox.
+      const biz = typeof (company || business) === "string" ? String(company || business).trim() : "";
+      subject = `Black Friday lead: ${name}${biz ? ` (${biz})` : ""}`;
     }
 
     // 4. Build HTML table
