@@ -2,20 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X, ArrowRight, Check } from "lucide-react";
+import { PHONE_PATTERN, PHONE_TITLE, isValidPhone } from "@/lib/phone";
 import { trackLead } from "@/lib/analytics";
 
 interface ProposalModalProps {
   isOpen: boolean;
   onClose: () => void;
   source: string;
-  /**
-   * Leave the phone field out. Set on the homepage, where the GHL chat widget must be the
-   * only place a phone number is collected (A2P 10DLC registration requirement).
-   */
-  hidePhone?: boolean;
 }
 
-export default function ProposalModal({ isOpen, onClose, source, hidePhone = false }: ProposalModalProps) {
+export default function ProposalModal({ isOpen, onClose, source }: ProposalModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
@@ -107,9 +103,9 @@ export default function ProposalModal({ isOpen, onClose, source, hidePhone = fal
     setErrorMessage("");
 
     // Client-side validation
-    if (!name.trim() || !email.trim() || !service || service === "Select a service...") {
+    if (!name.trim() || !email.trim() || !isValidPhone(phone) || !service || service === "Select a service...") {
       setStatus("error");
-      setErrorMessage("Please fill out Name, Email, and select a Service.");
+      setErrorMessage("Please fill out Name, Email, Phone, and select a Service.");
       return;
     }
 
@@ -318,21 +314,23 @@ export default function ProposalModal({ isOpen, onClose, source, hidePhone = fal
                 />
               </div>
 
-              {/* Phone (optional) */}
-              {!hidePhone && (
-                <div className="mb-4">
-                  <label className="block font-anton text-[10px] tracking-[1.5px] text-[#0a0a0a] uppercase mb-1.5">
-                    PHONE (OPTIONAL)
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="(555) 555-5555"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full border-[2.5px] border-[#0a0a0a] bg-[#F2EBDA] p-3 font-inter text-sm outline-none focus:bg-white transition-colors"
-                  />
-                </div>
-              )}
+              {/* Phone */}
+              <div className="mb-4">
+                <label className="block font-anton text-[10px] tracking-[1.5px] text-[#0a0a0a] uppercase mb-1.5">
+                  PHONE *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  pattern={PHONE_PATTERN}
+                  title={PHONE_TITLE}
+                  placeholder="(555) 555-5555"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full border-[2.5px] border-[#0a0a0a] bg-[#F2EBDA] p-3 font-inter text-sm outline-none focus:bg-white transition-colors"
+                />
+              </div>
 
               {/* Service Select */}
               <div className="mb-4">

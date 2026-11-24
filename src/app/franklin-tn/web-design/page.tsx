@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PHONE_PATTERN, PHONE_TITLE } from "@/lib/phone";
 import { trackLead } from "@/lib/analytics";
 import Link from "next/link";
 import Image from "next/image";
@@ -1820,6 +1821,9 @@ export default function WebDesignFranklinPage() {
                       id="form-phone"
                       name="phone"
                       type="tel"
+                      required
+                      pattern={PHONE_PATTERN}
+                      title={PHONE_TITLE}
                       placeholder="(615) 555-0199"
                       autoComplete="tel"
                       value={form.phone}

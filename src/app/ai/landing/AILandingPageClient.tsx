@@ -6,6 +6,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
 import type { IndustryContent } from "./content";
+import { PHONE_PATTERN, PHONE_TITLE } from "@/lib/phone";
 import { trackLead } from "@/lib/analytics";
 
 const LiveChatDemo = dynamic(() => import("./LiveChatDemo"), { ssr: false });
@@ -311,6 +312,9 @@ function LeadForm({
         name="phone"
         type="tel"
         required
+        autoComplete="tel"
+        pattern={PHONE_PATTERN}
+        title={PHONE_TITLE}
         placeholder={content.formPlaceholders.phone}
         value={form.phone}
         onChange={handleChange}
