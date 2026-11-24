@@ -265,11 +265,11 @@ const testimonials = [
 const faqs = [
   {
     question: "HOW MUCH DOES A WEBSITE COST IN FRANKLIN, TN?",
-    answer: "We offer two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and a Local SEO package. One Time builds start at $3,500 flat — you own everything outright on your own cloud server with no ongoing commitment. Most Franklin small businesses pick the model that matches their cash flow, not their site size. We publish these numbers because we'd rather start the conversation with money on the table than have you guess. If you find a Franklin agency quoting $1,500 for a 'custom' site, the work is being done offshore — that's not a value judgment, it's just useful information."
+    answer: "Custom websites start at $997, one time, and you own the site outright. Hosting, maintenance and updates start at $30 a month. If you also want local SEO, Local Growth is $297 a month, month to month. We publish these numbers because we'd rather start the conversation with money on the table than have you guess."
   },
   {
     question: "HOW LONG DOES IT TAKE TO BUILD A WEBSITE?",
-    answer: "4–6 weeks for most Ongoing builds, 6–10 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
+    answer: "4–10 weeks for most builds, depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
   },
   {
     question: "DO YOU BUILD ON WORDPRESS, WEBFLOW, OR SOMETHING ELSE?",
@@ -281,7 +281,7 @@ const faqs = [
   },
   {
     question: "WHAT HAPPENS AFTER LAUNCH? MAINTENANCE?",
-    answer: "If you chose Ongoing, all of this is already included — hosting, updates, backups, security monitoring, uptime monitoring, minor content edits, and a Local SEO package, all rolled into the $497/month. If you chose One Time, you own and run the site yourself on your own cloud server — and we can quote a separate care plan starting at $150/month if you want us handling maintenance, security, and small edits for you. Many Franklin clients run their One Time sites themselves after launch and only call us when they want a redesign — that's fine too."
+    answer: "Yes. Hosting, maintenance and updates start at $30 a month and cover hosting, security, backups, updates, and small edits. You own the site, so you can also move it to your own hosting and run it yourself. Many Franklin clients only call us when they want a redesign, and that's fine too."
   },
   {
     question: "CAN YOU REDESIGN MY SQUARESPACE / WIX / GODADDY SITE?",
@@ -289,11 +289,11 @@ const faqs = [
   },
   {
     question: "WHO OWNS THE SITE AND DOMAIN WHEN WE'RE DONE?",
-    answer: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. With Ongoing, the site lives on cloud hosting we manage as part of your subscription — and if you ever leave us, you can transfer or buy out the site outright. With One Time, the site is set up on your own secure cloud server from day one, in your name, with you holding the keys. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
+    answer: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. When you buy a website from us, you own it. We host it and look after it for a monthly fee, and you can move it elsewhere whenever you like. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
   },
   {
     question: "DO YOU HANDLE COPYWRITING AND PHOTOGRAPHY?",
-    answer: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included by default in One Time builds; available as an add-on for Ongoing subscribers."
+    answer: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly."
   },
   {
     question: "WHAT IF I'M NOT HAPPY WITH THE DESIGN DIRECTION?",
@@ -301,11 +301,11 @@ const faqs = [
   },
   {
     question: "DO YOU BUILD E-COMMERCE FOR FRANKLIN RETAILERS?",
-    answer: "Yes. We build on Shopify for most catalog-driven retail, or on our modern architecture for headless and custom commerce setups. We've built e-commerce for Williamson County boutique retail, food/CPG brands, and home goods. E-commerce projects price as One Time builds starting at $7,500+ depending on product count, custom integrations, and complexity."
+    answer: "Yes. We build on Shopify for most catalog-driven retail, or on our modern architecture for headless and custom commerce setups. We've built e-commerce for Williamson County boutique retail, food/CPG brands, and home goods. E-commerce projects are quoted separately, starting at $7,500+ depending on product count, custom integrations, and complexity."
   },
   {
     question: "CAN YOU MAKE MY SITE ADA / WCAG COMPLIANT?",
-    answer: "WCAG 2.1 AA is our default standard on every One Time build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. Ongoing subscribers get WCAG basics by default; a full compliance audit can be added as a one-time service."
+    answer: "WCAG 2.1 AA is our default standard on every build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. A full compliance audit can be added as a one-time service."
   },
   {
     question: "WHY HIRE CREATIVE COWBOYS INSTEAD OF LOCAL AGENCIES?",
@@ -1157,40 +1157,39 @@ export default function WebDesignFranklinPage() {
               </div>
               
               <div>
-                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">ONGOING</h3>
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">LOCAL GROWTH</h3>
                 <div className="my-4">
                   <div className="font-h3-display text-3xl text-h3-red flex items-baseline gap-1">
-                    <span className="font-h3-secondary text-[11px] font-bold text-h3-black/60 lowercase italic mr-1">starting at</span>
-                    <span>$497/mo</span>
+                    <span>$297/mo</span>
                   </div>
                   <div className="text-[10px] font-bold tracking-wider text-h3-black/60 uppercase mt-1">
-                    $0 UPFRONT &middot; 12-MONTH AGREEMENT
+                    MONTH TO MONTH &middot; NO CONTRACT
                   </div>
                 </div>
                 <p className="font-h3-secondary text-xs text-h3-black/75 mb-6">
-                  For local Franklin small businesses who want a real web presence &mdash; without writing a big check upfront.
+                  For local Franklin small businesses who want to be found on Google Maps and in local search.
                 </p>
                 
                 <ul className="space-y-3.5 mb-8 border-t border-h3-black/10 pt-6">
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>New custom website built for you</span>
+                    <span>Google Business Profile optimized and managed</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>Hosting, SSL, and security included</span>
+                    <span>Built to rank in the Map Pack for your service and city</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>Minor content updates on request</span>
+                    <span>Reviews handled for you</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>Local SEO + Google Business Profile management</span>
+                    <span>Local SEO for your service and your towns</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>Built and launched in as little as 2 weeks</span>
+                    <span>Month to month, no contract</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
@@ -1204,7 +1203,7 @@ export default function WebDesignFranklinPage() {
               </div>
               
               <button 
-                onClick={(e) => { e.preventDefault(); openContactModal("Ongoing Website ($497/mo)"); }}
+                onClick={(e) => { e.preventDefault(); openContactModal("Local Growth ($297/mo)"); }}
                 className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-red text-white cursor-pointer"
               >
                 GET STARTED
@@ -1214,13 +1213,13 @@ export default function WebDesignFranklinPage() {
             {/* Card 2 — ONE TIME (right) */}
             <div className="h3-brutalist-card p-8 flex flex-col justify-between text-left relative bg-white">
               <div>
-                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">ONE TIME</h3>
+                <h3 className="font-h3-display text-2xl uppercase tracking-wider mb-1 leading-none">WEBSITE</h3>
                 <div className="my-4">
                   <div className="font-h3-display text-3xl text-h3-red">
-                    Starting at $3,500
+                    Starting at $997
                   </div>
                   <div className="text-[10px] font-bold tracking-wider text-h3-black/60 uppercase mt-1">
-                    YOU OWN IT &middot; NO ONGOING REQUIRED
+                    YOU OWN IT &middot; HOSTING FROM $30/MO
                   </div>
                 </div>
                 <p className="font-h3-secondary text-xs text-h3-black/75 mb-6">
@@ -1234,7 +1233,7 @@ export default function WebDesignFranklinPage() {
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>Hosted on your own secure cloud server &mdash; yours to keep</span>
+                    <span>Hosting, maintenance and updates from $30 a month</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
@@ -1250,7 +1249,7 @@ export default function WebDesignFranklinPage() {
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
-                    <span>90 days of post-launch support included</span>
+                    <span>SEO-ready from day one</span>
                   </li>
                   <li className="flex gap-2.5 items-start text-xs font-h3-secondary text-h3-black/90 leading-snug">
                     <Check size={16} className="text-h3-green shrink-0 mt-0.5" />
@@ -1260,7 +1259,7 @@ export default function WebDesignFranklinPage() {
               </div>
               
               <button 
-                onClick={(e) => { e.preventDefault(); openContactModal("One Time Build (from $3,500)"); }}
+                onClick={(e) => { e.preventDefault(); openContactModal("Website Build (from $997)"); }}
                 className="h3-btn-brutalist w-full text-center font-bold py-3.5 uppercase tracking-wider text-xs bg-h3-cream text-h3-black cursor-pointer"
               >
                 GET A CUSTOM QUOTE
@@ -1274,7 +1273,7 @@ export default function WebDesignFranklinPage() {
             <div className="flex flex-col gap-2">
               <h3 className="font-h3-display text-xl text-h3-yellow uppercase tracking-widest leading-none">HOW WE PRICE OUR PROJECTS</h3>
               <p className="font-h3-secondary text-xs text-h3-cream/80 max-w-3xl leading-relaxed mt-1.5">
-                Two ways to start. Monthly is everything bundled &mdash; no upfront, just $497 a month. One time is a flat project fee paid in three milestones (kickoff / design approval / launch). No surprise charge orders either way. If your project doesn't fit, we'll tell you and recommend someone better suited (even if that's Squarespace or a freelancer).
+                Two things we sell most. Local Growth is $297 a month, month to month, for local SEO and your Google Business Profile. A custom website is a one-time fee starting at $997, and you own it, with hosting, maintenance and updates from $30 a month. No surprise charges either way. If your project doesn't fit, we'll tell you and recommend someone better suited (even if that's Squarespace or a freelancer).
               </p>
             </div>
             <button 
@@ -1857,8 +1856,8 @@ export default function WebDesignFranklinPage() {
                     className="w-full px-4 py-2.5 bg-white border-[3px] border-[#0a0a0a] text-[#0a0a0a] font-h3-secondary outline-none focus:border-[#DD5A2E] shadow-[4px_4px_0_#0a0a0a] transition-all cursor-pointer"
                   >
                     <option value="">Select a service...</option>
-                    <option value="Ongoing Website ($497/mo)">Ongoing Website ($497/mo)</option>
-                    <option value="One Time Build (from $3,500)">One Time Build (from $3,500)</option>
+                    <option value="Local Growth ($297/mo)">Local Growth ($297/mo)</option>
+                    <option value="Website Build (from $997)">Website Build (from $997)</option>
                     <option value="Local SEO & Maps Ranking">Local SEO & Maps Ranking</option>
                     <option value="PPC Advertising (Google/Meta)">PPC Advertising (Google/Meta)</option>
                     <option value="Brand Identity & Design">Brand Identity & Design</option>

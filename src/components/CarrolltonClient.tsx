@@ -127,33 +127,30 @@ const processSteps = [
 
 const pricing = [
   {
-    name: "ONGOING",
+    name: "LOCAL GROWTH",
     badge: "MOST POPULAR",
-    price: "$497",
+    price: "$297",
     unit: "/mo",
-    sub: "$0 upfront · 12-month agreement",
+    sub: "Month to month · no contract",
     features: [
-      "New custom website",
-      "Hosting, SSL & security",
-      "Minor updates included",
-      "Local SEO + Google Business Profile",
-      "Launch in ~2 weeks",
+      "Google Business Profile optimized and managed",
+      "Built to rank in the Map Pack for your service and city",
+      "Reviews handled for you",
       "Monthly performance report",
     ],
   },
   {
-    name: "ONE TIME",
+    name: "WEBSITE",
     badge: "YOU OWN IT",
-    price: "$3,500",
+    price: "$997",
     unit: "+",
-    sub: "One-time build · no ongoing required",
+    sub: "One-time build · hosting from $30/mo",
     features: [
-      "Custom build on your own cloud server",
-      "Full brand integration",
+      "Custom design and build",
+      "SEO-ready from day one",
       "Form + analytics setup",
-      "90 days post-launch support",
-      "You own domain, files, design & code",
-      "Milestone billing: kickoff / approval / launch",
+      "You own the site",
+      "Hosting, maintenance and updates from $30/mo",
     ],
   },
 ];
@@ -188,7 +185,7 @@ const faqs = [
     category: "PRICING",
     question: "HOW MUCH DOES DIGITAL MARKETING COST IN CARROLLTON?",
     answer:
-      "Most Carrollton small businesses start one of two ways: ongoing from $497/mo with $0 upfront, or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
+      "Most Carrollton small businesses start with one of two things: Local Growth at $297 a month, month to month, or a custom website from $997 that you own outright. No hidden fees — the proposal number is the invoice number.",
   },
   {
     index: "02",

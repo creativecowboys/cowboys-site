@@ -98,7 +98,7 @@ export default function SEOPage() {
                                         "name": "HOW MUCH DOES SEO COST?",
                                         "acceptedAnswer": {
                                             "@type": "Answer",
-                                            "text": "Our SEO packages start at $497/month. The right investment depends on your market competitiveness and goals. We'll give you a transparent quote after a free consultation."
+                                            "text": "Our SEO packages start at $297/month, month to month. The right investment depends on your market competitiveness and goals. We'll give you a transparent quote after a free consultation."
                                         }
                                     },
                                     {
@@ -489,7 +489,7 @@ export default function SEOPage() {
                                     HOW MUCH DOES SEO COST?
                                 </summary>
                                 <div className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 pr-6">
-                                    Our SEO packages start at $497/month. The right investment depends on your market competitiveness and goals. We&rsquo;ll give you a transparent quote after a free consultation.
+                                    Our SEO packages start at $297/month, month to month. The right investment depends on your market competitiveness and goals. We&rsquo;ll give you a transparent quote after a free consultation.
                                 </div>
                             </details>
 

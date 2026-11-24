@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 const faqs = [
-    { q: "How much do Google Ads cost for a small business?", a: "Ad spend varies by market and goals — most West Georgia small businesses start with $500–$1,500/month in ad budget. Our management fee starts at $497/month. We'll recommend a budget that makes sense for your goals after a free consultation." },
+    { q: "How much do Google Ads cost for a small business?", a: "Our Google Ads plans are $500, $1,000 or $1,500 a month, and your ad spend comes out of that price. We'll recommend the plan that makes sense for your goals after a free consultation." },
     { q: "How quickly can I see results from Google Ads?", a: "Unlike SEO, Google Ads can drive traffic within hours of launch. Most campaigns start showing meaningful lead volume in the first 2–4 weeks as we optimize targeting and bids." },
     { q: "Do you require long-term contracts?", a: "No contracts that trap you. We work month-to-month and earn your business by delivering results. If it's not working, you're not locked in." },
 ];

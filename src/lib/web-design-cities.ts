@@ -27,7 +27,7 @@ export type WebDesignCity = {
 };
 
 const CARE =
-  "Edits are requested by emailing howdy@creativecowboys.co. The $30 a month covers hosting, security, backups, updates, and those edits.";
+  "Edits are requested by emailing howdy@creativecowboys.co. The monthly plan, which starts at $30, covers hosting, security, backups, updates, and those edits.";
 
 export const carrolltonWebDesign: WebDesignCity = {
   name: "Carrollton",
@@ -41,7 +41,7 @@ export const carrolltonWebDesign: WebDesignCity = {
   paragraphs: [
     "Carrollton is the Carroll County seat, and it is a crowded small-business market. The University of West Georgia puts more than 9,000 students in town. Tanner Health System is one of the region's largest employers. Downtown still draws people to Adamson Square. A website that could belong to any Georgia city will not hold up next to that.",
     "We build the site around how Carrollton customers actually look. A contractor covering East Carrollton and Lake Carroll needs those places named. A shop in the Maple Street district needs a page that sounds like Maple Street, not a stock welcome line. A clinic or professional firm near the university and Tanner needs a clear next step, because a lot of that traffic is on a phone between appointments.",
-    `You work with Josh and Dave — the people doing the work — not a salesperson who hands the project off. The website build is a one-time $497, plus $30 a month for hosting, security, backups, updates, and edits. ${CARE} Google Business Profile local SEO is separate: $297 a month on a 12-month agreement. Month-to-month local SEO is $497. The site is not included in that plan.`,
+    `You work with Josh and Dave — the people doing the work — not a salesperson who hands the project off. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} Local SEO is a separate plan: Local Growth is $297 a month, month to month, and does not include the website.`,
   ],
   includes: [
     {
@@ -58,7 +58,7 @@ export const carrolltonWebDesign: WebDesignCity = {
     },
     {
       title: "Care after launch.",
-      body: "Hosting, security, backups, updates, and edits stay on the $30 a month plan. Email the change to howdy@creativecowboys.co.",
+      body: "Hosting, security, backups, updates, and edits stay on the monthly plan, which starts at $30. Email the change to howdy@creativecowboys.co.",
     },
   ],
   neighborhoods: [
@@ -79,7 +79,7 @@ export const carrolltonWebDesign: WebDesignCity = {
   faqs: [
     {
       q: "How much does web design in Carrollton, GA cost?",
-      a: "A Carrollton website is a one-time $497 build, plus $30 a month for hosting, security, backups, updates, and edits. Google Business Profile local SEO is $297 a month on a 12-month agreement, or $497 a month without that agreement. The website is billed separately from local SEO. Send edits to howdy@creativecowboys.co.",
+      a: "A Carrollton website starts at $997, one time, and you own it. Hosting, maintenance and updates start at $30 a month. Local SEO is separate: Local Growth is $297 a month, month to month. Send edits to howdy@creativecowboys.co.",
     },
     {
       q: "Do you meet Carrollton clients in person?",
@@ -95,7 +95,7 @@ export const carrolltonWebDesign: WebDesignCity = {
     },
     {
       q: "How do I request a change after the Carrollton site launches?",
-      a: "Email howdy@creativecowboys.co. Hosting, security, backups, updates, and edits are what the $30 a month is for.",
+      a: "Email howdy@creativecowboys.co. Hosting, security, backups, updates, and edits are what the monthly plan is for.",
     },
   ],
   digitalMarketingHref: "/digital-marketing-carrollton-ga",
@@ -118,7 +118,7 @@ export const villaRicaWebDesign: WebDesignCity = {
   paragraphs: [
     "Villa Rica sits on I-20 between Atlanta and Carrollton, straddling the Carroll and Douglas County line. New rooftops keep showing up around Mirror Lake and Fairfield Plantation. Shops and restaurants around historic downtown and The Mill serve a different customer than the contractors and professional firms along Highway 61 and Interstate West. Those buyers do not type the same search.",
     "A Villa Rica website has to say which of those places you actually cover. Downtown and The Mill are not the same job as Gold City, Pine Mountain, Temple, or Winston. We write pages for the neighborhoods you serve and leave off the ones you do not. We are a short drive from a lot of the businesses on this page, so you can sit down with us instead of onboarding through a ticket queue.",
-    `Josh and Dave do the work. The website is $497 once, plus $30 a month for hosting, security, backups, updates, and edits. ${CARE} If you want the Google Business Profile worked as well, local SEO is $297 a month on a 12-month agreement. That plan does not include the website. Without the agreement, local SEO is $497 a month.`,
+    `Josh and Dave do the work. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} If you want the Google Business Profile worked as well, Local Growth is $297 a month, month to month. That plan does not include the website.`,
   ],
   includes: [
     {
@@ -135,7 +135,7 @@ export const villaRicaWebDesign: WebDesignCity = {
     },
     {
       title: "Edits by email.",
-      body: "The $30 a month plan is hosting, security, backups, updates, and edits. The address for a change is howdy@creativecowboys.co.",
+      body: "The monthly plan, from $30, is hosting, security, backups, updates, and edits. The address for a change is howdy@creativecowboys.co.",
     },
   ],
   neighborhoods: [
@@ -155,19 +155,19 @@ export const villaRicaWebDesign: WebDesignCity = {
   faqs: [
     {
       q: "How much does web design in Villa Rica, GA cost?",
-      a: "The website build is $497 one time, plus $30 a month for hosting, security, backups, updates, and edits. Google Business Profile local SEO is $297 a month on a 12-month agreement and does not include the website. Month-to-month local SEO is $497. Email edits to howdy@creativecowboys.co.",
+      a: "Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. Local Growth, our local SEO plan, is $297 a month, month to month, and does not include the website. Email edits to howdy@creativecowboys.co.",
     },
     {
       q: "Are you actually based in Villa Rica?",
       a: "Yes. Creative Cowboys is headquartered at 222 W Montgomery St in downtown Villa Rica. We are neighbors, and we will meet you in person.",
     },
     {
-      q: "What does the $30 a month cover?",
+      q: "What does the monthly hosting fee cover?",
       a: "Hosting, security, backups, updates, and edits for a site we build. It is part of having the website with us. Send the change to howdy@creativecowboys.co.",
     },
     {
       q: "Does $297 a month include the website?",
-      a: "No. $297 a month is Google Business Profile local SEO on a 12-month agreement. The Villa Rica website is a separate one-time $497 build, plus $30 a month for care. Month-to-month local SEO is $497.",
+      a: "No. $297 a month is Local Growth, our local SEO plan, billed month to month. A Villa Rica website is a separate one-time build starting at $997, plus hosting, maintenance and updates from $30 a month.",
     },
     {
       q: "Can a Villa Rica site cover both Carroll and Douglas County?",
@@ -194,7 +194,7 @@ export const douglasvilleWebDesign: WebDesignCity = {
   paragraphs: [
     "Douglasville is the Douglas County seat and a west-metro gateway on I-20. Arbor Place, the Chapel Hill corridor, and WellStar Douglas Hospital pull customers from across the west side of Atlanta. That is useful for a local business and hard for a website. You are not only next to the shop down the street. You are next to larger brands bidding on the same searches.",
     "We write Douglasville pages for the places people name: downtown and O'Neal Plaza, Arbor Place, Chapel Hill, Lithia Springs, Winston, and the rest of Douglas County when that is your real service area. The page has to make the service, the town, and the next step obvious on a phone. Published Creative Cowboys work in Douglasville includes John B. Jackson & Associates and McKinley Roofing. Those projects are on our results page. They are not a promise that a new site will produce the same outcome.",
-    `The build is $497 once. Hosting, security, backups, updates, and edits are $30 a month. ${CARE} Google Business Profile local SEO is $297 a month on a 12-month agreement, billed separately from the website. Month-to-month local SEO is $497. If you want ads and Map Pack work on top of the site, that conversation starts on the Douglasville digital marketing page.`,
+    `Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} Local Growth, our local SEO plan, is $297 a month, month to month, billed separately from the website. If you want ads and Map Pack work on top of the site, that conversation starts on the Douglasville digital marketing page.`,
   ],
   includes: [
     {
@@ -211,7 +211,7 @@ export const douglasvilleWebDesign: WebDesignCity = {
     },
     {
       title: "Maintenance with a real inbox.",
-      body: "After launch, hosting, security, backups, updates, and edits are $30 a month. Email howdy@creativecowboys.co.",
+      body: "After launch, hosting, security, backups, updates, and edits start at $30 a month. Email howdy@creativecowboys.co.",
     },
   ],
   neighborhoods: [
@@ -231,7 +231,7 @@ export const douglasvilleWebDesign: WebDesignCity = {
   faqs: [
     {
       q: "How much does web design in Douglasville, GA cost?",
-      a: "The Douglasville website is $497 one time, plus $30 a month for hosting, security, backups, updates, and edits. Google Business Profile local SEO is $297 a month on a 12-month agreement and is not a website plan. Month-to-month local SEO is $497. Edits go to howdy@creativecowboys.co.",
+      a: "A Douglasville website starts at $997, one time, and you own it. Hosting, maintenance and updates start at $30 a month. Local Growth, our local SEO plan, is $297 a month, month to month, and is not a website plan. Edits go to howdy@creativecowboys.co.",
     },
     {
       q: "How far is your office from Douglasville?",
@@ -247,7 +247,7 @@ export const douglasvilleWebDesign: WebDesignCity = {
     },
     {
       q: "Who do I email when a Douglasville page needs a change?",
-      a: "howdy@creativecowboys.co. That is the edits channel for the $30 a month plan, which also includes hosting, security, backups, and updates.",
+      a: "howdy@creativecowboys.co. That is the edits channel for the monthly plan, which also includes hosting, security, backups, and updates.",
     },
   ],
   digitalMarketingHref: "/digital-marketing-douglasville-ga",
@@ -266,7 +266,7 @@ export const WEB_DESIGN_CITIES = [
 
 export function webDesignCityMetadata(city: WebDesignCity): Metadata {
   const title = `Web Design ${city.name}, GA`;
-  const description = `Web design in ${city.name}, GA from Creative Cowboys: a custom $497 website plus $30/month hosting and edits, built by a team based in Villa Rica.`;
+  const description = `Web design in ${city.name}, GA from Creative Cowboys: custom websites from $997, with hosting, maintenance and updates from $30 a month, built by a team based in Villa Rica.`;
 
   return {
     title,

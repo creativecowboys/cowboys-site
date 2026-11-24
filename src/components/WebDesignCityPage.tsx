@@ -30,17 +30,17 @@ export default function WebDesignCityPage({ city }: { city: WebDesignCity }) {
           {
             "@type": "Offer",
             name: "Website build",
-            price: "497",
+            price: "997",
             priceCurrency: "USD",
-            description: "One-time website build.",
+            description: "One-time custom website build, starting price. The client owns the site.",
           },
           {
             "@type": "Offer",
-            name: "Hosting, security, backups, updates, and edits",
+            name: "Hosting, maintenance and updates",
             price: "30",
             priceCurrency: "USD",
             description:
-              "Monthly care for a site we build. Edits are requested by emailing howdy@creativecowboys.co.",
+              "Monthly care for a site we build, starting price. Edits are requested by emailing howdy@creativecowboys.co.",
           },
           {
             "@type": "Offer",
@@ -48,7 +48,7 @@ export default function WebDesignCityPage({ city }: { city: WebDesignCity }) {
             price: "297",
             priceCurrency: "USD",
             description:
-              "Local SEO including Google Business Profile on a 12-month agreement. The website build is separate. Month-to-month local SEO is $497.",
+              "Local Growth: local SEO including Google Business Profile, billed month to month. The website build is separate.",
           },
         ],
       },
@@ -162,10 +162,10 @@ export default function WebDesignCityPage({ city }: { city: WebDesignCity }) {
               <article className="bg-white border-[2.5px] border-[#0a0a0a] p-8 shadow-[6px_6px_0px_#0a0a0a]">
                 <p className="font-anton text-xs tracking-wider text-[#B5330E] uppercase mb-3">The website</p>
                 <h3 className="font-anton text-4xl uppercase leading-none mb-2">
-                  $497 <span className="text-2xl text-[#5a5a5a]">once</span>
+                  From $997 <span className="text-2xl text-[#5a5a5a]">once</span>
                 </h3>
                 <p className="font-inter text-sm text-[#3a3a3a] leading-relaxed mb-4">
-                  Then $30 a month for hosting, security, backups, updates, and edits.
+                  Then hosting, maintenance and updates from $30 a month.
                 </p>
                 <ul className="font-inter text-sm text-[#3a3a3a] leading-relaxed flex flex-col gap-2">
                   <li>One-time website build for a {city.name} business.</li>
@@ -176,7 +176,7 @@ export default function WebDesignCityPage({ city }: { city: WebDesignCity }) {
                     </a>
                     .
                   </li>
-                  <li>The $497 is not billed again each month.</li>
+                  <li>You own the site. The build fee is charged once.</li>
                 </ul>
               </article>
               <article className="bg-[#0a0a0a] text-[#F2EBDA] border-[2.5px] border-[#0a0a0a] p-8 shadow-[6px_6px_0px_#B5330E]">
@@ -185,11 +185,11 @@ export default function WebDesignCityPage({ city }: { city: WebDesignCity }) {
                   $297 <span className="text-2xl text-[#F2EBDA]/70">/month</span>
                 </h3>
                 <p className="font-inter text-sm text-[#F2EBDA]/80 leading-relaxed mb-4">
-                  Includes Google Business Profile local SEO, on a 12-month agreement.
+                  Local Growth: Google Business Profile and local SEO, month to month.
                 </p>
                 <ul className="font-inter text-sm text-[#F2EBDA]/80 leading-relaxed flex flex-col gap-2">
                   <li>This plan does not include the website build.</li>
-                  <li>Month-to-month local SEO is $497.</li>
+                  <li>No contract.</li>
                   <li>
                     See <Link href="/seo" className="text-[#F5C842] font-bold underline">SEO</Link> for the broader search offer.
                   </li>

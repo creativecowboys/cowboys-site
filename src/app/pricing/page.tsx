@@ -39,22 +39,22 @@ interface Service {
  * Rebuilt 21 Sept 2026 off the Monday "Packages & Pricing" board, which is the
  * source of truth. If a price changes there, change it here.
  *
- * Agreement pricing stays off this page on purpose: Local Growth is $297/mo on
- * a 12-month agreement and $497/mo month-to-month (Dave, Sep 30 2026 — the old
- * "first year" step-up is retired), and the $497 website build is a special the
- * team quotes directly. The list price shown here is the month-to-month rate;
- * publishing the agreement rate would make it unsellable.
+ * Price list as of Nov 24 2026 (Josh): Local Growth is $297/mo, month to month,
+ * with no agreement and no other rate. Custom websites start at $997 one time,
+ * the client owns the site, and hosting, maintenance and updates start at $30/mo.
+ * The monthly offer does not mention a free website; that is kept for specials.
  */
 const MONTHLY_SERVICES: Service[] = [
     {
         id: "local-growth",
         name: "Local Growth",
         tagline: "Get found on Google Maps for what you do, in the town you do it.",
-        priceLabel: "$497/mo",
+        priceLabel: "$297/mo",
         billing: "monthly",
         icon: IoSearchOutline,
         badge: "Most Popular",
         bullets: [
+            "Month to month, no contract",
             "Google Business Profile optimized and managed",
             "Built to rank in the Map Pack for your service and city",
             "Reviews handled for you",
@@ -158,9 +158,9 @@ const MONTHLY_SERVICES: Service[] = [
     },
     {
         id: "website-hosting",
-        name: "Website Hosting & Support",
-        tagline: "Hosting, support and small changes for a site we build you.",
-        priceLabel: "$30/mo",
+        name: "Hosting, Maintenance & Updates",
+        tagline: "Hosting, upkeep and small changes for a site we build you.",
+        priceLabel: "From $30/mo",
         billing: "monthly",
         icon: IoGlobeOutline,
         bullets: [
@@ -176,15 +176,15 @@ const ONETIME_SERVICES: Service[] = [
     {
         id: "website-build",
         name: "Website Build",
-        tagline: "A full custom site, built once and yours to keep.",
-        priceLabel: "$5,900",
+        tagline: "A custom site, built once and yours to keep.",
+        priceLabel: "From $997",
         billing: "one-time",
         icon: IoGlobeOutline,
         bullets: [
-            "Complete custom design and development",
+            "Custom design and development",
             "SEO-ready from day one",
-            "Includes a CMS so you can update it yourself",
-            "Hosting and support runs $30/mo after launch",
+            "You own the site",
+            "Hosting, maintenance and updates start at $30/mo after launch",
         ],
     },
     {
@@ -543,7 +543,7 @@ export default function PricingPage() {
                         {[
                             {
                                 q: "Do I have to sign a long-term contract?",
-                                a: "Most services are month-to-month after an initial 3-month period, so we have time to show results before you decide. Some promotional rates are tied to a longer agreement, and we will tell you plainly if one applies to your quote.",
+                                a: "No. Our monthly plans are month to month, with no long-term contract.",
                             },
                             {
                                 q: "Is ad spend included in the ads pricing?",

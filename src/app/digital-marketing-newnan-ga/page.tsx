@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 const faqEntries = [
   {
     q: "How much does digital marketing cost in Newnan, GA?",
-    a: "Most Newnan small businesses start one of two ways: ongoing from $497/mo with $0 upfront, or a one-time build from $3,500 that you own outright. No hidden fees — the proposal number is the invoice number.",
+    a: "Most Newnan small businesses start with one of two things: Local Growth at $297 a month, month to month, or a custom website from $997 that you own outright. No hidden fees — the proposal number is the invoice number.",
   },
   {
     q: "How long until I see SEO results in Newnan?",
