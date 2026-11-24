@@ -71,7 +71,7 @@ export default function BlogGoogleAdsCost() {
                         <li><strong style={{ color: "rgba(255,255,255,0.80)" }}>Ad spend</strong> — Money paid directly to Google for your clicks. You set this budget and it goes directly to Google.</li>
                         <li><strong style={{ color: "rgba(255,255,255,0.80)" }}>Management fee</strong> — Paid to the agency managing your campaigns. This covers strategy, setup, ongoing optimization, and reporting.</li>
                     </ul>
-                    <p>At Creative Cowboys, our Google Ads management starts at $497/month. Your ad spend is separate and paid directly to Google.</p>
+                    <p>At Creative Cowboys, Google Ads plans are $500, $1,000 or $1,500 a month, and your ad spend comes out of that price.</p>
 
                     <h2>Expected Costs Per Click by Industry</h2>
                     <p>Cost-per-click varies enormously by industry and market. In West Georgia, you&rsquo;ll generally pay less than in Atlanta metro for the same keywords — but the ranges below give you a realistic picture:</p>

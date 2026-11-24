@@ -66,6 +66,13 @@ const nextConfig: NextConfig = {
       //     just split the signal between them.
       //   /ecommerce-seo  — no ecommerce client work to point at yet. Revisit
       //     when there's a case study to put on it.
+      // Nov 24 2026 price list: custom websites start at $997 and Local Growth is $297 month to month.
+      // These pages sold offers that no longer exist (free website builds, the $497 AI plan with a
+      // free site, the Oct 3 entrant offer). 307 on purpose so a future special offer can bring one back.
+      { source: '/free-website', destination: '/web-design', permanent: false },
+      { source: '/free-website/:path*', destination: '/web-design', permanent: false },
+      { source: '/local-max-offer', destination: '/pricing', permanent: false },
+      { source: '/ai/landing/:industry', destination: '/ai', permanent: false },
       { source: '/ecommerce-seo', destination: '/seo', permanent: true },
       { source: '/ppc-management', destination: '/ppc', permanent: true },
       { source: '/thank-you', destination: '/', permanent: true },

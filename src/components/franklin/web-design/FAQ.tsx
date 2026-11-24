@@ -10,11 +10,11 @@ export default function FAQ() {
   const faqs = [
     {
       q: "How much does a website cost in Franklin, TN?",
-      a: "We offer two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and a Local SEO package. One Time builds start at $3,500 flat — you own everything outright on your own cloud server with no ongoing commitment. Most Franklin small businesses pick the model that matches their cash flow, not their site size. We publish these numbers because we'd rather start the conversation with money on the table than have you guess. If you find a Franklin agency quoting $1,500 for a 'custom' site, the work is being done offshore — that's not a value judgment, it's just useful information."
+      a: "Custom websites start at $997, one time, and you own the site outright. Hosting, maintenance and updates start at $30 a month. If you also want local SEO, Local Growth is $297 a month, month to month. We publish these numbers because we'd rather start the conversation with money on the table than have you guess."
     },
     {
       q: "How long does it take to build a website for a Franklin business?",
-      a: "4–6 weeks for most Ongoing builds, 6–10 weeks for One Time builds depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
+      a: "4–10 weeks for most builds, depending on scope. Complex e-commerce or custom database work runs 10–14 weeks. That's calendar time, not 'we're working on it.' Each phase has a real deliverable date in your project tracker. We've never missed a launch date that wasn't pushed by the client."
     },
     {
       q: "Do you build on WordPress, Webflow, or something else?",
@@ -26,7 +26,7 @@ export default function FAQ() {
     },
     {
       q: "What happens after launch? Do you offer maintenance?",
-      a: "If you chose Ongoing, all of this is already included — hosting, updates, backups, security monitoring, uptime monitoring, minor content edits, and a Local SEO package, all rolled into the $497/month. If you chose One Time, you own and run the site yourself on your own cloud server — and we can quote a separate care plan starting at $150/month if you want us handling maintenance, security, and small edits for you. Many Franklin clients run their One Time sites themselves after launch and only call us when they want a redesign — that's fine too."
+      a: "Yes. Hosting, maintenance and updates start at $30 a month and cover hosting, security, backups, updates, and small edits. You own the site, so you can also move it to your own hosting and run it yourself. Many Franklin clients only call us when they want a redesign, and that's fine too."
     },
     {
       q: "Can you redesign my existing Squarespace / Wix / GoDaddy site?",
@@ -34,11 +34,11 @@ export default function FAQ() {
     },
     {
       q: "Who owns the site, the domain, and the hosting when we're done?",
-      a: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. With Ongoing, the site lives on cloud hosting we manage as part of your subscription — and if you ever leave us, you can transfer or buy out the site outright. With One Time, the site is set up on your own secure cloud server from day one, in your name, with you holding the keys. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
+      a: "You do. All of it. We don't lock clients into our infrastructure. The domain stays in your account. When you buy a website from us, you own it. We host it and look after it for a monthly fee, and you can move it elsewhere whenever you like. The files, design, and code are yours either way. If you ever fire us, you walk away with everything."
     },
     {
       q: "Do you handle copywriting and photography?",
-      a: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly. Included by default in One Time builds; available as an add-on for Ongoing subscribers."
+      a: "Yes — and we usually do. Most clients come to us with a website that's been written in the voice of whoever happened to have time. We write the site in your voice and source or produce professional photography for the project. For Franklin-area shoots we'll travel for the project scope, and we have a network of Nashville-area photographers we work with directly."
     },
     {
       q: "What if I'm not happy with the design?",
@@ -46,11 +46,11 @@ export default function FAQ() {
     },
     {
       q: "Do you build ecommerce sites for Franklin retailers?",
-      a: "Yes. We build on Shopify for most catalog-driven retail, or on our modern architecture for headless and custom commerce setups. We've built e-commerce for Williamson County boutique retail, food/CPG brands, and home goods. E-commerce projects price as One Time builds starting at $7,500+ depending on product count, custom integrations, and complexity."
+      a: "Yes. We build on Shopify for most catalog-driven retail, or on our modern architecture for headless and custom commerce setups. We've built e-commerce for Williamson County boutique retail, food/CPG brands, and home goods. E-commerce projects are quoted separately, starting at $7,500+ depending on product count, custom integrations, and complexity."
     },
     {
       q: "Can you make my site ADA / WCAG compliant?",
-      a: "WCAG 2.1 AA is our default standard on every One Time build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. Ongoing subscribers get WCAG basics by default; a full compliance audit can be added as a one-time service."
+      a: "WCAG 2.1 AA is our default standard on every build. If you're a Franklin healthcare practice, professional services firm, or running paid ads, this isn't optional — it's a real legal exposure. A full compliance audit can be added as a one-time service."
     },
     {
       q: "Why should I hire Creative Cowboys instead of JLB or Horton Group?",

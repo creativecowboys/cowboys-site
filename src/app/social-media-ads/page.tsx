@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const faqs = [
     { q: "Which platforms do you run ads on?", a: "Facebook, Instagram, and TikTok — the platforms where West Georgia buyers actually spend their time. We manage your full ad account and recommend the mix that fits your audience and budget." },
-    { q: "How much should I budget for social media ads?", a: "Most local businesses start with $300–$1,000/month in ad spend, plus management starting at $497/month. We'll recommend a budget after a free consultation — no pressure, just a straight answer." },
+    { q: "How much should I budget for social media ads?", a: "Our social ad plans are $300, $600 or $1,200 a month, and your ad spend comes out of that price. We'll recommend a plan after a free consultation — no pressure, just a straight answer." },
     { q: "Do social ads actually work for local businesses?", a: "Yes — when the targeting, creative, and offer are aligned. Social ads are unmatched for building local awareness and reaching people before they're actively searching. We manage to leads and ROI, not just likes." },
 ];
 

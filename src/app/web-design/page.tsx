@@ -76,7 +76,7 @@ export default function WebDesignPage() {
                     "name": "HOW MUCH DOES A WEBSITE COST?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "Two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and local SEO. One-time builds start at $3,500 flat — you own everything outright. We publish these numbers because we'd rather start the conversation with money on the table than have you guess."
+                      "text": "Custom websites start at $997, one time, and you own the site outright. Hosting, maintenance and updates start at $30 a month. We publish these numbers because we'd rather start the conversation with money on the table than have you guess."
                     }
                   },
                   {
@@ -523,7 +523,7 @@ export default function WebDesignPage() {
             <details className="faq-item" open={true}>
               <summary>HOW MUCH DOES A WEBSITE COST?</summary>
               <div className="font-inter text-sm md:text-base text-[#5a5a5a] leading-relaxed pb-6 max-w-2xl">
-                Two ways to start. Ongoing starts at $497/month with no upfront cost — includes the website, hosting, minor updates, and local SEO. One-time builds start at $3,500 flat — you own everything outright. We publish these numbers because we'd rather start the conversation with money on the table than have you guess.
+                Custom websites start at $997, one time, and you own the site outright. Hosting, maintenance and updates start at $30 a month. We publish these numbers because we'd rather start the conversation with money on the table than have you guess.
               </div>
             </details>
             <details className="faq-item">

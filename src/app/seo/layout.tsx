@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Lobster, Anton } from "next/font/google";
 
+// No `weight` here on purpose. Asking Google Fonts for the static 400 and 700 files made
+// Vercel builds fail about half the time on Nov 24 2026 ("Cannot read properties of null" in
+// next/font's loader). Without it this is the variable Inter the root layout already loads.
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "700"],
   variable: "--font-inter",
   display: "swap",
 });

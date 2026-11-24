@@ -26,6 +26,10 @@ const NOINDEX_ROUTES = new Set([
   // The giveaway is over: /thebiggiveaway redirects to "/" and /draw is noindex.
   "/thebiggiveaway",
   "/thebiggiveaway/draw",
+  // Retired Nov 24 2026 (redirected in next.config.ts): their offers no longer exist.
+  "/ai/landing/roofing",
+  "/ai/landing/plumbing",
+  "/ai/landing/law",
   // Paid-social landing page for the free-website promotion. Kept out of the
   // index so it can't compete with /local-seo; remove when the promo ends.
   "/free-website",
