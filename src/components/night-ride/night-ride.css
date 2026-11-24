@@ -33,6 +33,9 @@
 .nr .h-display{font-family:var(--display);font-weight:900;text-transform:uppercase;letter-spacing:-.045em;line-height:.9;margin:0;text-wrap:balance}
 .nr .h1{font-size:clamp(44px,7.2vw,104px)}
 .nr .h2{font-size:clamp(36px,5.6vw,76px)}
+.nr .h1.h1-long{font-size:clamp(36px,5.3vw,78px)}
+.nr .h1.h1-long > span{display:block}
+.nr .h1.h1-long > span + span{margin-top:.08em}
 .nr .h3{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:-.035em;line-height:.95;margin:0}
 .nr .grad{background:linear-gradient(90deg,var(--orange) 0%,#ff8a5c 45%,var(--orange-hi) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding-right:.06em}
 .nr .lede{color:#d8d0cc;font-size:clamp(16px,1.4vw,19px);max-width:48ch;margin:0;text-wrap:pretty}
@@ -100,6 +103,14 @@
 .nr .ticks li{display:flex;gap:12px;align-items:flex-start;color:#e3dbd7;font-size:16px}
 .nr .ticks svg{width:18px;height:18px;flex:none;margin-top:4px;color:var(--orange)}
 
+/* outcome quotes right under the hero */
+.nr .proof-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:clamp(32px,4vw,56px)}
+.nr .pq{margin:0;padding:20px 22px;display:flex;flex-direction:column;gap:10px;background:rgba(13,11,10,.82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.nr .pq-top{display:flex;align-items:center;justify-content:space-between}
+.nr .pq p{margin:0;color:#f1e9e5;font-size:16.5px;line-height:1.45;flex:1}
+.nr .pq footer{font-size:13.5px;color:var(--muted)}
+.nr .pq footer b{color:var(--fg);font-weight:600}
+
 /* claim form */
 .nr .claim{padding:clamp(22px,2.6vw,32px);padding-top:calc(clamp(22px,2.6vw,32px) + 18px);border-color:#3a251c;box-shadow:0 0 90px -40px rgba(241,90,41,.75)}
 .nr .claim-top{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#e9e2de;margin-bottom:16px}
@@ -117,6 +128,11 @@
 .nr .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .nr .claim .btn{margin-top:16px;height:54px;font-size:17px}
 .nr .claim .fine{margin:12px 0 0;font-size:13px;color:var(--dim);text-align:center}
+.nr .claim .next{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.nr .claim .next > span{color:var(--orange);font-size:11px}
+.nr .claim .next ol{list-style:none;counter-reset:nx;margin:10px 0 0;padding:0;display:grid;gap:6px;font-size:14px;color:#d8d0cc}
+.nr .claim .next li{counter-increment:nx;display:flex;gap:10px}
+.nr .claim .next li::before{content:counter(nx);flex:none;width:20px;height:20px;border-radius:50%;border:1px solid #5a3222;color:var(--orange-hi);font-size:11px;font-weight:600;display:grid;place-items:center;margin-top:1px}
 .nr .form-error{margin:12px 0 0;padding:10px 12px;border:1px solid #7a2a1c;border-radius:10px;background:#1a0c09;color:#ffb4a2;font-size:14px}
 
 /* section head */
@@ -142,6 +158,8 @@
 .nr .why-item .n{color:var(--orange)}
 .nr .why-item .h3{font-size:20px;margin-top:8px}
 .nr .why-item p{margin:8px 0 0;color:var(--muted);font-size:15.5px}
+.nr .why-item blockquote{margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:14px;line-height:1.5;color:#e3dbd7}
+.nr .why-item cite{display:block;margin-top:6px;font-style:normal;font-size:12.5px;color:var(--dim)}
 .nr .facts{display:grid;grid-template-columns:repeat(3,1fr);width:100%;max-width:760px;margin-inline:auto;border-top:1px solid var(--line);text-align:center}
 .nr .facts > div{padding:16px 0 0;display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:2px}
 .nr .facts span{font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#cfc7c3}
@@ -164,8 +182,17 @@
 .nr .pkg ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14.5px;color:#e3dbd7;flex:1}
 .nr .pkg li{display:flex;gap:10px}
 .nr .pkg li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--orange);margin-top:9px;flex:none}
+.nr .pkg .free span{color:var(--muted);font-weight:500;letter-spacing:.02em;text-transform:none}
 .nr .pkg .free{margin-top:4px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--orange-hi)}
 .nr .note{margin:22px 0 0;color:var(--muted);font-size:15px}
+
+/* what happens, and when */
+.nr .tline{padding:24px;display:flex;flex-direction:column;gap:10px}
+.nr .tline .when{color:var(--orange)}
+.nr .tline .h3{font-size:22px;margin-top:6px}
+.nr .tline p{margin:0;color:var(--muted);font-size:15px;flex:1}
+.nr .tline .yours{margin-top:6px;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;font-weight:600;color:var(--fg);display:flex;flex-direction:column;gap:2px}
+.nr .tline .yours span{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 
 /* steps */
 .nr .step{padding:28px;display:flex;flex-direction:column;gap:12px}
@@ -242,6 +269,7 @@
   .nr .hero-grid{grid-template-columns:1fr}
   .nr .hero-bg{bottom:auto;height:min(100%,860px)}
   .nr .grid-4{grid-template-columns:1fr 1fr}
+  .nr .proof-strip{grid-template-columns:1fr}
   .nr .grid-3,.nr .work{grid-template-columns:1fr 1fr}
   .nr .faq,.nr .book-grid{grid-template-columns:1fr}
   .nr .why-list{grid-template-columns:1fr 1fr}
@@ -255,6 +283,8 @@
   .nr .head{grid-template-columns:1fr}
   .nr .head .lede{justify-self:start}
   .nr .grid-3,.nr .grid-4,.nr .work{grid-template-columns:1fr}
+  .nr .proof-strip{grid-template-columns:1fr;gap:10px}
+  .nr .pq{padding:16px 18px}
   .nr .fields{grid-template-columns:1fr}
   .nr .why-list{grid-template-columns:1fr;text-align:center}
   .nr .person .stamp{display:none}

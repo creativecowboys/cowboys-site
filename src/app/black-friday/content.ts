@@ -28,18 +28,26 @@ export const WHY = [
     {
         title: "We learn your business first",
         body: "Before we build anything, we ask how your business works, who your customers are and what you want more of.",
+        quote: "They wanted to get to know me and my business...",
+        who: "Shana Genenbacher",
     },
     {
         title: "Nothing cookie-cutter",
         body: "Your website and your marketing are made for your trade and your town. We don't drop your logo into a template.",
+        quote: "...they listened to what I wanted for my website and delivered just that.",
+        who: "Shana Genenbacher",
     },
     {
         title: "We treat it like our own",
         body: "We work as a partner in your business. When you call, one of us answers.",
+        quote: "Always responsive when we have a question/issue.",
+        who: "Rob Goldin",
     },
     {
         title: "Clients stay with us",
         body: "99% of the clients we've worked with over the last few years are still with us. Our business is built on their results and their word.",
+        quote: "I am very satisfied with the service I have received from Creative Cowboys and will continue to use them for my website, SEO, and AIO",
+        who: "Kaden VanWey",
     },
 ];
 
@@ -89,10 +97,16 @@ export const PACKAGES = [
     },
 ];
 
-export const STEPS = [
-    { title: "Tell us about your business", body: "Fill in the short form. It takes about a minute." },
-    { title: "Book a quick call", body: "Pick a time for a 15-minute call with Josh. He'll help you choose the package that fits." },
-    { title: "We build your website", body: "We design it and write it. You review it, and we put it live." },
+/**
+ * "What happens, and when": answers how long it takes and how much work it is for the client.
+ * `yours` is the client's part of each step. BUILD_TIME is Josh's figure (confirmed Nov 24 2026).
+ */
+export const BUILD_TIME = "Most sites go live within about two weeks of the call.";
+export const TIMELINE = [
+    { when: "Today", title: "Send the form", body: "Tell us your name, your business and how to reach you.", yours: "About a minute" },
+    { when: "Right after", title: "Talk with Josh", body: "Pick a time on the calendar. Josh asks about your business and helps you choose a package.", yours: "One 15-minute call" },
+    { when: "While we build", title: "We design and write it", body: "We design the site and write every page. You send your logo and a few photos of your work.", yours: "A logo and a few photos" },
+    { when: "Launch", title: "You review it, then it's live", body: `You look it over before anyone else sees it. ${BUILD_TIME}`, yours: "One look to approve it" },
 ];
 
 export const WORK = [
@@ -100,31 +114,25 @@ export const WORK = [
     { img: "shana", name: "Shana Genenbacher", alt: "Shana Genenbacher real estate homepage" },
     { img: "icg", name: "Innovative Construction Group", alt: "Innovative Construction Group homepage" },
     { img: "bremencia", name: "Commercial Insurance Agency", alt: "Commercial Insurance Agency homepage" },
-    { img: "aetheria", name: "Aetheria Wellness", alt: "Aetheria Wellness homepage" },
-    { img: "squirrel", name: "Squirrel Made", alt: "Squirrel Made products homepage" },
+    { img: "blueridge", name: "Blue Ridge Golf Carts", alt: "Blue Ridge Golf Carts homepage" },
+    { img: "soltacos", name: "Sol Tacos & Tequila", alt: "Sol Tacos & Tequila homepage" },
 ];
 
-/** Google reviews, quoted as posted on the Creative Cowboys Google Business Profile. */
-export const REVIEWS = [
-    {
-        who: "Kaden VanWey",
-        quote: "They have completely transformed my marketing, and my phone rings off the hook now! I am very satisfied with the service I have received from Creative Cowboys and will continue to use them for my website, SEO, and AIO",
-    },
-    {
-        who: "Shana Genenbacher",
-        quote: "Josh and Dave are wonderful to work with. They are genuine, down-to-earth and truly care about the work they do. They wanted to get to know me and my business and they listened to what I wanted for my website and delivered just that.",
-    },
-    {
-        who: "Daniel Hooper",
-        quote: "I had very specific needs for my website, and they worked closely with me to build exactly what my company required. It felt like I was the only company in the world and they invested all of their time and resources to me.",
-    },
+/**
+ * Outcome quotes shown right under the hero, so proof is the next thing a visitor sees after the
+ * promise. Each is an excerpt, word for word, from a review on the Creative Cowboys Google profile.
+ */
+export const PROOF = [
+    { who: "Kaden VanWey", quote: "They have completely transformed my marketing, and my phone rings off the hook now!" },
+    { who: "Rob Goldin", quote: "We have been with Josh and his crew for 2 years and have seen GREAT ROI." },
+    { who: "Shana Genenbacher", quote: "Josh and Dave are wonderful to work with. They are genuine, down-to-earth and truly care about the work they do." },
 ];
 export const GOOGLE_RATING = { stars: "5.0", count: 20 };
 
 export const FAQS = [
     {
         q: "Is there a catch?",
-        a: "No. Sign up for any marketing package and we build your website for free. You pay for the package you choose, month to month.",
+        a: "No. Sign up for any marketing package and we build your website for free. You pay for the package, month to month. The site stays live for as long as you're a client.",
     },
     {
         q: "Which packages count?",

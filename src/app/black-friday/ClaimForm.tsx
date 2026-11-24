@@ -108,11 +108,11 @@ export default function ClaimForm({ phoneDisplay, phoneHref }: { phoneDisplay: s
                     <input id="bf-email" name="email" type="email" autoComplete="email" required maxLength={150} />
                 </div>
                 <div className="field">
-                    <label htmlFor="bf-trade">Type of business</label>
+                    <label htmlFor="bf-trade">Type of business <span>(optional)</span></label>
                     <input id="bf-trade" name="trade" type="text" placeholder="Roofing, salon, law firm..." maxLength={100} />
                 </div>
                 <div className="field">
-                    <label htmlFor="bf-site">Current website <span>(if any)</span></label>
+                    <label htmlFor="bf-site">Current website <span>(optional)</span></label>
                     <input id="bf-site" name="current_site" type="text" inputMode="url" placeholder="yourbusiness.com" maxLength={200} />
                 </div>
                 <div className="field full">
@@ -137,8 +137,16 @@ export default function ClaimForm({ phoneDisplay, phoneHref }: { phoneDisplay: s
                 {busy ? "Sending..." : "Claim my free website"} {!busy && <ArrowRight />}
             </button>
             <p className="fine">
-                We&apos;ll call or email you about your website. Prefer to talk now? <a href={phoneHref} style={{ color: "#cfc7c3", textDecoration: "underline" }}>{phoneDisplay}</a>
+                Month to month. No contract. Prefer to talk now? <a href={phoneHref} style={{ color: "#cfc7c3", textDecoration: "underline" }}>{phoneDisplay}</a>
             </p>
+            <div className="next">
+                <span className="mono">WHAT HAPPENS AFTER YOU CLICK</span>
+                <ol>
+                    <li>You pick a time for a 15-minute call with Josh.</li>
+                    <li>We design and write your website.</li>
+                    <li>You review it, then we put it live.</li>
+                </ol>
+            </div>
         </form>
     );
 }

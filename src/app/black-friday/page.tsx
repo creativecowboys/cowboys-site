@@ -6,7 +6,7 @@ import { ArrowRight, Check, Corners, GoogleG, PhoneIcon, Plus, Stars } from "@/c
 import { NAP } from "@/lib/seo";
 import ClaimForm from "./ClaimForm";
 import StickyCta from "./StickyCta";
-import { CREW, CREW_FACTS, FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, REVIEWS, STEPS, WORK, WHY } from "./content";
+import { CREW, CREW_FACTS, FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, PROOF, TIMELINE, WORK, WHY } from "./content";
 
 const PHONE_DISPLAY = NAP.telephoneDisplay;
 const PHONE_HREF = `tel:${NAP.telephone.replace(/[^+\d]/g, "")}`;
@@ -60,16 +60,16 @@ export default function BlackFridayPage() {
                                 <span className="pill hot">Black Friday deal</span>
                                 <span className="pill">Limited spots</span>
                             </div>
-                            <h1 className="h-display h1">
-                                <span className="grad">A free website</span> with any marketing package.
+                            <h1 className="h-display h1 h1-long">
+                                <span>A website that makes you money.</span> <span className="grad">Free with any marketing package.</span>
                             </h1>
                             <p className="lede">
-                                Sign up for any Creative Cowboys marketing package this Black Friday and we design, write and build your website for free.
+                                This Black Friday, sign up for any Creative Cowboys marketing package and we design, write and build your custom website free. Our websites normally start at $997.
                             </p>
                             <ul className="ticks">
-                                <li><Check /> A custom website, built for your business</li>
+                                <li><Check /> Built to turn visitors into calls and customers</li>
+                                <li><Check /> One 15-minute call. We design, write and launch it.</li>
                                 <li><Check /> Month to month. No contract.</li>
-                                <li><Check /> You deal with Josh and Dave directly</li>
                             </ul>
                             <div className="trust">
                                 <GoogleG />
@@ -78,10 +78,21 @@ export default function BlackFridayPage() {
                                 <span className="dotsep" />
                                 <span>{GOOGLE_RATING.count} reviews</span>
                                 <span className="dotsep" />
-                                <span>Villa Rica, Georgia</span>
+                                <span><b>99%</b> of clients stay</span>
                             </div>
                         </div>
                         <ClaimForm phoneDisplay={PHONE_DISPLAY} phoneHref={PHONE_HREF} />
+                    </div>
+
+                    {/* Proof straight after the promise: outcome quotes from Google reviews. */}
+                    <div className="wrap proof-strip">
+                        {PROOF.map((r) => (
+                            <blockquote key={r.who} className="card pq">
+                                <div className="pq-top"><Stars /><GoogleG size={18} /></div>
+                                <p>&ldquo;{r.quote}&rdquo;</p>
+                                <footer><b>{r.who}</b> · Google review</footer>
+                            </blockquote>
+                        ))}
                     </div>
                 </section>
             </div>
@@ -119,6 +130,10 @@ export default function BlackFridayPage() {
                                         <span className="n mono">{pad(i + 1)}</span>
                                         <h3 className="h3">{w.title}</h3>
                                         <p>{w.body}</p>
+                                        <blockquote>
+                                            &ldquo;{w.quote}&rdquo;
+                                            <cite>{w.who}, Google review</cite>
+                                        </blockquote>
                                     </div>
                                 ))}
                             </div>
@@ -142,7 +157,7 @@ export default function BlackFridayPage() {
                                 <span className="eyebrow">What you get</span>
                                 <h2 className="h-display h2">The website is <span className="grad">on us</span>.</h2>
                             </div>
-                            <p className="lede">A real website, built by the same team that builds our paid ones.</p>
+                            <p className="lede">The same custom website we sell from $997. With any marketing package this Black Friday, it costs you $0.</p>
                         </div>
                         <div className="grid-3">
                             {INCLUDED.map((item, i) => (
@@ -150,55 +165,6 @@ export default function BlackFridayPage() {
                                     <span className="n">{pad(i + 1)}</span>
                                     <h3 className="h3">{item.title}</h3>
                                     <p>{item.body}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* PACKAGES */}
-                <section>
-                    <div className="wrap">
-                        <div className="head rv">
-                            <div>
-                                <span className="eyebrow">Pick a package</span>
-                                <h2 className="h-display h2">Any package gets the <span className="grad">free website</span>.</h2>
-                            </div>
-                            <p className="lede">Every package is month to month. Choose the one that fits how you want to bring in customers.</p>
-                        </div>
-                        <div className="grid-4">
-                            {PACKAGES.map((p, i) => (
-                                <div key={p.name} className="card pkg rv" style={{ ["--d" as string]: `${i * 70}ms` }}>
-                                    <h3 className="h3">{p.name}</h3>
-                                    <div className="price">{p.price} <small>{p.unit}</small></div>
-                                    <p>{p.tagline}</p>
-                                    <ul>
-                                        {p.bullets.map((b) => <li key={b}>{b}</li>)}
-                                    </ul>
-                                    <div className="free">+ Free website</div>
-                                </div>
-                            ))}
-                        </div>
-                        <p className="note rv">Not sure which one fits? Pick &quot;Not sure yet&quot; on the form and we&apos;ll go through it with you on the call.</p>
-                    </div>
-                </section>
-
-                {/* HOW IT WORKS */}
-                <section>
-                    <div className="wrap">
-                        <div className="head rv">
-                            <div>
-                                <span className="eyebrow">How it works</span>
-                                <h2 className="h-display h2">Three steps to a <span className="grad">new site</span>.</h2>
-                            </div>
-                            <p className="lede">You fill in a form and take one 15-minute call. We do the building.</p>
-                        </div>
-                        <div className="grid-3">
-                            {STEPS.map((s, i) => (
-                                <div key={s.title} className="card step rv" style={{ ["--d" as string]: `${i * 90}ms` }}>
-                                    <span className="big" aria-hidden="true">{pad(i + 1)}</span>
-                                    <h3 className="h3">{s.title}</h3>
-                                    <p>{s.body}</p>
                                 </div>
                             ))}
                         </div>
@@ -213,7 +179,7 @@ export default function BlackFridayPage() {
                                 <span className="eyebrow">Our work</span>
                                 <h2 className="h-display h2">Sites we&apos;ve <span className="grad">built</span>.</h2>
                             </div>
-                            <p className="lede">A few of the websites we&apos;ve designed and launched for small businesses.</p>
+                            <p className="lede">A few of the websites we&apos;ve designed for small businesses.</p>
                         </div>
                         <div className="work">
                             {WORK.map((w, i) => (
@@ -226,25 +192,53 @@ export default function BlackFridayPage() {
                     </div>
                 </section>
 
-                {/* REVIEWS */}
+                {/* WHAT HAPPENS, AND WHEN: how long it takes and how little the client has to do */}
                 <section>
                     <div className="wrap">
                         <div className="head rv">
                             <div>
-                                <span className="eyebrow">Google reviews</span>
-                                <h2 className="h-display h2">What clients <span className="grad">say</span>.</h2>
+                                <span className="eyebrow">What happens, and when</span>
+                                <h2 className="h-display h2">From this form to a <span className="grad">live website</span>.</h2>
                             </div>
-                            <p className="lede">{GOOGLE_RATING.stars} stars across {GOOGLE_RATING.count} Google reviews.</p>
+                            <p className="lede">Your part is about a minute now and one 15-minute call. We do the building.</p>
                         </div>
-                        <div className="grid-3">
-                            {REVIEWS.map((r, i) => (
-                                <blockquote key={r.who} className="card quote rv" style={{ margin: 0, ["--d" as string]: `${i * 80}ms` }}>
-                                    <div className="quote-top"><Stars /><GoogleG size={22} /></div>
-                                    <p>&quot;{r.quote}&quot;</p>
-                                    <footer><b>{r.who}</b>Google review</footer>
-                                </blockquote>
+                        <div className="grid-4">
+                            {TIMELINE.map((t, i) => (
+                                <div key={t.title} className="card tline rv" style={{ ["--d" as string]: `${i * 80}ms` }}>
+                                    <span className="when mono">{pad(i + 1)} · {t.when.toUpperCase()}</span>
+                                    <h3 className="h3">{t.title}</h3>
+                                    <p>{t.body}</p>
+                                    <div className="yours"><span>Your part</span>{t.yours}</div>
+                                </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                {/* PACKAGES */}
+                <section>
+                    <div className="wrap">
+                        <div className="head rv">
+                            <div>
+                                <span className="eyebrow">Pick a package</span>
+                                <h2 className="h-display h2">Any package gets the <span className="grad">free website</span>.</h2>
+                            </div>
+                            <p className="lede">Every package is month to month, with no contract. {GOOGLE_RATING.stars} stars across {GOOGLE_RATING.count} Google reviews.</p>
+                        </div>
+                        <div className="grid-4">
+                            {PACKAGES.map((p, i) => (
+                                <div key={p.name} className="card pkg rv" style={{ ["--d" as string]: `${i * 70}ms` }}>
+                                    <h3 className="h3">{p.name}</h3>
+                                    <div className="price">{p.price} <small>{p.unit}</small></div>
+                                    <p>{p.tagline}</p>
+                                    <ul>
+                                        {p.bullets.map((b) => <li key={b}>{b}</li>)}
+                                    </ul>
+                                    <div className="free">+ Free website <span>(normally from $997)</span></div>
+                                </div>
+                            ))}
+                        </div>
+                        <p className="note rv">Not sure which one fits? Pick &quot;Not sure yet&quot; on the form and we&apos;ll go through it with you on the call.</p>
                     </div>
                 </section>
 
