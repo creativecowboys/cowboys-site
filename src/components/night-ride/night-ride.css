@@ -174,12 +174,21 @@
 
 /* packages */
 .nr .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.nr .pkgs{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:stretch}
 .nr .pkg{padding:24px;display:flex;flex-direction:column;gap:14px}
+.nr .pkg .pill{align-self:flex-start}
+.nr .pkg.pkg-main{padding:36px 32px 28px;border-color:#6b3420;box-shadow:0 0 90px -40px rgba(241,90,41,.8)}
+.nr .pkg.pkg-main .h3{font-size:32px}
+.nr .pkg.pkg-main .price{font-size:52px}
+.nr .pkg.pkg-main > p{color:#e3dbd7;font-size:16px}
+.nr .pkg.pkg-main ul{font-size:15.5px}
+.nr .pkg .roi{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border:1px solid #4a2c22;border-radius:12px;background:#170c08;color:var(--orange-hi);font-size:15px;font-weight:600}
+.nr .pkg .roi svg{width:18px;height:18px;flex:none;margin-top:2px}
 .nr .pkg .h3{font-size:24px}
 .nr .pkg .price{font-family:var(--display);font-weight:900;font-size:30px;letter-spacing:-.03em;line-height:1}
 .nr .pkg .price small{font-family:var(--body);font-weight:500;font-size:14px;letter-spacing:0;color:var(--muted)}
 .nr .pkg p{margin:0;color:var(--muted);font-size:15px}
-.nr .pkg ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14.5px;color:#e3dbd7;flex:1}
+.nr .pkg ul{list-style:none;margin:0;padding:0;display:grid;align-content:start;gap:8px;font-size:14.5px;color:#e3dbd7;flex:1}
 .nr .pkg li{display:flex;gap:10px}
 .nr .pkg li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--orange);margin-top:9px;flex:none}
 .nr .pkg .free span{color:var(--muted);font-weight:500;letter-spacing:.02em;text-transform:none}
@@ -193,6 +202,23 @@
 .nr .tline p{margin:0;color:var(--muted);font-size:15px;flex:1}
 .nr .tline .yours{margin-top:6px;padding-top:12px;border-top:1px solid var(--line);font-size:14.5px;font-weight:600;color:var(--fg);display:flex;flex-direction:column;gap:2px}
 .nr .tline .yours span{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+/* upright video with a claim button under it, beside the points it makes */
+.nr .vid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);grid-template-areas:"media head" "media points";gap:clamp(20px,3vw,36px) clamp(32px,5vw,80px);align-items:start}
+.nr .vid-head{grid-area:head;display:flex;flex-direction:column;gap:14px;align-self:end}
+.nr .vid-media{grid-area:media;display:flex;flex-direction:column;gap:14px}
+.nr .vid-points{grid-area:points;display:grid;gap:0}
+.nr .vid-point{display:grid;grid-template-columns:48px 1fr;padding:20px 0;border-top:1px solid var(--line)}
+.nr .vid-point .n{color:var(--orange);padding-top:5px}
+.nr .vid-point .h3{font-size:22px}
+.nr .vid-point p{margin:8px 0 0;color:var(--muted);font-size:15.5px;max-width:56ch}
+.nr .player{position:relative;aspect-ratio:9/16;border-radius:var(--r);overflow:hidden;border:1px solid #3a251c;background:#0e0c0b;box-shadow:0 0 90px -40px rgba(241,90,41,.75)}
+.nr .player video{display:block;width:100%;height:100%;object-fit:cover;background:#0e0c0b}
+.nr .player.on > .c{display:none}
+.nr .player .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:12px;padding:12px 20px 12px 12px;border-radius:999px;border:1px solid #6b3420;background:rgba(8,6,5,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--fg);font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;cursor:pointer;transition:transform .2s ease,border-color .2s}
+.nr .player .play:hover{transform:translate(-50%,-50%) scale(1.04);border-color:var(--orange)}
+.nr .player .play i{width:38px;height:38px;border-radius:50%;background:var(--orange);display:grid;place-items:center;box-shadow:0 0 22px rgba(241,90,41,.75)}
+.nr .player .play i::after{content:"";margin-left:3px;border-left:11px solid var(--on-orange);border-top:7px solid transparent;border-bottom:7px solid transparent}
 
 /* steps */
 .nr .step{padding:28px;display:flex;flex-direction:column;gap:12px}
@@ -269,9 +295,14 @@
   .nr .hero-grid{grid-template-columns:1fr}
   .nr .hero-bg{bottom:auto;height:min(100%,860px)}
   .nr .grid-4{grid-template-columns:1fr 1fr}
+  .nr .pkgs{grid-template-columns:1fr 1fr}
+  .nr .pkg-main{grid-column:1 / -1}
   .nr .proof-strip{grid-template-columns:1fr}
   .nr .grid-3,.nr .work{grid-template-columns:1fr 1fr}
   .nr .faq,.nr .book-grid{grid-template-columns:1fr}
+  .nr .vid{grid-template-columns:1fr;grid-template-areas:"head" "media" "points"}
+  .nr .vid-media{width:100%;max-width:340px;margin-inline:auto}
+  .nr .vid-head{align-self:auto}
   .nr .why-list{grid-template-columns:1fr 1fr}
   .nr .faq-side,.nr .book-side{position:static}
   /* Booking step on small screens: get the calendar on screen sooner. */
@@ -282,7 +313,7 @@
   .nr{font-size:16px}
   .nr .head{grid-template-columns:1fr}
   .nr .head .lede{justify-self:start}
-  .nr .grid-3,.nr .grid-4,.nr .work{grid-template-columns:1fr}
+  .nr .grid-3,.nr .grid-4,.nr .work,.nr .pkgs{grid-template-columns:1fr}
   .nr .proof-strip{grid-template-columns:1fr;gap:10px}
   .nr .pq{padding:16px 18px}
   .nr .fields{grid-template-columns:1fr}

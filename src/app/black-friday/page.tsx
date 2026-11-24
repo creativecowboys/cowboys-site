@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import PromoVideo from "@/components/night-ride/PromoVideo";
 import Reveal from "@/components/night-ride/Reveal";
 import { ArrowRight, Check, Corners, GoogleG, PhoneIcon, Plus, Stars } from "@/components/night-ride/icons";
 import { NAP } from "@/lib/seo";
 import ClaimForm from "./ClaimForm";
 import StickyCta from "./StickyCta";
-import { CREW, CREW_FACTS, FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, PROOF, TIMELINE, WORK, WHY } from "./content";
+import { CREW, CREW_FACTS, FAQS, GOOGLE_RATING, INCLUDED, PACKAGES, PROOF, TIMELINE, VIDEO, VIDEO_POINTS, WORK, WHY } from "./content";
 
 const PHONE_DISPLAY = NAP.telephoneDisplay;
 const PHONE_HREF = `tel:${NAP.telephone.replace(/[^+\d]/g, "")}`;
@@ -215,6 +216,33 @@ export default function BlackFridayPage() {
                     </div>
                 </section>
 
+                {/* WHY IT MATTERS: the video sells the marketing package right before the prices.
+                    It ends on "sign up from the link below", so the claim button sits under it. */}
+                <section>
+                    <div className="wrap vid">
+                        <div className="vid-head rv">
+                            <span className="eyebrow">Why it matters</span>
+                            <h2 className="h-display h2">Why the <span className="grad">marketing package</span> matters.</h2>
+                            <p className="lede">Dave explains it in 48 seconds.</p>
+                        </div>
+                        <div className="vid-media rv">
+                            <PromoVideo {...VIDEO} />
+                            <a href="#claim" className="btn btn-primary btn-block">Claim my spot <ArrowRight /></a>
+                        </div>
+                        <div className="vid-points">
+                            {VIDEO_POINTS.map((v, i) => (
+                                <div key={v.title} className="vid-point rv" style={{ ["--d" as string]: `${i * 80}ms` }}>
+                                    <span className="n mono">{pad(i + 1)}</span>
+                                    <div>
+                                        <h3 className="h3">{v.title}</h3>
+                                        <p>{v.body}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
                 {/* PACKAGES */}
                 <section>
                     <div className="wrap">
@@ -223,17 +251,20 @@ export default function BlackFridayPage() {
                                 <span className="eyebrow">Pick a package</span>
                                 <h2 className="h-display h2">Any package gets the <span className="grad">free website</span>.</h2>
                             </div>
-                            <p className="lede">Every package is month to month, with no contract. {GOOGLE_RATING.stars} stars across {GOOGLE_RATING.count} Google reviews.</p>
+                            <p className="lede">Most businesses start with Local Growth. Every package is month to month, with no contract.</p>
                         </div>
-                        <div className="grid-4">
+                        <div className="pkgs">
                             {PACKAGES.map((p, i) => (
-                                <div key={p.name} className="card pkg rv" style={{ ["--d" as string]: `${i * 70}ms` }}>
+                                <div key={p.name} className={`card pkg rv${p.featured ? " pkg-main vf" : ""}`} style={{ ["--d" as string]: `${i * 70}ms` }}>
+                                    {p.featured && <Corners />}
+                                    {p.badge && <span className="pill hot">{p.badge}</span>}
                                     <h3 className="h3">{p.name}</h3>
-                                    <div className="price">{p.price} <small>{p.unit}</small></div>
+                                    <div className="price">{p.price} {p.unit && <small>{p.unit}</small>}</div>
                                     <p>{p.tagline}</p>
                                     <ul>
                                         {p.bullets.map((b) => <li key={b}>{b}</li>)}
                                     </ul>
+                                    {p.note && <p className="roi"><Check /> {p.note}</p>}
                                     <div className="free">+ Free website <span>(normally from $997)</span></div>
                                 </div>
                             ))}

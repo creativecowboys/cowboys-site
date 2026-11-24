@@ -3,7 +3,8 @@
  *
  * The page exists for the Facebook ads Dave recorded on Nov 24 2026, so the offer wording follows
  * what he says on camera. Josh's terms (Nov 24): one page, no minimum term (month to month like
- * every other package), no end date shown, "limited spots" with no number. The lead form posts to
+ * every other package), no end date shown, "limited spots" with no number, and the client keeps
+ * the website even if they cancel after the first month. The lead form posts to
  * /api/contact (email + GoHighLevel), then /black-friday/book shows the Calendly calendar.
  *
  * Package names and prices mirror src/app/pricing/page.tsx. Change them there first.
@@ -66,34 +67,46 @@ export const INCLUDED = [
     { title: "Launched for you", body: "We connect your domain and put the site live. You don't touch any settings." },
 ];
 
+/**
+ * Josh, Nov 24 2026: list only Local Growth, Max Growth and a custom option. Google Ads and Social
+ * Ads are not shown as their own packages for now. Local Growth is the one to sell: the starting
+ * point for a small business that isn't doing any marketing yet. The return line is Josh's claim.
+ */
 export const PACKAGES = [
     {
         name: "Local Growth",
         price: "$297",
         unit: "/mo",
-        tagline: "Get found on Google Maps for what you do, in the town you do it.",
-        bullets: ["Google Business Profile optimized and managed", "Built to rank in the Map Pack", "Reviews handled for you"],
+        featured: true,
+        badge: "Most popular",
+        tagline: "Not doing any marketing yet? Start here. We get your business found on Google Maps for what you do, in the town you do it.",
+        bullets: [
+            "Google Business Profile optimized and managed",
+            "Built to rank in the Map Pack for your service and city",
+            "Reviews handled for you",
+            "A monthly report showing what actually moved",
+        ],
+        note: "Our lowest-priced package, and most clients see a great return on it.",
     },
     {
         name: "Max Growth",
         price: "$1,497",
         unit: "/mo",
+        featured: false,
+        badge: "",
         tagline: "Local Growth turned up, for a wider area and more competition.",
         bullets: ["Everything in Local Growth", "More search terms and more pages", "A bigger content push every month"],
+        note: "",
     },
     {
-        name: "Google Ads",
-        price: "$500",
-        unit: "/mo and up",
-        tagline: "Top of Google when someone is ready to hire. Ad budget included.",
-        bullets: ["Plans at $500, $1,000 or $1,500", "Your ad spend comes out of that price", "Campaign build and daily management"],
-    },
-    {
-        name: "Social Ads",
-        price: "$300",
-        unit: "/mo and up",
-        tagline: "Facebook and Instagram ads that look like your work. Ad budget included.",
-        bullets: ["Plans at $300, $600 or $1,200", "Your ad spend comes out of that price", "Creative, ad copy and daily management"],
+        name: "Custom",
+        price: "Let's talk",
+        unit: "",
+        featured: false,
+        badge: "",
+        tagline: "Need something specific? Tell us what you're after and we'll build a plan around it.",
+        bullets: ["Google Ads and social ads", "Video and photo", "A plan built around your goals"],
+        note: "",
     },
 ];
 
@@ -107,6 +120,32 @@ export const TIMELINE = [
     { when: "Right after", title: "Talk with Josh", body: "Pick a time on the calendar. Josh asks about your business and helps you choose a package.", yours: "One 15-minute call" },
     { when: "While we build", title: "We design and write it", body: "We design the site and write every page. You send your logo and a few photos of your work.", yours: "A logo and a few photos" },
     { when: "Launch", title: "You review it, then it's live", body: `You look it over before anyone else sees it. ${BUILD_TIME}`, yours: "One look to approve it" },
+];
+
+/**
+ * The Black Friday video (Dave on camera, 48 seconds), which also runs as a Facebook ad. It ends on "sign up
+ * from the link below", so the page puts a "Claim my spot" button directly under it. The three
+ * points restate what Dave says in it, for visitors who don't press play.
+ */
+export const VIDEO = {
+    src: "/night-ride/video/bf-why-it-matters.mp4",
+    poster: "/night-ride/video/bf-why-it-matters.jpg",
+    title: "Why the marketing package matters",
+    length: "0:48",
+};
+export const VIDEO_POINTS = [
+    {
+        title: "Customers start on Google",
+        body: "Most people find a local business with a Google search. If you're not in the top three spots in your area, you're invisible to them.",
+    },
+    {
+        title: "Search is changing",
+        body: "More people now ask ChatGPT, Gemini or Siri who's the best near them. AI gives them one or two names.",
+    },
+    {
+        title: "We set you up for both",
+        body: "We build your site, get you ranking on Google and set you up to be the answer AI gives.",
+    },
 ];
 
 export const WORK = [
@@ -132,11 +171,11 @@ export const GOOGLE_RATING = { stars: "5.0", count: 20 };
 export const FAQS = [
     {
         q: "Is there a catch?",
-        a: "No. Sign up for any marketing package and we build your website for free. You pay for the package, month to month. The site stays live for as long as you're a client.",
+        a: "No. Sign up for any marketing package and we build your website for free. You pay for the package, month to month. The website is yours to keep, even if you cancel.",
     },
     {
         q: "Which packages count?",
-        a: "Any of them: Local Growth, Max Growth, Google Ads or Social Ads. If you're not sure which one fits, we'll go through it with you on the call.",
+        a: "Any of them: Local Growth, Max Growth or a custom plan. If you're not sure which one fits, we'll go through it with you on the call.",
     },
     {
         q: "Is there a contract?",
@@ -144,7 +183,7 @@ export const FAQS = [
     },
     {
         q: "What happens to the website if I cancel?",
-        a: "The free website comes with your marketing package, so it stays live for as long as you're a client. If you cancel and want to keep the site, you can buy it from us and take it with you.",
+        a: "You keep it. The deal is a free website with any marketing package, and the website is yours. That holds even if you cancel after your first month.",
     },
     {
         q: "I already have a website. Can I still do this?",
