@@ -566,6 +566,16 @@ export default function HomeClient() {
       {/* Dotted retro printed background layer */}
       <div className="absolute inset-0 h3-dotted-bg pointer-events-none z-0 opacity-80" />
 
+      {/* Black Friday 2026 deal banner. The Facebook ads say "go to creativecowboys.co", so the
+          homepage has to point at the deal page. Remove this block when the deal closes. */}
+      <Link
+        href="/black-friday"
+        className="relative z-40 block w-full bg-[#F15A29] hover:bg-[#ff7a4d] transition-colors text-[#1c0700] text-center font-inter font-bold text-sm md:text-base py-2.5 px-4"
+      >
+        Black Friday: a free website with any marketing package. Limited spots.{" "}
+        <span className="underline underline-offset-2 whitespace-nowrap">Claim yours &rarr;</span>
+      </Link>
+
       {/* Navigation Header */}
       <header className="relative w-full bg-[#0a0a0a] border-b-4 border-[#0a0a0a] py-4 px-6 md:px-12 z-40">
         <div className="w-full flex justify-between items-center">
