@@ -1,0 +1,61 @@
+/*
+ * Night Ride proposal dialog. Self-contained (own colours and type) because it renders outside
+ * the page wrapper, so it can be dropped onto any page as that page moves to the new look.
+ */
+.nr-dialog{
+  --bg:#050404; --surface:#0d0b0a; --line:#2a2220; --fg:#f7f3f1; --muted:#a89e99; --dim:#6f6662;
+  --orange:#F15A29; --orange-hi:#FFB089; --orange-deep:#c8461d; --on-orange:#1c0700;
+  position:fixed; inset:0; z-index:200; display:grid; place-items:center; padding:16px;
+  background:rgba(5,4,4,.78); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  color:var(--fg); font-family:var(--font-inter-sans),Inter,system-ui,sans-serif; font-size:16px; line-height:1.55;
+  overflow-y:auto; animation:nr-dialog-in .22s ease;
+}
+@keyframes nr-dialog-in{from{opacity:0}to{opacity:1}}
+.nr-dialog *,.nr-dialog *::before,.nr-dialog *::after{box-sizing:border-box}
+.nr-dialog-box{position:relative; width:100%; max-width:880px; margin:auto; padding:clamp(26px,4vw,44px); border-radius:20px; border:1px solid #3a251c;
+  background:radial-gradient(ellipse 80% 55% at 75% 115%,rgba(241,90,41,.2),transparent 70%),var(--surface); box-shadow:0 0 120px -40px rgba(241,90,41,.8),0 40px 80px -40px #000}
+.nr-dialog-box > .c{position:absolute; width:20px; height:20px; border:0 solid var(--orange); pointer-events:none}
+.nr-dialog-box > .tl{top:14px; left:14px; border-top-width:2px; border-left-width:2px}
+.nr-dialog-box > .tr{top:14px; right:14px; border-top-width:2px; border-right-width:2px}
+.nr-dialog-box > .bl{bottom:14px; left:14px; border-bottom-width:2px; border-left-width:2px}
+.nr-dialog-box > .br{bottom:14px; right:14px; border-bottom-width:2px; border-right-width:2px}
+.nr-dialog-x{position:absolute; top:22px; right:22px; z-index:2; width:36px; height:36px; border-radius:50%; border:1px solid #3a3330; background:#0a0807; color:var(--fg); display:grid; place-items:center; cursor:pointer; transition:background .2s,border-color .2s}
+.nr-dialog-x:hover{background:var(--orange); border-color:var(--orange); color:var(--on-orange)}
+.nr-dialog-x svg{width:14px; height:14px}
+.nr-dialog-grid{display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:clamp(24px,3.4vw,44px); align-items:start}
+.nr-dialog-eyebrow{display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:var(--orange)}
+.nr-dialog-eyebrow svg{width:16px; height:16px}
+.nr-dialog h2{margin:14px 0 0; font-family:var(--font-inter-tight),"Arial Narrow",Arial,sans-serif; font-weight:900; font-size:clamp(30px,4vw,44px); line-height:.92; letter-spacing:-.04em; text-transform:uppercase; text-wrap:balance}
+.nr-dialog-side p,.nr-dialog-done p{margin:14px 0 0; color:#d8d0cc}
+.nr-dialog-next{margin-top:22px; padding-top:18px; border-top:1px solid var(--line)}
+.nr-dialog-next > span{font-family:var(--font-jetbrains-mono),ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--orange)}
+.nr-dialog-next ol{list-style:none; counter-reset:nd; margin:12px 0 0; padding:0; display:grid; gap:10px; font-size:14.5px; color:#d8d0cc}
+.nr-dialog-next li{counter-increment:nd; display:flex; gap:10px}
+.nr-dialog-next li::before{content:counter(nd); flex:none; width:22px; height:22px; border-radius:50%; border:1px solid #5a3222; color:var(--orange-hi); font-size:11px; font-weight:600; display:grid; place-items:center; margin-top:1px}
+.nr-dialog-fields{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.nr-dialog-fields label{display:flex; flex-direction:column; gap:6px; min-width:0; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:#cfc7c3}
+.nr-dialog-fields label.full{grid-column:1 / -1}
+.nr-dialog-fields em{font-style:normal; font-weight:500; letter-spacing:.04em; text-transform:none; color:var(--dim)}
+.nr-dialog-fields input,.nr-dialog-fields select,.nr-dialog-fields textarea{width:100%; min-width:0; padding:0 14px; height:48px; border-radius:10px; border:1px solid #33302e; background:#0a0807; color:var(--fg); font-family:inherit; font-size:16px; font-weight:400; letter-spacing:0; text-transform:none; appearance:none; -webkit-appearance:none; transition:border-color .2s,box-shadow .2s}
+.nr-dialog-fields textarea{height:auto; padding:12px 14px; resize:vertical; min-height:84px}
+.nr-dialog-fields select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23a89e99' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px}
+.nr-dialog-fields input:focus,.nr-dialog-fields select:focus,.nr-dialog-fields textarea:focus{outline:none; border-color:var(--orange); box-shadow:0 0 0 3px rgba(241,90,41,.2)}
+.nr-dialog-hp{position:absolute !important; left:-9999px; width:1px; height:1px; opacity:0}
+.nr-dialog-btn{margin-top:16px; width:100%; height:54px; display:inline-flex; align-items:center; justify-content:center; gap:10px; border:0; border-radius:12px; cursor:pointer; font-family:inherit; font-size:17px; font-weight:600;
+  background:linear-gradient(90deg,var(--orange-deep),#ff9566); color:var(--on-orange); box-shadow:0 0 32px -6px rgba(241,90,41,.85),inset 0 1px 0 rgba(255,255,255,.28); transition:transform .2s ease,box-shadow .2s ease}
+.nr-dialog-btn:hover{transform:translateY(-2px); box-shadow:0 0 44px -4px rgba(241,90,41,.95),inset 0 1px 0 rgba(255,255,255,.3)}
+.nr-dialog-btn[disabled]{opacity:.7; cursor:progress; transform:none}
+.nr-dialog-btn svg{width:16px; height:16px}
+.nr-dialog-error{margin:12px 0 0; padding:10px 12px; border:1px solid #7a2a1c; border-radius:10px; background:#1a0c09; color:#ffb4a2; font-size:14px}
+.nr-dialog-done{max-width:520px; padding-block:12px}
+.nr-dialog-done .nr-dialog-btn{width:auto; padding:0 28px; margin-top:24px}
+.nr-dialog :focus-visible{outline:2px solid var(--orange); outline-offset:3px}
+@media (max-width:760px){
+  .nr-dialog{padding:10px; place-items:start center}
+  .nr-dialog-grid{grid-template-columns:1fr}
+  .nr-dialog-next{display:none}
+  .nr-dialog-fields{grid-template-columns:1fr}
+  .nr-dialog-box{padding:26px 20px 24px}
+}
+@media (prefers-reduced-motion:reduce){ .nr-dialog{animation:none} .nr-dialog-btn{transition:none} }
+body.nr-dialog-open chat-widget{display:none !important}

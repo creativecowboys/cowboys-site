@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import HomeClient from "@/components/HomeClient";
+import HomeEffects from "@/components/night-ride/HomeEffects";
+import HomeNightRide from "@/components/night-ride/HomeNightRide";
 import { CHAT_WIDGET } from "@/lib/chat-widget";
 
 export const metadata: Metadata = {
   title: "Creative Cowboys — No-Fluff Digital Marketing Agency for the Southeast",
   description:
-    "Creative Cowboys is a West Georgia digital marketing agency. Custom web design, local SEO, PPC, and brand strategy, wrapped in a vintage indie-brutalist style.",
+    "Creative Cowboys builds websites, runs local SEO and manages Google and Facebook ads for small businesses across the Southeast. Based in Villa Rica, Georgia. Free proposal.",
   alternates: {
     canonical: "https://www.creativecowboys.co",
   },
   openGraph: {
     title: "Creative Cowboys — No-Fluff Digital Marketing Agency for the Southeast",
     description:
-      "Creative Cowboys is a West Georgia digital marketing agency. Custom web design, local SEO, PPC, and brand strategy, wrapped in a vintage indie-brutalist style.",
+      "Creative Cowboys builds websites, runs local SEO and manages Google and Facebook ads for small businesses across the Southeast. Based in Villa Rica, Georgia. Free proposal.",
     url: "https://www.creativecowboys.co",
     siteName: "Creative Cowboys",
     type: "website",
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <HomeClient />
+      <HomeNightRide />
+      <HomeEffects />
       {/* GHL chat widget (A2P SMS opt-in). Server-rendered so the tag is in the page HTML. */}
       <script
         id={CHAT_WIDGET.id}
