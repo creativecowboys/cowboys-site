@@ -23,24 +23,42 @@ export type ClientVideo = {
   src: string; poster: string; title: string; length: string; upright: boolean;
   who: string; business: string; quote: string; points: string[]; note?: string;
 };
-export const CLIENT_VIDEOS: ClientVideo[] = [
-  {
-    src: "/night-ride/video/shana-genenbacher.mp4",
-    poster: "/night-ride/video/shana-genenbacher.jpg",
-    title: "Shana Genenbacher on working with Creative Cowboys",
-    length: "0:38",
-    upright: true,
-    who: "Shana Genenbacher",
-    business: "Realtor · Prattville, AL",
-    quote: "They made me feel like I was a real person. I wasn't just a number.",
-    points: [
-      "\u201cMy first impression of the new website was that I loved it.\u201d",
-      "\u201cI did a lot of research, probably nine months worth of research. I interviewed multiple companies.\u201d",
-      "\u201c...definitely give them a call, check them out, you won't regret it.\u201d",
-    ],
-    note: "Shana is a client. She recorded this in exchange for a free video shoot day.",
-  },
-];
+export const VIDEO_SHANA: ClientVideo = {
+  src: "/night-ride/video/shana-genenbacher.mp4",
+  poster: "/night-ride/video/shana-genenbacher.jpg",
+  title: "Shana Genenbacher on working with Creative Cowboys",
+  length: "0:38",
+  upright: true,
+  who: "Shana Genenbacher",
+  business: "Realtor · Prattville, AL",
+  quote: "They made me feel like I was a real person. I wasn't just a number.",
+  points: [
+    "\u201cMy first impression of the new website was that I loved it.\u201d",
+    "\u201cI did a lot of research, probably nine months worth of research. I interviewed multiple companies.\u201d",
+    "\u201c...definitely give them a call, check them out, you won't regret it.\u201d",
+  ],
+  note: "Shana is a client. She recorded this in exchange for a free video shoot day.",
+};
+
+/** Victor talks about the church website, so he is on the web design page. Words are from the video. */
+export const VIDEO_VICTOR: ClientVideo = {
+  src: "/night-ride/video/victor-james.mp4",
+  poster: "/night-ride/video/victor-james.jpg",
+  title: "Victor James of Chapel Hill Church on the new church website",
+  length: "0:44",
+  upright: false,
+  who: "Victor James",
+  business: "Creative Pastor · Chapel Hill Church",
+  quote: "I think this is the best website we've ever had with the church, ever.",
+  points: [
+    "\u201cIt is fast, it looks phenomenal, it looks professional.\u201d",
+    "\u201c...you built a site, I think a landing page overnight, and it was so much better than the old website.\u201d",
+    "\u201c...yesterday I just looked it up and we're already in the top three.\u201d",
+  ],
+};
+
+/** The videos shown on the homepage. */
+export const CLIENT_VIDEOS: ClientVideo[] = [VIDEO_SHANA];
 
 /** `yours` is the client's part of each step. The two-week build time is Josh's figure. */
 export const TIMELINE = [
