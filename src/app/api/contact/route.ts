@@ -1,6 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { pushWebsiteFormToGHL } from "@/lib/ghl-website-form";
+import { sendSignupConfirmation } from "@/lib/website-signup-email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -142,7 +143,12 @@ export async function POST(request: NextRequest) {
       message: typeof message === "string" ? message : undefined, service: typeof service === "string" ? service : undefined,
       industry: typeof industry === "string" ? industry : undefined, source: typeof source === "string" ? source : undefined,
     };
-    after(() => pushWebsiteFormToGHL(lead).then(() => undefined));
+    after(async () => {
+      await Promise.all([
+        pushWebsiteFormToGHL(lead),
+        sendSignupConfirmation(resend, { name, email, source }),
+      ]);
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {
