@@ -4,6 +4,8 @@ import { nightRideFonts } from "./fonts";
 import { CLIENT_VIDEOS, GOOGLE_RATING, PACKAGES, PROOF, TIMELINE } from "./home-content";
 import { ArrowRight, Check, Corners, GoogleG, Stars } from "./icons";
 import PromoVideo from "./PromoVideo";
+import { ReviewsMarquee, WorkGrid } from "./Proof";
+import { NrBanner, NrFooter, NrNav, NrSprite } from "./Shell";
 import "./home.css";
 
 /**
@@ -18,31 +20,11 @@ const pad = (n: number) => String(n).padStart(2, "0");
 export default function HomeNightRide() {
   return (
     <div className={`nr-home ${nightRideFonts}`} id="top">
-      {/* Black Friday 2026 deal banner. The Facebook ads say "go to creativecowboys.co", so the
-          homepage has to point at the deal page. Remove this block when the deal closes. */}
-      <Link href="/black-friday" className="bf-banner">
-        Black Friday: a free website with any marketing package. Limited spots. <span>Claim yours &rarr;</span>
-      </Link>
+      <NrBanner />
 
-      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
-        <symbol id="star" viewBox="0 0 24 24"><rect x="1.5" y="4.5" width="21" height="15" rx="3" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M12 7.6l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4z" fill="currentColor"/></symbol>
-        <symbol id="arr" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></symbol>
-        <symbol id="arrup" viewBox="0 0 16 16"><path d="M5 11l6-6M6 5h5v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></symbol>
-        <symbol id="plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></symbol>
-        <symbol id="phone" viewBox="0 0 16 16"><path d="M5.2 2.5l1.6 3-1.2 1.2a8 8 0 0 0 3.7 3.7l1.2-1.2 3 1.6-.6 2.4c-5.5.4-10.4-4.5-10-10z" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></symbol>
-      </svg>
+      <NrSprite />
 
-      <header className="nav">
-        <div className="wrap">
-          <div className="nav-in">
-            <Link className="nav-logo" href="/" aria-label="Creative Cowboys home"><Image src="/night-ride/logo-white.png" alt="Creative Cowboys" width={158} height={30} /></Link>
-            <nav className="nav-links" aria-label="Main">
-              <a href="#crew">Crew</a><a href="#services">Services</a><a href="#work">Work</a><a href="#results">Results</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a>
-            </nav>
-            <a className="btn btn-primary" href="#start"><span>Free Proposal</span><svg><use href="#arr"/></svg></a>
-          </div>
-        </div>
-      </header>
+      <NrNav home />
 
       <main id="top">
         {/* HERO */}
@@ -285,62 +267,7 @@ export default function HomeNightRide() {
               </div>
               <p className="lede">Custom builds for venues, realtors, builders, insurers and other local businesses. Fast, mobile-first and set up for local search from day one.</p>
             </div>
-            <div className="work">
-              <a className="card proj" href="https://thegroveatdefoorfarm.com" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>thegroveatdefoorfarm.com</span></div><Image src="/night-ride/work/grove.jpg" alt="The Grove at DeFoor Farm homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 01</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">The Grove at DeFoor Farm</h3>
-                  <p>Wedding and event venue · West Georgia</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Video hero</span><span className="pill plain">Local SEO</span></div>
-                </div>
-              </a>
-              <a className="card proj" href="https://shanagenenbacher.com" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>shanagenenbacher.com</span></div><Image src="/night-ride/work/shana.jpg" alt="Shana Genenbacher real estate homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 02</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">Shana Genenbacher</h3>
-                  <p>Realtor, KW Montgomery · Prattville, AL</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Live MLS search</span><span className="pill plain">CRM</span></div>
-                </div>
-              </a>
-              <a className="card proj" href="https://blueridge.creativecowboys.co" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>blueridge.creativecowboys.co</span></div><Image src="/night-ride/work/blueridge.jpg" alt="Blue Ridge Golf Carts homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 03</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">Blue Ridge Golf Carts</h3>
-                  <p>Golf cart sales and service · Travelers Rest, SC</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Online parts store</span><span className="pill plain">Cart builder</span></div>
-                </div>
-              </a>
-              <a className="card proj" href="https://innovativeconstructiongroup.com" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>innovativeconstructiongroup.com</span></div><Image src="/night-ride/work/icg.jpg" alt="Innovative Construction Group homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 04</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">Innovative Construction Group</h3>
-                  <p>Custom home builder · West Georgia and East Alabama</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Project portfolio</span><span className="pill plain">SEO articles</span></div>
-                </div>
-              </a>
-              <a className="card proj" href="https://bremencia.com" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>bremencia.com</span></div><Image src="/night-ride/work/bremencia.jpg" alt="Commercial Insurance Agency homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 05</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">Commercial Insurance Agency</h3>
-                  <p>Independent insurance · Bremen, GA</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Quote funnel</span><span className="pill plain">AI chat</span></div>
-                </div>
-              </a>
-              <a className="card proj" href="https://www.harmonicproduction.co" target="_blank" rel="noopener">
-                <div className="shot"><div className="bar"><i></i><i></i><i></i><span>harmonicproduction.co</span></div><Image src="/night-ride/work/harmonic.jpg" alt="Harmonic Production homepage" loading="lazy" width={1200} height={750} /></div>
-                <div className="proj-body">
-                  <div className="card-top"><span className="tag"><svg><use href="#star"/></svg>No. 06</span><span className="arrow"><svg><use href="#arrup"/></svg></span></div>
-                  <h3 className="h3">Harmonic Production</h3>
-                  <p>Audio visual and concert production · Cleveland, TN</p>
-                  <div className="pills"><span className="pill plain">Web design</span><span className="pill plain">Local SEO</span><span className="pill plain">Project portfolio</span></div>
-                </div>
-              </a>
-            </div>
+            <WorkGrid />
             <div className="center-cta btn-row" style={{ justifyContent: "center" }}>
               <Link className="btn btn-ghost" href="/results">See all work <svg><use href="#arr"/></svg></Link>
               <a className="btn btn-primary" href="#start">Start a website project</a>
@@ -438,22 +365,7 @@ export default function HomeNightRide() {
               <p className="lede">About the work, the response time and the results. Word for word from our Google reviews.</p>
             </div>
           </div>
-          <div className="marquee">
-            <div className="track">
-                <article className="card quote"><div className="qm">“</div><p>They have completely transformed my marketing, and my phone rings off the hook now! I am very satisfied with the service I have received from Creative Cowboys and will continue to use them for my website, SEO, and AIO</p><div className="who"><span className="avatar logo fill"><Image src="/night-ride/reviews/arctic-law.png" alt="" width={96} height={96} /></span><div><b>Kaden VanWey</b><span>Arctic Law Alaska · Wasilla, AK</span></div></div></article>
-                <article className="card quote"><div className="qm">“</div><p>Top notch service! We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question/issue. Highly recommend.</p><div className="who"><span className="avatar logo light"><Image src="/night-ride/reviews/cia.png" alt="" width={96} height={96} /></span><div><b>Rob Goldin</b><span>Commercial Insurance Agency · Bremen, GA</span></div></div></article>
-                <article className="card quote"><div className="qm">“</div><p>Josh and Dave are wonderful to work with. They are genuine, down-to-earth and truly care about the work they do. They wanted to get to know me and my business and they listened to what I wanted for my website and delivered just that.</p><div className="who"><span className="avatar logo pad-s"><Image src="/night-ride/reviews/shana.png" alt="" width={96} height={96} /></span><div><b>Shana Genenbacher</b><span>Realtor · Prattville, AL</span></div></div></article>
-                <article className="card quote"><div className="qm">“</div><p>Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime.</p><div className="who"><span className="avatar logo pad"><Image src="/night-ride/reviews/harmonic.png" alt="" width={240} height={93} /></span><div><b>Ryan Coffey</b><span>Harmonic Production · Cleveland, TN</span></div></div></article>
-                <article className="card quote"><div className="qm">“</div><p>I had very specific needs for my website, and they worked closely with me to build exactly what my company required. It felt like I was the only company in the world and they invested all of their time and resources to me. Because of this, we are seeing fresh growth in our company.</p><div className="who"><span className="avatar">DH</span><div><b>Daniel Hooper</b><span>Google review</span></div></div></article>
-                <article className="card quote"><div className="qm">“</div><p>Creative Cowboys Media knows exactly what they’re doing! They get the job done right and it shows in the projects that they get their hands on.</p><div className="who"><span className="avatar">AM</span><div><b>Alexandra McKinley</b><span>Google review</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>They have completely transformed my marketing, and my phone rings off the hook now! I am very satisfied with the service I have received from Creative Cowboys and will continue to use them for my website, SEO, and AIO</p><div className="who"><span className="avatar logo fill"><Image src="/night-ride/reviews/arctic-law.png" alt="" width={96} height={96} /></span><div><b>Kaden VanWey</b><span>Arctic Law Alaska · Wasilla, AK</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>Top notch service! We have been with Josh and his crew for 2 years and have seen GREAT ROI. Always responsive when we have a question/issue. Highly recommend.</p><div className="who"><span className="avatar logo light"><Image src="/night-ride/reviews/cia.png" alt="" width={96} height={96} /></span><div><b>Rob Goldin</b><span>Commercial Insurance Agency · Bremen, GA</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>Josh and Dave are wonderful to work with. They are genuine, down-to-earth and truly care about the work they do. They wanted to get to know me and my business and they listened to what I wanted for my website and delivered just that.</p><div className="who"><span className="avatar logo pad-s"><Image src="/night-ride/reviews/shana.png" alt="" width={96} height={96} /></span><div><b>Shana Genenbacher</b><span>Realtor · Prattville, AL</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>Creative Cowboys provided us with a complete rehaul of our website and optimized our SEO which has provided our company with an almost 300% increase in customer engagement with a 200% customer retention. Cowboys always responded quickly to updates and needs with zero downtime.</p><div className="who"><span className="avatar logo pad"><Image src="/night-ride/reviews/harmonic.png" alt="" width={240} height={93} /></span><div><b>Ryan Coffey</b><span>Harmonic Production · Cleveland, TN</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>I had very specific needs for my website, and they worked closely with me to build exactly what my company required. It felt like I was the only company in the world and they invested all of their time and resources to me. Because of this, we are seeing fresh growth in our company.</p><div className="who"><span className="avatar">DH</span><div><b>Daniel Hooper</b><span>Google review</span></div></div></article>
-                <article className="card quote" aria-hidden="true"><div className="qm">“</div><p>Creative Cowboys Media knows exactly what they’re doing! They get the job done right and it shows in the projects that they get their hands on.</p><div className="who"><span className="avatar">AM</span><div><b>Alexandra McKinley</b><span>Google review</span></div></div></article>
-              </div>
-          </div>
+          <ReviewsMarquee />
         </section>
 
         {/* FAQ */}
@@ -477,37 +389,7 @@ export default function HomeNightRide() {
         </section>
       </main>
 
-      <footer>
-        <div className="wrap">
-          <div className="foot-grid">
-            <div>
-              <Image src="/night-ride/logo-white.png" alt="Creative Cowboys" width={190} height={36} style={{ height: "36px", width: "auto", marginBottom: "18px" }} />
-              <p>Websites, SEO and ads for local businesses across the Southeast. Built in Villa Rica, Georgia.</p>
-              <a className="btn btn-primary" href="#start" style={{ padding: "12px 18px", fontSize: "15px" }}>Get a free proposal <svg><use href="#arr"/></svg></a>
-              <div className="socials"><a className="pill plain" href="https://www.facebook.com/creativecowboys" target="_blank" rel="noopener">Facebook</a><a className="pill plain" href="https://www.instagram.com/creativecowboysmedia" target="_blank" rel="noopener">Instagram</a></div>
-            </div>
-            <div>
-                <h4 className="eyebrow"><svg><use href="#star"/></svg>Navigate</h4>
-                <ul><li><Link href="/results">Results</Link></li><li><Link href="/pricing">Pricing</Link></li><li><Link href="/blog">Blog</Link></li><li><Link href="/about">About</Link></li><li><Link href="/contact">Contact</Link></li></ul>
-              </div>
-            <div>
-                <h4 className="eyebrow"><svg><use href="#star"/></svg>Services</h4>
-                <ul><li><Link href="/web-design">Web design</Link></li><li><Link href="/seo">Local SEO</Link></li><li><Link href="/ppc">Google Ads</Link></li><li><Link href="/social-media-ads">Social media ads</Link></li><li><Link href="/brand-strategy">Brand strategy</Link></li><li><Link href="/media-creation">Media creation</Link></li></ul>
-              </div>
-            <div>
-              <h4 className="eyebrow"><svg><use href="#star"/></svg>Contact</h4>
-              <dl className="contact" style={{ margin: "0" }}>
-                <dt>Email</dt><dd><a href="mailto:howdy@creativecowboys.co">howdy@creativecowboys.co</a></dd>
-                <dt>Phone</dt><dd><a href="tel:+14702437517">(470) 243-7517</a></dd>
-                <dt>Hours</dt><dd>Mon–Fri, 9 AM–5 PM</dd>
-                <dt>Based in</dt><dd>Villa Rica, Georgia</dd>
-              </dl>
-            </div>
-          </div>
-          <div className="wordmark" aria-hidden="true"><span className="wm-fit"><span>C</span>owboys</span></div>
-          <div className="legal"><span>© 2026 Creative Cowboys</span><nav><Link href="/privacy-policy">Privacy</Link><Link href="/legal/terms-of-service">Terms</Link><Link href="/sms-terms">SMS terms</Link><a className="arrow" href="#top" aria-label="Back to top"><svg style={{ transform: "rotate(-90deg)" }}><use href="#arr"/></svg></a></nav></div>
-        </div>
-      </footer>
+      <NrFooter />
     </div>
   );
 }
