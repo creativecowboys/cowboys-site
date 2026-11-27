@@ -101,7 +101,6 @@
 .nr-home .clip figcaption b{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:-.02em;font-size:18px;line-height:1.15}
 .nr-home .clip figcaption span{font-size:12.5px;color:var(--muted)}
 .nr-home .reel-label{margin-top:28px;min-height:var(--vf-size);align-items:center;display:flex;justify-content:space-between;gap:12px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#e9e2de}
-.nr-home .reel-label span:last-child{color:var(--dim)}
 .nr-home .head{display:grid;grid-template-columns:1.4fr 1fr;gap:28px 48px;align-items:end;margin-bottom:56px}
 .nr-home .head .h2{margin-top:16px}
 .nr-home .head .lede{justify-self:end}
@@ -262,7 +261,7 @@
 .nr-home .reel,.nr-home .final{--vf-inset:12px;--vf-size:18px}
 .nr-home .reel{padding:calc(var(--vf-inset) + var(--vf-size) + 26px) 22px calc(var(--vf-inset) + 4px)}
 .nr-home .reel-top{left:calc(var(--vf-inset) + var(--vf-size) + 10px);right:calc(var(--vf-inset) + var(--vf-size) + 10px);justify-content:flex-start}
-.nr-home .reel-top>span:last-child:not(.rec),.nr-home .reel-label>span:last-child{display:none}
+.nr-home .reel-top>span:last-child:not(.rec){display:none}
 .nr-home .reel-label{margin-top:22px;padding-inline:calc(var(--vf-size) - 4px);letter-spacing:.12em;font-size:11px}
 .nr-home .final{padding-inline:22px}
 .nr-home .final .reel-top{left:calc(var(--vf-inset) + var(--vf-size) + 10px);right:calc(var(--vf-inset) + var(--vf-size) + 10px)}

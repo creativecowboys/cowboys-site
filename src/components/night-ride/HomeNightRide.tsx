@@ -88,7 +88,7 @@ export default function HomeNightRide() {
                   <figcaption><b>LEUCO Tools</b><span>Tooling store · Villa Rica, GA</span></figcaption>
                 </figure>
               </div>
-              <div className="reel-label"><span>Real client sites, recorded live</span><span>Hover to roll the tape</span></div>
+              <div className="reel-label"><span>Real client sites, recorded live</span></div>
             </div>
           </div>
         </section>
