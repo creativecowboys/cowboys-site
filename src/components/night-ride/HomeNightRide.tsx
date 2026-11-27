@@ -67,7 +67,7 @@ export default function HomeNightRide() {
 
             <div className="reel vf" aria-label="Recent client websites">
               <span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-              <div className="reel-top mono"><span className="rec"><i></i><span id="reel-status">STANDBY · HOVER A SITE TO PLAY</span></span><span>33.73°N 84.92°W</span></div>
+              <div className="reel-top mono"><span className="rec"><span id="reel-status">HOVER A SITE TO PLAY</span></span></div>
               <div className="reel-grid">
                 <figure className="clip" tabIndex={0} data-name="Stemma Brewing">
                   <div className="shot"><div className="bar"><i></i><i></i><i></i><span>stemma-brewing.vercel.app</span></div>

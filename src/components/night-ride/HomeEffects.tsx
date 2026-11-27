@@ -35,7 +35,7 @@ export default function HomeEffects() {
     const status = root.querySelector<HTMLElement>("#reel-status");
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const idle = canHover ? "STANDBY · HOVER A SITE TO PLAY" : "STANDBY · SCROLL TO PLAY";
+    const idle = canHover ? "HOVER A SITE TO PLAY" : "SCROLL TO PLAY";
     const setStatus = (t: string) => { if (status) status.textContent = t; };
     if (!canHover) setStatus(idle);
     const label = (clip: HTMLElement, t: string) => { const n = clip.querySelector(".play")?.lastChild; if (n) n.textContent = t; };

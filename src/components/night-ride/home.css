@@ -263,7 +263,7 @@
 .nr-home .reel,.nr-home .final{--vf-inset:12px;--vf-size:18px}
 .nr-home .reel{padding:calc(var(--vf-inset) + var(--vf-size) + 26px) 22px calc(var(--vf-inset) + 4px)}
 .nr-home .reel-top{left:calc(var(--vf-inset) + var(--vf-size) + 10px);right:calc(var(--vf-inset) + var(--vf-size) + 10px);justify-content:flex-start}
-.nr-home .reel-top>span:last-child,.nr-home .reel-label>span:last-child{display:none}
+.nr-home .reel-top>span:last-child:not(.rec),.nr-home .reel-label>span:last-child{display:none}
 .nr-home .reel-label{margin-top:22px;padding-inline:calc(var(--vf-size) - 4px);letter-spacing:.12em;font-size:11px}
 .nr-home .final{padding-inline:22px}
 .nr-home .final .reel-top{left:calc(var(--vf-inset) + var(--vf-size) + 10px);right:calc(var(--vf-inset) + var(--vf-size) + 10px)}
