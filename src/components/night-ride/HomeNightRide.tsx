@@ -158,6 +158,7 @@ export default function HomeNightRide() {
                   </div>
                   <div className="story-media">
                     <PromoVideo src={v.src} poster={v.poster} title={v.title} length={v.length} wide={!v.upright} />
+                    {v.place && <p className="story-note"><b>{v.who}</b> · {v.place}</p>}
                     {v.note && <p className="story-note">{v.note}</p>}
                   </div>
                   <div className="story-body">

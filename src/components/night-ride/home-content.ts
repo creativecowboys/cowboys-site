@@ -16,12 +16,12 @@ export const PROOF = [
 /**
  * Client testimonial videos. Add an entry when a finished file is in public/night-ride/video/.
  * With one video the section shows it beside its quote; with more it becomes a grid.
- * `quote` and `points` must be the client's own words from the video. `note` discloses anything
- * the client received in connection with the testimonial.
+ * `quote` and `points` must be the client's own words from the video. `place` is shown under
+ * the video with the client's name. `note` is an optional extra line under the video.
  */
 export type ClientVideo = {
   src: string; poster: string; title: string; length: string; upright: boolean;
-  who: string; business: string; quote: string; points: string[]; note?: string;
+  who: string; business: string; place?: string; quote: string; points: string[]; note?: string;
 };
 export const CLIENT_VIDEOS: ClientVideo[] = [
   {
@@ -38,7 +38,7 @@ export const CLIENT_VIDEOS: ClientVideo[] = [
       "\u201cI did a lot of research, probably nine months worth of research. I interviewed multiple companies.\u201d",
       "\u201c...definitely give them a call, check them out, you won't regret it.\u201d",
     ],
-    note: "Shana is a client. She recorded this in exchange for a free video shoot day.",
+    place: "Prattville, AL",
   },
 ];
 
