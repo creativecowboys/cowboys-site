@@ -502,7 +502,7 @@ export default function HomeNightRide() {
               </dl>
             </div>
           </div>
-          <div className="wordmark" aria-hidden="true"><span className="wm-fit"><span>C</span>reative <span>C</span>owboys</span></div>
+          <div className="wordmark" aria-hidden="true"><span className="wm-fit">Creative Cowboys</span></div>
           <div className="legal"><span>© 2026 Creative Cowboys</span><span className="credit">Designed &amp; built by <Image src="/night-ride/logo-white.png" alt="Creative Cowboys" width={600} height={114} /></span><nav><Link href="/privacy-policy">Privacy</Link><Link href="/legal/terms-of-service">Terms</Link><Link href="/sms-terms">SMS terms</Link><a className="arrow" href="#top" aria-label="Back to top"><svg style={{ transform: "rotate(-90deg)" }}><use href="#arr"/></svg></a></nav></div>
         </div>
       </footer>
