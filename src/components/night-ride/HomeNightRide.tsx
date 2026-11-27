@@ -414,7 +414,7 @@ export default function HomeNightRide() {
             <div className="final card vf">
               <div className="beam" aria-hidden="true"></div>
               <span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-              <div className="reel-top mono"><span className="rec"><i></i>OPEN · MON–FRI 9–5</span><span>VILLA RICA, GA</span></div>
+              <div className="reel-top mono"><span className="rec">OPEN · MON–FRI 9–5</span><span>VILLA RICA, GA</span></div>
               <span className="eyebrow"><svg><use href="#star"/></svg>Saddle up</span>
               <h2 className="h-display h2">Your business deserves to <span className="grad">get found.</span></h2>
               <p className="lede">Tell us about your business. We look at your website, your Google profile and your top competitors, then send back a plan with clear prices.</p>
@@ -504,8 +504,8 @@ export default function HomeNightRide() {
               </dl>
             </div>
           </div>
-          <div className="wordmark" aria-hidden="true"><span className="wm-fit"><span>C</span>owboys</span></div>
-          <div className="legal"><span>© 2026 Creative Cowboys</span><nav><Link href="/privacy-policy">Privacy</Link><Link href="/legal/terms-of-service">Terms</Link><Link href="/sms-terms">SMS terms</Link><a className="arrow" href="#top" aria-label="Back to top"><svg style={{ transform: "rotate(-90deg)" }}><use href="#arr"/></svg></a></nav></div>
+          <div className="wordmark" aria-hidden="true"><span className="wm-fit"><span>C</span>reative <span>C</span>owboys</span></div>
+          <div className="legal"><span>© 2026 Creative Cowboys</span><span className="credit">Designed &amp; built by <Image src="/night-ride/logo-white.png" alt="Creative Cowboys" width={600} height={114} /></span><nav><Link href="/privacy-policy">Privacy</Link><Link href="/legal/terms-of-service">Terms</Link><Link href="/sms-terms">SMS terms</Link><a className="arrow" href="#top" aria-label="Back to top"><svg style={{ transform: "rotate(-90deg)" }}><use href="#arr"/></svg></a></nav></div>
         </div>
       </footer>
     </div>
