@@ -122,7 +122,7 @@ const city: CityData = {
     answer: f.a,
   })),
   footerBlurb:
-    "We're Josh and Dave — headquartered right here in Villa Rica, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.",
+    "We're Dave and Josh — headquartered right here in Villa Rica, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.",
   footerLocation: "Villa Rica, GA · Our Home Base",
   otherCities: [
     { label: "Carrollton", href: "/digital-marketing-carrollton-ga" },

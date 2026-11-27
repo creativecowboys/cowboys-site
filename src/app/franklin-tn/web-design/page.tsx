@@ -1649,7 +1649,7 @@ export default function WebDesignFranklinPage() {
           <div className="md:col-span-5 flex flex-col gap-6 text-left">
             <h3 className="font-h3-display text-3xl uppercase tracking-widest text-h3-yellow">HOWDY PARTNER</h3>
             <p className="font-h3-secondary text-sm text-h3-cream/70 leading-relaxed max-w-sm">
-              We're Josh and Dave — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
+              We're Dave and Josh — serving Franklin and Williamson County, TN. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
             </p>
 
             <div className="flex flex-col gap-3 font-bold text-sm tracking-wider uppercase">

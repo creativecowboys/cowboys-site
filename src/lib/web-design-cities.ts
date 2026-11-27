@@ -41,7 +41,7 @@ export const carrolltonWebDesign: WebDesignCity = {
   paragraphs: [
     "Carrollton is the Carroll County seat, and it is a crowded small-business market. The University of West Georgia puts more than 9,000 students in town. Tanner Health System is one of the region's largest employers. Downtown still draws people to Adamson Square. A website that could belong to any Georgia city will not hold up next to that.",
     "We build the site around how Carrollton customers actually look. A contractor covering East Carrollton and Lake Carroll needs those places named. A shop in the Maple Street district needs a page that sounds like Maple Street, not a stock welcome line. A clinic or professional firm near the university and Tanner needs a clear next step, because a lot of that traffic is on a phone between appointments.",
-    `You work with Josh and Dave — the people doing the work — not a salesperson who hands the project off. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} Local SEO is a separate plan: Local Growth is $297 a month, month to month, and does not include the website.`,
+    `You work with Dave and Josh — the people doing the work — not a salesperson who hands the project off. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} Local SEO is a separate plan: Local Growth is $297 a month, month to month, and does not include the website.`,
   ],
   includes: [
     {
@@ -118,7 +118,7 @@ export const villaRicaWebDesign: WebDesignCity = {
   paragraphs: [
     "Villa Rica sits on I-20 between Atlanta and Carrollton, straddling the Carroll and Douglas County line. New rooftops keep showing up around Mirror Lake and Fairfield Plantation. Shops and restaurants around historic downtown and The Mill serve a different customer than the contractors and professional firms along Highway 61 and Interstate West. Those buyers do not type the same search.",
     "A Villa Rica website has to say which of those places you actually cover. Downtown and The Mill are not the same job as Gold City, Pine Mountain, Temple, or Winston. We write pages for the neighborhoods you serve and leave off the ones you do not. We are a short drive from a lot of the businesses on this page, so you can sit down with us instead of onboarding through a ticket queue.",
-    `Josh and Dave do the work. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} If you want the Google Business Profile worked as well, Local Growth is $297 a month, month to month. That plan does not include the website.`,
+    `Dave and Josh do the work. Custom websites start at $997, one time, and you own the site. Hosting, maintenance and updates start at $30 a month. ${CARE} If you want the Google Business Profile worked as well, Local Growth is $297 a month, month to month. That plan does not include the website.`,
   ],
   includes: [
     {

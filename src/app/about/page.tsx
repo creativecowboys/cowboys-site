@@ -218,7 +218,7 @@ export default function AboutPage() {
               </h1>
 
               <p className="font-inter text-base md:text-lg text-[#0a0a0a]/80 max-w-2xl leading-relaxed">
-                We&rsquo;re Josh and Dave. Creative Cowboys started in Villa Rica, Georgia, building
+                We&rsquo;re Dave and Josh. Creative Cowboys started in Villa Rica, Georgia, building
                 websites and running ads for the kind of businesses that keep a small town
                 running — contractors, attorneys, plumbers, manufacturers, pool builders.
                 These days we work with businesses across the Southeast, and we&rsquo;re opening

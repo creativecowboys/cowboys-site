@@ -316,7 +316,7 @@ export default function EntryForm({ phase, instagramUrl }: { phase: Phase; insta
                         </button>
                     </form>
                     <div className="text-center text-[12.5px] text-[#5a5a5a] px-7 pb-6">
-                        Your entry goes straight to Josh and Dave. We&rsquo;ll confirm by email within a few
+                        Your entry goes straight to Dave and Josh. We&rsquo;ll confirm by email within a few
                         minutes.
                     </div>
                 </>

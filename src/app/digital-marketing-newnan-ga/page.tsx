@@ -122,7 +122,7 @@ const city: CityData = {
     answer: f.a,
   })),
   footerBlurb:
-    "We're Josh and Dave — serving Newnan and Coweta County, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.",
+    "We're Dave and Josh — serving Newnan and Coweta County, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.",
   footerLocation: "Villa Rica, GA · Serving Newnan",
   otherCities: [
     { label: "Villa Rica", href: "/digital-marketing-villa-rica-ga" },

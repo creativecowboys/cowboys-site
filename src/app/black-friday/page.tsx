@@ -104,7 +104,7 @@ export default function BlackFridayPage() {
                     <div className="wrap why">
                         <div className="why-head rv">
                             <span className="eyebrow">Who you&apos;ll work with</span>
-                            <h2 className="h-display h2">Meet <span className="grad">Josh and Dave</span>.</h2>
+                            <h2 className="h-display h2">Meet <span className="grad">Dave and Josh</span>.</h2>
                             <p className="lede">
                                 We run Creative Cowboys out of Villa Rica, Georgia. The people you meet on the first call are the people who build your site and run your marketing.
                             </p>
@@ -115,7 +115,6 @@ export default function BlackFridayPage() {
                                     <div className="photo vf">
                                         <Corners />
                                         <Image src={`/night-ride/team/${c.img}.jpg`} alt={c.alt} width={800} height={1000} sizes="(max-width: 1020px) 50vw, 300px" />
-                                        <span className="stamp mono">NO. {pad(i + 1)} · VILLA RICA</span>
                                     </div>
                                     <figcaption>
                                         <h3 className="h3">{c.name}</h3>

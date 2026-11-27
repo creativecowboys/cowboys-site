@@ -61,7 +61,7 @@ export default function HomeNightRide() {
                   <a className="btn btn-primary" href="#start">Get a free proposal <svg><use href="#arr"/></svg></a>
                   <a className="btn btn-ghost" href="#work">See our work</a>
                 </div>
-                <div className="trust"><span className="grate"><GoogleG size={16} /><Stars /><b>{GOOGLE_RATING.stars}</b> on Google</span><span className="dotsep"></span><span><b>99%</b> of clients stay</span><span className="dotsep"></span><a href="#crew" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}><span className="faces"><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /></span>Dave &amp; Josh, Villa Rica GA</a></div>
+                <div className="trust"><span className="grate"><GoogleG size={16} /><Stars /><b>{GOOGLE_RATING.stars}</b> on Google</span><span className="dotsep"></span><span><b>99%</b> of clients stay</span><span className="dotsep"></span><a href="#crew" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}><span className="faces"><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /></span>Josh &amp; Dave, Villa Rica GA</a></div>
               </div>
             </div>
 
@@ -206,11 +206,11 @@ export default function HomeNightRide() {
             <div className="crew-copy">
               <span className="eyebrow"><svg><use href="#star"/></svg>The crew</span>
               <h2 className="h-display h2">Two cowboys.<br /><span className="grad">No call center.</span></h2>
-              <p className="lede">Creative Cowboys is Josh and Dave, working out of Villa Rica, Georgia. The people you meet on the first call are the people who build your site and run your ads.</p>
+              <p className="lede">Creative Cowboys is Dave and Josh, working out of Villa Rica, Georgia. The people you meet on the first call are the people who build your site and run your ads.</p>
               <div className="crew-facts">
                 <div><span>Based in</span><b>Villa Rica, GA</b></div>
                 <div><span>Client retention</span><b>99%</b></div>
-                <div><span>Who answers the phone</span><b>Dave or Josh</b></div>
+                <div><span>Who answers the phone</span><b>Josh or Dave</b></div>
               </div>
               <div className="btn-row"><a className="btn btn-primary" href="#start">Talk to the crew <svg><use href="#arr"/></svg></a></div>
             </div>
@@ -421,7 +421,7 @@ export default function HomeNightRide() {
                 <button type="button" className="btn btn-primary" data-proposal="home_final_cta">Get my free proposal <svg><use href="#arr"/></svg></button>
                 <a className="btn btn-ghost" href="tel:+14702437517"><svg><use href="#phone"/></svg>(470) 243-7517</a>
               </div>
-              <div className="trust"><span className="faces"><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /></span><span>Talk to Josh or Dave, not a call center</span><span className="dotsep"></span><a href="mailto:howdy@creativecowboys.co">howdy@creativecowboys.co</a></div>
+              <div className="trust"><span className="faces"><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /></span><span>Talk to Dave or Josh, not a call center</span><span className="dotsep"></span><a href="mailto:howdy@creativecowboys.co">howdy@creativecowboys.co</a></div>
             </div>
           </div>
         </section>

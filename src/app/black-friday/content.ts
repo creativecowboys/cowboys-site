@@ -22,7 +22,7 @@ export const LEAD_KEY = "cc_bf_lead";
  */
 export const CREW = [
     { img: "josh", name: "Josh", role: "Websites, SEO and ads.", alt: "Josh, smiling, in a black Creative Cowboys cap and T-shirt" },
-    { img: "dave", name: "Dave", role: "Clients and strategy.", alt: "Dave, smiling, in a white Creative Cowboys T-shirt" },
+    { img: "dave", name: "Dave", role: "Websites, clients and strategy.", alt: "Dave, smiling, in a white Creative Cowboys T-shirt" },
 ];
 
 export const WHY = [

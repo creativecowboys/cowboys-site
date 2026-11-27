@@ -690,7 +690,7 @@ export default function CarrolltonClient() {
           <div className="md:col-span-5 flex flex-col gap-6">
             <h3 className="font-anton text-3xl uppercase tracking-widest text-[#F5C842]">HOWDY PARTNER</h3>
             <p className="font-inter text-sm text-[#F2EBDA]/70 leading-relaxed max-w-sm">
-              We&apos;re Josh and Dave — serving Carrollton and Carroll County, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
+              We&apos;re Dave and Josh — serving Carrollton and Carroll County, GA. No vanity metrics. Just high-converting websites, fast code, and SEO built to make your phone ring.
             </p>
             <div className="flex flex-col gap-3 font-bold text-sm tracking-wider uppercase">
               <div className="flex items-center gap-3"><Clock size={16} className="text-[#F5C842]" /><span>Mon - Fri: 9:00 AM - 5:00 PM</span></div>

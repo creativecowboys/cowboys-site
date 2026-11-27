@@ -60,7 +60,7 @@ export default function OfferVideo({
                         <Play size={26} fill="currentColor" />
                     </span>
                     <span className="font-anton text-[#F2EBDA] text-xl tracking-[1px] uppercase">
-                        A quick word from Josh &amp; Dave
+                        A quick word from Dave &amp; Josh
                     </span>
                     <span className="font-inter text-[#F2EBDA]/60 text-sm">Video coming soon</span>
                 </div>
