@@ -217,13 +217,13 @@ export default function HomeNightRide() {
             <div className="crew-cards">
               <figure className="card person">
                 <div className="photo vf"><span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-                  <Image src="/night-ride/team/dave.jpg" alt="Dave, smiling, in a white Creative Cowboys T-shirt" width={800} height={1000} loading="lazy" /></div>
-                <figcaption><h3 className="h3">Dave</h3><p>Websites, clients and strategy.</p></figcaption>
+                  <Image src="/night-ride/team/josh.jpg" alt="Josh, smiling, in a black Creative Cowboys cap and T-shirt" width={800} height={1000} loading="lazy" /></div>
+                <figcaption><h3 className="h3">Josh</h3><p>Websites, SEO and ads.</p></figcaption>
               </figure>
               <figure className="card person">
                 <div className="photo vf"><span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-                  <Image src="/night-ride/team/josh.jpg" alt="Josh, smiling, in a black Creative Cowboys cap and T-shirt" width={800} height={1000} loading="lazy" /></div>
-                <figcaption><h3 className="h3">Josh</h3><p>Websites, SEO and ads.</p></figcaption>
+                  <Image src="/night-ride/team/dave.jpg" alt="Dave, smiling, in a white Creative Cowboys T-shirt" width={800} height={1000} loading="lazy" /></div>
+                <figcaption><h3 className="h3">Dave</h3><p>Websites, clients and strategy.</p></figcaption>
               </figure>
             </div>
           </div>
