@@ -61,7 +61,7 @@ export default function HomeNightRide() {
                   <a className="btn btn-primary" href="#start">Get a free proposal <svg><use href="#arr"/></svg></a>
                   <a className="btn btn-ghost" href="#work">See our work</a>
                 </div>
-                <div className="trust"><span className="grate"><GoogleG size={16} /><Stars /><b>{GOOGLE_RATING.stars}</b> on Google</span><span className="dotsep"></span><span><b>99%</b> of clients stay</span><span className="dotsep"></span><a href="#crew" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}><span className="faces"><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /></span>Josh &amp; Dave, Villa Rica GA</a></div>
+                <div className="trust"><span className="grate"><GoogleG size={16} /><Stars /><b>{GOOGLE_RATING.stars}</b> on Google</span><span className="dotsep"></span><span><b>99%</b> of clients stay</span><span className="dotsep"></span><a href="#crew" style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}><span className="faces"><Image src="/night-ride/team/dave-face.jpg" alt="" width={30} height={30} /><Image src="/night-ride/team/josh-face.jpg" alt="" width={30} height={30} /></span>Dave &amp; Josh, Villa Rica GA</a></div>
               </div>
             </div>
 
@@ -209,22 +209,20 @@ export default function HomeNightRide() {
               <div className="crew-facts">
                 <div><span>Based in</span><b>Villa Rica, GA</b></div>
                 <div><span>Client retention</span><b>99%</b></div>
-                <div><span>Who answers the phone</span><b>Josh or Dave</b></div>
+                <div><span>Who answers the phone</span><b>Dave or Josh</b></div>
               </div>
               <div className="btn-row"><a className="btn btn-primary" href="#start">Talk to the crew <svg><use href="#arr"/></svg></a></div>
             </div>
             <div className="crew-cards">
               <figure className="card person">
                 <div className="photo vf"><span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-                  <Image src="/night-ride/team/josh.jpg" alt="Josh, smiling, in a black Creative Cowboys cap and T-shirt" width={800} height={1000} loading="lazy" />
-                  <span className="stamp mono">NO. 01 · VILLA RICA</span></div>
-                <figcaption><h3 className="h3">Josh</h3><p>Websites, SEO and ads.</p></figcaption>
+                  <Image src="/night-ride/team/dave.jpg" alt="Dave, smiling, in a white Creative Cowboys T-shirt" width={800} height={1000} loading="lazy" /></div>
+                <figcaption><h3 className="h3">Dave</h3><p>Websites, clients and strategy.</p></figcaption>
               </figure>
               <figure className="card person">
                 <div className="photo vf"><span className="c tl"></span><span className="c tr"></span><span className="c bl"></span><span className="c br"></span>
-                  <Image src="/night-ride/team/dave.jpg" alt="Dave, smiling, in a white Creative Cowboys T-shirt" width={800} height={1000} loading="lazy" />
-                  <span className="stamp mono">NO. 02 · VILLA RICA</span></div>
-                <figcaption><h3 className="h3">Dave</h3><p>Clients and strategy.</p></figcaption>
+                  <Image src="/night-ride/team/josh.jpg" alt="Josh, smiling, in a black Creative Cowboys cap and T-shirt" width={800} height={1000} loading="lazy" /></div>
+                <figcaption><h3 className="h3">Josh</h3><p>Websites, SEO and ads.</p></figcaption>
               </figure>
             </div>
           </div>

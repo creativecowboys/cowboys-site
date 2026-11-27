@@ -134,7 +134,6 @@
 .nr-home .person .vf>.bl,.nr-home .person .vf>.br{bottom:12px}
 .nr-home .person .vf>.tl,.nr-home .person .vf>.bl{left:12px}
 .nr-home .person .vf>.tr,.nr-home .person .vf>.br{right:12px}
-.nr-home .person .stamp{position:absolute;left:46px;bottom:15px;z-index:2;color:#f1e9e5;font-size:11px}
 .nr-home .person figcaption{padding:0 10px;display:flex;flex-direction:column;gap:6px}
 .nr-home .person .h3{font-size:clamp(28px,2.6vw,38px)}
 .nr-home .person p{margin:0;color:var(--muted);font-size:15px}
@@ -259,7 +258,6 @@
 .nr-home .hero-foot,.nr-home .head,.nr-home .results,.nr-home .faq,.nr-home .crew{grid-template-columns:1fr}
 .nr-home .crew-cards{gap:12px}
 .nr-home .person:nth-child(2){margin-top:28px}
-.nr-home .person .stamp{display:none}
 .nr-home .hero-cta{align-items:flex-start}
 .nr-home .head .lede{justify-self:start}
 .nr-home .reel,.nr-home .final{--vf-inset:12px;--vf-size:18px}
